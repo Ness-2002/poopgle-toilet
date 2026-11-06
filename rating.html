@@ -335,7 +335,7 @@
                             </g>
 
                             <!-- =============================================================== -->
-                            <!-- DYNAMIC LAYER 4: LIGHTING OVERLAY                              -->
+                            <!-- DYNAMIC LAYER 4: LIGHTING OVERLAY                               -->
                             <!-- =============================================================== -->
                             <rect id="lightingDarkOverlay" x="0" y="0" width="896" height="1092" fill="#090D16" opacity="0.05" class="pointer-events-none transition-opacity duration-300" />
                         </g>
@@ -734,6 +734,43 @@
             localStorage.removeItem('poogle_shared_evaluations_v1');
             indexedDB.deleteDatabase('TaiwanPublicToiletEvalDB_v7');
         } catch (e) {}
+
+        // ===================================================================
+        // 👤 頭貼系統設定 (對應 ./img/pfp/：登入免費 3 款 & 匿名未登入隨機 3 款)
+        // ===================================================================
+        const DEFAULT_LOGGED_IN_PFP = 'free_toilet';
+        const FREE_LOGGED_IN_PFP_LIST = ['free_toilet', 'free_squat', 'free_urinal'];
+        const ANONYMOUS_PFP_LIST = ['anonymous_1', 'anonymous_2', 'anonymous_3'];
+
+        function normalizeLoggedInAvatarType(avatarType) {
+            const legacyMap = {
+                'red_toilet': 'free_toilet',
+                'blue_squat': 'free_squat',
+                'yellow_urinal': 'free_urinal',
+                'default_poop': 'free_toilet',
+                'pink_poop': 'free_toilet'
+            };
+            const mapped = legacyMap[avatarType] || avatarType;
+            if (FREE_LOGGED_IN_PFP_LIST.includes(mapped)) return mapped;
+            if (typeof mapped === 'string' && mapped.trim() !== '' && !ANONYMOUS_PFP_LIST.includes(mapped)) {
+                return mapped.trim();
+            }
+            return DEFAULT_LOGGED_IN_PFP;
+        }
+
+        function getRandomAnonymousPfpKey() {
+            try {
+                const savedAnon = sessionStorage.getItem('poogle_anon_pfp');
+                if (savedAnon && ANONYMOUS_PFP_LIST.includes(savedAnon)) {
+                    return savedAnon;
+                }
+            } catch (e) {}
+            const picked = ANONYMOUS_PFP_LIST[Math.floor(Math.random() * ANONYMOUS_PFP_LIST.length)];
+            try {
+                sessionStorage.setItem('poogle_anon_pfp', picked);
+            } catch (e) {}
+            return picked;
+        }
 
         const MAP_IDB_NAME = 'TaiwanPublicToiletMapDB_v9';
         const MAP_IDB_STORE = 'dataset_cache';
@@ -1217,11 +1254,13 @@
                 if (user) {
                     state.currentUser = user;
                     try {
+                        const rawSavedAvatar = localStorage.getItem(`poogle_avatar_${user.uid}`) || DEFAULT_LOGGED_IN_PFP;
                         localStorage.setItem('poogle_auth_user', JSON.stringify({
                             uid: user.uid,
                             displayName: user.displayName || '評鑑員',
                             email: user.email || '',
-                            photoURL: user.photoURL || ''
+                            photoURL: user.photoURL || '',
+                            avatarType: normalizeLoggedInAvatarType(rawSavedAvatar)
                         }));
                     } catch (e) {}
                     subscribeLoggedInUserEvaluations(user.uid);
@@ -1828,25 +1867,25 @@
                     const userId = (currentUser && currentUser.uid) ? currentUser.uid : null;
                     const userPhoto = (currentUser && currentUser.photoURL) ? currentUser.photoURL : null;
 
-                    // 決定評論顯示的頭貼：已登入使用使用者選擇的頭貼（預設 red_toilet），匿名則隨機三選一底色 + 深藍便便 icon
-                    const ANON_COLORS = ['#FF99D3', '#80E4FF', '#F3EF84'];
-                    let avatarType = 'red_toilet';
-                    let anonBgColor = null;
+                    // 決定評論顯示的頭貼：已登入使用使用者選擇的頭貼（預設 free_toilet），匿名則使用隨機三選一匿名頭貼 (anonymous_1 ~ 3)
+                    let avatarType = DEFAULT_LOGGED_IN_PFP;
+                    let anonPfp = null;
                     if (userId) {
                         try {
-                            avatarType = localStorage.getItem(`poogle_avatar_${userId}`) || currentUser.avatarType || 'red_toilet';
+                            const rawLocalAvatar = localStorage.getItem(`poogle_avatar_${userId}`) || currentUser.avatarType || DEFAULT_LOGGED_IN_PFP;
+                            avatarType = normalizeLoggedInAvatarType(rawLocalAvatar);
                         } catch (e) {}
                         if (db) {
                             try {
                                 const profDoc = await db.collection('user_profiles').doc(userId).get();
                                 if (profDoc.exists && profDoc.data()?.avatarType) {
-                                    avatarType = profDoc.data().avatarType;
+                                    avatarType = normalizeLoggedInAvatarType(profDoc.data().avatarType);
                                 }
                             } catch (e) {}
                         }
                     } else {
-                        avatarType = 'anon_poop';
-                        anonBgColor = ANON_COLORS[Math.floor(Math.random() * ANON_COLORS.length)];
+                        anonPfp = getRandomAnonymousPfpKey();
+                        avatarType = anonPfp;
                     }
 
                     // 若已登入且曾經評鑑過同一間公廁，強制使用原有的 evalId / docId 覆蓋更新舊評鑑，不新增新紀錄
@@ -1865,7 +1904,7 @@
                         userId,
                         userPhoto,
                         avatarType,
-                        anonBgColor,
+                        anonPfp,
                         cardBackground: state.selectedBgId || 'bg_classic',
                         stars: avgStars,
                         ratings: { ...state.ratings },
@@ -1890,7 +1929,7 @@
                                 userId,
                                 displayName: nickname,
                                 email: (currentUser && currentUser.email) ? currentUser.email : (pData.email || ''),
-                                avatarType: pData.avatarType || avatarType || 'red_toilet',
+                                avatarType: normalizeLoggedInAvatarType(pData.avatarType || avatarType || DEFAULT_LOGGED_IN_PFP),
                                 meritPoints: Math.max(0, currentMerit + 1),
                                 totalReports: Math.max(0, currentTotalReports + 1),
                                 _rawEvalCount: Math.max(0, currentRawEval + 1),

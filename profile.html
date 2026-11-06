@@ -106,9 +106,9 @@
             <div class="flex flex-col items-center shrink-0 w-[260px]">
                 <!-- Avatar Circle (No shadow; shows white photo icon on hover during edit mode) -->
                 <div id="profileAvatarBtn"
-                     class="w-[168px] h-[168px] sm:w-[184px] sm:h-[184px] rounded-full border-2 border-[#1E2270] overflow-hidden bg-[#990F1B] relative group transition-transform">
+                     class="w-[168px] h-[168px] sm:w-[184px] sm:h-[184px] rounded-full border-2 border-[#1E2270] overflow-hidden bg-[#FCF6E8] relative group transition-transform">
                     <div id="profileAvatarSvgContainer" class="w-full h-full">
-                        <!-- Dynamically rendered SVG avatar -->
+                        <!-- Dynamically rendered PFP image -->
                     </div>
                     <!-- Edit Mode Hover Overlay with White Photo Icon -->
                     <div id="avatarEditHoverOverlay"
@@ -439,151 +439,44 @@
             localStorage.removeItem('poogle_custom_profile_v1');
         } catch (e) {}
 
-        // 三款免費頭貼清單
+        // ===================================================================
+        // 👤 頭貼系統設定 (對應 ./img/pfp/ 內的免費三款頭貼，預設為 free_toilet)
+        // ===================================================================
+        const DEFAULT_LOGGED_IN_PFP = 'free_toilet';
+        const FREE_LOGGED_IN_PFP_LIST = ['free_toilet', 'free_squat', 'free_urinal'];
+
         const AVATAR_PRESETS = [
-            { id: 'red_toilet', name: '紅色背景馬桶' },
-            { id: 'yellow_urinal', name: '黃色背景小便斗' },
-            { id: 'blue_squat', name: '藍色背景蹲式馬桶' }
+            { id: 'free_toilet', name: '坐式馬桶' },
+            { id: 'free_squat', name: '蹲式馬桶' },
+            { id: 'free_urinal', name: '小便斗' }
         ];
 
+        function normalizeLoggedInAvatarType(avatarType) {
+            const legacyMap = {
+                'red_toilet': 'free_toilet',
+                'blue_squat': 'free_squat',
+                'yellow_urinal': 'free_urinal',
+                'default_poop': 'free_toilet',
+                'pink_poop': 'free_toilet'
+            };
+            const mapped = legacyMap[avatarType] || avatarType;
+            if (FREE_LOGGED_IN_PFP_LIST.includes(mapped)) return mapped;
+            if (typeof mapped === 'string' && mapped.trim() !== '') return mapped.trim();
+            return DEFAULT_LOGGED_IN_PFP;
+        }
+
+        function getFallbackPfpSvgDataUri() {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104"><circle cx="52" cy="52" r="52" fill="#2A348C"/><path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="#FF99D3"/></svg>`;
+            return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+        }
+
         function getPoogleAvatarSvg(avatarType, uidSuffix = 'main') {
-            if (avatarType === 'yellow_urinal') {
-                return `
-                    <svg viewBox="0 0 200 200" class="w-full h-full block">
-                        <defs>
-                            <radialGradient id="yellowTile_${uidSuffix}" cx="50%" cy="45%" r="58%">
-                                <stop offset="0%" stop-color="#FFF152" />
-                                <stop offset="70%" stop-color="#E5B80B" />
-                                <stop offset="100%" stop-color="#9E7400" />
-                            </radialGradient>
-                            <linearGradient id="urinalBody_${uidSuffix}" x1="15%" y1="0%" x2="85%" y2="100%">
-                                <stop offset="0%" stop-color="#FFFFFF" />
-                                <stop offset="60%" stop-color="#E2E2E2" />
-                                <stop offset="100%" stop-color="#B0B0B0" />
-                            </linearGradient>
-                        </defs>
-                        <rect x="0" y="0" width="200" height="200" fill="url(#yellowTile_${uidSuffix})" />
-                        <g stroke="#B88600" stroke-width="1.4" opacity="0.45">
-                            <line x1="25" y1="0" x2="25" y2="132" /><line x1="50" y1="0" x2="50" y2="132" />
-                            <line x1="75" y1="0" x2="75" y2="132" /><line x1="100" y1="0" x2="100" y2="132" />
-                            <line x1="125" y1="0" x2="125" y2="132" /><line x1="150" y1="0" x2="150" y2="132" />
-                            <line x1="175" y1="0" x2="175" y2="132" />
-                            <line x1="0" y1="22" x2="200" y2="22" /><line x1="0" y1="44" x2="200" y2="44" />
-                            <line x1="0" y1="66" x2="200" y2="66" /><line x1="0" y1="88" x2="200" y2="88" />
-                            <line x1="0" y1="110" x2="200" y2="110" /><line x1="0" y1="132" x2="200" y2="132" />
-                            <line x1="0" y1="152" x2="200" y2="152" /><line x1="0" y1="174" x2="200" y2="174" />
-                            <line x1="0" y1="196" x2="200" y2="196" />
-                            <line x1="25" y1="132" x2="-10" y2="200" /><line x1="50" y1="132" x2="25" y2="200" />
-                            <line x1="75" y1="132" x2="65" y2="200" /><line x1="100" y1="132" x2="100" y2="200" />
-                            <line x1="125" y1="132" x2="135" y2="200" /><line x1="150" y1="132" x2="175" y2="200" />
-                            <line x1="175" y1="132" x2="210" y2="200" />
-                        </g>
-                        <ellipse cx="100" cy="176" rx="34" ry="10" fill="#593E00" opacity="0.4" />
-                        <!-- Flush Pipe & Valve -->
-                        <rect x="95" y="34" width="10" height="22" rx="3" fill="#D4D4D8" stroke="#71717A" stroke-width="1.5" />
-                        <rect x="86" y="38" width="28" height="8" rx="4" fill="#E4E4E7" stroke="#71717A" stroke-width="1.5" />
-                        <!-- Urinal Outer Porcelain Body -->
-                        <path d="M 68,54 C 68,46 132,46 132,54 L 138,118 C 140,152 120,170 100,170 C 80,170 60,152 62,118 Z" fill="url(#urinalBody_${uidSuffix})" />
-                        <!-- Urinal Inner Basin -->
-                        <path d="M 77,64 C 77,57 123,57 123,64 L 127,116 C 128,140 114,153 100,153 C 86,153 72,140 73,116 Z" fill="#BCBCBC" />
-                        <ellipse cx="100" cy="138" rx="14" ry="7" fill="#8C8C8C" />
-                    </svg>
-                `;
-            }
-            if (avatarType === 'blue_squat') {
-                return `
-                    <svg viewBox="0 0 200 200" class="w-full h-full block">
-                        <defs>
-                            <radialGradient id="blueTile_${uidSuffix}" cx="50%" cy="45%" r="58%">
-                                <stop offset="0%" stop-color="#52C4FF" />
-                                <stop offset="70%" stop-color="#1479C9" />
-                                <stop offset="100%" stop-color="#083B6B" />
-                            </radialGradient>
-                            <linearGradient id="squatGrad_${uidSuffix}" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFFFFF" />
-                                <stop offset="65%" stop-color="#DFDFDF" />
-                                <stop offset="100%" stop-color="#A8A8A8" />
-                            </linearGradient>
-                        </defs>
-                        <rect x="0" y="0" width="200" height="200" fill="url(#blueTile_${uidSuffix})" />
-                        <g stroke="#9EE0FF" stroke-width="1.4" opacity="0.55">
-                            <line x1="25" y1="0" x2="25" y2="132" /><line x1="50" y1="0" x2="50" y2="132" />
-                            <line x1="75" y1="0" x2="75" y2="132" /><line x1="100" y1="0" x2="100" y2="132" />
-                            <line x1="125" y1="0" x2="125" y2="132" /><line x1="150" y1="0" x2="150" y2="132" />
-                            <line x1="175" y1="0" x2="175" y2="132" />
-                            <line x1="0" y1="22" x2="200" y2="22" /><line x1="0" y1="44" x2="200" y2="44" />
-                            <line x1="0" y1="66" x2="200" y2="66" /><line x1="0" y1="88" x2="200" y2="88" />
-                            <line x1="0" y1="110" x2="200" y2="110" /><line x1="0" y1="132" x2="200" y2="132" />
-                            <line x1="0" y1="152" x2="200" y2="152" /><line x1="0" y1="174" x2="200" y2="174" />
-                            <line x1="0" y1="196" x2="200" y2="196" />
-                            <line x1="25" y1="132" x2="-10" y2="200" /><line x1="50" y1="132" x2="25" y2="200" />
-                            <line x1="75" y1="132" x2="65" y2="200" /><line x1="100" y1="132" x2="100" y2="200" />
-                            <line x1="125" y1="132" x2="135" y2="200" /><line x1="150" y1="132" x2="175" y2="200" />
-                            <line x1="175" y1="132" x2="210" y2="200" />
-                        </g>
-                        <!-- Floor Shadow -->
-                        <ellipse cx="100" cy="152" rx="60" ry="26" fill="#042240" opacity="0.5" />
-                        <!-- Vertical Flush Pipe -->
-                        <rect x="96" y="42" width="8" height="48" rx="3" fill="#E4E4E7" />
-                        <!-- Squat Toilet Outer Base -->
-                        <path d="M 44,142 C 44,108 70,88 100,88 C 130,88 156,108 156,142 C 156,166 132,178 100,178 C 68,178 44,166 44,142 Z" fill="url(#squatGrad_${uidSuffix})" />
-                        <!-- Inner Trough Basin -->
-                        <ellipse cx="100" cy="136" rx="26" ry="32" fill="#B5B5B5" />
-                        <ellipse cx="100" cy="146" rx="16" ry="12" fill="#8A8A8A" />
-                        <!-- Squat Toilet Front Dome Hood -->
-                        <path d="M 74,108 C 74,82 126,82 126,108 C 126,118 74,118 74,108 Z" fill="#FFFFFF" />
-                        <!-- Foot Treads (Left & Right) -->
-                        <g stroke="#9E9E9E" stroke-width="2.2" stroke-linecap="round">
-                            <line x1="55" y1="126" x2="67" y2="126" /><line x1="53" y1="136" x2="66" y2="136" /><line x1="55" y1="146" x2="67" y2="146" />
-                            <line x1="133" y1="126" x2="145" y2="126" /><line x1="134" y1="136" x2="147" y2="136" /><line x1="133" y1="146" x2="145" y2="146" />
-                        </g>
-                    </svg>
-                `;
-            }
-            // Default: red_toilet (紅色背景馬桶)
-            return `
-                <svg viewBox="0 0 200 200" class="w-full h-full block">
-                    <defs>
-                        <radialGradient id="tileVignette_${uidSuffix}" cx="50%" cy="45%" r="55%">
-                            <stop offset="0%" stop-color="#D9232E" />
-                            <stop offset="70%" stop-color="#9E111A" />
-                            <stop offset="100%" stop-color="#5E070D" />
-                        </radialGradient>
-                        <linearGradient id="toiletRimGrad_${uidSuffix}" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#FFFFFF" />
-                            <stop offset="100%" stop-color="#D8D8D8" />
-                        </linearGradient>
-                        <linearGradient id="toiletBowlGrad_${uidSuffix}" x1="20%" y1="0%" x2="80%" y2="100%">
-                            <stop offset="0%" stop-color="#F5F5F5" />
-                            <stop offset="55%" stop-color="#CCCCCC" />
-                            <stop offset="100%" stop-color="#9E9E9E" />
-                        </linearGradient>
-                    </defs>
-                    <rect x="0" y="0" width="200" height="200" fill="url(#tileVignette_${uidSuffix})" />
-                    <g stroke="#E8807F" stroke-width="1.4" opacity="0.65">
-                        <line x1="25" y1="0" x2="25" y2="132" /><line x1="50" y1="0" x2="50" y2="132" />
-                        <line x1="75" y1="0" x2="75" y2="132" /><line x1="100" y1="0" x2="100" y2="132" />
-                        <line x1="125" y1="0" x2="125" y2="132" /><line x1="150" y1="0" x2="150" y2="132" />
-                        <line x1="175" y1="0" x2="175" y2="132" />
-                        <line x1="0" y1="22" x2="200" y2="22" /><line x1="0" y1="44" x2="200" y2="44" />
-                        <line x1="0" y1="66" x2="200" y2="66" /><line x1="0" y1="88" x2="200" y2="88" />
-                        <line x1="0" y1="110" x2="200" y2="110" /><line x1="0" y1="132" x2="200" y2="132" />
-                        <line x1="0" y1="152" x2="200" y2="152" /><line x1="0" y1="174" x2="200" y2="174" />
-                        <line x1="0" y1="196" x2="200" y2="196" />
-                        <line x1="25" y1="132" x2="-10" y2="200" /><line x1="50" y1="132" x2="25" y2="200" />
-                        <line x1="75" y1="132" x2="65" y2="200" /><line x1="100" y1="132" x2="100" y2="200" />
-                        <line x1="125" y1="132" x2="135" y2="200" /><line x1="150" y1="132" x2="175" y2="200" />
-                        <line x1="175" y1="132" x2="210" y2="200" />
-                    </g>
-                    <ellipse cx="100" cy="176" rx="40" ry="12" fill="#3B0307" opacity="0.55" />
-                    <path d="M 78,125 L 122,125 L 116,172 C 115,180 85,180 84,172 Z" fill="url(#toiletBowlGrad_${uidSuffix})" />
-                    <rect x="70" y="64" width="60" height="36" rx="8" fill="url(#toiletRimGrad_${uidSuffix})" />
-                    <path d="M 52,92 C 52,138 72,154 100,154 C 128,154 148,138 148,92 Z" fill="url(#toiletBowlGrad_${uidSuffix})" />
-                    <ellipse cx="100" cy="92" rx="49" ry="19" fill="url(#toiletRimGrad_${uidSuffix})" />
-                    <ellipse cx="100" cy="92" rx="35" ry="12" fill="#B8B8B8" />
-                    <ellipse cx="100" cy="94" rx="28" ry="8.5" fill="#969696" />
-                </svg>
-            `;
+            const normalized = normalizeLoggedInAvatarType(avatarType);
+            const cleanKey = String(normalized).replace(/\.(png|PNG|jpg|JPG|svg|SVG|webp|WEBP)$/i, '');
+            const primarySrc = `./img/pfp/${encodeURIComponent(cleanKey)}.png`;
+            const upperExtSrc = `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`;
+            const fallbackDataUri = getFallbackPfpSvgDataUri();
+            return `<img src="${primarySrc}" alt="${escapeHtml(cleanKey)}" class="w-full h-full object-cover block rounded-full" onerror="if(!this.dataset.triedUpper){this.dataset.triedUpper='1';this.src='${upperExtSrc}';}else{this.onerror=null;this.src='${fallbackDataUri}';}" />`;
         }
 
         const SHOP_ITEMS = [
@@ -601,9 +494,9 @@
             uid: null,
             displayName: '用戶名稱',
             email: '尚未登入',
-            avatarType: 'red_toilet',
-            savedAvatarType: 'red_toilet',
-            tempModalAvatarType: 'red_toilet',
+            avatarType: DEFAULT_LOGGED_IN_PFP,
+            savedAvatarType: DEFAULT_LOGGED_IN_PFP,
+            tempModalAvatarType: DEFAULT_LOGGED_IN_PFP,
             isEditing: false,
             pendingRedirectHome: false,
             evaluations: [],
@@ -681,6 +574,7 @@
         function renderProfileAvatar() {
             const container = document.getElementById('profileAvatarSvgContainer');
             if (!container) return;
+            profileState.avatarType = normalizeLoggedInAvatarType(profileState.avatarType);
             container.innerHTML = getPoogleAvatarSvg(profileState.avatarType, 'profile_main');
         }
 
@@ -688,12 +582,15 @@
             const grid = document.getElementById('avatarOptionsGrid');
             if (!grid) return;
 
+            const currentTemp = normalizeLoggedInAvatarType(profileState.tempModalAvatarType);
+            profileState.tempModalAvatarType = currentTemp;
+
             grid.innerHTML = AVATAR_PRESETS.map((preset) => {
-                const isSelected = profileState.tempModalAvatarType === preset.id;
+                const isSelected = currentTemp === preset.id;
                 return `
                     <button type="button" data-avatar-opt="${preset.id}"
                             class="flex flex-col items-center gap-2.5 p-3 rounded-2xl border-2 ${isSelected ? 'border-[#1E2270] bg-[#FFF57E]/65 scale-105' : 'border-transparent hover:border-[#1E2270]/40 hover:bg-white/60'} transition focus:outline-none">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#1E2270] overflow-hidden">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#1E2270] overflow-hidden bg-[#FCF6E8]">
                             ${getPoogleAvatarSvg(preset.id, `opt_${preset.id}`)}
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full ${isSelected ? 'bg-[#3CE6B0]' : 'bg-white'} border border-[#1E2270] text-[11px] font-normal text-black">
@@ -705,7 +602,7 @@
 
             grid.querySelectorAll('[data-avatar-opt]').forEach((btn) => {
                 btn.addEventListener('click', () => {
-                    profileState.tempModalAvatarType = btn.getAttribute('data-avatar-opt');
+                    profileState.tempModalAvatarType = normalizeLoggedInAvatarType(btn.getAttribute('data-avatar-opt'));
                     renderAvatarModalOptions();
                 });
             });
@@ -787,20 +684,21 @@
         }
 
         async function persistSelectedAvatar(avatarType) {
+            const normalized = normalizeLoggedInAvatarType(avatarType);
             if (!profileState.uid) return;
             try {
-                localStorage.setItem(`poogle_avatar_${profileState.uid}`, avatarType);
-                localStorage.setItem('poogle_latest_avatar', avatarType);
+                localStorage.setItem(`poogle_avatar_${profileState.uid}`, normalized);
+                localStorage.setItem('poogle_latest_avatar', normalized);
                 const cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
                 if (cachedUser) {
-                    cachedUser.avatarType = avatarType;
+                    cachedUser.avatarType = normalized;
                     localStorage.setItem('poogle_auth_user', JSON.stringify(cachedUser));
                 } else {
                     localStorage.setItem('poogle_auth_user', JSON.stringify({
                         uid: profileState.uid,
                         displayName: profileState.displayName,
                         email: profileState.email,
-                        avatarType: avatarType
+                        avatarType: normalized
                     }));
                 }
             } catch (e) {}
@@ -809,7 +707,7 @@
                 try {
                     await db.collection('user_profiles').doc(profileState.uid).set({
                         userId: profileState.uid,
-                        avatarType: avatarType,
+                        avatarType: normalized,
                         updatedAt: new Date().toISOString()
                     }, { merge: true });
 
@@ -817,7 +715,7 @@
                     const snap = await db.collection('evaluations').where('userId', '==', profileState.uid).get();
                     const batch = db.batch();
                     snap.forEach((doc) => {
-                        batch.update(doc.ref, { avatarType: avatarType });
+                        batch.update(doc.ref, { avatarType: normalized });
                     });
                     await batch.commit();
                 } catch (err) {
@@ -930,7 +828,7 @@
                             userId: profileState.uid,
                             displayName: profileState.displayName || 'Google 用戶',
                             email: profileState.email || '',
-                            avatarType: profileState.avatarType || 'red_toilet',
+                            avatarType: normalizeLoggedInAvatarType(profileState.avatarType),
                             meritPoints: finalPoints,
                             totalReports: finalReports,
                             _rawEvalCount: rawEvalCount,
@@ -1101,12 +999,17 @@
                         const data = doc.data() || {};
                         profileState.profileDoc = data;
                         if (data.avatarType && !profileState.isEditing) {
-                            profileState.avatarType = data.avatarType;
-                            profileState.savedAvatarType = data.avatarType;
+                            const normalizedCloud = normalizeLoggedInAvatarType(data.avatarType);
+                            profileState.avatarType = normalizedCloud;
+                            profileState.savedAvatarType = normalizedCloud;
                             renderProfileAvatar();
                             try {
-                                localStorage.setItem(`poogle_avatar_${uid}`, data.avatarType);
+                                localStorage.setItem(`poogle_avatar_${uid}`, normalizedCloud);
+                                localStorage.setItem('poogle_latest_avatar', normalizedCloud);
                             } catch (e) {}
+                            if (normalizedCloud !== data.avatarType) {
+                                db.collection('user_profiles').doc(uid).set({ avatarType: normalizedCloud }, { merge: true }).catch(() => {});
+                            }
                         }
                     } else {
                         profileState.profileDoc = null;
@@ -1151,9 +1054,12 @@
             profileState.displayName = user.displayName || 'Google 用戶';
             profileState.email = user.email || '';
 
-            let savedAvatar = 'red_toilet';
+            let savedAvatar = DEFAULT_LOGGED_IN_PFP;
             try {
-                savedAvatar = localStorage.getItem(`poogle_avatar_${user.uid}`) || user.avatarType || 'red_toilet';
+                const rawSaved = localStorage.getItem(`poogle_avatar_${user.uid}`) || user.avatarType || DEFAULT_LOGGED_IN_PFP;
+                savedAvatar = normalizeLoggedInAvatarType(rawSaved);
+                localStorage.setItem(`poogle_avatar_${user.uid}`, savedAvatar);
+                localStorage.setItem('poogle_latest_avatar', savedAvatar);
             } catch (e) {}
             profileState.avatarType = savedAvatar;
             profileState.savedAvatarType = savedAvatar;
@@ -1181,9 +1087,10 @@
                 auth.onAuthStateChanged((user) => {
                     if (user) {
                         document.getElementById('requireLoginModal').classList.add('hidden');
-                        let savedAvatar = 'red_toilet';
+                        let savedAvatar = DEFAULT_LOGGED_IN_PFP;
                         try {
-                            savedAvatar = localStorage.getItem(`poogle_avatar_${user.uid}`) || 'red_toilet';
+                            const rawSaved = localStorage.getItem(`poogle_avatar_${user.uid}`) || DEFAULT_LOGGED_IN_PFP;
+                            savedAvatar = normalizeLoggedInAvatarType(rawSaved);
                         } catch (e) {}
                         const cleanUser = {
                             uid: user.uid,
@@ -1225,7 +1132,7 @@
             });
 
             document.getElementById('confirmAvatarSelectBtn').addEventListener('click', () => {
-                profileState.avatarType = profileState.tempModalAvatarType;
+                profileState.avatarType = normalizeLoggedInAvatarType(profileState.tempModalAvatarType);
                 renderProfileAvatar();
                 chooseAvatarModal.classList.add('hidden');
             });
@@ -1235,8 +1142,8 @@
                 btn.disabled = true;
                 btn.textContent = '儲存中...';
                 try {
-                    profileState.savedAvatarType = profileState.avatarType;
-                    await persistSelectedAvatar(profileState.avatarType);
+                    profileState.savedAvatarType = normalizeLoggedInAvatarType(profileState.avatarType);
+                    await persistSelectedAvatar(profileState.savedAvatarType);
                     setEditProfileMode(false);
                     showProfileToast('✅ 已儲存您的個人頭貼設定！', '#3CE6B0');
                 } finally {
@@ -1309,7 +1216,7 @@
                     uid: 'preview_demo_user',
                     displayName: '有所味探險家',
                     email: 'poogle.explorer@gmail.com',
-                    avatarType: profileState.avatarType || 'red_toilet'
+                    avatarType: normalizeLoggedInAvatarType(profileState.avatarType)
                 };
                 try {
                     localStorage.setItem('poogle_auth_user', JSON.stringify(demoUser));
@@ -1436,7 +1343,7 @@
                     userId: profileState.uid || 'preview_demo_user',
                     displayName: profileState.displayName || 'Google 用戶',
                     email: profileState.email || '',
-                    avatarType: profileState.avatarType || 'red_toilet',
+                    avatarType: normalizeLoggedInAvatarType(profileState.avatarType),
                     meritPoints: cleanPoints,
                     totalReports: cleanReports,
                     _rawEvalCount: rawEvalCount,
