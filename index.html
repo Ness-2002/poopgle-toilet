@@ -538,6 +538,47 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
+
+        /* ========================================================= */
+        /* 右上角下拉式衛生紙捲筒選單展開動畫與選項互動              */
+        /* ========================================================= */
+        @keyframes tpDropdownUnroll {
+            0% {
+                opacity: 0;
+                transform: translateY(-24px) scaleY(0.25);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(4px) scaleY(1.03);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0px) scaleY(1);
+            }
+        }
+        #tpRollDropdownMenu {
+            transform-origin: top center;
+        }
+        #tpRollDropdownMenu.is-open {
+            display: block;
+            animation: tpDropdownUnroll 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @media (min-width: 768px) {
+            #tpRollDropdownMenu,
+            #tpRollDropdownMenu.is-open {
+                display: none !important;
+            }
+        }
+        .tp-menu-item {
+            cursor: pointer;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+        .tp-menu-item:hover {
+            transform: translateX(5px);
+        }
+        .tp-menu-item:hover text {
+            fill: #F26559;
+        }
     </style>
 </head>
 
@@ -583,23 +624,84 @@
         </div>
     </header>
 
-    <!-- 2. TOP-RIGHT USER LOGIN BUTTON (預設匿名頭貼 1:1 還原 pp頭貼.svg) -->
-    <button id="homeLoginBtn" type="button" class="absolute md:fixed top-[42px] md:top-[48px] right-[4.5%] md:right-[2.8%] z-30 flex items-center gap-3 sm:gap-3.5 group focus:outline-none">
-        <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
-        <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
-            <svg viewBox="0 0 104 104" class="w-full h-full block">
-                <defs>
-                    <clipPath id="anonPoopClip_init">
-                        <circle cx="52" cy="52" r="52" />
-                    </clipPath>
-                </defs>
-                <g clip-path="url(#anonPoopClip_init)">
-                    <circle cx="52" cy="52" r="52" fill="#2A348C" />
-                    <path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="#FF99D3" />
+    <!-- 2. TOP-RIGHT USER LOGIN BUTTON & HAMBURGER MENU (預設匿名頭貼 + 雙橫線漢堡選單 + 下拉式衛生紙捲筒選單) -->
+    <div id="topRightNavContainer" class="absolute md:fixed top-[38px] md:top-[44px] right-[4.2%] md:right-[2.8%] z-40 flex items-center gap-3 sm:gap-4">
+        <!-- 登入文字與頭貼按鈕 -->
+        <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
+            <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
+            <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
+                <svg viewBox="0 0 104 104" class="w-full h-full block">
+                    <defs>
+                        <clipPath id="anonPoopClip_init">
+                            <circle cx="52" cy="52" r="52" />
+                        </clipPath>
+                    </defs>
+                    <g clip-path="url(#anonPoopClip_init)">
+                        <circle cx="52" cy="52" r="52" fill="#2A348C" />
+                        <path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="#FF99D3" />
+                    </g>
+                </svg>
+            </span>
+        </button>
+
+        <!-- 頭貼右側的雙橫線漢堡選單按鈕 (=) (僅手機版顯示 md:hidden) -->
+        <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
+                class="flex md:hidden flex-col justify-center gap-[8px] sm:gap-[9px] p-1.5 focus:outline-none group transition-transform active:scale-95">
+            <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+            <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+        </button>
+
+        <!-- 下拉式衛生紙捲筒選單 (僅手機版點擊漢堡選單時展開) -->
+        <div id="tpRollDropdownMenu" class="hidden md:hidden absolute right-0 top-[54px] sm:top-[62px] w-[166px] sm:w-[192px] z-50 select-none filter drop-shadow-[0_8px_12px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 202 548" class="w-full h-auto block overflow-visible">
+                <!-- 垂直下拉的衛生紙張本體 -->
+                <path d="M 3,448 L 3,4 L 198,4 L 198,448 Z"
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                <!-- 選單項目 1：公廁回報系統 -->
+                <g id="tpMenuReportSystemBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="42" width="184" height="48" fill="transparent" />
+                    <text x="27" y="72" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.2">公廁回報系統</text>
                 </g>
+
+                <!-- 選單項目 2：公廁地圖 -->
+                <g id="tpMenuMapBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="108" width="184" height="48" fill="transparent" />
+                    <text x="27" y="138" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.2">公廁地圖</text>
+                </g>
+
+                <!-- 選單項目 3：公廁現況版 -->
+                <g id="tpMenuStatusBoardBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="174" width="184" height="48" fill="transparent" />
+                    <text x="27" y="204" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.2">公廁現況版</text>
+                </g>
+
+                <!-- 選單項目 4：小怪圖鑑 -->
+                <g id="tpMenuMonsterDexBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="240" width="184" height="48" fill="transparent" />
+                    <text x="27" y="270" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.2">小怪圖鑑</text>
+                </g>
+
+                <!-- 選單項目 5：個人空間 -->
+                <g id="tpMenuPersonalSpaceBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="306" width="184" height="48" fill="transparent" />
+                    <text x="27" y="336" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.2">個人空間</text>
+                </g>
+
+                <!-- 底部橫向衛生紙捲筒圓柱體 -->
+                <path d="M 34,360 L 167,360 A 31,88 0 0,1 167,536 L 34,536 Z"
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                <!-- 衛生紙捲筒左側橢圓端面 -->
+                <ellipse cx="34" cy="448" rx="31" ry="88"
+                         fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                <!-- 衛生紙捲筒左側亮黃色紙軸心 (#F3EF84) -->
+                <ellipse cx="31" cy="448" rx="9" ry="26"
+                         fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
             </svg>
-        </span>
-    </button>
+        </div>
+    </div>
 
     <!-- 3. BOTTOM-RIGHT SMALL ADMIN PORTAL ENTRANCE -->
     <button id="openAdminPortalBtn" type="button"
@@ -2861,6 +2963,68 @@
             };
             zonePersonalSpace?.addEventListener('click', handleOpenPersonalSpace);
             document.getElementById('mobileZonePersonalSpace')?.addEventListener('click', handleOpenPersonalSpace);
+
+            // ===================================================================
+            // 右上角漢堡選單與下拉式衛生紙捲筒選單互動控制
+            // ===================================================================
+            const topHamburgerBtn = document.getElementById('topHamburgerBtn');
+            const tpRollDropdownMenu = document.getElementById('tpRollDropdownMenu');
+
+            const closeTpDropdownMenu = () => {
+                if (!tpRollDropdownMenu) return;
+                tpRollDropdownMenu.classList.remove('is-open');
+                tpRollDropdownMenu.classList.add('hidden');
+                topHamburgerBtn?.setAttribute('aria-expanded', 'false');
+            };
+
+            const toggleTpDropdownMenu = (e) => {
+                if (e) e.stopPropagation();
+                if (!tpRollDropdownMenu) return;
+                const isOpen = tpRollDropdownMenu.classList.contains('is-open');
+                if (isOpen) {
+                    closeTpDropdownMenu();
+                } else {
+                    tpRollDropdownMenu.classList.remove('hidden');
+                    void tpRollDropdownMenu.offsetWidth;
+                    tpRollDropdownMenu.classList.add('is-open');
+                    topHamburgerBtn?.setAttribute('aria-expanded', 'true');
+                }
+            };
+
+            topHamburgerBtn?.addEventListener('click', toggleTpDropdownMenu);
+
+            // 點擊衛生紙捲筒選單內的 5 個選項
+            document.getElementById('tpMenuReportSystemBtn')?.addEventListener('click', (e) => {
+                closeTpDropdownMenu();
+                handleOpenLocateModal(e);
+            });
+            document.getElementById('tpMenuMapBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeTpDropdownMenu();
+                handleGoMap();
+            });
+            document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
+                closeTpDropdownMenu();
+                openUnderConstruction(e);
+            });
+            document.getElementById('tpMenuMonsterDexBtn')?.addEventListener('click', (e) => {
+                closeTpDropdownMenu();
+                openUnderConstruction(e);
+            });
+            document.getElementById('tpMenuPersonalSpaceBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeTpDropdownMenu();
+                handleOpenPersonalSpace();
+            });
+
+            // 點擊畫面其他區域時自動收起衛生紙捲筒選單
+            document.addEventListener('click', (e) => {
+                if (!tpRollDropdownMenu || !tpRollDropdownMenu.classList.contains('is-open')) return;
+                const navContainer = document.getElementById('topRightNavContainer');
+                if (navContainer && !navContainer.contains(e.target)) {
+                    closeTpDropdownMenu();
+                }
+            });
 
             // ===================================================================
             // 會員登入與頭貼狀態同步
