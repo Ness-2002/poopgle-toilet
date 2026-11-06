@@ -1522,54 +1522,122 @@
 
         // ===================================================================
         // 👾 小怪圖片清單設定區 (對應 ./img/ 底下的四個分類資料夾)
+        // 💡 已全部改為英文檔名，不論在 GitHub Pages 或未來購買正式網域 (.com / .tw) 皆 100% 穩定讀取！
         // ===================================================================
         const MONSTER_FOLDER_CONFIG = {
-            urinal: [
-                "便斗乾淨.png",
-                "感應不良.png",
-                "擋板太低.png",
-                "擋好擋滿.png"
-            ],
-            stall: [
-                "地板有尿.png",
-                "臭臭的.png"
-            ],
             consumable: [
-                "衛生紙.png",
-                "沒衛生紙.png",
-                "洗手乳.png",
-                "擦手紙.png"
+                "pad_yes.png",
+                "pad_no.png",
+                "paper_no.png",
+                "paper_yes.png",
+                "sanitizer_no.png",
+                "sanitizer_yes.png",
+                "soap_no.png",
+                "soap_yes.png"
             ],
             hardware: [
-                "鏡子髒汙.png",
-                "鏡子.png",
-                "水龍頭.png",
-                "門鎖.png"
+                "dryer_broke.png",
+                "dryer_strong.png",
+                "mirror_dirty.png",
+                "sink_clean.png",
+                "sink_trash.png",
+                "tools_tidy.png",
+                "trash_too_much.png",
+                "walls_ceiling_tidy.png"
+            ],
+            stall: [
+                "air_clean.png",
+                "floor_clean.png",
+                "flush_broke.png",
+                "handle_wet.png",
+                "lock_broke.png",
+                "placing_ok.png",
+                "poopee.png",
+                "privacy_ok.png",
+                "smell_nice.png",
+                "toilet_clogged.png"
+            ],
+            urinal: [
+                "panel_not_ok.png",
+                "panel_ok.png",
+                "pee_floor.png",
+                "stinky.png",
+                "urinal_clean.png",
+                "urinal_sensor_broke.png"
             ]
         };
 
-        // 內建備援向量圖 Data URI（皆採用標準 7 色計畫）
+        // 若未來綁定自訂網域但仍架設於 GitHub Pages，可於此填入您的 GitHub 帳號與倉庫名稱作為備援（選填）
+        const GITHUB_REPO_FALLBACK = {
+            owner: "", // 例如 "poogle-team"
+            repo: ""   // 例如 "poogle-toilet"
+        };
+
+        // 內建備援向量圖 Data URI（皆採用標準 7 色計畫，支援新英文命名對應）
         const FALLBACK_MONSTER_SVGS = {
-            "便斗乾淨": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -68,-76 Q -65,-52 -88,-48 Q -65,-46 -62,-22 Q -59,-46 -38,-50 Q -61,-52 -68,-76 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M 74,18 Q 74,40 55,44 Q 74,48 74,70 Q 78,48 96,44 Q 78,40 74,18 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M -28,-38 C -28,-66 -24,-78 -6,-82 C 12,-86 28,-85 38,-78 C 46,-72 46,-54 44,-34 C 58,-30 64,-18 60,2 C 56,22 50,36 62,54 C 76,74 74,104 54,124 C 32,144 -8,144 -34,126 C -64,104 -72,48 -58,-2 C -50,-28 -36,-38 -28,-38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -10,-22 C 2,-22 10,-16 20,-22 C 34,-20 40,-4 32,16 C 24,36 24,52 38,68 C 52,84 42,108 14,110 C -18,112 -32,96 -34,58 C -36,16 -26,-22 -10,-22 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8" stroke-linejoin="round"/><path d="M -6,-62 C -6,-78 12,-78 12,-66 C 12,-78 30,-78 30,-62" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="3" cy="-56" rx="7" ry="9" fill="#2A348C"/><ellipse cx="21" cy="-56" rx="7" ry="9" fill="#2A348C"/><path d="M 3,-40 Q 12,-41 21,-40 C 22,-20 2,-20 3,-40 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2"/><circle cx="12" cy="-29" r="7.5" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
-            "感應不良": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -32,-88 L 32,-88 C 46,-88 54,-72 60,-22 C 78,-16 88,16 82,48 C 94,50 96,68 82,70 C 84,78 74,80 72,72 C 72,82 62,82 62,74 L 62,106 C 62,136 36,148 0,148 C -36,148 -62,136 -62,106 L -58,34 C -74,26 -76,-10 -54,-18 C -48,-68 -44,-88 -32,-88 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><rect x="-28" y="-76" width="56" height="34" rx="7" fill="#2A348C"/><line x1="-19" y1="-67" x2="19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><line x1="19" y1="-67" x2="-19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><ellipse cx="-10" cy="-27" rx="9" ry="11" fill="#2A348C"/><ellipse cx="10" cy="-27" rx="9" ry="11" fill="#2A348C"/><path d="M -22,-14 Q -8,-10 0,-18 Q 8,-10 22,-14" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/><ellipse cx="0" cy="64" rx="40" ry="54" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -54,-18 C -36,-22 -24,-6 -28,12 C -34,34 -56,42 -68,26" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8" stroke-linecap="round"/></svg>`),
-            "擋板太低": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 230"><path d="M -52,66 C -58,76 -52,86 -44,82 C -42,92 -30,92 -28,84 C -24,94 -12,88 -16,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 22,66 C 20,88 32,94 36,84 C 38,92 50,92 52,82 C 60,86 66,76 58,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M -55,0 C -58,-25 -46,-38 -34,-42 C -32,-70 -14,-82 0,-72 C 14,-82 32,-70 34,-42 C 48,-38 60,-22 55,0 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="-9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><ellipse cx="9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><path d="M -11,-34 L 11,-34 C 13,-10 -13,-10 -11,-34 Z" fill="#2A348C"/><ellipse cx="0" cy="-22" rx="7.2" ry="7.8" fill="#F26559"/><rect x="-86" y="-8" width="172" height="76" rx="2" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><rect x="-86" y="10" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/><rect x="-86" y="45" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/></svg>`),
-            "擋好擋滿": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-115 -115 230 230"><path d="M -38,-96 L -62,-92 C -78,-88 -96,-48 -96,4 C -96,56 -78,86 -62,92 L -38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -38,-96 C -22,-55 -22,45 -38,98 C -72,45 -72,-55 -38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 L 62,-92 C 78,-88 96,-48 96,4 C 96,56 78,86 62,92 L 38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 C 22,-55 22,45 38,98 C 72,45 72,-55 38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 0,-68 C 10,-68 15,-62 18,-56 C 28,-52 34,-44 30,-36 C 44,-22 44,12 24,26 C 34,30 36,38 28,38 C 30,44 22,46 19,38 C 21,46 12,48 9,36 C 6,28 -6,28 -9,36 C -12,48 -21,46 -19,38 C -22,46 -30,44 -28,38 C -36,38 -34,30 -24,26 C -44,12 -44,-22 -30,-36 C -34,-44 -28,-52 -18,-56 C -15,-62 -10,-68 0,-68 Z" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><path d="M -9,-48 C -9,-40 0,-40 0,-50 C 0,-40 9,-40 9,-48" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/><path d="M -11,-38 Q 0,-31 11,-38" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/></svg>`),
-            "地板有尿": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 225 285"><path d="M -22,-68 C -36,-76 -54,-64 -52,-42 C -50,-28 -36,-22 -34,-10 C -32,4 -44,8 -54,0 C -62,-6 -68,0 -62,8 C -68,8 -70,16 -62,20 C -68,24 -64,34 -54,34 C -44,34 -42,46 -52,56 C -66,68 -68,82 -70,96 C -72,108 -90,112 -88,125 C -86,138 -62,135 -48,136 C -30,138 -20,162 2,162 C 26,162 36,136 58,136 C 82,136 102,132 102,115 C 102,98 82,92 68,84 C 56,76 62,60 60,44 C 58,30 44,26 48,14 C 52,4 66,-2 62,-10 C 68,-12 66,-20 58,-20 C 62,-26 54,-32 46,-26 C 36,-18 28,-22 32,-38 C 36,-52 46,-66 38,-82 C 28,-100 -2,-98 -16,-78 C -18,-72 -20,-68 -22,-68 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><ellipse cx="-12" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><ellipse cx="4" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><circle cx="-11" cy="-48" r="6" fill="#2A348C"/><circle cx="5" cy="-48" r="6" fill="#2A348C"/><path d="M -16,-25 Q -3,-30 10,-25 C 6,2 -8,2 -16,-25 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-3" cy="-14" rx="7" ry="9" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
-            "臭臭的": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 -105 240 250"><path d="M -28,-66 C -38,-90 28,-90 20,-66 C 14,-56 14,-48 26,-44 C 52,-38 58,-4 44,12 C 38,18 32,20 32,22 C 66,26 84,66 72,102 C 60,132 -60,132 -72,102 C -84,66 -66,26 -32,22 C -32,20 -38,18 -44,12 C -58,-4 -52,-38 -26,-44 C -14,-48 -14,-56 -28,-66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -36,-22 C -36,-35 -6,-35 0,-26 C 6,-35 36,-35 36,-22 C 36,-9 6,-9 0,-18 C -6,-9 -36,-9 -36,-22 Z" fill="#FFF9EC"/><ellipse cx="-21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><ellipse cx="21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><path d="M -28,2 Q 0,15 28,2" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/></svg>`),
-            "鏡子髒汙": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><g transform="rotate(6)"><rect x="-46" y="-58" width="92" height="118" rx="14" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><rect x="-32" y="-36" width="64" height="82" rx="6" fill="#80E4FF" stroke="#2A348C" stroke-width="3.5"/><path d="M -16,-58 C -16,-78 16,-78 16,-58" fill="#FF99D3" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><ellipse cx="6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><path d="M 6,-36 L 6,2 C 6,10 14,10 14,2 L 14,-36 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="2.8"/><path d="M -28,24 C -18,16 -8,28 2,22 C 12,16 22,28 28,20 L 28,44 L -28,44 Z" fill="#FFF9EC" opacity="0.85"/></g></svg>`),
-            "衛生紙": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><path d="M -46,-36 L -46,44 A 46,18 0 0,0 46,44 L 46,-36 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="46" ry="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="16" ry="6" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2"/><path d="M 32,-12 L 66,8 L 54,58 L 24,38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="-12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><ellipse cx="12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><path d="M -10,20 Q 0,30 10,20" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/></svg>`),
-            "洗手乳": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><rect x="-12" y="-72" width="24" height="22" rx="5" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5"/><path d="M 0,-72 L 0,-86 L 32,-86 L 36,-76" fill="none" stroke="#2A348C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="-44" y="-50" width="88" height="114" rx="28" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><ellipse cx="13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><path d="M -12,14 Q 0,24 12,14" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><circle cx="48" cy="-58" r="9" fill="#80E4FF" stroke="#2A348C" stroke-width="3"/><circle cx="62" cy="-38" r="6" fill="#80E4FF" stroke="#2A348C" stroke-width="2.8"/></svg>`)
+            "urinal_clean": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -68,-76 Q -65,-52 -88,-48 Q -65,-46 -62,-22 Q -59,-46 -38,-50 Q -61,-52 -68,-76 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M 74,18 Q 74,40 55,44 Q 74,48 74,70 Q 78,48 96,44 Q 78,40 74,18 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M -28,-38 C -28,-66 -24,-78 -6,-82 C 12,-86 28,-85 38,-78 C 46,-72 46,-54 44,-34 C 58,-30 64,-18 60,2 C 56,22 50,36 62,54 C 76,74 74,104 54,124 C 32,144 -8,144 -34,126 C -64,104 -72,48 -58,-2 C -50,-28 -36,-38 -28,-38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -10,-22 C 2,-22 10,-16 20,-22 C 34,-20 40,-4 32,16 C 24,36 24,52 38,68 C 52,84 42,108 14,110 C -18,112 -32,96 -34,58 C -36,16 -26,-22 -10,-22 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8" stroke-linejoin="round"/><path d="M -6,-62 C -6,-78 12,-78 12,-66 C 12,-78 30,-78 30,-62" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="3" cy="-56" rx="7" ry="9" fill="#2A348C"/><ellipse cx="21" cy="-56" rx="7" ry="9" fill="#2A348C"/><path d="M 3,-40 Q 12,-41 21,-40 C 22,-20 2,-20 3,-40 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2"/><circle cx="12" cy="-29" r="7.5" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
+            "urinal_sensor_broke": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -32,-88 L 32,-88 C 46,-88 54,-72 60,-22 C 78,-16 88,16 82,48 C 94,50 96,68 82,70 C 84,78 74,80 72,72 C 72,82 62,82 62,74 L 62,106 C 62,136 36,148 0,148 C -36,148 -62,136 -62,106 L -58,34 C -74,26 -76,-10 -54,-18 C -48,-68 -44,-88 -32,-88 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><rect x="-28" y="-76" width="56" height="34" rx="7" fill="#2A348C"/><line x1="-19" y1="-67" x2="19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><line x1="19" y1="-67" x2="-19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><ellipse cx="-10" cy="-27" rx="9" ry="11" fill="#2A348C"/><ellipse cx="10" cy="-27" rx="9" ry="11" fill="#2A348C"/><path d="M -22,-14 Q -8,-10 0,-18 Q 8,-10 22,-14" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/><ellipse cx="0" cy="64" rx="40" ry="54" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -54,-18 C -36,-22 -24,-6 -28,12 C -34,34 -56,42 -68,26" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8" stroke-linecap="round"/></svg>`),
+            "panel_not_ok": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 230"><path d="M -52,66 C -58,76 -52,86 -44,82 C -42,92 -30,92 -28,84 C -24,94 -12,88 -16,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 22,66 C 20,88 32,94 36,84 C 38,92 50,92 52,82 C 60,86 66,76 58,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M -55,0 C -58,-25 -46,-38 -34,-42 C -32,-70 -14,-82 0,-72 C 14,-82 32,-70 34,-42 C 48,-38 60,-22 55,0 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="-9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><ellipse cx="9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><path d="M -11,-34 L 11,-34 C 13,-10 -13,-10 -11,-34 Z" fill="#2A348C"/><ellipse cx="0" cy="-22" rx="7.2" ry="7.8" fill="#F26559"/><rect x="-86" y="-8" width="172" height="76" rx="2" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><rect x="-86" y="10" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/><rect x="-86" y="45" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/></svg>`),
+            "panel_ok": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-115 -115 230 230"><path d="M -38,-96 L -62,-92 C -78,-88 -96,-48 -96,4 C -96,56 -78,86 -62,92 L -38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -38,-96 C -22,-55 -22,45 -38,98 C -72,45 -72,-55 -38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 L 62,-92 C 78,-88 96,-48 96,4 C 96,56 78,86 62,92 L 38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 C 22,-55 22,45 38,98 C 72,45 72,-55 38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 0,-68 C 10,-68 15,-62 18,-56 C 28,-52 34,-44 30,-36 C 44,-22 44,12 24,26 C 34,30 36,38 28,38 C 30,44 22,46 19,38 C 21,46 12,48 9,36 C 6,28 -6,28 -9,36 C -12,48 -21,46 -19,38 C -22,46 -30,44 -28,38 C -36,38 -34,30 -24,26 C -44,12 -44,-22 -30,-36 C -34,-44 -28,-52 -18,-56 C -15,-62 -10,-68 0,-68 Z" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><path d="M -9,-48 C -9,-40 0,-40 0,-50 C 0,-40 9,-40 9,-48" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/><path d="M -11,-38 Q 0,-31 11,-38" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/></svg>`),
+            "pee_floor": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 225 285"><path d="M -22,-68 C -36,-76 -54,-64 -52,-42 C -50,-28 -36,-22 -34,-10 C -32,4 -44,8 -54,0 C -62,-6 -68,0 -62,8 C -68,8 -70,16 -62,20 C -68,24 -64,34 -54,34 C -44,34 -42,46 -52,56 C -66,68 -68,82 -70,96 C -72,108 -90,112 -88,125 C -86,138 -62,135 -48,136 C -30,138 -20,162 2,162 C 26,162 36,136 58,136 C 82,136 102,132 102,115 C 102,98 82,92 68,84 C 56,76 62,60 60,44 C 58,30 44,26 48,14 C 52,4 66,-2 62,-10 C 68,-12 66,-20 58,-20 C 62,-26 54,-32 46,-26 C 36,-18 28,-22 32,-38 C 36,-52 46,-66 38,-82 C 28,-100 -2,-98 -16,-78 C -18,-72 -20,-68 -22,-68 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><ellipse cx="-12" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><ellipse cx="4" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><circle cx="-11" cy="-48" r="6" fill="#2A348C"/><circle cx="5" cy="-48" r="6" fill="#2A348C"/><path d="M -16,-25 Q -3,-30 10,-25 C 6,2 -8,2 -16,-25 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-3" cy="-14" rx="7" ry="9" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
+            "stinky": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 -105 240 250"><path d="M -28,-66 C -38,-90 28,-90 20,-66 C 14,-56 14,-48 26,-44 C 52,-38 58,-4 44,12 C 38,18 32,20 32,22 C 66,26 84,66 72,102 C 60,132 -60,132 -72,102 C -84,66 -66,26 -32,22 C -32,20 -38,18 -44,12 C -58,-4 -52,-38 -26,-44 C -14,-48 -14,-56 -28,-66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -36,-22 C -36,-35 -6,-35 0,-26 C 6,-35 36,-35 36,-22 C 36,-9 6,-9 0,-18 C -6,-9 -36,-9 -36,-22 Z" fill="#FFF9EC"/><ellipse cx="-21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><ellipse cx="21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><path d="M -28,2 Q 0,15 28,2" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/></svg>`),
+            "mirror_dirty": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><g transform="rotate(6)"><rect x="-46" y="-58" width="92" height="118" rx="14" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><rect x="-32" y="-36" width="64" height="82" rx="6" fill="#80E4FF" stroke="#2A348C" stroke-width="3.5"/><path d="M -16,-58 C -16,-78 16,-78 16,-58" fill="#FF99D3" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><ellipse cx="6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><path d="M 6,-36 L 6,2 C 6,10 14,10 14,2 L 14,-36 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="2.8"/><path d="M -28,24 C -18,16 -8,28 2,22 C 12,16 22,28 28,20 L 28,44 L -28,44 Z" fill="#FFF9EC" opacity="0.85"/></g></svg>`),
+            "paper_yes": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><path d="M -46,-36 L -46,44 A 46,18 0 0,0 46,44 L 46,-36 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="46" ry="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="16" ry="6" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2"/><path d="M 32,-12 L 66,8 L 54,58 L 24,38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="-12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><ellipse cx="12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><path d="M -10,20 Q 0,30 10,20" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/></svg>`),
+            "soap_yes": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><rect x="-12" y="-72" width="24" height="22" rx="5" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5"/><path d="M 0,-72 L 0,-86 L 32,-86 L 36,-76" fill="none" stroke="#2A348C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="-44" y="-50" width="88" height="114" rx="28" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><ellipse cx="13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><path d="M -12,14 Q 0,24 12,14" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><circle cx="48" cy="-58" r="9" fill="#80E4FF" stroke="#2A348C" stroke-width="3"/><circle cx="62" cy="-38" r="6" fill="#80E4FF" stroke="#2A348C" stroke-width="2.8"/></svg>`)
         };
 
         const FOLDER_DEFAULT_FALLBACK = {
-            urinal: FALLBACK_MONSTER_SVGS["便斗乾淨"],
-            stall: FALLBACK_MONSTER_SVGS["地板有尿"],
-            consumable: FALLBACK_MONSTER_SVGS["衛生紙"],
-            hardware: FALLBACK_MONSTER_SVGS["鏡子髒汙"]
+            urinal: FALLBACK_MONSTER_SVGS["urinal_clean"],
+            stall: FALLBACK_MONSTER_SVGS["pee_floor"],
+            consumable: FALLBACK_MONSTER_SVGS["paper_yes"],
+            hardware: FALLBACK_MONSTER_SVGS["mirror_dirty"]
         };
 
+        // 自動掃描 ./img/ 四個資料夾底下的所有圖檔（同時支援快取、本地 Live Server 目錄與 GitHub Pages API）
         async function discoverFolderImagesFromServer(folder) {
+            const cacheKey = `poogle_folder_files_v2_${folder}`;
+            try {
+                const cached = sessionStorage.getItem(cacheKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+
             const foundFiles = [];
+
+            // 1. 若部署於 GitHub Pages (*.github.io) 或有設定 GITHUB_REPO_FALLBACK，透過 GitHub API 讀取資料夾內的真實圖檔清單
+            const host = window.location.hostname || '';
+            const ghOwner = host.endsWith('.github.io') ? host.replace('.github.io', '') : (GITHUB_REPO_FALLBACK.owner || '');
+            if (ghOwner) {
+                try {
+                    const pathParts = window.location.pathname.split('/').filter(Boolean);
+                    const repo = GITHUB_REPO_FALLBACK.repo || (pathParts.length > 0 ? pathParts[0] : `${ghOwner}.github.io`);
+                    const apiUrls = [
+                        `https://api.github.com/repos/${ghOwner}/${repo}/contents/img/${folder}`,
+                        `https://api.github.com/repos/${ghOwner}/${ghOwner}.github.io/contents/img/${folder}`
+                    ];
+                    for (const apiUrl of apiUrls) {
+                        const apiRes = await fetch(apiUrl);
+                        if (apiRes.ok) {
+                            const items = await apiRes.json();
+                            if (Array.isArray(items)) {
+                                items.forEach((item) => {
+                                    if (item && item.type === 'file' && /\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i.test(item.name)) {
+                                        foundFiles.push(item.name);
+                                    }
+                                });
+                                if (foundFiles.length > 0) {
+                                    try { sessionStorage.setItem(cacheKey, JSON.stringify(foundFiles)); } catch (e) {}
+                                    return foundFiles;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 2. 本地伺服器 (如 VS Code Live Server) 目錄掃描
             try {
                 const res = await fetch(`./img/${folder}/`, { cache: 'no-store' });
                 if (!res.ok) return foundFiles;
@@ -1588,19 +1656,24 @@
                         foundFiles.push(fileName);
                     }
                 });
+                if (foundFiles.length > 0) {
+                    try { sessionStorage.setItem(cacheKey, JSON.stringify(foundFiles)); } catch (e) {}
+                }
             } catch (e) {}
             return foundFiles;
         }
 
         function createMonsterItem(folder, fileName) {
             const baseName = fileName.replace(/\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i, '');
+            const encodedFile = encodeURIComponent(fileName);
+            const encodedBase = encodeURIComponent(baseName);
             const candidates = [
+                `./img/${folder}/${encodedFile}`,
                 `./img/${folder}/${fileName}`,
-                `./img/${folder}/${baseName}.png`,
-                `./img/${folder}/${baseName}.PNG`,
-                `img/${folder}/${fileName}`,
-                `img/${folder}/${baseName}.png`,
-                `img/${folder}/${baseName}.PNG`
+                `./img/${folder}/${encodedBase}.png`,
+                `./img/${folder}/${encodedBase}.PNG`,
+                `img/${folder}/${encodedFile}`,
+                `img/${folder}/${encodedBase}.png`
             ];
             return {
                 id: `${folder}_${baseName}`,
@@ -1609,7 +1682,7 @@
                 candidates: Array.from(new Set(candidates)),
                 resolvedUrl: null,
                 isRealFile: false,
-                fallbackSvg: FALLBACK_MONSTER_SVGS[baseName] || FOLDER_DEFAULT_FALLBACK[folder] || FALLBACK_MONSTER_SVGS["便斗乾淨"]
+                fallbackSvg: FALLBACK_MONSTER_SVGS[baseName] || FOLDER_DEFAULT_FALLBACK[folder] || FALLBACK_MONSTER_SVGS["urinal_clean"]
             };
         }
 
@@ -1617,19 +1690,32 @@
             if (monsterObj.resolvedUrl) return Promise.resolve(monsterObj.resolvedUrl);
             return new Promise((resolve) => {
                 let idx = 0;
+                let settled = false;
+                const finish = (url, isReal) => {
+                    if (settled) return;
+                    settled = true;
+                    monsterObj.resolvedUrl = url;
+                    monsterObj.isRealFile = isReal;
+                    resolve(url);
+                };
+
+                // 逾時保護：避免 GitHub Pages 單一圖檔請求卡住導致全部泡泡空白
+                const timeoutId = setTimeout(() => {
+                    finish(monsterObj.fallbackSvg, false);
+                }, 2500);
+
                 const tryNext = () => {
+                    if (settled) return;
                     if (idx >= monsterObj.candidates.length) {
-                        monsterObj.resolvedUrl = monsterObj.fallbackSvg;
-                        monsterObj.isRealFile = false;
-                        resolve(monsterObj.resolvedUrl);
+                        clearTimeout(timeoutId);
+                        finish(monsterObj.fallbackSvg, false);
                         return;
                     }
                     const testUrl = monsterObj.candidates[idx++];
                     const probe = new Image();
                     probe.onload = () => {
-                        monsterObj.resolvedUrl = testUrl;
-                        monsterObj.isRealFile = true;
-                        resolve(testUrl);
+                        clearTimeout(timeoutId);
+                        finish(testUrl, true);
                     };
                     probe.onerror = () => {
                         tryNext();
@@ -1638,6 +1724,12 @@
                 };
                 tryNext();
             });
+        }
+
+        function setSvgImageHref(imgEl, url) {
+            if (!imgEl || !url) return;
+            imgEl.setAttribute('href', url);
+            imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
         }
 
         const firebaseConfig = {
@@ -2018,6 +2110,17 @@
                 const folders = ['urinal', 'consumable', 'stall', 'hardware'];
                 const folderItemsMap = { urinal: [], consumable: [], stall: [], hardware: [] };
 
+                // 0. 頁面一載入立即先填入內建備援小怪，確保泡泡在圖片載入期間絕不空白
+                const initialFallbackKeys = Object.keys(FALLBACK_MONSTER_SVGS);
+                for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
+                    const fbUrl = FALLBACK_MONSTER_SVGS[initialFallbackKeys[slot % initialFallbackKeys.length]];
+                    setSvgImageHref(document.getElementById(`bubbleMonsterImg_${slot}`), fbUrl);
+                    if (slot < 3) {
+                        setSvgImageHref(document.getElementById(`mobileBubbleMonsterImg_${slot}`), fbUrl);
+                    }
+                }
+
+                // 1. 掃描四個資料夾底下的真實圖檔 (含 GitHub API 支援) + 結合設定清單
                 await Promise.all(folders.map(async (folder) => {
                     const discovered = await discoverFolderImagesFromServer(folder);
                     const configured = MONSTER_FOLDER_CONFIG[folder] || [];
@@ -2045,12 +2148,12 @@
                     const url = monsterPool[mIdx].resolvedUrl || monsterPool[mIdx].fallbackSvg;
                     const imgEl = document.getElementById(`bubbleMonsterImg_${slot}`);
                     if (imgEl) {
-                        imgEl.setAttribute('href', url);
+                        setSvgImageHref(imgEl, url);
                     }
                     if (slot < 3) {
                         const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slot}`);
                         if (mobileImgEl) {
-                            mobileImgEl.setAttribute('href', url);
+                            setSvgImageHref(mobileImgEl, url);
                         }
                     }
                 }
@@ -2081,10 +2184,10 @@
                     setTimeout(() => {
                         currentSlotMonsterIdx[slotToSwap] = nextMonsterIdx;
                         const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
-                        imgEl.setAttribute('href', nextUrl);
+                        setSvgImageHref(imgEl, nextUrl);
                         slotGroup.classList.remove('is-swapping');
                         if (slotToSwap < 3 && mobileImgEl && mobileSlotGroup) {
-                            mobileImgEl.setAttribute('href', nextUrl);
+                            setSvgImageHref(mobileImgEl, nextUrl);
                             mobileSlotGroup.classList.remove('is-swapping');
                         }
                     }, 270);
@@ -2438,7 +2541,7 @@
                             const imgEl = document.getElementById(`bubbleMonsterImg_${b.slotIndex}`);
                             if (imgEl) {
                                 const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
-                                imgEl.setAttribute('href', nextUrl);
+                                setSvgImageHref(imgEl, nextUrl);
                             }
                         }
 
@@ -2483,9 +2586,9 @@
                             currentSlotMonsterIdx[slotIdx] = nextMonsterIdx;
                             const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
                             const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slotIdx}`);
-                            if (mobileImgEl) mobileImgEl.setAttribute('href', nextUrl);
+                            if (mobileImgEl) setSvgImageHref(mobileImgEl, nextUrl);
                             const desktopImgEl = document.getElementById(`bubbleMonsterImg_${slotIdx}`);
-                            if (desktopImgEl) desktopImgEl.setAttribute('href', nextUrl);
+                            if (desktopImgEl) setSvgImageHref(desktopImgEl, nextUrl);
                         }
 
                         mbEl.classList.remove('is-single-popped');
