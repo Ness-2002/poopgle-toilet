@@ -545,29 +545,29 @@
         @keyframes tpDropdownUnroll {
             0% {
                 opacity: 0;
-                transform: translateY(-24px) scaleY(0.25);
+                transform: scaleY(0.18);
             }
             70% {
                 opacity: 1;
-                transform: translateY(4px) scaleY(1.03);
+                transform: scaleY(1.03);
             }
             100% {
                 opacity: 1;
-                transform: translateY(0px) scaleY(1);
+                transform: scaleY(1);
             }
         }
         @keyframes tpDropdownRollUp {
             0% {
                 opacity: 1;
-                transform: translateY(0px) scaleY(1);
+                transform: scaleY(1);
             }
             30% {
                 opacity: 1;
-                transform: translateY(4px) scaleY(1.02);
+                transform: scaleY(1.02);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-24px) scaleY(0.2);
+                transform: scaleY(0.12);
             }
         }
         #tpRollDropdownMenu {
@@ -671,11 +671,11 @@
             <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
-        <!-- 下拉式衛生紙捲筒選單 (僅手機版點擊漢堡選單時展開，保留右側出血且不切到文字) -->
-        <div id="tpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[52px] sm:top-[60px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+        <!-- 下拉式衛生紙捲筒選單 (僅手機版點擊漢堡選單時展開，頂端無縫貼齊跑馬燈下緣並直接覆蓋漢堡選單) -->
+        <div id="tpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-18px] sm:top-[-16px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
             <svg viewBox="0 0 212 548" class="w-full h-auto block overflow-visible">
-                <!-- 垂直下拉的衛生紙張本體 -->
-                <path d="M 3,448 L 3,4 L 208,4 L 208,448 Z"
+                <!-- 垂直下拉的衛生紙張本體 (頂端 y=0 直接貼齊跑馬燈底部無空隙) -->
+                <path d="M 3,448 L 3,0 L 208,0 L 208,448 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                 <!-- 選單項目 1：公廁回報系統 -->
@@ -736,12 +736,12 @@
         <g id="halftoneDotsBgLayer" fill="#FFFFFF" opacity="0.55"></g>
     </svg>
 
-    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x875 整體選項圖樣向下移動空隙的 2/3) -->
+    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x780 依 有所味網頁設計-11.jpg 排版) -->
     <main class="flex-1 md:min-h-0 w-full flex items-start md:items-end justify-center overflow-visible md:overflow-hidden relative z-10">
         <!-- =============================================================== -->
-        <!-- 5A. MOBILE STAGE SVG (手機版 < 768px：整體選項圖樣向下移動空隙的 2/3) -->
+        <!-- 5A. MOBILE STAGE SVG (手機版 < 768px：1:1 還原 有所味網頁設計-11.jpg) -->
         <!-- =============================================================== -->
-        <svg id="mobileStageSvg" viewBox="0 0 430 875" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
+        <svg id="mobileStageSvg" viewBox="0 0 430 780" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
             <defs>
                 <!-- 手機版泡泡圓形裁切遮罩 (r=51) -->
                 <clipPath id="mobileBubbleInnerClip">
@@ -768,16 +768,21 @@
                 </g>
             </defs>
 
-            <!-- 1. 上方中央：直接打開的馬桶 (向下移動空隙的 2/3) -->
-            <g id="mobileCenterToiletGroup" transform="translate(222, 336) scale(0.565) translate(-720, -445)">
+            <!-- 0. 頂端水平置中：「有所味」Logo (對齊 有所味網頁設計-11.jpg 位置並保留輕柔上下飄動) -->
+            <g class="pointer-events-none" transform="translate(225, 160)">
+                <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
+                    <image href="./img/logo.png" x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                </g>
+            </g>
+
+            <!-- 1. 中央：直接打開的馬桶 (公廁現況版 + 公廁回報系統) -->
+            <g id="mobileCenterToiletGroup" transform="translate(225, 441) scale(0.573) translate(-720, -445)">
                 <!-- 掀開的直立橢圓馬桶蓋 -->
                 <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
 
-                <!-- 馬桶下半部底座、雙腳與往上看微笑表情 -->
-                <path d="M 501.2,538 C 495,608 510,688 553,735 L 575,758 L 865,758 L 887,735 C 930,688 945,608 938.8,538 Z"
+                <!-- 馬桶下半部圓弧曲線底座 -->
+                <path d="M 501.2,538 C 495,622 522,702 574,738 C 618,766 822,766 866,738 C 918,702 945,622 938.8,538 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
-                <ellipse cx="574.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
-                <ellipse cx="865.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
 
                 <!-- 往上看微笑表情 -->
                 <g>
@@ -856,37 +861,34 @@
                         </text>
                     </g>
                 </g>
-
-                <!-- 左上微傾「有所味」Logo (1:1 對齊 有所味網頁設計-10_4.jpg 角度與位置，並保留輕柔上下浮動) -->
-                <g class="pointer-events-none" transform="translate(642, 112) rotate(-14)">
-                    <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
-                        <image href="./img/logo.png" x="-190" y="-70" width="380" height="150" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
-                    </g>
-                </g>
             </g>
 
-            <!-- 2. 中下段左方：直接打開的珊瑚紅垃圾桶「公廁地圖」 (向下移動空隙的 2/3) -->
+            <!-- 2. 左下側：直接打開的珊瑚紅垃圾桶「公廁地圖」 (位於馬桶左方，與馬桶左腳交疊) -->
             <g id="mobileZoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
-                <rect x="116" y="552" width="116" height="224" rx="18" fill="transparent" />
+                <rect x="28" y="438" width="112" height="214" rx="18" fill="transparent" />
 
                 <!-- 下方珊瑚紅圓柱桶身 -->
-                <path d="M 123,636 L 123,752 A 50,19.5 0 0,0 223,752 L 223,636"
+                <path d="M 33,518 L 33,624 A 51,19.5 0 0,0 135,624 L 135,518"
                       fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 <!-- 薄荷綠桶口內圈 + 橫向「公廁地圖」文字 -->
-                <ellipse cx="173" cy="636" rx="50" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="173" y="637" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <ellipse cx="84" cy="518" rx="51" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="84" y="519" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     公廁地圖
                 </text>
 
                 <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈) -->
-                <path d="M 123,578 L 123,591 A 50,19 0 0,0 223,591 L 223,578"
+                <path d="M 33,462 L 33,475 A 51,19 0 0,0 135,475 L 135,462"
                       fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                <ellipse cx="173" cy="578" rx="50" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                <ellipse cx="84" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
             </g>
 
-            <!-- 3. 中下段右方：三捲衛生紙「小怪圖鑑」 (向下移動空隙的 2/3) -->
+            <!-- 馬桶左右兩側水平對齊的橢圓小手/小腳 (左椭圆位於垃圾桶前層、右椭圆位於衛生紙捲後層) -->
+            <ellipse cx="153" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
+            <ellipse cx="297" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
+
+            <!-- 3. 右下側：三捲衛生紙「小怪圖鑑」 (位於馬桶右方並覆蓋馬桶右腳) -->
             <g id="mobileZoneMonsterDex" class="poogle-zone" role="button" aria-label="小怪圖鑑"
-               transform="translate(280, 672) scale(0.675) translate(-1090, -612)">
+               transform="translate(355, 566) scale(0.675) translate(-1090, -612)">
                 <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
 
                 <!-- 中下偏右直立衛生紙捲 -->
@@ -918,24 +920,24 @@
                 </g>
             </g>
 
-            <!-- 4. 最下方：橫向排列的「個人空間」貼紙 + 緊急按鈕 (向下移動空隙的 2/3) -->
+            <!-- 4. 底部置中：橫向排列的「個人空間」貼紙 + 緊急按鈕 -->
             <g id="mobileZonePersonalSpace" class="poogle-zone" role="button" aria-label="個人空間">
-                <rect x="110" y="789" width="170" height="68" rx="14" fill="transparent" />
+                <rect x="148" y="676" width="170" height="68" rx="14" fill="transparent" />
 
                 <!-- 左方「個人空間」圓角貼紙 -->
-                <rect x="116" y="797" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="170" y="823" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <rect x="154" y="684" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="208" y="710" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     個人空間
                 </text>
 
                 <!-- 右方牆上緊急按鈕 -->
-                <rect x="233" y="795" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <rect x="246.5" y="812" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
+                <rect x="271" y="682" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <rect x="284.5" y="699" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
             </g>
 
-            <!-- 5. 手機版 3 顆小怪泡泡 (右上、中左、右下同步向下移動空隙的 2/3) -->
-            <g id="mobileBubblesGroup">
-                <!-- 手機泡泡 0：右上 (微出血) -->
+            <!-- 5. 手機版小怪泡泡圖層 (依 有所味網頁設計-11.jpg 隱藏，保留 DOM 供腳本安全同步) -->
+            <g id="mobileBubblesGroup" class="hidden">
+                <!-- 手機泡泡 0：右上 -->
                 <g class="mobile-bubble-unit cursor-pointer" data-slot="0" transform="translate(395, 174)">
                     <g class="bubble-travel-wrapper bubble-rise-in" style="animation-delay: 0.05s;">
                         <g class="bubble-float-loop" style="animation-delay: 0s;">
