@@ -30,9 +30,16 @@
             font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
             background-color: var(--poogle-mint-bg);
             color: var(--poogle-ink);
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             margin: 0;
             padding: 0;
+        }
+        @media (min-width: 768px) {
+            body {
+                overflow: hidden;
+            }
         }
 
         /* 頂部 POOPGLE 跑馬燈連續動畫 (GPU 硬體加速無縫平滑捲動) */
@@ -529,14 +536,15 @@
             cursor: pointer;
             outline: none !important;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
     </style>
 </head>
 
-<body class="h-screen w-screen overflow-hidden select-none relative flex flex-col">
+<body class="min-h-screen md:h-screen w-screen overflow-x-hidden overflow-y-auto md:overflow-hidden select-none relative flex flex-col">
 
     <!-- 1. TOP MARQUEE BAR (POOPGLE 跑馬燈：高度與文字縮小 1/2，獨立渲染層防止卡頓) -->
-    <header class="poopgle-header-bar w-full h-4 sm:h-[18px] bg-[#2A348C] overflow-hidden flex items-center shrink-0 z-40">
+    <header class="poopgle-header-bar sticky top-0 w-full h-4 sm:h-[18px] bg-[#2A348C] overflow-hidden flex items-center shrink-0 z-40">
         <div class="poopgle-marquee-track items-center">
             <!-- 第一組 -->
             <div class="flex items-center shrink-0">
@@ -576,7 +584,7 @@
     </header>
 
     <!-- 2. TOP-RIGHT USER LOGIN BUTTON (預設匿名頭貼 1:1 還原 pp頭貼.svg) -->
-    <button id="homeLoginBtn" type="button" class="fixed top-[48px] right-[2.8%] z-30 flex items-center gap-3 sm:gap-3.5 group focus:outline-none">
+    <button id="homeLoginBtn" type="button" class="absolute md:fixed top-[42px] md:top-[48px] right-[4.5%] md:right-[2.8%] z-30 flex items-center gap-3 sm:gap-3.5 group focus:outline-none">
         <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
         <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
             <svg viewBox="0 0 104 104" class="w-full h-full block">
@@ -606,12 +614,12 @@
         <g id="halftoneDotsBgLayer" fill="#FFFFFF" opacity="0.55"></g>
     </svg>
 
-    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x900) -->
-    <main class="flex-1 min-h-0 w-full flex items-end justify-center overflow-hidden relative z-10">
+    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x930 可上下滑動) -->
+    <main class="flex-1 md:min-h-0 w-full flex items-start md:items-end justify-center overflow-visible md:overflow-hidden relative z-10">
         <!-- =============================================================== -->
         <!-- 5A. MOBILE STAGE SVG (手機版 < 768px：直接顯示所有選項 + 3顆小怪泡泡) -->
         <!-- =============================================================== -->
-        <svg id="mobileStageSvg" viewBox="0 0 430 900" preserveAspectRatio="xMidYMid meet" class="block md:hidden w-full h-full max-w-full max-h-full select-none">
+        <svg id="mobileStageSvg" viewBox="0 0 430 930" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
             <defs>
                 <!-- 手機版泡泡圓形裁切遮罩 (r=51) -->
                 <clipPath id="mobileBubbleInnerClip">
@@ -1750,6 +1758,10 @@
                     halftoneCursorX = e.clientX;
                     halftoneCursorY = e.clientY;
                 });
+                window.addEventListener('pointermove', (e) => {
+                    halftoneCursorX = e.clientX;
+                    halftoneCursorY = e.clientY;
+                }, { passive: true });
                 window.addEventListener('mouseleave', () => {
                     halftoneCursorX = null;
                     halftoneCursorY = null;
