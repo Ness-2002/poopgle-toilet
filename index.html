@@ -645,7 +645,7 @@
     </header>
 
     <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；電腦版：頭貼維持右上角) -->
-    <div id="topRightNavContainer" class="absolute md:fixed top-[36px] md:top-[44px] left-[6.8%] right-[6.8%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
+    <div id="topRightNavContainer" class="absolute md:fixed top-[34px] md:top-[44px] left-[7.4%] right-[7.4%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
         <!-- 登入文字與頭貼按鈕 -->
         <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
             <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
@@ -736,12 +736,12 @@
         <g id="halftoneDotsBgLayer" fill="#FFFFFF" opacity="0.55"></g>
     </svg>
 
-    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x930 可上下滑動) -->
+    <!-- 5. MAIN VECTOR STAGE (響應式切換：電腦版 1440x780 / 手機版 430x845 整體選項圖樣上移空隙的 1/2) -->
     <main class="flex-1 md:min-h-0 w-full flex items-start md:items-end justify-center overflow-visible md:overflow-hidden relative z-10">
         <!-- =============================================================== -->
-        <!-- 5A. MOBILE STAGE SVG (手機版 < 768px：直接顯示所有選項 + 3顆小怪泡泡) -->
+        <!-- 5A. MOBILE STAGE SVG (手機版 < 768px：整體選項圖樣上移空隙的 1/2) -->
         <!-- =============================================================== -->
-        <svg id="mobileStageSvg" viewBox="0 0 430 930" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
+        <svg id="mobileStageSvg" viewBox="0 0 430 845" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
             <defs>
                 <!-- 手機版泡泡圓形裁切遮罩 (r=51) -->
                 <clipPath id="mobileBubbleInnerClip">
@@ -768,8 +768,8 @@
                 </g>
             </defs>
 
-            <!-- 1. 上方中央：直接打開的馬桶 (含公廁現況版、公廁回報系統與斜向有所味 Logo，1:1 對齊 有所味網頁設計-10_2.jpg) -->
-            <g id="mobileCenterToiletGroup" transform="translate(220, 366) scale(0.57) translate(-720, -445)">
+            <!-- 1. 上方中央：直接打開的馬桶 (整體上移空隙的 1/2) -->
+            <g id="mobileCenterToiletGroup" transform="translate(222, 306) scale(0.565) translate(-720, -445)">
                 <!-- 掀開的直立橢圓馬桶蓋 -->
                 <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
 
@@ -857,36 +857,36 @@
                     </g>
                 </g>
 
-                <!-- 左上微傾「有所味」Logo (1:1 對齊 有所味網頁設計-10_2.jpg 角度與位置，並保留輕柔上下浮動) -->
-                <g class="pointer-events-none" transform="translate(652, 118) rotate(-13)">
+                <!-- 左上微傾「有所味」Logo (1:1 對齊 有所味網頁設計-10_4.jpg 角度與位置，並保留輕柔上下浮動) -->
+                <g class="pointer-events-none" transform="translate(642, 112) rotate(-14)">
                     <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
-                        <image href="./img/logo.png" x="-185" y="-68" width="370" height="146" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                        <image href="./img/logo.png" x="-190" y="-70" width="380" height="150" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
                     </g>
                 </g>
             </g>
 
-            <!-- 2. 中下段左方：直接打開的珊瑚紅垃圾桶「公廁地圖」 (1:1 還原 有所味網頁設計-10_2.jpg) -->
+            <!-- 2. 中下段左方：直接打開的珊瑚紅垃圾桶「公廁地圖」 (整體上移空隙的 1/2) -->
             <g id="mobileZoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
-                <rect x="108" y="580" width="120" height="220" rx="18" fill="transparent" />
+                <rect x="116" y="522" width="116" height="224" rx="18" fill="transparent" />
 
                 <!-- 下方珊瑚紅圓柱桶身 -->
-                <path d="M 118,659 L 118,772 A 50,19 0 0,0 218,772 L 218,659"
+                <path d="M 123,606 L 123,722 A 50,19.5 0 0,0 223,722 L 223,606"
                       fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 <!-- 薄荷綠桶口內圈 + 橫向「公廁地圖」文字 -->
-                <ellipse cx="168" cy="659" rx="50" ry="19.5" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="168" y="660" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <ellipse cx="173" cy="606" rx="50" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="173" y="607" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     公廁地圖
                 </text>
 
                 <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈) -->
-                <path d="M 118,605 L 118,617 A 50,18.5 0 0,0 218,617 L 218,605"
+                <path d="M 123,548 L 123,561 A 50,19 0 0,0 223,561 L 223,548"
                       fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                <ellipse cx="168" cy="605" rx="50" ry="18.5" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                <ellipse cx="173" cy="548" rx="50" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
             </g>
 
-            <!-- 3. 中下段右方：三捲衛生紙「小怪圖鑑」 (1:1 還原 有所味網頁設計-10_2.jpg) -->
+            <!-- 3. 中下段右方：三捲衛生紙「小怪圖鑑」 (整體上移空隙的 1/2) -->
             <g id="mobileZoneMonsterDex" class="poogle-zone" role="button" aria-label="小怪圖鑑"
-               transform="translate(276, 692) scale(0.665) translate(-1090, -612)">
+               transform="translate(280, 642) scale(0.675) translate(-1090, -612)">
                 <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
 
                 <!-- 中下偏右直立衛生紙捲 -->
@@ -918,29 +918,29 @@
                 </g>
             </g>
 
-            <!-- 4. 最下方：橫向排列的「個人空間」貼紙 + 緊急按鈕 (1:1 還原 有所味網頁設計-10_2.jpg) -->
+            <!-- 4. 最下方：橫向排列的「個人空間」貼紙 + 緊急按鈕 (整體上移空隙的 1/2) -->
             <g id="mobileZonePersonalSpace" class="poogle-zone" role="button" aria-label="個人空間">
-                <rect x="110" y="810" width="170" height="64" rx="14" fill="transparent" />
+                <rect x="110" y="759" width="170" height="68" rx="14" fill="transparent" />
 
                 <!-- 左方「個人空間」圓角貼紙 -->
-                <rect x="116" y="818" width="106" height="46" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="169" y="841" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <rect x="116" y="767" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="170" y="793" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     個人空間
                 </text>
 
                 <!-- 右方牆上緊急按鈕 -->
-                <rect x="232" y="817" width="40" height="49" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <rect x="245" y="832" width="14" height="19" rx="7" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
+                <rect x="233" y="765" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <rect x="246.5" y="782" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
             </g>
 
-            <!-- 5. 手機版 3 顆小怪泡泡 (右上、中左、右下，1:1 還原 有所味網頁設計-10_2.jpg) -->
+            <!-- 5. 手機版 3 顆小怪泡泡 (右上、中左、右下同步上移空隙的 1/2) -->
             <g id="mobileBubblesGroup">
-                <!-- 手機泡泡 0：右上 -->
-                <g class="mobile-bubble-unit cursor-pointer" data-slot="0" transform="translate(388, 204)">
+                <!-- 手機泡泡 0：右上 (微出血) -->
+                <g class="mobile-bubble-unit cursor-pointer" data-slot="0" transform="translate(395, 144)">
                     <g class="bubble-travel-wrapper bubble-rise-in" style="animation-delay: 0.05s;">
                         <g class="bubble-float-loop" style="animation-delay: 0s;">
                             <g class="bubble-body-group">
-                                <circle cx="0" cy="0" r="53" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
+                                <circle cx="0" cy="0" r="52" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
                                 <g id="mobileBubbleMonsterSlot_0" class="bubble-monster-slot" clip-path="url(#mobileBubbleInnerClip)">
                                     <image id="mobileBubbleMonsterImg_0" x="-44" y="-44" width="88" height="88" preserveAspectRatio="xMidYMid meet" />
                                 </g>
@@ -953,12 +953,12 @@
                     </g>
                 </g>
 
-                <!-- 手機泡泡 1：中左 -->
-                <g class="mobile-bubble-unit cursor-pointer" data-slot="1" transform="translate(38, 524)">
+                <!-- 手機泡泡 1：中左 (馬桶左下側微出血) -->
+                <g class="mobile-bubble-unit cursor-pointer" data-slot="1" transform="translate(38, 458)">
                     <g class="bubble-travel-wrapper bubble-rise-in" style="animation-delay: 0.16s;">
                         <g class="bubble-float-loop" style="animation-delay: -1.2s;">
                             <g class="bubble-body-group">
-                                <circle cx="0" cy="0" r="53" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
+                                <circle cx="0" cy="0" r="52" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
                                 <g id="mobileBubbleMonsterSlot_1" class="bubble-monster-slot" clip-path="url(#mobileBubbleInnerClip)">
                                     <image id="mobileBubbleMonsterImg_1" x="-44" y="-44" width="88" height="88" preserveAspectRatio="xMidYMid meet" />
                                 </g>
@@ -971,12 +971,12 @@
                     </g>
                 </g>
 
-                <!-- 手機泡泡 2：右下 -->
-                <g class="mobile-bubble-unit cursor-pointer" data-slot="2" transform="translate(372, 856)">
+                <!-- 手機泡泡 2：右下 (右下角微出血) -->
+                <g class="mobile-bubble-unit cursor-pointer" data-slot="2" transform="translate(382, 796)">
                     <g class="bubble-travel-wrapper bubble-rise-in" style="animation-delay: 0.26s;">
                         <g class="bubble-float-loop" style="animation-delay: -2.3s;">
                             <g class="bubble-body-group">
-                                <circle cx="0" cy="0" r="53" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
+                                <circle cx="0" cy="0" r="52" fill="transparent" stroke="#FFF9EC" stroke-width="2" />
                                 <g id="mobileBubbleMonsterSlot_2" class="bubble-monster-slot" clip-path="url(#mobileBubbleInnerClip)">
                                     <image id="mobileBubbleMonsterImg_2" x="-44" y="-44" width="88" height="88" preserveAspectRatio="xMidYMid meet" />
                                 </g>
