@@ -537,17 +537,21 @@
             outline: none !important;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
-            transition: filter 0.15s ease;
+            transition: filter 0.18s ease;
         }
 
-        /* 按下／點按選項時的發光特效 */
-        #mobileStageSvg .poogle-zone:active,
-        #mobileStageSvg .poogle-zone.is-pressed-glow,
-        #openReportSystemBtn:active,
-        #openReportSystemBtn.is-pressed-glow,
-        #openStatusBoardBtn:active,
-        #openStatusBoardBtn.is-pressed-glow {
-            filter: url(#mobilePressGlow) drop-shadow(0 0 10px #FFF9EC) drop-shadow(0 0 18px #F3EF84);
+        /* 按下／點按選項時的柔和微白光特效（與電腦版 Hover 白光一致） */
+        #mobileCenterToiletGroup {
+            transition: filter 0.18s ease;
+        }
+        #mobileZoneMapTrashCan:active,
+        #mobileZoneMapTrashCan.is-pressed-glow,
+        #mobileZoneMonsterDex:active,
+        #mobileZoneMonsterDex.is-pressed-glow,
+        #mobileZonePersonalSpace:active,
+        #mobileZonePersonalSpace.is-pressed-glow,
+        #mobileCenterToiletGroup.is-pressed-glow {
+            filter: url(#mobilePressGlow);
         }
 
         /* ========================================================= */
@@ -744,10 +748,9 @@
         <!-- =============================================================== -->
         <svg id="mobileStageSvg" viewBox="0 0 430 780" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
             <defs>
-                <!-- 手機版按下選項時的雙層暖白亮黃外發光濾鏡 -->
-                <filter id="mobilePressGlow" x="-35%" y="-35%" width="170%" height="170%">
-                    <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#FFF9EC" flood-opacity="1" />
-                    <feDropShadow dx="0" dy="0" stdDeviation="11" flood-color="#F3EF84" flood-opacity="0.95" />
+                <!-- 手機版按下選項時的柔和微白光濾鏡 (比照電腦版 #whiteGlow) -->
+                <filter id="mobilePressGlow" x="-25%" y="-25%" width="150%" height="150%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="6.5" flood-color="#FFF9EC" flood-opacity="0.96" />
                 </filter>
 
                 <!-- 手機版泡泡圓形裁切遮罩 (r=51) -->
@@ -2877,27 +2880,38 @@
             const homeClickAudio = new Audio('./sfx/home_click.mp3');
             homeClickAudio.preload = 'auto';
 
-            // 手機版與電腦版點擊選項時的發光回饋觸發器
+            // 手機版按下選項時的柔和微白光回饋（若點擊馬桶內的子選項，則讓整座馬桶一起發光）
+            const resolveMobileGlowTarget = (el) => {
+                if (!el) return null;
+                if (el.id === 'mobileOpenReportSystemBtn' || el.id === 'mobileOpenStatusBoardBtn') {
+                    return document.getElementById('mobileCenterToiletGroup');
+                }
+                return el;
+            };
+
             const triggerPressGlow = (el) => {
-                if (!el) return;
-                el.classList.add('is-pressed-glow');
+                const target = resolveMobileGlowTarget(el);
+                if (!target) return;
+                target.classList.add('is-pressed-glow');
                 setTimeout(() => {
-                    el.classList.remove('is-pressed-glow');
+                    target.classList.remove('is-pressed-glow');
                 }, 380);
             };
 
-            document.querySelectorAll('#mobileStageSvg .poogle-zone, #openReportSystemBtn, #openStatusBoardBtn').forEach((zoneEl) => {
+            document.querySelectorAll('#mobileStageSvg .poogle-zone').forEach((zoneEl) => {
+                const target = resolveMobileGlowTarget(zoneEl);
+                if (!target) return;
                 zoneEl.addEventListener('pointerdown', () => {
-                    zoneEl.classList.add('is-pressed-glow');
+                    target.classList.add('is-pressed-glow');
                 });
                 zoneEl.addEventListener('pointerup', () => {
-                    setTimeout(() => zoneEl.classList.remove('is-pressed-glow'), 260);
+                    setTimeout(() => target.classList.remove('is-pressed-glow'), 260);
                 });
                 zoneEl.addEventListener('pointercancel', () => {
-                    zoneEl.classList.remove('is-pressed-glow');
+                    target.classList.remove('is-pressed-glow');
                 });
                 zoneEl.addEventListener('mouseleave', () => {
-                    zoneEl.classList.remove('is-pressed-glow');
+                    target.classList.remove('is-pressed-glow');
                 });
             });
 
