@@ -537,6 +537,17 @@
             outline: none !important;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            transition: filter 0.15s ease;
+        }
+
+        /* 按下／點按選項時的發光特效 */
+        #mobileStageSvg .poogle-zone:active,
+        #mobileStageSvg .poogle-zone.is-pressed-glow,
+        #openReportSystemBtn:active,
+        #openReportSystemBtn.is-pressed-glow,
+        #openStatusBoardBtn:active,
+        #openStatusBoardBtn.is-pressed-glow {
+            filter: url(#mobilePressGlow) drop-shadow(0 0 10px #FFF9EC) drop-shadow(0 0 18px #F3EF84);
         }
 
         /* ========================================================= */
@@ -650,17 +661,7 @@
         <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
             <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
             <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
-                <svg viewBox="0 0 104 104" class="w-full h-full block">
-                    <defs>
-                        <clipPath id="anonPoopClip_init">
-                            <circle cx="52" cy="52" r="52" />
-                        </clipPath>
-                    </defs>
-                    <g clip-path="url(#anonPoopClip_init)">
-                        <circle cx="52" cy="52" r="52" fill="#2A348C" />
-                        <path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="#FF99D3" />
-                    </g>
-                </svg>
+                <img src="./img/pfp/anonymous_1.png" alt="匿名訪客頭貼" class="w-full h-full object-cover block rounded-full" />
             </span>
         </button>
 
@@ -743,6 +744,12 @@
         <!-- =============================================================== -->
         <svg id="mobileStageSvg" viewBox="0 0 430 780" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
             <defs>
+                <!-- 手機版按下選項時的雙層暖白亮黃外發光濾鏡 -->
+                <filter id="mobilePressGlow" x="-35%" y="-35%" width="170%" height="170%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#FFF9EC" flood-opacity="1" />
+                    <feDropShadow dx="0" dy="0" stdDeviation="11" flood-color="#F3EF84" flood-opacity="0.95" />
+                </filter>
+
                 <!-- 手機版泡泡圓形裁切遮罩 (r=51) -->
                 <clipPath id="mobileBubbleInnerClip">
                     <circle cx="0" cy="0" r="51" />
@@ -768,15 +775,15 @@
                 </g>
             </defs>
 
-            <!-- 0. 頂端水平置中：「有所味」Logo (對齊 有所味網頁設計-11.jpg 位置並保留輕柔上下飄動) -->
-            <g class="pointer-events-none" transform="translate(225, 160)">
+            <!-- 0. 頂端水平置中：「有所味」Logo (精準對齊畫布中心 x=215 並保留輕柔上下飄動) -->
+            <g class="pointer-events-none" transform="translate(215, 160)">
                 <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
                     <image href="./img/logo.png" x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
                 </g>
             </g>
 
-            <!-- 1. 中央：直接打開的馬桶 (公廁現況版 + 公廁回報系統) -->
-            <g id="mobileCenterToiletGroup" transform="translate(225, 441) scale(0.573) translate(-720, -445)">
+            <!-- 1. 中央：直接打開的馬桶 (精準置中於 x=215：公廁現況版 + 公廁回報系統) -->
+            <g id="mobileCenterToiletGroup" transform="translate(215, 441) scale(0.573) translate(-720, -445)">
                 <!-- 掀開的直立橢圓馬桶蓋 -->
                 <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
 
@@ -863,76 +870,77 @@
                 </g>
             </g>
 
-            <!-- 2. 左下側：直接打開的珊瑚紅垃圾桶「公廁地圖」 (位於馬桶左方，與馬桶左腳交疊) -->
+            <!-- 2. 左下側：直接打開的珊瑚紅垃圾桶「公廁地圖」 (與右側衛生紙捲對稱置中) -->
             <g id="mobileZoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
-                <rect x="28" y="438" width="112" height="214" rx="18" fill="transparent" />
+                <rect x="24" y="438" width="112" height="214" rx="18" fill="transparent" />
 
                 <!-- 下方珊瑚紅圓柱桶身 -->
-                <path d="M 33,518 L 33,624 A 51,19.5 0 0,0 135,624 L 135,518"
+                <path d="M 29,518 L 29,624 A 51,19.5 0 0,0 131,624 L 131,518"
                       fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
                 <!-- 薄荷綠桶口內圈 + 橫向「公廁地圖」文字 -->
-                <ellipse cx="84" cy="518" rx="51" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="84" y="519" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <ellipse cx="80" cy="518" rx="51" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="80" y="519" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     公廁地圖
                 </text>
 
                 <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈) -->
-                <path d="M 33,462 L 33,475 A 51,19 0 0,0 135,475 L 135,462"
+                <path d="M 29,462 L 29,475 A 51,19 0 0,0 131,475 L 131,462"
                       fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                <ellipse cx="84" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                <ellipse cx="80" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
             </g>
 
-            <!-- 馬桶左右兩側水平對齊的橢圓小手/小腳 (左椭圆位於垃圾桶前層、右椭圆位於衛生紙捲後層) -->
-            <ellipse cx="153" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
-            <ellipse cx="297" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
+            <!-- 馬桶左右兩側水平對齊的橢圓小手/小腳 (以 x=215 對稱：cx=143 與 cx=287) -->
+            <ellipse cx="143" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
+            <ellipse cx="287" cy="621" rx="24.6" ry="14.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.5" class="pointer-events-none" />
 
-            <!-- 3. 右下側：三捲衛生紙「小怪圖鑑」 (位於馬桶右方並覆蓋馬桶右腳) -->
-            <g id="mobileZoneMonsterDex" class="poogle-zone" role="button" aria-label="小怪圖鑑"
-               transform="translate(355, 566) scale(0.675) translate(-1090, -612)">
-                <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
+            <!-- 3. 右下側：三捲衛生紙「小怪圖鑑」 (與左側垃圾桶對稱配置於馬桶右方) -->
+            <g id="mobileZoneMonsterDex" class="poogle-zone" role="button" aria-label="小怪圖鑑">
+                <g transform="translate(348, 566) scale(0.675) translate(-1090, -612)">
+                    <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
 
-                <!-- 中下偏右直立衛生紙捲 -->
-                <g>
-                    <path d="M 1058,576 L 1058,690 A 55,20 0 0,0 1168,690 L 1168,576"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                    <ellipse cx="1113" cy="576" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
-                    <ellipse cx="1113" cy="576" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
-                </g>
+                    <!-- 中下偏右直立衛生紙捲 -->
+                    <g>
+                        <path d="M 1058,576 L 1058,690 A 55,20 0 0,0 1168,690 L 1168,576"
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                        <ellipse cx="1113" cy="576" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                        <ellipse cx="1113" cy="576" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+                    </g>
 
-                <!-- 左下水平橫放衛生紙捲 -->
-                <g>
-                    <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                    <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
-                    <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
-                </g>
+                    <!-- 左下水平橫放衛生紙捲 -->
+                    <g>
+                        <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                        <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                        <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+                    </g>
 
-                <!-- 最上方直立衛生紙捲 + 「小怪 / 圖鑑」文字 -->
-                <g>
-                    <path d="M 1041,474 L 1041,580 A 55,20 0 0,0 1151,580 L 1151,474"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                    <ellipse cx="1096" cy="474" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
-                    <ellipse cx="1096" cy="474" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
-                    <text fill="#2A348C" font-size="22" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
-                        <tspan x="1096" y="523">小怪</tspan>
-                        <tspan x="1096" y="553">圖鑑</tspan>
-                    </text>
+                    <!-- 最上方直立衛生紙捲 + 「小怪 / 圖鑑」文字 -->
+                    <g>
+                        <path d="M 1041,474 L 1041,580 A 55,20 0 0,0 1151,580 L 1151,474"
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                        <ellipse cx="1096" cy="474" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                        <ellipse cx="1096" cy="474" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+                        <text fill="#2A348C" font-size="22" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                            <tspan x="1096" y="523">小怪</tspan>
+                            <tspan x="1096" y="553">圖鑑</tspan>
+                        </text>
+                    </g>
                 </g>
             </g>
 
-            <!-- 4. 底部置中：橫向排列的「個人空間」貼紙 + 緊急按鈕 -->
+            <!-- 4. 底部置中：橫向排列的「個人空間」貼紙 + 緊急按鈕 (整體總寬 157px 精準置中於 x=215) -->
             <g id="mobileZonePersonalSpace" class="poogle-zone" role="button" aria-label="個人空間">
-                <rect x="148" y="676" width="170" height="68" rx="14" fill="transparent" />
+                <rect x="130" y="676" width="170" height="68" rx="14" fill="transparent" />
 
                 <!-- 左方「個人空間」圓角貼紙 -->
-                <rect x="154" y="684" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="208" y="710" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                <rect x="136.5" y="684" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <text x="190.5" y="710" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                     個人空間
                 </text>
 
                 <!-- 右方牆上緊急按鈕 -->
-                <rect x="271" y="682" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <rect x="284.5" y="699" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
+                <rect x="253.5" y="682" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                <rect x="267" y="699" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
             </g>
 
             <!-- 5. 手機版小怪泡泡圖層 (依 有所味網頁設計-11.jpg 隱藏，保留 DOM 供腳本安全同步) -->
@@ -2082,9 +2090,21 @@
 
         let currentSessionAnonPfp = null;
         function getRandomAnonymousPfpKey(forceNew = false) {
-            if (!forceNew && currentSessionAnonPfp) return currentSessionAnonPfp;
+            if (!forceNew) {
+                if (currentSessionAnonPfp) return currentSessionAnonPfp;
+                try {
+                    const savedAnon = sessionStorage.getItem('poogle_anon_pfp');
+                    if (savedAnon && ANONYMOUS_PFP_LIST.includes(savedAnon)) {
+                        currentSessionAnonPfp = savedAnon;
+                        return currentSessionAnonPfp;
+                    }
+                } catch (e) {}
+            }
             const randomIndex = Math.floor(Math.random() * ANONYMOUS_PFP_LIST.length);
             currentSessionAnonPfp = ANONYMOUS_PFP_LIST[randomIndex];
+            try {
+                sessionStorage.setItem('poogle_anon_pfp', currentSessionAnonPfp);
+            } catch (e) {}
             return currentSessionAnonPfp;
         }
 
@@ -2092,7 +2112,9 @@
             const legacyMap = {
                 'red_toilet': 'free_toilet',
                 'blue_squat': 'free_squat',
-                'yellow_urinal': 'free_urinal'
+                'yellow_urinal': 'free_urinal',
+                'default_poop': 'free_toilet',
+                'pink_poop': 'free_toilet'
             };
             const mapped = legacyMap[avatarType] || avatarType;
             if (FREE_LOGGED_IN_PFP_LIST.includes(mapped)) return mapped;
@@ -2855,6 +2877,30 @@
             const homeClickAudio = new Audio('./sfx/home_click.mp3');
             homeClickAudio.preload = 'auto';
 
+            // 手機版與電腦版點擊選項時的發光回饋觸發器
+            const triggerPressGlow = (el) => {
+                if (!el) return;
+                el.classList.add('is-pressed-glow');
+                setTimeout(() => {
+                    el.classList.remove('is-pressed-glow');
+                }, 380);
+            };
+
+            document.querySelectorAll('#mobileStageSvg .poogle-zone, #openReportSystemBtn, #openStatusBoardBtn').forEach((zoneEl) => {
+                zoneEl.addEventListener('pointerdown', () => {
+                    zoneEl.classList.add('is-pressed-glow');
+                });
+                zoneEl.addEventListener('pointerup', () => {
+                    setTimeout(() => zoneEl.classList.remove('is-pressed-glow'), 260);
+                });
+                zoneEl.addEventListener('pointercancel', () => {
+                    zoneEl.classList.remove('is-pressed-glow');
+                });
+                zoneEl.addEventListener('mouseleave', () => {
+                    zoneEl.classList.remove('is-pressed-glow');
+                });
+            });
+
             const playHomeClickSfx = (navigateCallback) => {
                 try {
                     homeClickAudio.currentTime = 0;
@@ -2862,19 +2908,20 @@
                     if (typeof navigateCallback === 'function') {
                         if (playPromise !== undefined) {
                             playPromise
-                                .then(() => setTimeout(navigateCallback, 160))
-                                .catch(() => navigateCallback());
+                                .then(() => setTimeout(navigateCallback, 200))
+                                .catch(() => setTimeout(navigateCallback, 160));
                         } else {
-                            setTimeout(navigateCallback, 160);
+                            setTimeout(navigateCallback, 200);
                         }
                     }
                 } catch (e) {
-                    if (typeof navigateCallback === 'function') navigateCallback();
+                    if (typeof navigateCallback === 'function') setTimeout(navigateCallback, 160);
                 }
             };
 
-            // 1. 點擊「公廁地圖 (紅色垃圾桶)」 -> 進入 map.html
-            const handleGoMap = () => {
+            // 1. 點擊「公廁地圖 (紅色垃圾桶)」 -> 發光並進入 map.html
+            const handleGoMap = (e) => {
+                if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 playHomeClickSfx(() => {
                     window.location.href = './map.html';
                 });
@@ -2882,12 +2929,17 @@
             zoneMapTrashCan?.addEventListener('click', handleGoMap);
             document.getElementById('mobileZoneMapTrashCan')?.addEventListener('click', handleGoMap);
 
-            // 2. 點擊「公廁回報系統」 -> 開啟網路定位彈窗
+            // 2. 點擊「公廁回報系統」 -> 發光並開啟網路定位彈窗
             const locateMethodModal = document.getElementById('locateMethodModal');
             const handleOpenLocateModal = (e) => {
-                if (e) e.stopPropagation();
+                if (e) {
+                    e.stopPropagation();
+                    if (e.currentTarget) triggerPressGlow(e.currentTarget);
+                }
                 playHomeClickSfx();
-                locateMethodModal?.classList.remove('hidden');
+                setTimeout(() => {
+                    locateMethodModal?.classList.remove('hidden');
+                }, 140);
             };
             document.getElementById('openReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
             document.getElementById('mobileOpenReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
@@ -2908,12 +2960,17 @@
                 if (labelEl) labelEl.textContent = '定位啟動中...';
             });
 
-            // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 顯示施工中彈窗
+            // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 發光並顯示施工中彈窗
             const underConstructionModal = document.getElementById('underConstructionModal');
             const openUnderConstruction = (e) => {
-                if (e) e.stopPropagation();
+                if (e) {
+                    e.stopPropagation();
+                    if (e.currentTarget) triggerPressGlow(e.currentTarget);
+                }
                 playHomeClickSfx();
-                underConstructionModal?.classList.remove('hidden');
+                setTimeout(() => {
+                    underConstructionModal?.classList.remove('hidden');
+                }, 140);
             };
             document.getElementById('openStatusBoardBtn')?.addEventListener('click', openUnderConstruction);
             document.getElementById('mobileOpenStatusBoardBtn')?.addEventListener('click', openUnderConstruction);
@@ -2926,8 +2983,9 @@
                 if (e.target === underConstructionModal) underConstructionModal.classList.add('hidden');
             });
 
-            // 4. 點擊「個人空間」 -> 若已登入跳轉 profile.html，未登入彈出登入視窗
-            const handleOpenPersonalSpace = () => {
+            // 4. 點擊「個人空間」 -> 發光並判斷登入狀態（已登入跳轉 profile.html，未登入彈出登入視窗）
+            const handleOpenPersonalSpace = (e) => {
+                if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 let cachedUser = null;
                 try {
                     cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
@@ -2945,7 +3003,9 @@
                     if (statusText) {
                         statusText.textContent = '個人空間需要登入 Google 帳號才能使用，請先登入！';
                     }
-                    document.getElementById('loginModal')?.classList.remove('hidden');
+                    setTimeout(() => {
+                        document.getElementById('loginModal')?.classList.remove('hidden');
+                    }, 140);
                 }
             };
             zonePersonalSpace?.addEventListener('click', handleOpenPersonalSpace);
@@ -3079,6 +3139,13 @@
                         || userObj.avatarType
                         || DEFAULT_LOGGED_IN_PFP;
                     chosenAvatar = normalizeLoggedInAvatarType(rawSaved);
+                    localStorage.setItem(`poogle_avatar_${userObj.uid}`, chosenAvatar);
+                    localStorage.setItem('poogle_latest_avatar', chosenAvatar);
+                    const cachedAuth = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
+                    if (cachedAuth && cachedAuth.uid === userObj.uid) {
+                        cachedAuth.avatarType = chosenAvatar;
+                        localStorage.setItem('poogle_auth_user', JSON.stringify(cachedAuth));
+                    }
                 } catch (e) {}
 
                 if (loginText) loginText.textContent = userObj.displayName || '評鑑員';
