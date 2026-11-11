@@ -1798,70 +1798,70 @@
                     <clipPath id="mobileDoorWheelViewportClip">
                         <rect x="-400" y="-400" width="1230" height="1732" />
                     </clipPath>
-                    <!-- 手機版米白門元件 (放大 1 倍：尺寸 154x228，轉盤半徑 R=395) -->
+                    <!-- 手機版米白門元件 (水平置中對齊，尺寸 154x228) -->
                     <g id="mobileCreamToiletDoorUnit">
-                        <rect x="-77" y="-509" width="154" height="228" rx="22"
+                        <rect x="-77" y="-114" width="154" height="228" rx="22"
                               fill="#FFF9EC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
-                        <circle cx="43" cy="-380" r="11"
+                        <circle cx="43" cy="15" r="11"
                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2" />
                     </g>
                 </defs>
 
                 <g clip-path="url(#mobileDoorWheelViewportClip)">
-                    <!-- 1. 手機ui-23.jpg：右下圓心 (cx=332, cy=955) 的放大版九扇門轉盤 -->
-                    <g id="mobileDoorWheelCenterAnchor" transform="translate(332, 955)">
-                        <g id="mobileDoorWheelRotatingGroup" transform="rotate(0)">
-                            <use id="mobileWheelDoor_40" href="#mobileCreamToiletDoorUnit" transform="rotate(40)" />
-                            <use id="mobileWheelDoor_80" href="#mobileCreamToiletDoorUnit" transform="rotate(80)" />
-                            <use id="mobileWheelDoor_120" href="#mobileCreamToiletDoorUnit" transform="rotate(120)" />
-                            <use id="mobileWheelDoor_160" href="#mobileCreamToiletDoorUnit" transform="rotate(160)" />
-                            <use id="mobileWheelDoor_200" href="#mobileCreamToiletDoorUnit" transform="rotate(200)" />
-                            <use id="mobileWheelDoor_240" href="#mobileCreamToiletDoorUnit" transform="rotate(240)" />
-                            <use id="mobileWheelDoor_280" href="#mobileCreamToiletDoorUnit" transform="rotate(280)" />
-                            <use id="mobileWheelDoor_320" href="#mobileCreamToiletDoorUnit" transform="rotate(320)" />
+                    <!-- 1. 手機版橫向排列門軌 (中心位於 x=215, y=446，點擊後向右水平移動) -->
+                    <g id="mobileDoorWheelCenterAnchor" transform="translate(215, 446)">
+                        <g id="mobileDoorWheelRotatingGroup" transform="translate(0, 0)">
+                            <use id="mobileWheelDoor_80" href="#mobileCreamToiletDoorUnit" transform="translate(-1344, 0)" />
+                            <use id="mobileWheelDoor_120" href="#mobileCreamToiletDoorUnit" transform="translate(-1152, 0)" />
+                            <use id="mobileWheelDoor_160" href="#mobileCreamToiletDoorUnit" transform="translate(-960, 0)" />
+                            <use id="mobileWheelDoor_200" href="#mobileCreamToiletDoorUnit" transform="translate(-768, 0)" />
+                            <use id="mobileWheelDoor_240" href="#mobileCreamToiletDoorUnit" transform="translate(-576, 0)" />
+                            <use id="mobileWheelDoor_280" href="#mobileCreamToiletDoorUnit" transform="translate(-384, 0)" />
+                            <use id="mobileWheelDoor_320" href="#mobileCreamToiletDoorUnit" transform="translate(-192, 0)" />
+                            <use id="mobileWheelDoor_40" href="#mobileCreamToiletDoorUnit" transform="translate(192, 0)" />
 
-                            <!-- 正上方 0° 粉紅門：「定位 所在位置」 (放大 1 倍) -->
+                            <!-- 正中央粉紅門：「定位 所在位置」 -->
                             <g id="mobilePinkLocateDoorBtn" role="button" tabindex="0" aria-label="定位所在位置">
-                                <rect x="-77" y="-509" width="154" height="228" rx="22"
+                                <rect x="-77" y="-114" width="154" height="228" rx="22"
                                       fill="#FF99D3" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
-                                <text x="0" y="-393" fill="#2A348C" font-size="38" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                <text x="0" y="2" fill="#2A348C" font-size="38" font-weight="900" letter-spacing="5" text-anchor="middle">
                                     定位
                                 </text>
-                                <text x="0" y="-360" fill="#2A348C" font-size="18.5" font-weight="800" letter-spacing="2.2" text-anchor="middle">
+                                <text x="0" y="35" fill="#2A348C" font-size="18.5" font-weight="800" letter-spacing="2.2" text-anchor="middle">
                                     所在位置
                                 </text>
                             </g>
                         </g>
                     </g>
 
-                    <!-- 手機版階段轉盤大圓心 (cx=215, cy=980) -->
+                    <!-- 手機版階段群組錨點 -->
                     <g id="mobileStageWheelPivotAnchor" transform="translate(215, 980)">
 
-                         <!-- 2. 手機ui-24.jpg：「我要評鑑...」附近 100m 公廁選單 (整體放大 1/3，無右側黃色捲軸，支援手指上下滑動) -->
-                      <g id="mobileNearby100mMenuWheelRotator" transform="rotate(-135)">
-                          <g id="mobileNearby100mMenuWheelGroup" class="hidden" transform="translate(-215, -980)">
-                              <g id="mobileNearby100mMenuUprightBox">
-                                  <text x="215" y="252" fill="#2A348C" font-size="37.5" font-weight="900" letter-spacing="5" text-anchor="middle">
-                                      我要評鑑...
-                                  </text>
+                        <!-- 2. 「我要評鑑...」附近 100m 公廁選單 (從左側水平移入、選好後向右水平移出) -->
+                        <g id="mobileNearby100mMenuWheelRotator" transform="translate(-460, 0)">
+                            <g id="mobileNearby100mMenuWheelGroup" class="hidden" transform="translate(-215, -980)">
+                                <g id="mobileNearby100mMenuUprightBox">
+                                    <text x="215" y="252" fill="#2A348C" font-size="37.5" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                        我要評鑑...
+                                    </text>
 
-                                  <foreignObject x="15" y="296" width="400" height="462">
-                                      <div xmlns="http://www.w3.org/1999/xhtml"
-                                           style="width:400px; height:462px; background:#2A348C; border-radius:19px; position:relative; overflow:hidden; display:flex; padding:28px 26px 0px 26px; box-sizing:border-box;">
-                                          <div id="mobileNearby100mScrollViewport"
-                                               class="nearby-100m-no-scrollbar"
-                                               style="width:100%; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding-bottom:24px; display:flex; flex-direction:column; gap:17px;">
-                                              <!-- 由 JS 動態產生手機版附近 100m 公廁卡片 -->
-                                          </div>
-                                      </div>
-                                  </foreignObject>
-                              </g>
-                          </g>
-                      </g>
+                                    <foreignObject x="15" y="296" width="400" height="462">
+                                        <div xmlns="http://www.w3.org/1999/xhtml"
+                                             style="width:400px; height:462px; background:#2A348C; border-radius:19px; position:relative; overflow:hidden; display:flex; padding:28px 26px 0px 26px; box-sizing:border-box;">
+                                            <div id="mobileNearby100mScrollViewport"
+                                                 class="nearby-100m-no-scrollbar"
+                                                 style="width:100%; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding-bottom:24px; display:flex; flex-direction:column; gap:17px;">
+                                                <!-- 由 JS 動態產生手機版附近 100m 公廁卡片 -->
+                                            </div>
+                                        </div>
+                                    </foreignObject>
+                                </g>
+                            </g>
+                        </g>
 
 
                         <!-- 3. 手機ui-25.jpg：左側直排「我在使用・・・」+ 右側上下垂直排列「小便斗（上） / 一般廁間（下）」 -->
-                        <g id="mobileWheelReplacedCategoryRotator" transform="rotate(-135)">
+                        <g id="mobileWheelReplacedCategoryRotator" transform="translate(-460, 0)">
                             <g id="mobileWheelReplacedCategoryGroup" class="hidden" transform="translate(-215, -980)">
                                 <g id="mobileCategoryUprightBox">
                                     <!-- 左側直式文字：我在使用・・・ -->
@@ -4105,7 +4105,7 @@
                 window.location.href = `./rating.html?${params.toString()}`;
             };
 
-            // 選好 100m 公廁後：順時針將公廁選單轉出右下角，同時順時針轉入「小便斗 / 一般廁間」
+            // 選好 100m 公廁後：電腦版順時針轉出，手機版平滑向右完整移出畫面並停在「小便斗 / 一般廁間」
             const transitionClockwiseFrom100mMenuToEvalCards = (chosenToilet) => {
                 if (isDoorWheelAnimating) return;
                 isDoorWheelAnimating = true;
@@ -4119,14 +4119,17 @@
                     } catch (e) {}
                 }
 
-                // 同時設定電腦版與手機版的「小便斗 / 一般廁間」起始角度 (-130°)
+                // 電腦版起始角度 (-130°) 與手機版左側水平起始位置 (-540px)
                 if (wheelReplacedCategoryRotatorEl) {
                     wheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-130)');
                 }
                 wheelReplacedCategoryGroupEl?.classList.remove('hidden');
 
                 if (mobileWheelReplacedCategoryRotatorEl) {
-                    mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-130)');
+                    mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'translate(-540, 0)');
+                }
+                if (mobileCategoryUprightBoxEl) {
+                    mobileCategoryUprightBoxEl.setAttribute('transform', 'rotate(0)');
                 }
                 mobileWheelReplacedCategoryGroupEl?.classList.remove('hidden');
 
@@ -4138,9 +4141,11 @@
                     const elapsed = now - startTime;
                     const progress = Math.min(1, elapsed / durationMs);
                     const eased = easeInOutCubic(progress);
+                    const remainRatio = 1 - eased;
 
-                    // 1. 附近 100m 公廁選單由 0° 順時針轉向 +125° 離開畫面右下角 (同步電腦版與手機版)
+                    // 1. 附近 100m 公廁選單：電腦版順時針轉出，手機版向右完整滑出畫面外 (+640px，中途不隱藏)
                     const menuOutDeg = 125 * eased;
+                    const mobileMenuOutX = 640 * eased;
                     if (nearby100mMenuWheelRotatorEl) {
                         nearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuOutDeg.toFixed(2)})`);
                     }
@@ -4148,19 +4153,15 @@
                         nearby100mMenuUprightBoxEl.setAttribute('transform', `translate(720, 455) rotate(${(-24 * eased).toFixed(2)}) translate(-720, -455)`);
                     }
                     if (mobileNearby100mMenuWheelRotatorEl) {
-                        mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuOutDeg.toFixed(2)})`);
-                    }
-                    if (mobileNearby100mMenuUprightBoxEl) {
-                        mobileNearby100mMenuUprightBoxEl.setAttribute('transform', `translate(215, 520) rotate(${(-22 * eased).toFixed(2)}) translate(-215, -520)`);
+                        mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `translate(${mobileMenuOutX.toFixed(2)}, 0)`);
                     }
                     if (menuOutDeg >= 112) {
                         nearby100mMenuWheelGroupEl?.classList.add('hidden');
-                        mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
                     }
 
-                    // 2. 馬桶與小便斗由 -130° 順時針轉至 0° 畫面正中央並平滑回正
-                    const cardsInDeg = -130 * (1 - eased);
-                    const remainRatio = 1 - eased;
+                    // 2. 馬桶與小便斗：電腦版順時針轉至中央，手機版由左側 (-540px) 向右水平移至中央 (0px)
+                    const cardsInDeg = -130 * remainRatio;
+                    const mobileCardsInX = -540 * remainRatio;
 
                     if (wheelReplacedCategoryRotatorEl) {
                         wheelReplacedCategoryRotatorEl.setAttribute('transform', `rotate(${cardsInDeg.toFixed(2)})`);
@@ -4173,10 +4174,7 @@
                     }
 
                     if (mobileWheelReplacedCategoryRotatorEl) {
-                        mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', `rotate(${cardsInDeg.toFixed(2)})`);
-                    }
-                    if (mobileCategoryUprightBoxEl) {
-                        mobileCategoryUprightBoxEl.setAttribute('transform', `translate(215, 500) rotate(${(24 * remainRatio).toFixed(2)}) translate(-215, -500)`);
+                        mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', `translate(${mobileCardsInX.toFixed(2)}, 0)`);
                     }
 
                     if (progress < 1) {
@@ -4190,7 +4188,7 @@
                         if (evalCardStallPosEl) evalCardStallPosEl.setAttribute('transform', 'translate(524, 456) rotate(0)');
                         if (evalCardUrinalPosEl) evalCardUrinalPosEl.setAttribute('transform', 'translate(928, 456) rotate(0)');
 
-                        if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(0)');
+                        if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'translate(0, 0)');
                         if (mobileCategoryUprightBoxEl) mobileCategoryUprightBoxEl.setAttribute('transform', 'rotate(0)');
 
                         isDoorWheelAnimating = false;
@@ -4367,13 +4365,13 @@
                 wheelDoor320El?.classList.remove('hidden');
                 wheelReplacedCategoryGroupEl?.classList.add('hidden');
 
-                // 重置手機版門盤 (回到 手機ui-23 初始狀態)
-                if (mobileDoorWheelRotatingGroupEl) mobileDoorWheelRotatingGroupEl.setAttribute('transform', 'rotate(0)');
-                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                // 重置手機版水平門軌 (回到初始置中狀態)
+                if (mobileDoorWheelRotatingGroupEl) mobileDoorWheelRotatingGroupEl.setAttribute('transform', 'translate(0, 0)');
+                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'translate(-460, 0)');
                 if (mobileNearby100mMenuUprightBoxEl) mobileNearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
                 mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
 
-                if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-135)');
+                if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'translate(-460, 0)');
                 if (mobileCategoryUprightBoxEl) mobileCategoryUprightBoxEl.setAttribute('transform', 'rotate(0)');
                 if (mobilePinkLocateDoorBtnEl) {
                     mobilePinkLocateDoorBtnEl.classList.remove('hidden');
@@ -4397,7 +4395,6 @@
                 }
                 if (isStageTransitioning) return;
 
-                // 若已經在公廁回報系統畫面中（例如從手機版漢堡選單再次點選「公廁回報系統」），直接重置回定位門盤第一階段
                 if (reportFlowStageEl && !reportFlowStageEl.classList.contains('hidden')) {
                     playHomeClickSfx();
                     resetDoorWheelToStage01();
@@ -4412,7 +4409,6 @@
                 void mainHomeStageEl?.offsetWidth;
                 mainHomeStageEl?.classList.add('is-sinking-down');
 
-                // 手機版依據 手機ui-23~25 保留右上角雙橫線漢堡選單，僅隱藏左上角登入頭貼按鈕；電腦版則隱藏右上角登入鈕並顯示專屬返回列
                 homeLoginBtnEl?.classList.add('hidden');
                 topRightNavContainerEl?.classList.add('md:hidden');
                 openAdminPortalBtnEl?.classList.add('hidden');
@@ -4498,7 +4494,6 @@
                 handleOpenLocateModal(e);
             });
 
-            // 若由其他頁面選單帶 ?openReport=1 進入主頁，自動切換至公廁回報定位門盤畫面
             try {
                 const initParams = new URLSearchParams(window.location.search);
                 if (initParams.get('openReport') === '1') {
@@ -4512,7 +4507,7 @@
                 }
             } catch (e) {}
 
-            // 動畫輔助函式：同步順時針旋轉電腦版與手機版門盤
+            // 動畫輔助函式：電腦版順時針旋轉、手機版門軌與後方公廁選單保持固定間距向右水平移動
             const animateDoorWheelClockwise = (startDeg, endDeg, durationMs, easingFn, onUpdateDeg, onComplete) => {
                 const startTime = performance.now();
                 const tick = (now) => {
@@ -4524,7 +4519,10 @@
                         doorWheelRotatingGroupEl.setAttribute('transform', `rotate(${currentDeg.toFixed(2)})`);
                     }
                     if (mobileDoorWheelRotatingGroupEl) {
-                        mobileDoorWheelRotatingGroupEl.setAttribute('transform', `rotate(${currentDeg.toFixed(2)})`);
+                        const mobileDx = currentDeg <= 180
+                            ? currentDeg * (768 / 180)
+                            : 768 + ((currentDeg - 180) / 225) * 800;
+                        mobileDoorWheelRotatingGroupEl.setAttribute('transform', `translate(${mobileDx.toFixed(2)}, 0)`);
                     }
                     if (typeof onUpdateDeg === 'function') {
                         onUpdateDeg(currentDeg, eased, progress);
@@ -4539,7 +4537,7 @@
                 doorWheelAnimFrameId = requestAnimationFrame(tick);
             };
 
-            // 點擊粉紅門「定位 所在位置」 (同時支援電腦版與 手機ui-23)
+            // 點擊粉紅門「定位 所在位置」 (手機版門與 100m 公廁選單保持間距向右水平滑動，絕不重疊)
             const handleStartPinkDoorLocate = (e) => {
                 if (e) e.stopPropagation();
                 if (isDoorWheelAnimating) return;
@@ -4585,11 +4583,14 @@
                         }
                         nearby100mMenuWheelGroupEl?.classList.remove('hidden');
 
+                        // 隱藏還在畫面左外侧的最後一扇門 (mobileWheelDoor_80)，將該位置留給「我要評鑑...」列表接續滑入
                         mobilePinkLocateDoorBtnEl?.classList.add('hidden');
-                        mobileWheelDoor320El?.classList.add('hidden');
-                        mobileWheelDoor40El?.classList.add('hidden');
+                        mobileWheelDoor80El?.classList.add('hidden');
                         if (mobileNearby100mMenuWheelRotatorEl) {
-                            mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                            mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'translate(-720, 0)');
+                        }
+                        if (mobileNearby100mMenuUprightBoxEl) {
+                            mobileNearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
                         }
                         mobileNearby100mMenuWheelGroupEl?.classList.remove('hidden');
 
@@ -4600,8 +4601,9 @@
                             1020,
                             easeOutSmooth,
                             (doorDeg, easedProgress) => {
-                                const menuInDeg = -135 * (1 - easedProgress);
                                 const remainRatio = 1 - easedProgress;
+                                const menuInDeg = -135 * remainRatio;
+                                const mobileMenuInX = -720 * remainRatio;
 
                                 if (nearby100mMenuWheelRotatorEl) {
                                     nearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuInDeg.toFixed(2)})`);
@@ -4611,42 +4613,28 @@
                                 }
 
                                 if (mobileNearby100mMenuWheelRotatorEl) {
-                                    mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuInDeg.toFixed(2)})`);
-                                }
-                                if (mobileNearby100mMenuUprightBoxEl) {
-                                    mobileNearby100mMenuUprightBoxEl.setAttribute('transform', `translate(215, 520) rotate(${(22 * remainRatio).toFixed(2)}) translate(-215, -520)`);
+                                    mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `translate(${mobileMenuInX.toFixed(2)}, 0)`);
                                 }
 
-                                if (doorDeg >= 210) {
-                                    wheelDoor280El?.classList.add('hidden');
-                                    mobileWheelDoor280El?.classList.add('hidden');
-                                }
-                                if (doorDeg >= 250) {
-                                    wheelDoor240El?.classList.add('hidden');
-                                    mobileWheelDoor240El?.classList.add('hidden');
-                                }
-                                if (doorDeg >= 290) {
-                                    wheelDoor200El?.classList.add('hidden');
-                                    mobileWheelDoor200El?.classList.add('hidden');
-                                }
-                                if (doorDeg >= 330) {
-                                    wheelDoor160El?.classList.add('hidden');
-                                    mobileWheelDoor160El?.classList.add('hidden');
-                                }
-                                if (doorDeg >= 370) {
-                                    wheelDoor120El?.classList.add('hidden');
-                                    mobileWheelDoor120El?.classList.add('hidden');
-                                }
-                                if (doorDeg >= 402) {
-                                    wheelDoor80El?.classList.add('hidden');
-                                    mobileWheelDoor80El?.classList.add('hidden');
-                                }
+                                if (doorDeg >= 210) wheelDoor280El?.classList.add('hidden');
+                                if (doorDeg >= 250) wheelDoor240El?.classList.add('hidden');
+                                if (doorDeg >= 290) wheelDoor200El?.classList.add('hidden');
+                                if (doorDeg >= 330) wheelDoor160El?.classList.add('hidden');
+                                if (doorDeg >= 370) wheelDoor120El?.classList.add('hidden');
+                                if (doorDeg >= 402) wheelDoor80El?.classList.add('hidden');
                             },
                             () => {
                                 if (nearby100mMenuWheelRotatorEl) nearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(0)');
                                 if (nearby100mMenuUprightBoxEl) nearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
-                                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(0)');
-                                if (mobileNearby100mMenuUprightBoxEl) mobileNearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'translate(0, 0)');
+                                mobileWheelDoor40El?.classList.add('hidden');
+                                mobileWheelDoor80El?.classList.add('hidden');
+                                mobileWheelDoor120El?.classList.add('hidden');
+                                mobileWheelDoor160El?.classList.add('hidden');
+                                mobileWheelDoor200El?.classList.add('hidden');
+                                mobileWheelDoor240El?.classList.add('hidden');
+                                mobileWheelDoor280El?.classList.add('hidden');
+                                mobileWheelDoor320El?.classList.add('hidden');
                                 syncNearby100mCustomScrollbar();
                                 isDoorWheelAnimating = false;
                             }

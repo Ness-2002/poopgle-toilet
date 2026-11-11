@@ -326,11 +326,8 @@
         }
 
         #ratingMainStage.is-completed .mobile-shift-up-on-complete {
-
-            transform: translate3d(0, -48px, 0);
-
+            transform: translate3d(0, -124px, 0);
             transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
-
         }
 
 
@@ -450,10 +447,130 @@
         .rating-tp-menu-item:hover text {
             fill: #F26559;
         }
+
+        /* ========================================================= */
+        /* 進入公廁中 Loading 畫面與頂部跑馬燈樣式                      */
+        /* ========================================================= */
+        @keyframes loadingPoopgleMarquee {
+            0% { transform: translate3d(0%, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        @keyframes loadingPoopgleColorCycle {
+            0%, 100% { color: #FF99D3; }
+            25%      { color: #F26559; }
+            50%      { color: #F3EF84; }
+            75%      { color: #80E4FF; }
+        }
+        #poogleLoadingOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: #45E5AC; /* 改為與主頁相同的薄荷綠 */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        #loadingStageContentGroup {
+            transform-origin: 720px 390px;
+            transform: scale(0.6667); /* 電腦版縮小 1/3 倍 */
+        }
+        @media (max-width: 767px) {
+            #loadingStageContentGroup {
+                transform: scale(2);
+            }
+        }
+
+        #poogleLoadingOverlay.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loading-marquee-bar {
+            width: 100%;
+            height: 18px;
+            background-color: #2A348C;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+        .loading-marquee-track {
+            display: flex;
+            width: max-content;
+            align-items: center;
+            animation:
+                loadingPoopgleMarquee 22s linear infinite,
+                loadingPoopgleColorCycle 7.5s linear infinite;
+        }
+        .loading-marquee-item {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            margin: 0 28px;
+            line-height: 1;
+        }
+
     </style>
 </head>
 <body>
+    <!-- =================================================================== -->
+    <!-- 0. 進入公廁中 LOADING 畫面                                          -->
+    <!-- =================================================================== -->
+    <div id="poogleLoadingOverlay">
+        <!-- 頂部 POOPGLE 跑馬燈 -->
+        <div class="loading-marquee-bar">
+            <div class="loading-marquee-track">
+                <div style="display:flex; align-items:center; flex-shrink:0;">
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                </div>
+                <div style="display:flex; align-items:center; flex-shrink:0;" aria-hidden="true">
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                    <span class="loading-marquee-item">POOPGLE</span><span class="loading-marquee-item">POOPGLE</span>
+                </div>
+            </div>
+        </div>
 
+        <!-- 滿版漸變圓點背景 -->
+        <svg id="loadingHalftoneSvg" style="position:absolute; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0;" preserveAspectRatio="none">
+            <g id="loadingHalftoneDotsLayer" fill="#FFFFFF" opacity="0.55"></g>
+        </svg>
+
+        <!-- 中央黃色雨鞋走路動畫舞台 -->
+        <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; z-index:1;">
+            <svg viewBox="0 0 1440 780" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; max-width:100%; max-height:100%; display:block;">
+                <g id="loadingStageContentGroup">
+                    <!-- 標題：進入公廁中... -->
+                    <text x="720" y="162" fill="#2A348C" font-size="25" font-weight="900" letter-spacing="4" text-anchor="middle">
+                    進入公廁中...
+                    </text>
+                    <!-- 米白色地板區塊與深藍頂邊線 -->
+                    <rect x="414" y="458" width="612" height="162" fill="#FFF9EC" />
+                    <line x1="414" y1="458" x2="1026" y2="458" stroke="#2A348C" stroke-width="3.4" />
+
+                    <!-- 雨鞋下方薄荷綠橢圓陰影 -->
+                    <ellipse id="loadingBootsShadow" cx="720" cy="480" rx="142" ry="6.5" fill="#45E5AC" />
+
+                    <!-- 後腳雨鞋 (遠端層) -->
+                    <path id="loadingBootBack" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" />
+
+                    <!-- 前腳雨鞋 (近端層) -->
+                    <path id="loadingBootFront" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" />
+                </g>
+            </svg>
+        </div>
+    </div>
     <!-- =================================================================== -->
     <!-- 1. 主評鑑畫面 (支援 電腦版 1550x780 與 手機版 430x968 手機ui-26 / 28) -->
     <!-- =================================================================== -->
@@ -522,8 +639,9 @@
         <!-- =============================================================== -->
         <!-- 1A. MOBILE RATING SVG (< 768px：1:1 還原 手機ui-26.jpg & 28.jpg) -->
         <!-- =============================================================== -->
-<svg id="mobileRatingMainSvg" viewBox="0 0 430 1046" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">            <defs>
-                <!-- 手機版獨立圓潤五角星路徑 -->
+        <svg id="mobileRatingMainSvg" viewBox="0 0 430 1122" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
+        <defs>                
+            <!-- 手機版獨立圓潤五角星路徑 -->
                 <path id="mobilePoogleStarShape"
                       d="M 1.2,-20.5
                          C 4.4,-20.4 6.6,-10.8 9.2,-8.9
@@ -539,7 +657,7 @@
 
                 <!-- 手機版小便斗視角裁切遮罩 (讓全寬藍色地板與黃色隔板整齊收合於中央視景區) -->
                 <clipPath id="mobileUrinalViewportClip">
-                    <rect x="0" y="152" width="430" height="382" />
+                    <rect x="0" y="228" width="430" height="382" />
                 </clipPath>
 
                 <!-- 手機版獨立定義的四大分類圖示 (避免跨隱藏 SVG 引用失效) -->
@@ -609,26 +727,51 @@
             </defs>
 
             <!-- 0. 手機版滿版米白底色 -->
-            <rect x="0" y="0" width="430" height="1046" fill="#FFF9EC" />
+            <rect x="0" y="0" width="430" height="1122" fill="#FFF9EC" />
 
-            <!-- 1. 頂部左方：公廁名、管理單位、地址 (已移除右上角 Logo，保留空間給漢堡選單) -->
+        <!-- 1. 頂部左方：公廁名、管理單位、地址 (已移除右上角 Logo，保留空間給漢堡選單) -->
             <g id="mobileHeaderGroup" class="mobile-scatter-left">
-                <text id="mobileDisplayToiletName" x="36" y="72" fill="#2A348C" font-size="25.5" font-weight="900" letter-spacing="1.5">
-                    公廁名
-                </text>
-                <text id="mobileDisplayToiletManager" x="37" y="97" fill="#2A348C" font-size="10.5" font-weight="700" letter-spacing="1.2">
-                    管理單位 : 000000
-                </text>
-                <text id="mobileDisplayToiletAddress" x="37" y="119" fill="#2A348C" font-size="10.5" font-weight="700" letter-spacing="1.2">
-                    地址 : 000000
-                </text>
-
-                <!-- 編輯模式提示徽章 (手機版) -->
-                <g id="mobileEditModeBadgeGroup" class="hidden" transform="translate(36, 129)">
+                <!-- 編輯模式提示徽章 (手機版：移至公廁名稱上方) -->
+                <g id="mobileEditModeBadgeGroup" class="hidden" transform="translate(36, 18)">
                     <rect x="0" y="0" width="168" height="20" rx="10" fill="#08F29A" stroke="#2A348C" stroke-width="1.4" />
                     <text x="84" y="10.5" fill="#2A348C" font-size="9.5" font-weight="900" letter-spacing="0.4" text-anchor="middle" dominant-baseline="central">
                         ✓ 已評鑑過・目前為編輯模式
                     </text>
+                </g>
+
+                <text id="mobileDisplayToiletName" x="36" y="74" fill="#2A348C" font-size="34" font-weight="900" letter-spacing="1.5">
+                    公廁名
+                </text>
+                <text id="mobileDisplayToiletManager" x="37" y="105" fill="#2A348C" font-size="14" font-weight="700" letter-spacing="1.2">
+                    管理單位 : 000000
+                </text>
+                <text id="mobileDisplayToiletAddress" x="37" y="131" fill="#2A348C" font-size="14" font-weight="700" letter-spacing="1.2">
+                    地址 : 000000
+                </text>
+            </g>
+
+                <!-- 編輯模式提示徽章 (手機版) -->
+                <g id="mobileEditModeBadgeGroup" class="hidden" transform="translate(36, 142)">
+                    <rect x="0" y="0" width="168" height="20" rx="10" fill="#08F29A" stroke="#2A348C" stroke-width="1.4" />
+                    <text x="84" y="10.5" fill="#2A348C" font-size="9.5" font-weight="900" letter-spacing="0.4" text-anchor="middle" dominant-baseline="central">
+                        ✓ 已評鑑過・目前為編輯模式
+                    </text>
+                </g>
+            </g>
+
+            <!-- 1B. 地址與視覺圖卡中間空隙：「不是您所在的廁所嗎？」切換廁所氣泡 (整體放大 1/3 倍) -->
+            <g id="mobileSwitchToiletGroup" transform="translate(36, 164) scale(0.88)">
+                <g class="mobile-scatter-left mobile-scatter-delay-1">
+                    <g id="mobileStallSwitchToiletBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="切換附近100公尺內的廁所">
+                        <rect x="0" y="0" width="218" height="68" rx="26" fill="transparent" />
+                        <g class="svg-action-inner">
+                            <path d="M 26,0 L 192,0 A 26,26 0 0,1 218,26 L 218,28 A 26,26 0 0,1 192,54 L 182,54 L 182,68 L 162,54 L 26,54 A 26,26 0 0,1 0,28 L 0,26 A 26,26 0 0,1 26,0 Z"
+                                  fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
+                            <text x="109" y="27.5" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
+                                不是您所在的廁所嗎？
+                            </text>
+                        </g>
+                    </g>
                 </g>
             </g>
 
@@ -637,8 +780,8 @@
             <!-- =========================================================== -->
 
             <!-- 2A. 手機版場景 A：一般廁間視角 (1:1 還原 手機ui-26.jpg) -->
-           <g id="mobileSceneStallGroup" class="mobile-shift-up-on-complete">
-                <g transform="translate(215, 162) scale(0.49) translate(-720, 0)">
+            <g id="mobileSceneStallGroup" class="mobile-shift-up-on-complete">
+                <g transform="translate(215, 238) scale(0.49) translate(-720, 0)">
                     <!-- 粉紅門板與亮黃地板 (門頂無邊框，門底與地板分界粗藍線) -->
                     <polygon points="432,0 1008,0 845,495 595,495" fill="#FF99D3" stroke="none" />
                     <polygon points="595,495 845,495 886,695 554,695" fill="#F3EF84" stroke="none" />
@@ -655,7 +798,8 @@
                             <ellipse cx="720" cy="48" rx="17" ry="12" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6" />
                             <path d="M 623,174 L 817,174 L 786,312 Q 780,334 756,334 L 684,334 Q 660,334 654,312 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
-<text id="mobileStallCommentBtnText" x="720" y="252" class="fade-on-complete" fill="#2A348C" font-size="22" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">                                我要留言
+                            <text id="mobileStallCommentBtnText" x="720" y="252" class="fade-on-complete" fill="#2A348C" font-size="29.5" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">
+                                我要留言
                             </text>
                         </g>
                     </g>
@@ -666,8 +810,8 @@
                     <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#59E1FF" stroke="#2A348C" stroke-width="1.8" />
 
                     <!-- 右側牆上捲筒衛生紙 -->
-                   <polygon points="996,322 938,472 971,576 1042,404" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
-                   <line x1="977" y1="386" x2="1013" y2="460" stroke="#2A348C" stroke-width="2" stroke-dasharray="3 5" />
+                    <polygon points="996,322 938,472 971,576 1042,404" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
+                    <line x1="977" y1="386" x2="1013" y2="460" stroke="#2A348C" stroke-width="2" stroke-dasharray="3 5" />
                     <line x1="950" y1="458" x2="980" y2="545" stroke="#2A348C" stroke-width="2" stroke-dasharray="3 5" />
                     <path d="M 1038,296 L 1090,348 L 1032,408 L 990,338 C 980,316 1004,274 1038,296 Z"
                           fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
@@ -678,40 +822,12 @@
 
                     <!-- 一般廁間前景：雙腳、自訂拖鞋/鞋子、膝蓋與藍色短褲 -->
                     <g id="mobileMainStallForegroundUse" class="pointer-events-none"></g>
-
-                    <!-- 「不是您所在的廁所嗎？」切換廁所氣泡 -->
-<g transform="translate(384, 344) scale(1.3333)">
-
-                        <g class="mobile-scatter-left mobile-scatter-delay-1">
-
-                            <g id="mobileStallSwitchToiletBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="切換附近100公尺內的廁所">
-
-                                <rect x="0" y="0" width="218" height="66" rx="26" fill="transparent" />
-
-                                <g class="svg-action-inner">
-
-                                    <path d="M 26,0 L 192,0 A 26,26 0 0,1 218,26 L 218,28 A 26,26 0 0,1 192,54 L 182,54 L 182,68 L 162,54 L 26,54 A 26,26 0 0,1 0,28 L 0,26 A 26,26 0 0,1 26,0 Z"
-
-                                          fill="#FFFFFF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
-
-                                    <text x="109" y="27.5" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
-
-                                        不是您所在的廁所嗎？
-
-                                    </text>
-
-                                </g>
-
-                            </g>
-
-                        </g>
-
-                    </g>
-                 </g>
+                </g>
             </g>
 
             <!-- 2B. 手機版場景 B：小便斗視角 (同步製作小便斗、黃色隔板、藍色地板、綠長褲球鞋與中央小雞) -->
-<g id="mobileSceneUrinalGroup" class="hidden mobile-shift-up-on-complete" clip-path="url(#mobileUrinalViewportClip)">                <g transform="translate(215, 162) scale(0.485) translate(-720, 0)">
+            <g id="mobileSceneUrinalGroup" class="hidden mobile-shift-up-on-complete" clip-path="url(#mobileUrinalViewportClip)">
+                <g transform="translate(215, 238) scale(0.485) translate(-720, 0)">
                     <!-- 小便斗藍色地板 -->
                     <rect x="-150" y="492" width="1740" height="270" fill="#59E1FF" />
 
@@ -732,7 +848,8 @@
                                      C 808,41 820.4,65.2 813,82
                                      L 792,130 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
-<text id="mobileUrinalCommentBtnText" x="720" y="86" class="fade-on-complete" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">                                我要留言
+                            <text id="mobileUrinalCommentBtnText" x="720" y="86" class="fade-on-complete" fill="#2A348C" font-size="28" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                                我要留言
                             </text>
                         </g>
                     </g>
@@ -761,49 +878,14 @@
 
                     <!-- 小便斗前景：雙腳球鞋、綠長褲與中央小雞 -->
                     <g id="mobileMainUrinalForegroundUse" class="pointer-events-none"></g>
-
-<!-- 「不是您所在的廁所嗎？」切換廁所氣泡 -->
-
-                    <g transform="translate(376, 344) scale(1.3333)">
-
-                        <g class="mobile-scatter-left mobile-scatter-delay-1">
-
-                            <g id="mobileUrinalSwitchToiletBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="切換附近100公尺內的廁所">
-
-                                <rect x="0" y="0" width="218" height="66" rx="26" fill="transparent" />
-
-                                <g class="svg-action-inner">
-
-                                    <path d="M 26,0 L 192,0 A 26,26 0 0,1 218,26 L 218,28 A 26,26 0 0,1 192,54 L 182,54 L 182,68 L 162,54 L 26,54 A 26,26 0 0,1 0,28 L 0,26 A 26,26 0 0,1 26,0 Z"
-
-                                          fill="#FFFFFF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
-
-                                    <text x="109" y="27.5" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
-
-                                        不是您所在的廁所嗎？
-
-                                    </text>
-
-                                </g>
-
-                            </g>
-
-                        </g>
-
-                    </g>
                 </g>
             </g>
-        
-           <!-- 2C. 手機版擺放的小怪圖層 (共用 720,0 座標空間，雙端即時同步且支援觸控拖曳、旋轉、縮放、刪除) -->
 
+            <!-- 2C. 手機版擺放的小怪圖層 (共用 720,0 座標空間，雙端即時同步且支援觸控拖曳、旋轉、縮放、刪除) -->
             <g class="mobile-shift-up-on-complete">
-
-                <g id="mobilePlacedMonstersTransformGroup" transform="translate(215, 162) scale(0.49) translate(-720, 0)">
-
+                <g id="mobilePlacedMonstersTransformGroup" transform="translate(215, 238) scale(0.49) translate(-720, 0)">
                     <g id="mobilePlacedMonstersLayer"></g>
-
                 </g>
-
             </g>
 
         
@@ -814,7 +896,7 @@
 
             <!-- =========================================================== -->
 
-            <g id="mobileStallShoeBarWrapper" transform="translate(88, 546)">
+            <g id="mobileStallShoeBarWrapper" transform="translate(88, 622)">
 
                 <g id="mobileStallShoeSelectorBar" class="mobile-scatter-right mobile-scatter-delay-1">
 
@@ -874,8 +956,7 @@
 
 
 
-            <g id="mobileUrinalShoeBarWrapper" class="hidden" transform="translate(88, 546)">
-
+            <g id="mobileUrinalShoeBarWrapper" class="hidden" transform="translate(88, 622)">
                 <g id="mobileUrinalShoeSelectorBar" class="mobile-scatter-right mobile-scatter-delay-1">
 
                     <rect x="0" y="0" width="254" height="44" rx="22" fill="#FFFFFF" stroke="#2A348C" stroke-width="2" />
@@ -948,9 +1029,9 @@
 
                     <!-- 左上：整潔衛生 -->
 
-                    <text x="22.5" y="628" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">整潔衛生</text>
+                    <text x="22.5" y="704" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">整潔衛生</text>
 
-                    <g transform="translate(37.5, 658)">
+                    <g transform="translate(37.5, 734)">
 
                         <g data-mobile-star-row="cleanliness"></g>
 
@@ -960,9 +1041,8 @@
 
                     <!-- 左下：環境明亮 -->
 
-                    <text x="22.5" y="714" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">環境明亮</text>
-
-                    <g transform="translate(37.5, 744)">
+                    <text x="22.5" y="790" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">環境明亮</text>
+                    <g transform="translate(37.5, 820)">
 
                         <g data-mobile-star-row="lighting"></g>
 
@@ -978,10 +1058,8 @@
 
                     <!-- 右上：設備完善 -->
 
-                    <text x="231.5" y="628" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">設備完善</text>
-
-                    <g transform="translate(246.5, 658)">
-
+                   <text x="231.5" y="704" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">設備完善</text>
+                    <g transform="translate(246.5, 734)">
                         <g data-mobile-star-row="equipment"></g>
 
                     </g>
@@ -990,9 +1068,8 @@
 
                     <!-- 右下：空間寬敞 -->
 
-                    <text x="231.5" y="714" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">空間寬敞</text>
-
-                    <g transform="translate(246.5, 744)">
+                    <text x="231.5" y="790" fill="#2A348C" font-size="14.5" font-weight="900" letter-spacing="1.5">空間寬敞</text>
+                    <g transform="translate(246.5, 820)">
 
                         <g data-mobile-star-row="space"></g>
 
@@ -1016,7 +1093,7 @@
 
                 <g id="mobileStallCategoryBarWrapper">
 
-                    <g transform="translate(115, 854)">
+                    <g transform="translate(115, 930)">
 
                         <g class="mobile-scatter-left mobile-scatter-delay-2">
 
@@ -1040,7 +1117,7 @@
 
 
 
-                    <g transform="translate(215, 854)">
+                    <g transform="translate(215, 930)">
 
                         <g class="mobile-scatter-left mobile-scatter-delay-3">
 
@@ -1064,7 +1141,7 @@
 
 
 
-                    <g transform="translate(315, 854)">
+                    <g transform="translate(315, 930)">
 
                         <g class="mobile-scatter-right mobile-scatter-delay-2">
 
@@ -1091,86 +1168,49 @@
 
 
                 <!-- 小便斗的三顆橫排分類按鈕：小便斗 / 消耗品 / 硬體 -->
-
                 <g id="mobileUrinalCategoryBarWrapper" class="hidden">
-
-                    <g transform="translate(115, 854)">
-
+                    <g transform="translate(115, 930)">
                         <g class="mobile-scatter-left mobile-scatter-delay-2">
-
                             <g id="mobileUrinalOpenUrinalMenuBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="開啟小便斗小怪選單">
-
                                 <rect x="-44" y="-48" width="88" height="132" rx="14" fill="transparent" />
-
                                 <g class="svg-action-inner">
-
                                     <use href="#mobileIconCategoryUrinal" transform="translate(0, 5) scale(1.05)" />
-
                                     <text x="0" y="74" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle">小便斗</text>
-
                                 </g>
-
                             </g>
-
                         </g>
-
                     </g>
 
-
-
-                    <g transform="translate(215, 854)">
-
+                    <g transform="translate(215, 930)">
                         <g class="mobile-scatter-left mobile-scatter-delay-3">
-
                             <g id="mobileUrinalOpenConsumableMenuBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="開啟消耗品小怪選單">
-
                                 <rect x="-44" y="-48" width="88" height="132" rx="14" fill="transparent" />
-
                                 <g class="svg-action-inner">
-
                                     <use href="#mobileIconCategoryConsumable" transform="translate(0, 14) scale(1.08)" />
-
                                     <text x="0" y="74" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle">消耗品</text>
-
                                 </g>
-
                             </g>
-
                         </g>
-
                     </g>
 
-
-
-                    <g transform="translate(315, 854)">
-
+                    <g transform="translate(315, 930)">
                         <g class="mobile-scatter-right mobile-scatter-delay-2">
-
                             <g id="mobileUrinalOpenHardwareMenuBtn" class="svg-action-btn" role="button" tabindex="0" aria-label="開啟硬體小怪選單">
-
                                 <rect x="-44" y="-48" width="88" height="132" rx="14" fill="transparent" />
-
                                 <g class="svg-action-inner">
-
                                     <use href="#mobileIconCategoryHardware" transform="translate(0, 2) scale(1.08)" />
-
                                     <text x="0" y="74" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2.5" text-anchor="middle">硬體</text>
-
                                 </g>
-
                             </g>
-
                         </g>
-
                     </g>
-
                 </g>
 
 
 
                 <!-- 底部置中：「完成」亮黃立體厚邊橢圓按鈕 (完成時向右散開) -->
 
-                <g transform="translate(215, 990)">
+                <g transform="translate(215, 1066)">
 
                     <g class="mobile-scatter-right mobile-scatter-delay-3">
 
@@ -1307,25 +1347,21 @@
             </g>
         </svg>
 
+       <!-- =============================================================== -->
+
+        <!-- 1B. MOBILE BOTTOM MONSTER DRAWER (整體縮小 1/3 倍版手機底部小怪選單) -->
+
         <!-- =============================================================== -->
 
-        <!-- 1B. MOBILE BOTTOM MONSTER DRAWER (放大一倍版手機底部小怪選單)      -->
-
-        <!-- =============================================================== -->
-
-        <div id="mobileMonsterBottomDrawer" class="hidden md:hidden fixed bottom-0 left-0 right-0 z-40 h-[296px] bg-white border-t-[2px] border-[#2A348C] flex items-stretch select-none shadow-[0_-8px_24px_rgba(42,52,140,0.15)]">
-
+        <div id="mobileMonsterBottomDrawer" class="hidden md:hidden fixed bottom-0 left-0 right-0 z-40 h-[198px] bg-white border-t-[1.8px] border-[#2A348C] flex items-stretch select-none shadow-[0_-6px_18px_rgba(42,52,140,0.14)]">
             <!-- 左側：橫向小怪卡片捲動區 + 跨頂線右上關閉圓鈕 (⊗) + 底部自訂藍色水平捲軸 -->
-
-            <div class="relative flex-1 min-w-0 flex flex-col justify-between pt-5 pb-4 pl-5 pr-4">
-
+            <div class="relative flex-1 min-w-0 flex flex-col justify-between pt-3 pb-3 pl-4 pr-3">
                 <!-- 右上角跨邊框關閉圓鈕 (⊗) -->
-
                 <button id="mobileCloseMonsterDrawerBtn" type="button" aria-label="關閉小怪選單"
-
-                        class="absolute -top-[19px] right-2.5 z-30 w-[38px] h-[38px] rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] active:scale-90 border-[2px] border-[#2A348C] flex items-center justify-center shadow-sm focus:outline-none">
-
-                    <svg viewBox="0 0 20 20" class="w-4 h-4" fill="none" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round">
+                        class="absolute -top-[13px] right-2.5 z-30 w-[26px] h-[26px] rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] active:scale-90 border-[1.6px] border-[#2A348C] flex items-center justify-center shadow-sm focus:outline-none">
+                    <svg viewBox="0 0 20 20" class="w-3 h-3" fill="none" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round">
+                         <line x1="4.5" y1="4.5" x2="15.5" y2="15.5" />
+                         <line x1="15.5" y1="4.5" x2="4.5" y2="15.5" />
 
                         <line x1="4.5" y1="4.5" x2="15.5" y2="15.5" />
 
@@ -1341,29 +1377,26 @@
 
                 <div id="mobileMonsterScrollViewport"
 
-                     class="w-full flex-1 flex items-center overflow-x-auto overflow-y-hidden pr-4"
-
-                     style="scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
+                     class="w-full flex-1 flex items-center overflow-x-auto overflow-y-hidden pr-3 cursor-grab active:cursor-grabbing"
+                     style="scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; touch-action: pan-x;">
 
                     <style>
 
                         #mobileMonsterScrollViewport::-webkit-scrollbar { display: none; }
 
+                        .mobile-drawer-card { touch-action: pan-x; }
+
                     </style>
-
-                    <div id="mobileMonsterListContent" class="flex items-center gap-8 px-3"></div>
-
+                    <div id="mobileMonsterListContent" class="flex items-center gap-5 px-2 shrink-0 min-w-max"></div>
                 </div>
 
 
 
                 <!-- 底部水平捲軸軌道與藍色滑塊 -->
 
-                <div class="w-full px-5 pt-2 flex items-center">
-
-                    <div id="mobileMonsterScrollTrack" class="relative w-full h-[8px] rounded-full bg-white border-[1.4px] border-[#2A348C] cursor-pointer flex items-center">
-
-                        <div id="mobileMonsterScrollThumb" class="h-[8px] rounded-full bg-[#59E1FF] border-[1.4px] border-[#2A348C] transition-transform duration-75" style="width: 30%; transform: translateX(0px);"></div>
+               <div class="w-full px-4 pt-1.5 flex items-center">
+                    <div id="mobileMonsterScrollTrack" class="relative w-full h-[6px] rounded-full bg-white border-[1.2px] border-[#2A348C] cursor-pointer flex items-center">
+                        <div id="mobileMonsterScrollThumb" class="h-[6px] rounded-full bg-[#59E1FF] border-[1.2px] border-[#2A348C] transition-transform duration-75" style="width: 30%; transform: translateX(0px);"></div>
 
                     </div>
 
@@ -1373,16 +1406,14 @@
 
 
 
-            <!-- 右側：放大版粉紅底直立切換欄 (小妖 ⇅ 小仙) -->
-
-            <div class="w-[64px] shrink-0 bg-[#FF85D6] border-l-[2px] border-[#2A348C] rounded-tr-[16px] flex flex-col items-center justify-between py-4 px-1.5">
+            <!-- 右側：縮小 1/3 版粉紅底直立切換欄 (小妖 ⇅ 小仙) -->
+            <div class="w-[44px] shrink-0 bg-[#FF85D6] border-l-[1.8px] border-[#2A348C] rounded-tr-[12px] flex flex-col items-center justify-between py-2.5 px-1">
 
                 <!-- 上方膠囊：小妖 -->
 
                 <button id="mobileTabYaoBtn" type="button"
 
-                        class="w-[36px] h-[96px] rounded-full border-[1.6px] border-[#2A348C] bg-[#FF85D6] text-[#2A348C] text-[15px] font-black leading-[1.25] flex flex-col items-center justify-center transition-colors focus:outline-none">
-
+                        class="w-[26px] h-[64px] rounded-full border-[1.4px] border-[#2A348C] bg-[#FF85D6] text-[#2A348C] text-[11px] font-black leading-[1.15] flex flex-col items-center justify-center transition-colors focus:outline-none">
                     <span>小</span>
 
                     <span>妖</span>
@@ -1395,9 +1426,8 @@
 
                 <button id="mobileTabSwapArrowBtn" type="button" aria-label="切換小仙與小妖"
 
-                        class="w-9 h-9 flex items-center justify-center active:scale-90 focus:outline-none">
-
-                    <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#2A348C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        class="w-7 h-6 flex items-center justify-center active:scale-90 focus:outline-none">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#2A348C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 
                         <line x1="9" y1="19" x2="9" y2="5" />
 
@@ -1417,7 +1447,7 @@
 
                 <button id="mobileTabXianBtn" type="button"
 
-                        class="w-[36px] h-[96px] rounded-full border-[1.6px] border-[#2A348C] bg-[#F3EF84] text-[#2A348C] text-[15px] font-black leading-[1.25] flex flex-col items-center justify-center transition-colors focus:outline-none">
+                        class="w-[26px] h-[64px] rounded-full border-[1.4px] border-[#2A348C] bg-[#F3EF84] text-[#2A348C] text-[11px] font-black leading-[1.15] flex flex-col items-center justify-center transition-colors focus:outline-none">
 
                     <span>小</span>
 
@@ -1636,7 +1666,15 @@
             <!-- 2A. 左欄：公廁標題資訊 + 四排互動星等                       -->
             <!-- =========================================================== -->
             <g id="leftRatingPanelGroup">
-                <g id="leftToiletHeaderGroup" class="fade-on-complete">
+               <g id="leftToiletHeaderGroup" class="fade-on-complete">
+                    <!-- 編輯模式提示徽章 (電腦版：移至公廁名稱上方) -->
+                    <g id="editModeBadgeGroup" class="hidden" transform="translate(46, 40)">
+                        <rect x="0" y="0" width="224" height="28" rx="14" fill="#08F29A" stroke="#2A348C" stroke-width="1.8" />
+                        <text x="112" y="14.5" fill="#2A348C" font-size="12" font-weight="900" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central">
+                            ✓ 已評鑑過・目前為編輯模式
+                        </text>
+                    </g>
+
                     <text id="displayToiletName" x="46" y="114" fill="#2A348C" font-size="40" font-weight="900" letter-spacing="2.5">
                         公廁一
                     </text>
@@ -1646,13 +1684,6 @@
                     <text id="displayToiletAddress" x="48" y="180" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2">
                         地址 : 000000
                     </text>
-
-                    <g id="editModeBadgeGroup" class="hidden" transform="translate(46, 195)">
-                        <rect x="0" y="0" width="224" height="28" rx="14" fill="#08F29A" stroke="#2A348C" stroke-width="1.8" />
-                        <text x="112" y="14.5" fill="#2A348C" font-size="12" font-weight="900" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central">
-                            ✓ 您已評鑑過此公廁・目前為編輯模式
-                        </text>
-                    </g>
                 </g>
 
                 <!-- 第 1 排：整潔衛生 -->
@@ -2807,7 +2838,7 @@
                 mobileUrinalGroup?.classList.remove('hidden');
                 mobileStallCatWrapper?.classList.add('hidden');
                 mobileUrinalCatWrapper?.classList.remove('hidden');
-                mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 162) scale(0.485) translate(-720, 0)');
+                mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 238) scale(0.485) translate(-720, 0)');
                 if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#59E1FF');
 
                 updateUrinalShoeSelectorUI();
@@ -2831,7 +2862,7 @@
                 mobileUrinalGroup?.classList.add('hidden');
                 mobileStallCatWrapper?.classList.remove('hidden');
                 mobileUrinalCatWrapper?.classList.add('hidden');
-                mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 162) scale(0.49) translate(-720, 0)');
+                mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 238) scale(0.485) translate(-720, 0)');
                 if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#59E1FF');
 
                 updateStallShoeSelectorUI();
@@ -3266,17 +3297,29 @@
             }
 
             if (mobileNameEl && toiletName) {
+
                 mobileNameEl.textContent = toiletName;
+
                 const charLen = Array.from(toiletName).length;
+
                 if (charLen > 14) {
-                    mobileNameEl.setAttribute('font-size', '15.5');
+
+                    mobileNameEl.setAttribute('font-size', '20.5');
+
                 } else if (charLen > 11) {
-                    mobileNameEl.setAttribute('font-size', '17.5');
+
+                    mobileNameEl.setAttribute('font-size', '23.5');
+
                 } else if (charLen > 8) {
-                    mobileNameEl.setAttribute('font-size', '20');
+
+                    mobileNameEl.setAttribute('font-size', '26.5');
+
                 } else {
-                    mobileNameEl.setAttribute('font-size', '25.5');
+
+                    mobileNameEl.setAttribute('font-size', '34');
+
                 }
+
             }
             if (mobileManagerEl) {
                 mobileManagerEl.textContent = `管理單位 : ${toiletManager || '000000'}`;
@@ -4214,7 +4257,7 @@
                 }
             }
 
-            // 2. 手機版底部橫向抽屜選單渲染 (放大一倍版：140px 小怪圖示 + 16.5px 清晰文字)
+             // 2. 手機版底部橫向抽屜選單渲染 (縮小 1/3 倍：94px 小怪圖示 + 11.5px 文字)
 
             if (mobileMonsterListContentEl) {
 
@@ -4226,7 +4269,7 @@
 
                     return `
 
-                        <div class="mobile-drawer-card${placedClass}" data-monster-id="${escapeHtml(item.id)}" style="padding: 8px 10px;">
+                        <div class="mobile-drawer-card${placedClass}" data-monster-id="${escapeHtml(item.id)}" style="padding: 5px 7px;">
 
                             <img id="mobileMenuMonsterImg_${escapeHtml(item.id)}"
 
@@ -4234,13 +4277,16 @@
 
                                  alt="${escapeHtml(item.name)}"
 
-                                 style="width:140px; height:140px; object-fit:contain; pointer-events:none; display:block;" />
+                                 style="width:94px; height:94px; object-fit:contain; pointer-events:none; display:block;" />
 
-                            <div style="margin-top:10px; color:#2A348C; font-size:16.5px; font-weight:900; letter-spacing:2px; text-align:center; white-space:nowrap; pointer-events:none;">
+                            <div style="margin-top:6px; color:#2A348C; font-size:11.5px; font-weight:900; letter-spacing:1.4px; text-align:center; white-space:nowrap; pointer-events:none;">
 
                                 ${escapeHtml(item.name)}
+
                             </div>
+
                         </div>
+
                     `;
 
                 }).join('');
@@ -4343,23 +4389,43 @@
         }
 
         function spawnPlacedMonsterOnCanvas(monsterItem, imgUrl) {
+
             hasCanvasUnsavedChanges = true;
+
             const offsetSeed = (placedMonstersState.length % 5) * 18 - 36;
+
             const uid = `pm_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+            const defaultScale = window.innerWidth < 768 ? 2.0 : 1.0;
+
             const newMonster = {
+
                 uid,
+
                 id: monsterItem.id,
+
                 folder: monsterItem.folder || findMonsterCatalogInfo(monsterItem.id)?.folder || 'stall',
+
                 name: monsterItem.name,
+
                 url: imgUrl || getMonsterFallbackDataUri(monsterItem.id),
-                x: clampMonsterX(720 + offsetSeed, 1),
+
+                x: clampMonsterX(720 + offsetSeed, defaultScale),
+
                 y: 376 + offsetSeed,
-                scale: 1.0,
+
+                scale: defaultScale,
+
                 rotation: 0
+
             };
+
             placedMonstersState.push(newMonster);
+
             selectedPlacedMonsterUid = uid;
+
             renderPlacedMonstersLayer();
+
         }
 
         function renderMonstersIntoLayer(layerEl) {
@@ -4418,8 +4484,7 @@
                     e.stopPropagation();
                     e.preventDefault();
                     const delta = e.deltaY < 0 ? 0.08 : -0.08;
-                    m.scale = Math.min(2.0, Math.max(0.5, Number((m.scale + delta).toFixed(2))));
-                    m.x = clampMonsterX(m.x, m.scale);
+                    m.scale = Math.min(3.5, Math.max(0.5, Number((m.scale + delta).toFixed(2))));                    m.x = clampMonsterX(m.x, m.scale);
                     renderPlacedMonstersLayer();
                 }, { passive: false });
 
@@ -4435,41 +4500,76 @@
                     frameRect.style.pointerEvents = 'none';
                     rootG.appendChild(frameRect);
 
-                    // 右上角刪除按鈕 (✕)
+                    // 右上角刪除按鈕 (✕) (整體放大 1/3 倍：scale(1.3333))
+
                     const deleteBtnG = document.createElementNS(svgNs, 'g');
-                    deleteBtnG.setAttribute('transform', `translate(${halfBox.toFixed(1)}, ${(-halfBox).toFixed(1)})`);
+
+                    deleteBtnG.setAttribute('transform', `translate(${halfBox.toFixed(1)}, ${(-halfBox).toFixed(1)}) scale(1.3333)`);
+
                     deleteBtnG.style.cursor = 'pointer';
+
                     deleteBtnG.innerHTML = `
+
                         <circle cx="0" cy="0" r="22" fill="transparent" />
+
                         <circle cx="0" cy="0" r="16.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
                         <line x1="-5.8" y1="-5.8" x2="5.8" y2="5.8" stroke="#2A348C" stroke-width="2.6" stroke-linecap="round" />
+
                         <line x1="5.8" y1="-5.8" x2="-5.8" y2="5.8" stroke="#2A348C" stroke-width="2.6" stroke-linecap="round" />
+
                     `;
+
                     deleteBtnG.addEventListener('pointerdown', (e) => {
+
                         e.stopPropagation();
+
                         e.preventDefault();
+
                         hasCanvasUnsavedChanges = true;
+
                         const idx = placedMonstersState.findIndex(item => item.uid === m.uid);
+
                         if (idx >= 0) placedMonstersState.splice(idx, 1);
+
                         if (selectedPlacedMonsterUid === m.uid) {
+
                             selectedPlacedMonsterUid = placedMonstersState.length > 0
+
                                 ? placedMonstersState[placedMonstersState.length - 1].uid
+
                                 : null;
+
                         }
+
                         renderPlacedMonstersLayer();
+
                         syncStallMonsterMenuPlacedState();
+
                     });
+
                     rootG.appendChild(deleteBtnG);
 
-                    // 左下角旋轉與縮放控制點 (⤵)
+
+
+                    // 左下角旋轉與縮放控制點 (⤵) (整體放大 1/3 倍：scale(1.3333))
+
                     const rotateScaleBtnG = document.createElementNS(svgNs, 'g');
-                    rotateScaleBtnG.setAttribute('transform', `translate(${(-halfBox).toFixed(1)}, ${halfBox.toFixed(1)})`);
+
+                    rotateScaleBtnG.setAttribute('transform', `translate(${(-halfBox).toFixed(1)}, ${halfBox.toFixed(1)}) scale(1.3333)`);
+
                     rotateScaleBtnG.style.cursor = 'nwse-resize';
+
                     rotateScaleBtnG.innerHTML = `
+
                         <circle cx="0" cy="0" r="22" fill="transparent" />
+
                         <circle cx="0" cy="0" r="16.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
                         <path d="M -5,-5 C -5,2 0,6 6,6" fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" />
+
                         <polyline points="2,2 6.5,6 2,9.5" fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+
                     `;
                     rotateScaleBtnG.addEventListener('pointerdown', (e) => {
                         e.stopPropagation();
@@ -4522,8 +4622,7 @@
                 const curAngleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
 
                 const scaleRatio = curDist / activeTransformSession.startDist;
-                m.scale = Math.min(2.0, Math.max(0.5, activeTransformSession.initialScale * scaleRatio));
-                m.x = clampMonsterX(m.x, m.scale);
+                m.scale = Math.min(3.5, Math.max(0.5, activeTransformSession.initialScale * scaleRatio));                m.x = clampMonsterX(m.x, m.scale);
 
                 const deltaAngle = curAngleDeg - activeTransformSession.startAngleDeg;
                 m.rotation = activeTransformSession.initialRotation + deltaAngle;
@@ -5032,7 +5131,7 @@
             // 👇 新增：點擊「編輯評鑑」時，將手機版 SVG 畫布高度恢復為原本的 1046
             const mobileSvg = document.getElementById('mobileRatingMainSvg');
             if (mobileSvg) {
-                mobileSvg.setAttribute('viewBox', '0 0 430 1046');
+                mobileSvg.setAttribute('viewBox', '0 0 430 1122');
             }
 
             document.getElementById('ratingMainStage')?.classList.remove('is-completed');
@@ -5131,6 +5230,168 @@
             }
         }
 
+
+        // ===================================================================
+        // 進入公廁中 Loading 網點與雙腳雨鞋走路動畫 (對應分鏡 01 ~ 06)
+        // ===================================================================
+        let loadingWalkAnimId = null;
+        const loadingStartTime = performance.now();
+
+        function initLoadingHalftoneDots() {
+            const svgEl = document.getElementById('loadingHalftoneSvg');
+            const layer = document.getElementById('loadingHalftoneDotsLayer');
+            if (!svgEl || !layer) return;
+
+            const vw = Math.max(window.innerWidth || 1440, 320);
+            const vh = Math.max(window.innerHeight || 780, 480);
+            svgEl.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+
+            const isMobile = vw < 768;
+            const rows = isMobile ? 21 : 22;
+            const topY = isMobile ? Math.max(80, vh * 0.12) : Math.max(76, vh * 0.112);
+            const bottomY = vh - 14;
+            const dy = (bottomY - topY) / (rows - 1);
+            const spacingX = isMobile ? Math.max(25, vw / 15.2) : Math.max(36, dy * 1.38);
+            const cols = Math.ceil(vw / spacingX) + 2;
+            const startX = (vw - (cols - 1) * spacingX) / 2;
+            const topR = isMobile ? 1.15 : 1.65;
+            const bottomR = isMobile ? 4.4 : 6.75;
+
+            const frag = document.createDocumentFragment();
+            const svgNs = 'http://www.w3.org/2000/svg';
+            for (let r = 0; r < rows; r++) {
+                const t = r / (rows - 1);
+                const cy = (topY + r * dy).toFixed(1);
+                const radius = (topR + t * (bottomR - topR)).toFixed(2);
+                for (let c = 0; c < cols; c++) {
+                    const circle = document.createElementNS(svgNs, 'circle');
+                    circle.setAttribute('cx', (startX + c * spacingX).toFixed(1));
+                    circle.setAttribute('cy', cy);
+                    circle.setAttribute('r', radius);
+                    frag.appendChild(circle);
+                }
+            }
+            layer.innerHTML = '';
+            layer.appendChild(frag);
+        }
+
+        // 計算單隻雨鞋 SVG Path（保持頂部水平切齊 y=292，邁步時腳跟抬起傾斜、支撐時鞋底貼平）
+        function buildBootSvgPath(offsetX, tiltDeg) {
+            const groundY = 478;
+            const topCutY = 292;
+            const pivotX = 720 + offsetX + 26;
+            const pivotY = groundY;
+            const rad = (tiltDeg * Math.PI) / 180;
+            const cosA = Math.cos(rad);
+            const sinA = Math.sin(rad);
+
+            const rotPt = (lx, ly) => {
+                const dx = lx - 26;
+                const dy = ly;
+                return [
+                    pivotX + dx * cosA - dy * sinA,
+                    pivotY + dx * sinA + dy * cosA
+                ];
+            };
+
+            // 腳筒前後邊線與 y = topCutY 水平線求交點，確保鞋口永遠水平切齊
+            const intersectTopY = (localX) => {
+                const [bx, by] = rotPt(localX, 0);
+                const [tx, ty] = rotPt(localX, -220);
+                const t = (topCutY - by) / (ty - by);
+                return [bx + (tx - bx) * t, topCutY];
+            };
+
+            const [topBackX, topBackY] = intersectTopY(-54);
+            const [topFrontX, topFrontY] = intersectTopY(52);
+            const [heelStartX, heelStartY] = rotPt(-54, -48);
+            const [heelCtrl1X, heelCtrl1Y] = rotPt(-54, -14);
+            const [heelCtrl2X, heelCtrl2Y] = rotPt(-28, 0);
+            const [soleBackX, soleBackY] = rotPt(-4, 0);
+            const [soleFrontX, soleFrontY] = rotPt(52, 0);
+            const [toeCtrl1X, toeCtrl1Y] = rotPt(86, 0);
+            const [toeTipX, toeTipY] = rotPt(104, -22);
+            const [toeTopX, toeTopY] = rotPt(104, -44);
+            const [instepCtrl1X, instepCtrl1Y] = rotPt(104, -70);
+            const [instepCtrl2X, instepCtrl2Y] = rotPt(80, -86);
+            const [shinJoinX, shinJoinY] = rotPt(52, -90);
+
+            const f = (n) => n.toFixed(1);
+            return [
+                `M ${f(topBackX)},${f(topBackY)}`,
+                `L ${f(heelStartX)},${f(heelStartY)}`,
+                `C ${f(heelCtrl1X)},${f(heelCtrl1Y)} ${f(heelCtrl2X)},${f(heelCtrl2Y)} ${f(soleBackX)},${f(soleBackY)}`,
+                `L ${f(soleFrontX)},${f(soleFrontY)}`,
+                `C ${f(toeCtrl1X)},${f(toeCtrl1Y)} ${f(toeTipX)},${f(toeTipY)} ${f(toeTopX)},${f(toeTopY)}`,
+                `C ${f(instepCtrl1X)},${f(instepCtrl1Y)} ${f(instepCtrl2X)},${f(instepCtrl2Y)} ${f(shinJoinX)},${f(shinJoinY)}`,
+                `L ${f(topFrontX)},${f(topFrontY)}`,
+                `Z`
+            ].join(' ');
+        }
+
+        function startLoadingBootsAnimation() {
+            initLoadingHalftoneDots();
+            const backBootEl = document.getElementById('loadingBootBack');
+            const frontBootEl = document.getElementById('loadingBootFront');
+            const shadowEl = document.getElementById('loadingBootsShadow');
+            if (!backBootEl || !frontBootEl) return;
+
+            const cycleDuration = 1100; // 完整左右邁步週期 (毫秒)
+            const strideHalfSpan = 38;  // 前後跨步幅度
+            const maxTiltDeg = 14.5;    // 邁步時雨鞋前傾角度
+
+            const computeLegPose = (phase) => {
+                // phase: 0 ~ 0.5 為抬腳跟向前邁步 (01->03)，0.5 ~ 1.0 為平踩向後滑動支撐 (04->06)
+                if (phase < 0.5) {
+                    const p = phase / 0.5;
+                    const easeP = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                    const offsetX = -strideHalfSpan + easeP * (strideHalfSpan * 2);
+                    const tilt = p < 0.15
+                        ? (p / 0.15) * maxTiltDeg
+                        : (p > 0.88 ? ((1 - p) / 0.12) * maxTiltDeg : maxTiltDeg);
+                    return { offsetX, tilt };
+                } else {
+                    const p = (phase - 0.5) / 0.5;
+                    const easeP = 0.5 - 0.5 * Math.cos(p * Math.PI);
+                    const offsetX = strideHalfSpan - easeP * (strideHalfSpan * 2);
+                    return { offsetX, tilt: 0 };
+                }
+            };
+
+            const tick = (now) => {
+                const t = ((now - loadingStartTime) % cycleDuration) / cycleDuration;
+                const backPose = computeLegPose(t);
+                const frontPose = computeLegPose((t + 0.5) % 1.0);
+
+                backBootEl.setAttribute('d', buildBootSvgPath(backPose.offsetX, backPose.tilt));
+                frontBootEl.setAttribute('d', buildBootSvgPath(frontPose.offsetX, frontPose.tilt));
+
+                if (shadowEl) {
+                    const spread = Math.abs(backPose.offsetX - frontPose.offsetX);
+                    shadowEl.setAttribute('rx', (118 + spread * 0.45).toFixed(1));
+                }
+                loadingWalkAnimId = requestAnimationFrame(tick);
+            };
+            loadingWalkAnimId = requestAnimationFrame(tick);
+        }
+
+        function hidePoogleLoadingOverlay() {
+            const overlay = document.getElementById('poogleLoadingOverlay');
+            if (!overlay) return;
+
+            // 在真正載入完成後，固定多停留 2 秒 (2000ms) 讓動畫繼續播放
+            setTimeout(() => {
+                overlay.classList.add('is-hidden');
+                setTimeout(() => {
+                    if (loadingWalkAnimId) {
+                        cancelAnimationFrame(loadingWalkAnimId);
+                        loadingWalkAnimId = null;
+                    }
+                }, 380);
+            }, 2000);
+        }
+        startLoadingBootsAnimation();
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 initStallShoeImages();
@@ -5144,6 +5405,7 @@
                 prepareNearbyToiletsList().catch(() => {});
                 await syncToiletEvaluationState(currentSelectedToilet?.name);
             } catch (e) {}
+            hidePoogleLoadingOverlay();
 
             // 一般廁間與小便斗右上角「自訂鞋子選擇框」點擊切換事件
             document.getElementById('mobileStallShoeBarWrapper')?.addEventListener('pointerdown', (e) => {
