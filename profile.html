@@ -4,12 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>有所味 Poogle｜個人空間</title>
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e && e.target && e.target !== window) {
+                if (typeof e.target.onerror === 'function') {
+                    try { e.target.onerror.call(e.target, e); } catch (err) {}
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+            if (e && (!e.error || e.message === 'Script error.' || (e.message && e.message.indexOf('ResizeObserver') !== -1))) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+            var isSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').indexOf('usercontent.goog') !== -1 ||
+                (window.location.hostname || '').indexOf('googleusercontent.com') !== -1
+            );
+            if (e && (!e.reason || !e.reason.message || isSandbox)) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+    </script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -25,13 +56,35 @@
             --poogle-gray: #D6D6D6;
             --poogle-navy: #1E2270;
         }
+        @font-face {
+            font-family: 'jf-openhuninn';
+            src: local('jf-openhuninn-2.1'),
+                 local('jf-openhuninn-2.0'),
+                 local('jf-openhuninn-1.1'),
+                 local('jf-openhuninn'),
+                 url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-web-font@1.1/font/jf-openhuninn.woff') format('woff'),
+                 url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-2.1.ttf') format('truetype');
+            font-display: swap;
+        }
         body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
             background-color: var(--poogle-cream);
             color: #18181B;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+        }
+        button, a, input, select, textarea, svg, [role="button"], [tabindex] {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:focus, button:focus-visible,
+        a:focus, a:focus-visible,
+        input:focus, input:focus-visible,
+        select:focus, select:focus-visible,
+        [role="button"]:focus, [role="button"]:focus-visible,
+        [tabindex]:focus, [tabindex]:focus-visible {
+            outline: none !important;
         }
         .poogle-ellipse-btn {
             border: 2px solid #1E2270;
@@ -77,9 +130,10 @@
     <header class="w-full max-w-[1440px] mx-auto pt-7 px-8 sm:px-14 flex items-center justify-between">
         <div class="flex items-center gap-5 sm:gap-8">
             <a href="./index.html" id="profileLogoLink" class="group inline-block focus:outline-none" title="回到有所味主頁">
-                <img src="./img/logo.png" alt="有所味 Logo"
-                     class="w-[130px] sm:w-[165px] h-auto object-contain transition-transform duration-200 group-hover:scale-105"
-                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 260 95%22><text x=%2210%22 y=%2265%22 font-size=%2250%22 font-weight=%22bold%22 fill=%22%2372D0FF%22 stroke=%22%231E2270%22 stroke-width=%223%22>有所味</text></svg>';" />
+                <img data-local-src="./img/logo.png"
+                     src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20260%2095%22%3E%3Ctext%20x%3D%2210%22%20y%3D%2265%22%20font-size%3D%2250%22%20font-weight%3D%22bold%22%20fill%3D%22%2372D0FF%22%20stroke%3D%22%231E2270%22%20stroke-width%3D%223%22%3E%E6%9C%89%E6%89%80%E5%91%B3%3C%2Ftext%3E%3C%2Fsvg%3E"
+                     alt="有所味 Logo"
+                     class="w-[130px] sm:w-[165px] h-auto object-contain transition-transform duration-200 group-hover:scale-105" />
             </a>
             <button id="headerLogoutBtn" type="button"
                     class="poogle-pill-btn px-4 py-1.5 bg-white hover:bg-[#FF85D0] text-xs sm:text-sm font-extrabold text-black flex items-center gap-1.5 focus:outline-none mt-1">
@@ -123,7 +177,12 @@
                         載入中...
                     </div>
                     <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border-[1.5px] border-[#1E2270] max-w-full">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
+                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" aria-hidden="true">
+                            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                        </svg>
                         <span id="displayUserEmailText" class="text-xs sm:text-[13px] font-bold text-neutral-700 truncate">
                             google@gmail.com
                         </span>
@@ -313,7 +372,12 @@
             <div class="flex flex-col gap-2.5 pt-1">
                 <button id="profileGoogleLoginBtn" type="button"
                         class="poogle-pill-btn w-full py-2.5 bg-white hover:bg-neutral-50 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2.5">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4" />
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" aria-hidden="true">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                    </svg>
                     <span>使用 Google 帳號登入</span>
                 </button>
                 <button id="profilePreviewGuestBtn" type="button"
@@ -470,13 +534,74 @@
             return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
         }
 
+        const profileResolvedAssetCache = new Map();
+        function upgradeProfileLocalImages() {
+            const isPreviewSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (isPreviewSandbox) return;
+            document.querySelectorAll('img[data-local-src]').forEach((imgEl) => {
+                const rawSrc = imgEl.getAttribute('data-local-src');
+                if (!rawSrc || imgEl.dataset.probed === rawSrc) return;
+                imgEl.dataset.probed = rawSrc;
+                if (profileResolvedAssetCache.has(rawSrc)) {
+                    const cached = profileResolvedAssetCache.get(rawSrc);
+                    if (cached) imgEl.src = cached;
+                    return;
+                }
+                const probe = new Image();
+                probe.onload = () => {
+                    profileResolvedAssetCache.set(rawSrc, rawSrc);
+                    imgEl.src = rawSrc;
+                };
+                probe.onerror = () => {
+                    profileResolvedAssetCache.set(rawSrc, null);
+                };
+                probe.src = rawSrc;
+            });
+
+            document.querySelectorAll('img[data-pfp-key]').forEach((imgEl) => {
+                const cleanKey = imgEl.getAttribute('data-pfp-key');
+                if (!cleanKey || imgEl.dataset.probedKey === cleanKey) return;
+                imgEl.dataset.probedKey = cleanKey;
+                if (profileResolvedAssetCache.has(cleanKey)) {
+                    const cached = profileResolvedAssetCache.get(cleanKey);
+                    if (cached) imgEl.src = cached;
+                    return;
+                }
+                const candidates = [
+                    `./img/pfp/${encodeURIComponent(cleanKey)}.png`,
+                    `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`
+                ];
+                let idx = 0;
+                const tryNext = () => {
+                    if (idx >= candidates.length) {
+                        profileResolvedAssetCache.set(cleanKey, null);
+                        return;
+                    }
+                    const testUrl = candidates[idx++];
+                    const probe = new Image();
+                    probe.onload = () => {
+                        profileResolvedAssetCache.set(cleanKey, testUrl);
+                        imgEl.src = testUrl;
+                    };
+                    probe.onerror = () => tryNext();
+                    probe.src = testUrl;
+                };
+                tryNext();
+            });
+        }
+
         function getPoogleAvatarSvg(avatarType, uidSuffix = 'main') {
             const normalized = normalizeLoggedInAvatarType(avatarType);
             const cleanKey = String(normalized).replace(/\.(png|PNG|jpg|JPG|svg|SVG|webp|WEBP)$/i, '');
-            const primarySrc = `./img/pfp/${encodeURIComponent(cleanKey)}.png`;
-            const upperExtSrc = `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`;
-            const fallbackDataUri = getFallbackPfpSvgDataUri();
-            return `<img src="${primarySrc}" alt="${escapeHtml(cleanKey)}" class="w-full h-full object-cover block rounded-full" onerror="if(!this.dataset.triedUpper){this.dataset.triedUpper='1';this.src='${upperExtSrc}';}else{this.onerror=null;this.src='${fallbackDataUri}';}" />`;
+            const initialSrc = profileResolvedAssetCache.get(cleanKey) || getFallbackPfpSvgDataUri();
+            setTimeout(upgradeProfileLocalImages, 0);
+            return `<img src="${initialSrc}" data-pfp-key="${escapeHtml(cleanKey)}" alt="${escapeHtml(cleanKey)}" class="w-full h-full object-cover block rounded-full" />`;
         }
 
         const SHOP_ITEMS = [
@@ -1070,6 +1195,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            upgradeProfileLocalImages();
             renderProfileAvatar();
             renderShopItems();
             recalculateAndRenderPointsAndHistory();

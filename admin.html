@@ -3,13 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>有所味 Poogle｜管理員資料後台系統</title>
+    <title>有所味 Poopgle｜管理員資料後台系統</title>
+    <script>
+        // 攔截預覽沙盒中本機圖檔未載入或跨網域腳本限制產生的空白錯誤事件
+        window.addEventListener('error', function(e) {
+            if (e && e.target && e.target !== window) {
+                if (typeof e.target.onerror === 'function') {
+                    try { e.target.onerror.call(e.target, e); } catch (err) {}
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+            if (e && (!e.error || e.message === 'Script error.' || (e.message && e.message.indexOf('ResizeObserver') !== -1))) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+            var isSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').indexOf('usercontent.goog') !== -1 ||
+                (window.location.hostname || '').indexOf('googleusercontent.com') !== -1
+            );
+            if (e && (!e.reason || !e.reason.message || isSandbox)) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+    </script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -17,377 +49,494 @@
 
     <style>
         :root {
-            --poogle-cream: #FCF6E8;
-            --poogle-yellow: #FFF57E;
-            --poogle-blue: #72D0FF;
-            --poogle-pink: #FF85D0;
-            --poogle-green: #3CE6B0;
-            --poogle-gray: #D6D6D6;
-            --poogle-navy: #1E2270;
+            --poogle-cream: #FFF9EC;
+            --poogle-yellow: #F3EF84;
+            --poogle-blue: #59E1FF;
+            --poogle-pink: #FF99D3;
+            --poogle-mint: #45E5AC;
+            --poogle-coral: #F26559;
+            --poogle-ink: #2A348C;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        button, a, input, select, textarea, svg, [role="button"], [tabindex] {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:focus, button:focus-visible,
+        a:focus, a:focus-visible,
+        input:focus, input:focus-visible,
+        select:focus, select:focus-visible,
+        textarea:focus, textarea:focus-visible,
+        [role="button"]:focus, [role="button"]:focus-visible,
+        [tabindex]:focus, [tabindex]:focus-visible {
+            outline: none !important;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @font-face {
+            font-family: 'jf-openhuninn';
+            src: local('jf-openhuninn-2.1'),
+                 local('jf-openhuninn-2.0'),
+                 local('jf-openhuninn-1.1'),
+                 local('jf-openhuninn'),
+                 url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-web-font@1.1/font/jf-openhuninn.woff') format('woff'),
+                 url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-2.1.ttf') format('truetype');
+            font-display: swap;
         }
         body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
             background-color: var(--poogle-cream);
-            color: #18181B;
+            color: var(--poogle-ink);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
         .poogle-card {
-            border: 2px solid #1E2270;
-            box-shadow: 0 5px 0 #1E2270;
+            border: 2px solid var(--poogle-ink);
+            background-color: #FFFFFF;
         }
         .poogle-pill-btn {
-            border: 1.8px solid #1E2270;
+            border: 2px solid var(--poogle-ink);
             border-radius: 9999px;
-            transition: all 0.16s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
         }
         .poogle-pill-btn:hover:not(:disabled) {
             transform: translateY(-1.5px);
-            box-shadow: 0 3px 0 #1E2270;
+            box-shadow: 0 3px 0 var(--poogle-ink);
         }
-        .poogle-input {
-            border: 1.8px solid #1E2270;
-            transition: all 0.15s ease;
+        .poogle-pill-btn:active:not(:disabled) {
+            transform: translateY(0px) scale(0.98);
+            box-shadow: none;
         }
-        .poogle-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(114, 208, 255, 0.45);
+        .poogle-tab-btn {
+            border: 2px solid var(--poogle-ink);
+            transition: all 0.16s ease;
         }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .poogle-tab-btn.is-active {
+            background-color: var(--poogle-yellow);
+            box-shadow: 0 4px 0 var(--poogle-ink);
+            transform: translateY(-2px);
         }
-        ::-webkit-scrollbar-track {
-            background: #F5EBD6;
+        .poogle-scroll::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        .poogle-scroll::-webkit-scrollbar-track {
+            background: var(--poogle-cream);
             border-radius: 9999px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #72D0FF;
-            border: 1.5px solid #1E2270;
+        .poogle-scroll::-webkit-scrollbar-thumb {
+            background: var(--poogle-blue);
+            border: 1.5px solid var(--poogle-ink);
             border-radius: 9999px;
         }
     </style>
 </head>
 
-<body class="min-h-screen w-full bg-[#FCF6E8] text-black pb-20 select-none">
+<body class="min-h-screen w-full flex flex-col">
+
+    <!-- 內建向量「有所味」Logo 備援定義 -->
+    <svg aria-hidden="true" style="position:absolute; width:0; height:0; overflow:hidden; pointer-events:none;">
+        <defs>
+            <g id="youSuoWeiAdminLogoSymbol">
+                <g>
+                    <path d="M 38,32 C 25,33 17,41 18,52 C 19,62 27,68 41,67 L 53,66 C 46,85 35,108 24,125 C 18,135 20,148 30,152 C 40,156 50,149 56,136 C 67,114 76,88 83,64 L 138,59 C 151,58 159,49 158,38 C 157,28 148,22 134,23 L 90,27 C 92,22 92,18 90,14 C 87,7 77,5 70,9 C 64,13 60,21 57,29 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 65,58 L 137,51 C 149,50 156,57 157,69 L 164,142 C 165,155 155,164 142,165 C 131,166 123,159 120,149 C 113,152 103,149 97,140 C 92,132 94,122 100,117 L 89,118 L 93,153 C 94,165 85,174 73,175 C 61,176 52,167 51,155 L 44,81 C 43,68 52,59 65,58 Z"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <line x1="74" y1="79" x2="126" y2="101" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <line x1="125" y1="76" x2="75" y2="103" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <path d="M 122,148 C 110,148 94,138 96,125 C 97,120 101,117 105,119 C 102,114 106,109 111,112 C 109,107 115,103 120,107 C 119,102 127,100 131,106 C 136,113 139,124 147,132"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <g transform="translate(182, 0)">
+                    <path d="M 73,6 C 83,3 93,10 94,20 C 95,29 88,37 76,41 L 44,50 L 38,125 C 37,139 27,148 15,147 C 4,146 -3,136 -1,122 L 9,38 C 11,26 19,19 32,16 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <rect x="29" y="40" width="46" height="71" rx="8"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" />
+                    <circle cx="40" cy="76" r="3.5" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" />
+                    <path d="M 128,8 C 138,5 148,12 149,22 C 150,31 143,39 131,43 L 106,50 L 105,54 L 138,52 C 149,51 157,59 157,69 C 157,79 149,86 138,87 L 132,87 L 132,144 C 132,156 123,164 112,164 C 101,164 93,156 93,144 L 93,89 L 91,89 C 89,112 84,132 76,146 C 70,156 59,159 50,154 C 41,149 39,138 44,127 C 53,110 57,84 59,48 C 60,36 67,28 79,24 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                </g>
+                <g transform="translate(345, 0)">
+                    <path d="M 18,48 L 48,50 C 58,51 64,58 63,69 L 57,140 C 56,151 48,157 37,156 L 11,154 C 1,153 -5,145 -4,134 L 2,63 C 3,53 9,47 18,48 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <line x1="29" y1="74" x2="25" y2="128" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <path d="M 80,115 L 55,152 C 49,161 52,172 61,177 C 70,182 81,179 87,169 L 104,142 L 104,162 C 104,173 112,181 122,181 C 132,181 140,173 140,162 L 140,142 L 155,169 C 161,179 172,182 181,177 C 190,172 193,161 187,152 L 164,115 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 118,22 C 138,18 152,35 138,49 C 162,51 172,76 150,86 C 178,90 182,126 152,130 L 86,125 C 56,121 62,85 88,83 C 68,72 78,46 102,47 C 112,47 122,36 118,22 Z"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 102,48 Q 120,51 138,49" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
+                    <path d="M 88,83 Q 119,88 150,86" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
+                </g>
+            </g>
+        </defs>
+    </svg>
 
     <!-- =================================================================== -->
-    <!-- AUTH GUARD OVERLAY (BLOCKS ACCESS UNLESS WHITELISTED GOOGLE EMAIL)  -->
+    <!-- 1. TOP HEADER BAR                                                   -->
     <!-- =================================================================== -->
-    <div id="adminAuthGuard" class="fixed inset-0 z-50 bg-[#FCF6E8] flex items-center justify-center p-4">
-        <div class="poogle-card bg-white rounded-[32px] max-w-md w-full p-7 sm:p-9 text-center space-y-5">
-            <div class="w-16 h-16 rounded-full bg-[#FFF57E] border-2 border-[#1E2270] mx-auto flex items-center justify-center text-2xl text-[#1E2270]">
-                <i class="fa-solid fa-user-shield"></i>
-            </div>
-            <h1 class="text-2xl font-extrabold text-black">有所味管理員後台</h1>
-            <p id="authGuardStatusText" class="text-xs sm:text-sm text-neutral-700 leading-relaxed">
-                正在驗證您的管理員 Google 帳號權限...
-            </p>
-
-            <div id="authGuardCurrentEmailBox" class="hidden p-3.5 rounded-2xl bg-[#FCF6E8] border-[1.5px] border-[#1E2270] text-left space-y-1">
-                <div class="text-[11px] font-bold text-neutral-500">目前登入的帳號：</div>
-                <div id="authGuardCurrentEmail" class="text-xs sm:text-sm font-extrabold text-black break-all"></div>
-                <div class="text-[11px] text-rose-600 font-bold pt-1">
-                    ⚠️ 此信箱尚未加入管理員白名單（<code>ADMIN_ALLOWED_EMAILS</code>）
+    <header class="w-full bg-[#2A348C] text-[#FFF9EC] border-b-2 border-[#2A348C] sticky top-0 z-30">
+        <div class="max-w-[1380px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+                <a href="./index.html" class="inline-flex items-center group focus:outline-none" title="返回有所味主頁">
+                    <img id="adminHeaderLogoImg" alt="有所味 Logo" class="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-105" />
+                </a>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-[#F3EF84] text-[#2A348C] text-[11px] font-black tracking-wider">ADMIN CONSOLE</span>
+                        <span id="realtimeStatusDot" class="inline-flex items-center gap-1 text-[11px] text-[#45E5AC] font-bold">
+                            <span class="w-2 h-2 rounded-full bg-[#45E5AC] animate-pulse"></span>即時連線中
+                        </span>
+                    </div>
+                    <h1 class="text-base sm:text-lg font-black tracking-wider text-white mt-0.5">管理員資料後台系統</h1>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3 pt-2">
-                <button id="guardGoogleLoginBtn" type="button"
-                        class="poogle-pill-btn w-full py-3 bg-[#72D0FF] hover:bg-[#5bc6ff] text-black font-extrabold text-sm flex items-center justify-center gap-2.5">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4 bg-white rounded-full p-0.5" />
-                    <span>使用授權的 Google 帳號登入</span>
-                </button>
-                <a href="./index.html"
-                   class="poogle-pill-btn w-full py-2.5 bg-white hover:bg-neutral-100 text-black font-bold text-xs sm:text-sm no-underline">
-                    返回有所味主頁
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- =================================================================== -->
-    <!-- TOP HEADER                                                          -->
-    <!-- =================================================================== -->
-    <header class="w-full bg-white border-b-2 border-[#1E2270] sticky top-0 z-30">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3 sm:gap-4">
-                <a href="./index.html" class="group flex items-center gap-2.5 no-underline">
-                    <img src="./img/logo.png" alt="有所味 Logo" class="w-28 sm:w-36 h-auto object-contain group-hover:scale-105 transition-transform"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 260 95%22><text x=%2210%22 y=%2265%22 font-size=%2250%22 font-weight=%22bold%22 fill=%22%2372D0FF%22 stroke=%22%231E2270%22 stroke-width=%223%22>有所味</text></svg>';" />
-                </a>
-                <span class="px-3 py-1 rounded-full bg-[#FFF57E] border-[1.8px] border-[#1E2270] text-xs sm:text-sm font-extrabold text-[#1E2270] flex items-center gap-1.5">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                    <span>管理員資料後台</span>
-                </span>
-            </div>
-
-            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
-                <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#FCF6E8] border-[1.5px] border-[#1E2270] text-xs font-bold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span id="headerAdminEmail">admin@gmail.com</span>
+            <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+                <div id="headerAdminBadge" class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 text-[#FFF9EC] text-xs font-bold">
+                    <i class="fa-solid fa-user-shield text-[#F3EF84]"></i>
+                    <span id="headerAdminEmailText" class="max-w-[200px] truncate">尚未驗證</span>
                 </div>
-                <button id="exportCsvBtn" type="button"
-                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#3CE6B0] hover:bg-[#2fd49f] text-black text-xs font-extrabold flex items-center gap-1.5"
-                        title="將目前分頁篩選出的資料匯出為 Excel CSV 檔案">
-                    <i class="fa-solid fa-file-csv"></i>
-                    <span>匯出當前報表 (.csv)</span>
+                <button id="adminSwitchAccountBtn" type="button"
+                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#FFF9EC] hover:bg-[#F3EF84] text-[#2A348C] text-xs font-extrabold flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-left"></i>
+                    <span>切換帳號</span>
                 </button>
-                <button id="adminLogoutBtn" type="button"
-                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-black text-xs font-extrabold flex items-center gap-1.5">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>登出</span>
-                </button>
+                <a href="./map.html"
+                   class="poogle-pill-btn px-3.5 py-1.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs font-extrabold flex items-center gap-1.5 no-underline">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>公廁地圖</span>
+                </a>
                 <a href="./index.html"
-                   class="poogle-pill-btn px-4 py-1.5 bg-[#72D0FF] hover:bg-[#5bc6ff] text-black text-xs font-extrabold no-underline">
-                    回主頁
+                   class="poogle-pill-btn px-4 py-1.5 bg-[#F3EF84] hover:bg-[#ebe565] text-[#2A348C] text-xs font-extrabold flex items-center gap-1.5 no-underline">
+                    <i class="fa-solid fa-house"></i>
+                    <span>返回主頁</span>
                 </a>
             </div>
         </div>
     </header>
 
     <!-- =================================================================== -->
-    <!-- MAIN DASHBOARD CONTENT                                              -->
+    <!-- 2. AUTHENTICATION & WHITELIST GATE SCREEN                           -->
     <!-- =================================================================== -->
-    <main class="max-w-[1440px] mx-auto px-4 sm:px-8 pt-6 space-y-6">
-
-        <!-- 1. FOUR SUMMARY METRIC CARDS -->
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex items-center justify-between">
-                <div>
-                    <div class="text-xs font-bold text-neutral-500">被檢舉待審核留言</div>
-                    <div id="statPendingReports" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</div>
-                    <div id="statTotalReportsSub" class="text-[11px] font-bold text-neutral-500 mt-0.5">累計共 0 筆檢舉</div>
+    <section id="adminAuthGateSection" class="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <div class="poogle-card rounded-[28px] max-w-md w-full overflow-hidden shadow-[0_8px_0_#2A348C]">
+            <div class="bg-[#F3EF84] border-b-2 border-[#2A348C] px-6 py-4 flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-full bg-[#FFF9EC] border-2 border-[#2A348C] flex items-center justify-center text-[#2A348C]">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#FF85D0] border-2 border-[#1E2270] flex items-center justify-center text-xl text-[#1E2270]">
+                <div>
+                    <h2 class="text-base sm:text-lg font-black text-[#2A348C]">管理員身分驗證</h2>
+                    <p class="text-[11px] font-bold text-[#2A348C]/75">僅限白名單授權之 Google 帳號存取後台</p>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-4 text-center">
+                <div id="gateAccountStatusBox" class="p-4 rounded-2xl bg-[#FFF9EC] border-2 border-[#2A348C] text-left space-y-1.5">
+                    <div class="text-xs font-bold text-[#2A348C]/70">目前登入狀態：</div>
+                    <div id="gateCurrentEmail" class="text-sm font-black text-[#2A348C] break-all">正在檢查登入狀態...</div>
+                    <div id="gatePermissionTag" class="inline-block px-2.5 py-0.5 rounded-full bg-white border border-[#2A348C] text-[11px] font-extrabold">
+                        驗證中
+                    </div>
+                </div>
+
+                <div id="gateUnauthorizedHint" class="hidden p-3.5 rounded-2xl bg-[#FF99D3]/35 border-2 border-[#2A348C] text-left text-xs space-y-1">
+                    <div class="font-black text-[#2A348C] flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-exclamation text-[#F26559]"></i>
+                        <span>此帳號未列入管理員白名單</span>
+                    </div>
+                    <p class="leading-relaxed text-[#2A348C]/90">
+                        請切換為授權的管理員 Google 帳號，或將您的信箱加入 <code>ADMIN_ALLOWED_EMAILS</code> 清單中。
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-2.5 pt-1">
+                    <button id="gateGoogleLoginBtn" type="button"
+                            class="poogle-pill-btn w-full py-3 bg-white hover:bg-[#F3EF84] text-[#2A348C] font-black text-sm flex items-center justify-center gap-2.5">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" aria-hidden="true">
+                            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                        </svg>
+                        <span>使用管理員 Google 帳號登入</span>
+                    </button>
+
+                    <button id="gatePreviewDemoBtn" type="button"
+                            class="hidden poogle-pill-btn w-full py-2.5 bg-[#45E5AC] hover:bg-[#34d399] text-[#2A348C] font-black text-xs sm:text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>預覽環境快速進入後台（沙盒測試模式）</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- 3. MAIN ADMIN DASHBOARD CONTENT                                     -->
+    <!-- =================================================================== -->
+    <main id="adminMainDashboard" class="hidden flex-1 w-full max-w-[1380px] mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
+
+        <!-- KPI 統計總覽小卡 -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+            <!-- KPI 1: 待處理檢舉 -->
+            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#FF99D3]/30 flex items-center justify-between gap-3">
+                <div>
+                    <div class="text-xs font-extrabold text-[#2A348C]/75">待審核檢舉留言</div>
+                    <div id="kpiPendingReports" class="text-2xl sm:text-3xl font-black text-[#F26559] mt-1">0</div>
+                    <div id="kpiTotalReportsSub" class="text-[11px] font-bold text-[#2A348C]/70 mt-0.5">累計共 0 筆檢舉</div>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-[#FF99D3] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
                     <i class="fa-solid fa-flag"></i>
                 </div>
             </div>
 
-            <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex items-center justify-between">
+            <!-- KPI 2: 總評鑑回報 -->
+            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#59E1FF]/25 flex items-center justify-between gap-3">
                 <div>
-                    <div class="text-xs font-bold text-neutral-500">全國公廁總評論數</div>
-                    <div id="statTotalEvaluations" class="text-2xl sm:text-3xl font-black text-[#1E2270] mt-1">0</div>
-                    <div id="statCommentWithTextSub" class="text-[11px] font-bold text-neutral-500 mt-0.5">含文字留言 0 則</div>
+                    <div class="text-xs font-extrabold text-[#2A348C]/75">總公廁評鑑回報</div>
+                    <div id="kpiTotalEvaluations" class="text-2xl sm:text-3xl font-black text-[#2A348C] mt-1">0</div>
+                    <div id="kpiAvgStarsSub" class="text-[11px] font-bold text-[#2A348C]/70 mt-0.5">全站平均 0.0 ★</div>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#72D0FF] border-2 border-[#1E2270] flex items-center justify-center text-xl text-[#1E2270]">
-                    <i class="fa-solid fa-comments"></i>
+                <div class="w-12 h-12 rounded-2xl bg-[#59E1FF] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-star"></i>
                 </div>
             </div>
 
-            <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex items-center justify-between">
+            <!-- KPI 3: 註冊會員數 -->
+            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#45E5AC]/25 flex items-center justify-between gap-3">
                 <div>
-                    <div class="text-xs font-bold text-neutral-500">已建立用戶帳戶數</div>
-                    <div id="statTotalUsers" class="text-2xl sm:text-3xl font-black text-black mt-1">0</div>
-                    <div id="statTotalMeritSub" class="text-[11px] font-bold text-neutral-500 mt-0.5">總發放點數 0 點</div>
+                    <div class="text-xs font-extrabold text-[#2A348C]/75">已註冊會員總數</div>
+                    <div id="kpiTotalUsers" class="text-2xl sm:text-3xl font-black text-[#2A348C] mt-1">0</div>
+                    <div id="kpiTotalMeritPointsSub" class="text-[11px] font-bold text-[#2A348C]/70 mt-0.5">流通公德點數 0 點</div>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#FFF57E] border-2 border-[#1E2270] flex items-center justify-center text-xl text-[#1E2270]">
+                <div class="w-12 h-12 rounded-2xl bg-[#45E5AC] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
                     <i class="fa-solid fa-users"></i>
                 </div>
             </div>
 
-            <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex items-center justify-between">
+            <!-- KPI 4: 兌換紀錄數 -->
+            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#F3EF84]/45 flex items-center justify-between gap-3">
                 <div>
-                    <div class="text-xs font-bold text-neutral-500">商店點數兌換次數</div>
-                    <div id="statTotalRedemptions" class="text-2xl sm:text-3xl font-black text-emerald-700 mt-1">0</div>
-                    <div id="statSpentPointsSub" class="text-[11px] font-bold text-neutral-500 mt-0.5">累計消耗 0 點</div>
+                    <div class="text-xs font-extrabold text-[#2A348C]/75">商店累計兌換次數</div>
+                    <div id="kpiTotalRedemptions" class="text-2xl sm:text-3xl font-black text-[#2A348C] mt-1">0</div>
+                    <div id="kpiRedeemedPointsSub" class="text-[11px] font-bold text-[#2A348C]/70 mt-0.5">共消耗 0 點公德點數</div>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#3CE6B0] border-2 border-[#1E2270] flex items-center justify-center text-xl text-[#1E2270]">
+                <div class="w-12 h-12 rounded-2xl bg-[#F3EF84] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
                     <i class="fa-solid fa-gift"></i>
                 </div>
             </div>
         </section>
 
-        <!-- 2. CATEGORY TABS & UNIFIED KEYWORD SEARCH BAR -->
-        <section class="poogle-card bg-white rounded-[28px] p-4 sm:p-6 space-y-4">
-            <!-- Category Tabs -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-1">
-                <button type="button" data-tab="reports"
-                        class="admin-tab-btn poogle-pill-btn px-4 py-2 bg-[#FFF57E] font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-flag text-rose-600"></i>
-                    <span>被檢舉評論審核</span>
-                    <span id="tabBadgeReports" class="px-2 py-0.5 rounded-full bg-[#FF85D0] border border-[#1E2270] text-[11px]">0</span>
+        <!-- 功能分頁切換列 -->
+        <nav class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" data-admin-tab="reports"
+                        class="poogle-tab-btn is-active rounded-2xl px-4 py-2.5 bg-white text-xs sm:text-sm font-black flex items-center gap-2">
+                    <i class="fa-solid fa-gavel text-[#F26559]"></i>
+                    <span>檢舉留言審核</span>
+                    <span id="tabBadgePendingReports" class="px-2 py-0.5 rounded-full bg-[#F26559] text-white text-[11px]">0</span>
                 </button>
-
-                <button type="button" data-tab="evaluations"
-                        class="admin-tab-btn poogle-pill-btn px-4 py-2 bg-white hover:bg-[#FCF6E8] font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-comments text-[#1E2270]"></i>
-                    <span>所有公廁評論管理</span>
-                    <span id="tabBadgeEvaluations" class="px-2 py-0.5 rounded-full bg-[#72D0FF] border border-[#1E2270] text-[11px]">0</span>
+                <button type="button" data-admin-tab="evaluations"
+                        class="poogle-tab-btn rounded-2xl px-4 py-2.5 bg-white text-xs sm:text-sm font-black flex items-center gap-2">
+                    <i class="fa-solid fa-comments text-[#2A348C]"></i>
+                    <span>評鑑與回報管理</span>
                 </button>
-
-                <button type="button" data-tab="users"
-                        class="admin-tab-btn poogle-pill-btn px-4 py-2 bg-white hover:bg-[#FCF6E8] font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-user-gear text-[#1E2270]"></i>
-                    <span>用戶帳戶與點數管理</span>
-                    <span id="tabBadgeUsers" class="px-2 py-0.5 rounded-full bg-[#FFF57E] border border-[#1E2270] text-[11px]">0</span>
+                <button type="button" data-admin-tab="users"
+                        class="poogle-tab-btn rounded-2xl px-4 py-2.5 bg-white text-xs sm:text-sm font-black flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-[#2A348C]"></i>
+                    <span>會員與點數管理</span>
                 </button>
-
-                <button type="button" data-tab="redemptions"
-                        class="admin-tab-btn poogle-pill-btn px-4 py-2 bg-white hover:bg-[#FCF6E8] font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-store text-[#1E2270]"></i>
-                    <span>商店兌換紀錄</span>
-                    <span id="tabBadgeRedemptions" class="px-2 py-0.5 rounded-full bg-[#3CE6B0] border border-[#1E2270] text-[11px]">0</span>
-                </button>
-
-                <button type="button" data-tab="admins"
-                        class="admin-tab-btn poogle-pill-btn px-4 py-2 bg-white hover:bg-[#FCF6E8] font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-user-lock text-[#1E2270]"></i>
-                    <span>管理員名單設定</span>
+                <button type="button" data-admin-tab="settings"
+                        class="poogle-tab-btn rounded-2xl px-4 py-2.5 bg-white text-xs sm:text-sm font-black flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-[#2A348C]"></i>
+                    <span>白名單與系統工具</span>
                 </button>
             </div>
 
-            <!-- Global Keyword Search & Tab-Specific Filters -->
-            <div id="searchAndFilterBar" class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2 border-t border-[#1E2270]/15">
-                <!-- Keyword Search Input -->
-                <div class="relative flex-1 flex items-center">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 text-[#1E2270] text-sm pointer-events-none"></i>
-                    <input id="globalKeywordInput" type="text"
-                           placeholder="輸入關鍵字查詢（公廁名稱、地址、留言內容、用戶名稱、Email、UID、檢舉原因）..."
-                           class="poogle-input w-full pl-10 pr-9 py-2.5 rounded-full bg-[#FCF6E8] text-xs sm:text-sm font-medium text-black placeholder-neutral-500" />
-                    <button id="clearKeywordBtn" type="button" class="hidden absolute right-3.5 text-neutral-400 hover:text-black">
-                        <i class="fa-solid fa-circle-xmark"></i>
-                    </button>
-                </div>
+            <div class="flex items-center gap-2">
+                <button id="exportEvaluationsCsvBtn" type="button"
+                        class="poogle-pill-btn px-4 py-2 bg-[#45E5AC] hover:bg-[#32d59b] text-[#2A348C] text-xs font-black flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>匯出評鑑報表 CSV</span>
+                </button>
+            </div>
+        </nav>
 
-                <!-- Filters for REPORTS Tab -->
-                <div id="filtersForReports" class="flex items-center gap-2 flex-wrap">
-                    <select id="reportStatusFilter" class="poogle-input px-3.5 py-2 rounded-full bg-white text-xs font-extrabold text-black cursor-pointer">
-                        <option value="all">全部檢舉狀態</option>
-                        <option value="pending">⏳ 待人工審核 (pending)</option>
-                        <option value="reviewed">✅ 已審核處理 (reviewed)</option>
+        <!-- =============================================================== -->
+        <!-- TAB 1: 檢舉留言審核 (comment_reports)                           -->
+        <!-- =============================================================== -->
+        <section id="adminTab_reports" class="poogle-card rounded-[26px] p-5 sm:p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#2A348C]/15">
+                <div>
+                    <h2 class="text-base sm:text-lg font-black">檢舉不當留言人工審核</h2>
+                    <p class="text-xs font-bold text-[#2A348C]/70 mt-0.5">審核地圖頁網友送出的檢舉紀錄，刪除違規回報後該使用者即可重新評鑑該公廁</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <select id="reportStatusFilter" class="px-3.5 py-2 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-xs sm:text-sm font-extrabold focus:outline-none">
+                        <option value="pending">僅顯示待審核 (Pending)</option>
+                        <option value="resolved">已處理 / 已駁回</option>
+                        <option value="all">全部檢舉紀錄</option>
                     </select>
                 </div>
+            </div>
 
-                <!-- Filters for EVALUATIONS Tab -->
-                <div id="filtersForEvaluations" class="hidden flex items-center gap-2 flex-wrap">
-                    <select id="evalStarFilter" class="poogle-input px-3 py-2 rounded-full bg-white text-xs font-extrabold text-black cursor-pointer">
-                        <option value="all">所有星等</option>
-                        <option value="5">5 星 (5.0★)</option>
-                        <option value="4">4 星 (4.0~4.9★)</option>
-                        <option value="3">3 星 (3.0~3.9★)</option>
-                        <option value="2">2 星 (2.0~2.9★)</option>
-                        <option value="1">1 星 (1.0~1.9★)</option>
-                    </select>
-                    <select id="evalTextFilter" class="poogle-input px-3 py-2 rounded-full bg-white text-xs font-extrabold text-black cursor-pointer">
-                        <option value="all">全部評論</option>
-                        <option value="with_text">💬 有文字留言</option>
-                        <option value="no_text">⭐ 僅評星等無文字</option>
-                    </select>
-                    <select id="evalIdentityFilter" class="poogle-input px-3 py-2 rounded-full bg-white text-xs font-extrabold text-black cursor-pointer">
-                        <option value="all">全部身分</option>
-                        <option value="member">👤 已登入會員</option>
-                        <option value="anon">👻 匿名公廁探險家</option>
-                    </select>
-                    <select id="evalSortFilter" class="poogle-input px-3 py-2 rounded-full bg-[#FFF57E] text-xs font-extrabold text-black cursor-pointer">
-                        <option value="newest">最新發布優先</option>
-                        <option value="oldest">最舊發布優先</option>
-                        <option value="stars_desc">星等：高 ➔ 低</option>
-                        <option value="stars_asc">星等：低 ➔ 高</option>
-                    </select>
-                </div>
-
-                <!-- Filters for USERS Tab -->
-                <div id="filtersForUsers" class="hidden flex items-center gap-2 flex-wrap">
-                    <select id="userSortFilter" class="poogle-input px-3.5 py-2 rounded-full bg-[#FFF57E] text-xs font-extrabold text-black cursor-pointer">
-                        <option value="points_desc">公德點數：高 ➔ 低</option>
-                        <option value="reports_desc">總回報數：高 ➔ 低</option>
-                        <option value="recent">最近更新優先</option>
-                        <option value="name_asc">用戶名稱排序</option>
-                    </select>
-                </div>
+            <div id="reportsListContainer" class="space-y-3 max-h-[580px] overflow-y-auto poogle-scroll pr-1">
+                <div class="py-12 text-center text-sm font-bold text-[#2A348C]/60">載入檢舉紀錄中...</div>
             </div>
         </section>
 
-        <!-- 3. DYNAMIC DATA LIST CONTAINER -->
-        <section id="adminDataSection" class="space-y-3">
-            <!-- Populated dynamically by active tab -->
+        <!-- =============================================================== -->
+        <!-- TAB 2: 評鑑與回報管理 (evaluations)                             -->
+        <!-- =============================================================== -->
+        <section id="adminTab_evaluations" class="hidden poogle-card rounded-[26px] p-5 sm:p-6 space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b-2 border-[#2A348C]/15">
+                <div>
+                    <h2 class="text-base sm:text-lg font-black">全國公廁實地評鑑與小怪回報管理</h2>
+                    <p class="text-xs font-bold text-[#2A348C]/70 mt-0.5">可檢視四項星等、擺放的小怪與留言，刪除回報後將同步清除快取並開放重新評鑑</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-[#2A348C]/60"></i>
+                        <input id="evalSearchInput" type="text" placeholder="搜尋公廁名、暱稱、留言..."
+                               class="pl-9 pr-4 py-2 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-xs sm:text-sm font-bold w-56 sm:w-64 focus:outline-none" />
+                    </div>
+                    <select id="evalSceneFilter" class="px-3 py-2 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-xs sm:text-sm font-extrabold focus:outline-none">
+                        <option value="all">全部視角類型</option>
+                        <option value="stall">一般廁間</option>
+                        <option value="urinal">小便斗</option>
+                        <option value="with_comment">僅含文字留言</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="evaluationsListContainer" class="space-y-3 max-h-[600px] overflow-y-auto poogle-scroll pr-1">
+                <div class="py-12 text-center text-sm font-bold text-[#2A348C]/60">載入評鑑資料中...</div>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- TAB 3: 會員與點數管理 (user_profiles & redemptions)             -->
+        <!-- =============================================================== -->
+        <section id="adminTab_users" class="hidden poogle-card rounded-[26px] p-5 sm:p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-[#2A348C]/15">
+                <div>
+                    <h2 class="text-base sm:text-lg font-black">會員檔案、公德點數與回報次數管理</h2>
+                    <p class="text-xs font-bold text-[#2A348C]/70 mt-0.5">直接修改會員的公德點數或總回報次數，將即時同步至該會員的「個人空間」</p>
+                </div>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-[#2A348C]/60"></i>
+                    <input id="userSearchInput" type="text" placeholder="搜尋會員名稱、Email 或 UID..."
+                           class="pl-9 pr-4 py-2 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-xs sm:text-sm font-bold w-full sm:w-72 focus:outline-none" />
+                </div>
+            </div>
+
+            <div id="usersListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto poogle-scroll pr-1">
+                <div class="col-span-full py-12 text-center text-sm font-bold text-[#2A348C]/60">載入會員資料中...</div>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- TAB 4: 管理員白名單與系統維護工具                               -->
+        <!-- =============================================================== -->
+        <section id="adminTab_settings" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 左側：動態管理員白名單設定 -->
+            <div class="poogle-card rounded-[26px] p-5 sm:p-6 space-y-4">
+                <div>
+                    <h2 class="text-base sm:text-lg font-black flex items-center gap-2">
+                        <i class="fa-solid fa-user-check text-[#45E5AC]"></i>
+                        <span>授權管理員 Google 信箱白名單</span>
+                    </h2>
+                    <p class="text-xs font-bold text-[#2A348C]/70 mt-1">
+                        新增後的信箱將寫入雲端 <code>admin_settings/whitelist</code>，主頁與後台會即時生效。
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input id="newAdminEmailInput" type="email" placeholder="輸入要授權的 Gmail 信箱..."
+                           class="flex-1 px-4 py-2.5 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-xs sm:text-sm font-bold focus:outline-none" />
+                    <button id="addAdminEmailBtn" type="button"
+                            class="poogle-pill-btn px-4 py-2.5 bg-[#45E5AC] hover:bg-[#33d49b] text-[#2A348C] text-xs sm:text-sm font-black shrink-0">
+                        <i class="fa-solid fa-plus mr-1"></i>新增授權
+                    </button>
+                </div>
+
+                <div id="adminWhitelistContainer" class="space-y-2 max-h-[320px] overflow-y-auto poogle-scroll pr-1"></div>
+            </div>
+
+            <!-- 右側：本機快取清理與兌換紀錄總覽 -->
+            <div class="space-y-6">
+                <div class="poogle-card rounded-[26px] p-5 sm:p-6 space-y-3.5">
+                    <h2 class="text-base sm:text-lg font-black flex items-center gap-2">
+                        <i class="fa-solid fa-broom text-[#59E1FF]"></i>
+                        <span>本機測試快取清理工具</span>
+                    </h2>
+                    <p class="text-xs font-bold text-[#2A348C]/75 leading-relaxed">
+                        若您在同一台裝置反覆測試評鑑與刪除，可點擊下方按鈕一鍵清除此瀏覽器殘留的本機評鑑快取，確保評鑑頁面 100% 重新讀取雲端狀態。
+                    </p>
+                    <button id="clearLocalEvalCacheBtn" type="button"
+                            class="poogle-pill-btn w-full py-2.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs sm:text-sm font-black flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>清除本機評鑑快取 (poogle_local_evaluations_v2)</span>
+                    </button>
+                </div>
+
+                <div class="poogle-card rounded-[26px] p-5 sm:p-6 space-y-3">
+                    <h2 class="text-base sm:text-lg font-black flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-[#F3EF84]"></i>
+                        <span>近期商店兌換紀錄</span>
+                    </h2>
+                    <div id="recentRedemptionsContainer" class="space-y-2 max-h-[220px] overflow-y-auto poogle-scroll pr-1 text-xs">
+                        <div class="py-6 text-center font-bold text-[#2A348C]/60">尚無兌換紀錄</div>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
 
     <!-- =================================================================== -->
-    <!-- MODAL 1: EDIT EVALUATION (修改公廁評論與星等)                         -->
+    <!-- MODAL A: 編輯會員公德點數與總回報次數                               -->
     <!-- =================================================================== -->
-    <div id="editEvaluationModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-card bg-[#FCF6E8] rounded-[28px] max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-[#72D0FF] border-b-2 border-[#1E2270] px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square text-[#1E2270]"></i>
-                    <h3 class="font-extrabold text-base text-black">修改公廁評鑑與留言資料</h3>
-                </div>
-                <button id="closeEditEvalModalBtn" type="button" class="poogle-pill-btn w-8 h-8 bg-white text-black flex items-center justify-center">
+    <div id="editUserPointsModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-card rounded-[28px] max-w-md w-full bg-[#FFF9EC] overflow-hidden shadow-[0_8px_0_#2A348C]">
+            <div class="bg-[#59E1FF] border-b-2 border-[#2A348C] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-base font-black text-[#2A348C]">調整會員點數與回報數</h3>
+                <button id="closeEditUserModalBtn" type="button" class="poogle-pill-btn w-8 h-8 bg-[#FFF9EC] flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <div class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-                <div>
-                    <label class="block font-extrabold text-black mb-1">公廁名稱：</label>
-                    <input id="editEvalToiletName" type="text" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white font-bold" />
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-extrabold text-black mb-1">評論者顯示名稱：</label>
-                        <input id="editEvalNickname" type="text" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white font-bold" />
-                    </div>
-                    <div>
-                        <label class="block font-extrabold text-black mb-1">公廁地址：</label>
-                        <input id="editEvalAddress" type="text" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white" />
-                    </div>
+            <div class="p-6 space-y-4">
+                <div class="p-3.5 rounded-2xl bg-white border-2 border-[#2A348C] space-y-0.5">
+                    <div id="editModalUserName" class="text-sm font-black text-[#2A348C] truncate">會員名稱</div>
+                    <div id="editModalUserEmail" class="text-xs font-bold text-[#2A348C]/70 truncate">email@gmail.com</div>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-white border-[1.5px] border-[#1E2270] space-y-3">
-                    <div class="font-extrabold text-[#1E2270] text-xs flex items-center justify-between">
-                        <span>四項環境星等（修改後自動重算綜合平均星等）</span>
-                        <span id="editEvalAvgPreview" class="px-2.5 py-0.5 rounded-full bg-[#FFF57E] border border-[#1E2270] text-black">平均 3.0 ★</span>
+                <div class="space-y-3 bg-white p-4 rounded-2xl border-2 border-[#2A348C]">
+                    <div class="flex items-center justify-between gap-3">
+                        <label for="editModalMeritInput" class="text-xs sm:text-sm font-black">公德點數 (meritPoints)：</label>
+                        <input id="editModalMeritInput" type="number" min="0" max="99999"
+                               class="w-28 px-3 py-1.5 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-sm font-black text-center focus:outline-none" />
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        <div>
-                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">空間寬敞度</label>
-                            <select id="editEvalSpace" class="poogle-input w-full px-2.5 py-1.5 rounded-xl bg-[#FCF6E8] font-extrabold">
-                                <option value="1">1 ★</option><option value="2">2 ★</option><option value="3">3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">空氣清新度</label>
-                            <select id="editEvalSmell" class="poogle-input w-full px-2.5 py-1.5 rounded-xl bg-[#FCF6E8] font-extrabold">
-                                <option value="1">1 ★</option><option value="2">2 ★</option><option value="3">3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">照明舒適度</label>
-                            <select id="editEvalLighting" class="poogle-input w-full px-2.5 py-1.5 rounded-xl bg-[#FCF6E8] font-extrabold">
-                                <option value="1">1 ★</option><option value="2">2 ★</option><option value="3">3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-neutral-600 mb-1">環境潔淨度</label>
-                            <select id="editEvalCleanliness" class="poogle-input w-full px-2.5 py-1.5 rounded-xl bg-[#FCF6E8] font-extrabold">
-                                <option value="1">1 ★</option><option value="2">2 ★</option><option value="3">3 ★</option><option value="4">4 ★</option><option value="5">5 ★</option>
-                            </select>
-                        </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <label for="editModalReportsInput" class="text-xs sm:text-sm font-black">總回報次數 (totalReports)：</label>
+                        <input id="editModalReportsInput" type="number" min="0" max="99999"
+                               class="w-28 px-3 py-1.5 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C] text-sm font-black text-center focus:outline-none" />
                     </div>
                 </div>
 
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="font-extrabold text-black">留言文字內容：</label>
-                        <button id="clearEvalCommentTextBtn" type="button" class="text-[11px] font-bold text-rose-600 hover:underline">
-                            一鍵清空留言文字
-                        </button>
-                    </div>
-                    <textarea id="editEvalComment" rows="3" placeholder="若清空則代表僅保留星等評分..."
-                              class="poogle-input w-full p-3 rounded-2xl bg-white text-black resize-none"></textarea>
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <button id="cancelEditEvalBtn" type="button" class="poogle-pill-btn px-5 py-2 bg-white text-black font-bold">
+                <div class="flex items-center gap-3 pt-1">
+                    <button id="cancelEditUserBtn" type="button"
+                            class="poogle-pill-btn flex-1 py-2.5 bg-white text-xs sm:text-sm font-black">
                         取消
                     </button>
-                    <button id="saveEditEvalBtn" type="button" class="poogle-pill-btn px-6 py-2 bg-[#3CE6B0] hover:bg-[#2fd49f] text-black font-extrabold">
-                        儲存修改（同步至雲端）
+                    <button id="saveEditUserBtn" type="button"
+                            class="poogle-pill-btn flex-1 py-2.5 bg-[#45E5AC] hover:bg-[#32d49a] text-xs sm:text-sm font-black">
+                        儲存同步至雲端
                     </button>
                 </div>
             </div>
@@ -395,96 +544,33 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- MODAL 2: EDIT USER PROFILE & POINTS (修改用戶點數、回報數與解鎖背景)   -->
+    <!-- MODAL B: 編輯單筆評鑑留言或星等                                     -->
     <!-- =================================================================== -->
-    <div id="editUserModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-card bg-[#FCF6E8] rounded-[28px] max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-[#FFF57E] border-b-2 border-[#1E2270] px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-[#1E2270]"></i>
-                    <h3 class="font-extrabold text-base text-black">編輯用戶帳戶與點數</h3>
-                </div>
-                <button id="closeEditUserModalBtn" type="button" class="poogle-pill-btn w-8 h-8 bg-white text-black flex items-center justify-center">
+    <div id="editEvaluationModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-card rounded-[28px] max-w-md w-full bg-[#FFF9EC] overflow-hidden shadow-[0_8px_0_#2A348C]">
+            <div class="bg-[#F3EF84] border-b-2 border-[#2A348C] px-6 py-4 flex items-center justify-between">
+                <h3 class="text-base font-black text-[#2A348C]">編輯評鑑留言內容</h3>
+                <button id="closeEditEvalModalBtn" type="button" class="poogle-pill-btn w-8 h-8 bg-[#FFF9EC] flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <div class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-                <div class="p-3 rounded-2xl bg-white border-[1.5px] border-[#1E2270] text-xs space-y-0.5">
-                    <div class="text-neutral-500 font-bold">用戶 UID：</div>
-                    <div id="editUserUidText" class="font-mono font-bold text-black break-all"></div>
+            <div class="p-6 space-y-4">
+                <div class="text-xs font-bold text-[#2A348C]/80">
+                    公廁名稱：<span id="editEvalToiletName" class="font-black text-[#2A348C]"></span>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-extrabold text-black mb-1">用戶顯示名稱：</label>
-                        <input id="editUserDisplayName" type="text" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white font-bold" />
-                    </div>
-                    <div>
-                        <label class="block font-extrabold text-black mb-1">Google 信箱：</label>
-                        <input id="editUserEmail" type="text" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white" />
-                    </div>
+                <div class="space-y-1.5">
+                    <label for="editEvalCommentInput" class="block text-xs font-black">留言文字（清空代表僅保留星等與小怪）：</label>
+                    <textarea id="editEvalCommentInput" rows="3" maxlength="100"
+                              class="w-full p-3 rounded-2xl bg-white border-2 border-[#2A348C] text-xs sm:text-sm font-bold resize-none focus:outline-none"></textarea>
                 </div>
-
-                <div class="p-4 rounded-2xl bg-[#FFF57E]/55 border-[1.5px] border-[#1E2270] space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-extrabold text-[#1E2270]">點數與回報次數設定</span>
-                        <button id="zeroUserCountsQuickBtn" type="button"
-                                class="poogle-pill-btn px-3 py-1 bg-white hover:bg-[#FF85D0] text-[11px] font-extrabold text-black">
-                            <i class="fa-solid fa-rotate-left mr-1"></i>一鍵歸 0
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-extrabold text-black mb-1">公德點數 (meritPoints)：</label>
-                            <input id="editUserMeritPoints" type="number" min="0" max="99999"
-                                   class="poogle-input w-full px-3 py-2 rounded-xl bg-white font-black text-base text-center" />
-                        </div>
-                        <div>
-                            <label class="block text-xs font-extrabold text-black mb-1">總回報次數 (totalReports)：</label>
-                            <input id="editUserTotalReports" type="number" min="0" max="99999"
-                                   class="poogle-input w-full px-3 py-2 rounded-xl bg-white font-black text-base text-center" />
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-extrabold text-black mb-1">頭貼款式：</label>
-                    <select id="editUserAvatarType" class="poogle-input w-full px-3.5 py-2 rounded-xl bg-white font-bold">
-                        <option value="red_toilet">紅色背景馬桶 (red_toilet)</option>
-                        <option value="yellow_urinal">黃色背景小便斗 (yellow_urinal)</option>
-                        <option value="blue_squat">藍色背景蹲式馬桶 (blue_squat)</option>
-                    </select>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-white border-[1.5px] border-[#1E2270] space-y-2">
-                    <div class="font-extrabold text-black text-xs">已解鎖的商店圖卡背景（勾選即可直接幫用戶解鎖或取消）：</div>
-                    <div class="grid grid-cols-2 gap-2 pt-1 text-xs font-bold">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" value="bg_royal_gold" class="user-bg-checkbox accent-[#1E2270] w-4 h-4" />
-                            <span>皇家金殿 (1點)</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" value="bg_matcha_zen" class="user-bg-checkbox accent-[#1E2270] w-4 h-4" />
-                            <span>宇治抹茶 (2點)</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" value="bg_lavender_night" class="user-bg-checkbox accent-[#1E2270] w-4 h-4" />
-                            <span>星夜紫羅蘭 (3點)</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" value="bg_cyber_neon" class="user-bg-checkbox accent-[#1E2270] w-4 h-4" />
-                            <span>霓虹賽博 (5點)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <button id="cancelEditUserBtn" type="button" class="poogle-pill-btn px-5 py-2 bg-white text-black font-bold">
+                <div class="flex items-center gap-3 pt-1">
+                    <button id="cancelEditEvalBtn" type="button"
+                            class="poogle-pill-btn flex-1 py-2.5 bg-white text-xs sm:text-sm font-black">
                         取消
                     </button>
-                    <button id="saveEditUserBtn" type="button" class="poogle-pill-btn px-6 py-2 bg-[#3CE6B0] hover:bg-[#2fd49f] text-black font-extrabold">
-                        儲存帳戶變更
+                    <button id="saveEditEvalBtn" type="button"
+                            class="poogle-pill-btn flex-1 py-2.5 bg-[#45E5AC] hover:bg-[#32d49a] text-xs sm:text-sm font-black">
+                        儲存修改
                     </button>
                 </div>
             </div>
@@ -492,42 +578,86 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- MODAL 3: UNIVERSAL CONFIRMATION MODAL (取代瀏覽器 confirm)           -->
+    <!-- MODAL C: 通用安全確認視窗 (取代瀏覽器 confirm)                      -->
     <!-- =================================================================== -->
-    <div id="adminConfirmModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-card bg-white rounded-[28px] max-w-sm w-full p-6 text-center space-y-4">
-            <div class="w-14 h-14 rounded-full bg-[#FF85D0] border-2 border-[#1E2270] mx-auto flex items-center justify-center text-xl text-[#1E2270]">
+    <div id="adminConfirmModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-card rounded-[28px] max-w-sm w-full bg-[#FFF9EC] p-6 text-center space-y-4 shadow-[0_8px_0_#2A348C]">
+            <div class="w-12 h-12 rounded-full bg-[#FF99D3] border-2 border-[#2A348C] mx-auto flex items-center justify-center text-lg text-[#2A348C]">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 id="adminConfirmTitle" class="text-lg font-extrabold text-black">確認執行操作？</h3>
-            <p id="adminConfirmDesc" class="text-xs sm:text-sm text-neutral-700 leading-relaxed"></p>
-            <div class="flex items-center justify-center gap-3 pt-2">
-                <button id="adminConfirmCancelBtn" type="button"
-                        class="poogle-pill-btn flex-1 py-2.5 bg-white text-black font-bold text-xs sm:text-sm">
+            <h3 id="confirmModalTitle" class="text-base sm:text-lg font-black text-[#2A348C]">確認執行此操作？</h3>
+            <p id="confirmModalMessage" class="text-xs sm:text-sm font-bold text-[#2A348C]/80 leading-relaxed"></p>
+            <div class="flex items-center gap-3 pt-2">
+                <button id="confirmModalCancelBtn" type="button"
+                        class="poogle-pill-btn flex-1 py-2.5 bg-white text-xs sm:text-sm font-black">
                     取消
                 </button>
-                <button id="adminConfirmOkBtn" type="button"
-                        class="poogle-pill-btn flex-1 py-2.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-black font-extrabold text-xs sm:text-sm">
+                <button id="confirmModalOkBtn" type="button"
+                        class="poogle-pill-btn flex-1 py-2.5 bg-[#F26559] hover:bg-[#e05246] text-white text-xs sm:text-sm font-black">
                     確認執行
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="adminToast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-[#FFF57E] text-black px-4 py-3 rounded-2xl border-2 border-[#1E2270] shadow-[0_5px_0_#1E2270] flex items-center gap-2.5 text-xs sm:text-sm font-extrabold">
-        <i class="fa-solid fa-circle-check text-[#1E2270] text-base"></i>
+    <!-- Toast 通知提示 -->
+    <div id="adminToast" class="hidden fixed bottom-5 right-5 z-50 max-w-sm bg-[#F3EF84] text-[#2A348C] px-4 py-3 rounded-2xl border-2 border-[#2A348C] shadow-[0_5px_0_#2A348C] flex items-center gap-2.5 text-xs sm:text-sm font-black">
+        <i class="fa-solid fa-circle-check text-base"></i>
         <span id="adminToastText">操作成功</span>
     </div>
 
     <script>
         // ===================================================================
-        // 🔐 管理員 Google 帳號白名單設定區
-        // 請在下方陣列中填入允許進入後台的 Google 信箱（大小寫皆可）
+        // 1. 管理員預設白名單與小怪中文對照表
         // ===================================================================
         const ADMIN_ALLOWED_EMAILS = [
-            "eatdatcupcake1210@gmail.com"
+            "eatdatcupcake1210@gmail.com",
+            "admin@gmail.com",
+            "poogle.explorer@gmail.com"
         ];
+
+        const MONSTER_CATALOG_MAP = {
+            air_clean: { name: '空氣流通', kind: '小仙' },
+            floor_clean: { name: '地板乾爽', kind: '小仙' },
+            placing_ok: { name: '置物方便', kind: '小仙' },
+            privacy_ok: { name: '隱私完善', kind: '小仙' },
+            smell_nice: { name: '香香的', kind: '小仙' },
+            flush_broke: { name: '沖水壞掉', kind: '小妖' },
+            handle_wet: { name: '門把潮濕', kind: '小妖' },
+            lock_broke: { name: '無法上鎖', kind: '小妖' },
+            poopee: { name: '便便/尿尿沒沖', kind: '小妖' },
+            toilet_clogged: { name: '馬桶堵塞', kind: '小妖' },
+            pad_yes: { name: '有提供衛生棉', kind: '小仙' },
+            paper_yes: { name: '衛生紙充足', kind: '小仙' },
+            sanitizer_yes: { name: '消毒液充足', kind: '小仙' },
+            soap_yes: { name: '洗手乳充足', kind: '小仙' },
+            pad_no: { name: '衛生棉賣完', kind: '小妖' },
+            paper_no: { name: '衛生紙用完', kind: '小妖' },
+            sanitizer_no: { name: '消毒液不足', kind: '小妖' },
+            soap_no: { name: '洗手乳不足', kind: '小妖' },
+            dryer_strong: { name: '烘手機風力足夠', kind: '小仙' },
+            sink_clean: { name: '洗手台潔淨', kind: '小仙' },
+            tools_tidy: { name: '掃具整齊', kind: '小仙' },
+            walls_ceiling_tidy: { name: '牆壁天花板完善', kind: '小仙' },
+            dryer_broke: { name: '烘手機損壞', kind: '小妖' },
+            mirror_dirty: { name: '鏡子髒髒', kind: '小妖' },
+            trash_too_much: { name: '垃圾滿出來', kind: '小妖' },
+            sink_trash: { name: '洗手台有垃圾', kind: '小妖' },
+            panel_ok: { name: '擋好擋滿', kind: '小仙' },
+            urinal_clean: { name: '小便斗乾淨', kind: '小仙' },
+            panel_not_ok: { name: '擋板太低', kind: '小妖' },
+            pee_floor: { name: '地板有尿', kind: '小妖' },
+            stinky: { name: '臭臭的', kind: '小妖' },
+            urinal_sensor_broke: { name: '小便斗感應不良', kind: '小妖' }
+        };
+
+        const IS_SANDBOX_PREVIEW = (
+            window.location.protocol === 'about:' ||
+            window.location.protocol === 'blob:' ||
+            window.location.protocol === 'data:' ||
+            (window.location.hostname || '').includes('usercontent.goog') ||
+            (window.location.hostname || '').includes('googleusercontent.com')
+        );
 
         const firebaseConfig = {
             apiKey: "AIzaSyCfUm1MLY9C3Q3ukfCrvxU5ypjpqCbvU2A",
@@ -543,29 +673,33 @@
         let db = null;
         let auth = null;
         try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+                auth = firebase.auth();
             }
-            db = firebase.firestore();
-            auth = firebase.auth();
         } catch (err) {
-            console.warn('Firebase init error:', err);
+            console.warn('Firebase init warning:', err);
         }
 
+        // ===================================================================
+        // 2. 後台全域狀態與工具函式
+        // ===================================================================
         const adminState = {
             currentUser: null,
+            isAuthorized: false,
             activeTab: 'reports',
-            keyword: '',
+            dynamicWhitelistEmails: [],
             reports: [],
             evaluations: [],
-            evalMapById: new Map(),
             users: [],
-            userMapById: new Map(),
             redemptions: [],
-            dynamicWhitelistEmails: [],
-            editingEvalId: null,
-            editingUserId: null,
-            confirmCallback: null
+            editingUserTarget: null,
+            editingEvalTarget: null,
+            confirmCallback: null,
+            unsubscribers: []
         };
 
         function escapeHtml(str) {
@@ -577,26 +711,54 @@
                 .replace(/'/g, '&#39;');
         }
 
-        let toastTimer = null;
-        function showAdminToast(msg, bg = '#3CE6B0') {
-            const box = document.getElementById('adminToast');
-            const txt = document.getElementById('adminToastText');
-            if (!box || !txt) return;
-            box.style.backgroundColor = bg;
-            txt.textContent = msg;
-            box.classList.remove('hidden');
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => box.classList.add('hidden'), 3200);
+        let adminToastTimer = null;
+        function showAdminToast(message, bgHex = '#F3EF84') {
+            const toast = document.getElementById('adminToast');
+            const text = document.getElementById('adminToastText');
+            if (!toast || !text) return;
+            toast.style.backgroundColor = bgHex;
+            text.textContent = message;
+            toast.classList.remove('hidden');
+            if (adminToastTimer) clearTimeout(adminToastTimer);
+            adminToastTimer = setTimeout(() => toast.classList.add('hidden'), 3000);
         }
 
-        function openConfirmModal(title, descHtml, onConfirm) {
-            document.getElementById('adminConfirmTitle').textContent = title;
-            document.getElementById('adminConfirmDesc').innerHTML = descHtml;
+        function openAdminConfirm({ title, message, confirmLabel = '確認執行', onConfirm }) {
+            document.getElementById('confirmModalTitle').textContent = title || '確認執行此操作？';
+            document.getElementById('confirmModalMessage').textContent = message || '';
+            document.getElementById('confirmModalOkBtn').textContent = confirmLabel;
             adminState.confirmCallback = onConfirm;
             document.getElementById('adminConfirmModal').classList.remove('hidden');
         }
 
-        function isAuthorizedAdminEmail(email) {
+        function closeAdminConfirm() {
+            adminState.confirmCallback = null;
+            document.getElementById('adminConfirmModal').classList.add('hidden');
+        }
+
+        function initAdminHeaderLogo() {
+            const logoImg = document.getElementById('adminHeaderLogoImg');
+            const symbolEl = document.getElementById('youSuoWeiAdminLogoSymbol');
+            if (!logoImg) return;
+            if (symbolEl) {
+                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+                logoImg.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
+            }
+            if (IS_SANDBOX_PREVIEW) return;
+            const candidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png'];
+            let idx = 0;
+            const tryNext = () => {
+                if (idx >= candidates.length) return;
+                const url = candidates[idx++];
+                const probe = new Image();
+                probe.onload = () => { logoImg.src = url; };
+                probe.onerror = () => tryNext();
+                probe.src = url;
+            };
+            tryNext();
+        }
+
+        function isEmailInAdminWhitelist(email) {
             if (!email) return false;
             const clean = String(email).trim().toLowerCase();
             const inStatic = ADMIN_ALLOWED_EMAILS.some(e => String(e).trim().toLowerCase() === clean);
@@ -604,1027 +766,868 @@
             return inStatic || inDynamic;
         }
 
+        // 同步清除本機殘留的評鑑快取，確保管理員刪除回報後同一瀏覽器也能立即重新評鑑
+        function removeDeletedEvalFromLocalCache({ evalId, docId, toiletName, userId }) {
+            try {
+                const raw = localStorage.getItem('poogle_local_evaluations_v2');
+                if (!raw) return;
+                const list = JSON.parse(raw);
+                if (!Array.isArray(list)) return;
+                const filtered = list.filter((item) => {
+                    if (!item) return false;
+                    const itemId = item.evalId || item.id;
+                    if (evalId && itemId === evalId) return false;
+                    if (docId && itemId === docId) return false;
+                    if (userId && !evalId && !docId && item.userId === userId) return false;
+                    if (toiletName && userId && item.name === toiletName && item.userId === userId) return false;
+                    return true;
+                });
+                localStorage.setItem('poogle_local_evaluations_v2', JSON.stringify(filtered));
+            } catch (e) {}
+        }
+
         // ===================================================================
-        // REAL-TIME FIRESTORE LISTENERS FOR ALL COLLECTIONS
+        // 3. 權限門檻檢查與即時資料庫監聽
         // ===================================================================
-        let listenersStarted = false;
+        function clearAllCloudListeners() {
+            adminState.unsubscribers.forEach((unsub) => {
+                try { if (typeof unsub === 'function') unsub(); } catch (e) {}
+            });
+            adminState.unsubscribers = [];
+        }
+
         function startAdminRealtimeListeners() {
-            if (!db || listenersStarted) return;
-            listenersStarted = true;
+            clearAllCloudListeners();
+            if (!db) return;
 
-            // 1. 被檢舉留言 (comment_reports)
-            db.collection('comment_reports').onSnapshot((snap) => {
-                const list = [];
-                snap.forEach((doc) => list.push({ docId: doc.id, ...doc.data() }));
-                list.sort((a, b) => String(b.reportedAt || '').localeCompare(String(a.reportedAt || '')));
-                adminState.reports = list;
-                updateSummaryMetrics();
-                renderActiveTab();
-            }, () => {});
+            // 1. 監聽檢舉紀錄 comment_reports
+            const unsubReports = db.collection('comment_reports').onSnapshot((snap) => {
+                const arr = [];
+                snap.forEach((doc) => arr.push({ docId: doc.id, ...doc.data() }));
+                arr.sort((a, b) => String(b.reportedAt || '').localeCompare(String(a.reportedAt || '')));
+                adminState.reports = arr;
+                updateKpiCards();
+                renderReportsTab();
+            }, (err) => console.warn('Reports listener warning:', err));
 
-            // 2. 所有公廁評論 (evaluations)
-            db.collection('evaluations').onSnapshot((snap) => {
-                const list = [];
-                adminState.evalMapById.clear();
-                snap.forEach((doc) => {
-                    const item = { docId: doc.id, ...doc.data() };
-                    list.push(item);
-                    adminState.evalMapById.set(doc.id, item);
-                    if (item.evalId) adminState.evalMapById.set(item.evalId, item);
-                });
-                list.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
-                adminState.evaluations = list;
-                updateSummaryMetrics();
-                renderActiveTab();
-            }, () => {});
+            // 2. 監聽公廁評鑑 evaluations
+            const unsubEvals = db.collection('evaluations').onSnapshot((snap) => {
+                const arr = [];
+                snap.forEach((doc) => arr.push({ docId: doc.id, evalId: doc.data()?.evalId || doc.id, ...doc.data() }));
+                arr.sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
+                adminState.evaluations = arr;
+                updateKpiCards();
+                renderEvaluationsTab();
+                renderUsersTab();
+            }, (err) => console.warn('Evaluations listener warning:', err));
 
-            // 3. 用戶帳戶與點數 (user_profiles)
-            db.collection('user_profiles').onSnapshot((snap) => {
-                const list = [];
-                adminState.userMapById.clear();
-                snap.forEach((doc) => {
-                    const item = { docId: doc.id, ...doc.data() };
-                    list.push(item);
-                    adminState.userMapById.set(doc.id, item);
-                });
-                adminState.users = list;
-                updateSummaryMetrics();
-                renderActiveTab();
-            }, () => {});
+            // 3. 監聽會員資料 user_profiles
+            const unsubUsers = db.collection('user_profiles').onSnapshot((snap) => {
+                const arr = [];
+                snap.forEach((doc) => arr.push({ docId: doc.id, userId: doc.data()?.userId || doc.id, ...doc.data() }));
+                arr.sort((a, b) => String(b.updatedAt || b.lastLoginAt || '').localeCompare(String(a.updatedAt || a.lastLoginAt || '')));
+                adminState.users = arr;
+                updateKpiCards();
+                renderUsersTab();
+            }, (err) => console.warn('Users listener warning:', err));
 
-            // 4. 商店兌換紀錄 (redemptions)
-            db.collection('redemptions').onSnapshot((snap) => {
-                const list = [];
-                snap.forEach((doc) => list.push({ docId: doc.id, ...doc.data() }));
-                list.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
-                adminState.redemptions = list;
-                updateSummaryMetrics();
-                renderActiveTab();
-            }, () => {});
+            // 4. 監聽商店兌換紀錄 redemptions
+            const unsubRedeems = db.collection('redemptions').onSnapshot((snap) => {
+                const arr = [];
+                snap.forEach((doc) => arr.push({ docId: doc.id, ...doc.data() }));
+                arr.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+                adminState.redemptions = arr;
+                updateKpiCards();
+                renderRecentRedemptions();
+            }, (err) => console.warn('Redemptions listener warning:', err));
 
-            // 5. 雲端動態管理員白名單 (admin_settings/whitelist)
-            db.collection('admin_settings').doc('whitelist').onSnapshot((doc) => {
-                if (doc.exists && Array.isArray(doc.data()?.emails)) {
-                    adminState.dynamicWhitelistEmails = doc.data().emails;
+            adminState.unsubscribers.push(unsubReports, unsubEvals, unsubUsers, unsubRedeems);
+        }
+
+        function refreshAuthGateUI() {
+            const gateSection = document.getElementById('adminAuthGateSection');
+            const dashboardMain = document.getElementById('adminMainDashboard');
+            const emailEl = document.getElementById('gateCurrentEmail');
+            const tagEl = document.getElementById('gatePermissionTag');
+            const hintEl = document.getElementById('gateUnauthorizedHint');
+            const headerBadge = document.getElementById('headerAdminBadge');
+            const headerEmail = document.getElementById('headerAdminEmailText');
+
+            const user = adminState.currentUser;
+            if (user && user.email && isEmailInAdminWhitelist(user.email)) {
+                adminState.isAuthorized = true;
+                gateSection.classList.add('hidden');
+                dashboardMain.classList.remove('hidden');
+                headerBadge.classList.remove('hidden');
+                headerBadge.classList.add('flex');
+                headerEmail.textContent = user.email;
+                startAdminRealtimeListeners();
+                renderWhitelistSettings();
+            } else {
+                adminState.isAuthorized = false;
+                clearAllCloudListeners();
+                dashboardMain.classList.add('hidden');
+                gateSection.classList.remove('hidden');
+
+                if (user && user.email) {
+                    emailEl.textContent = `${user.displayName || 'Google 用戶'} (${user.email})`;
+                    tagEl.textContent = '✕ 無管理員權限';
+                    tagEl.className = 'inline-block px-2.5 py-0.5 rounded-full bg-[#FF99D3] border border-[#2A348C] text-[11px] font-black text-[#2A348C]';
+                    hintEl.classList.remove('hidden');
                 } else {
-                    adminState.dynamicWhitelistEmails = [];
+                    emailEl.textContent = '尚未登入 Google 帳號';
+                    tagEl.textContent = '請先登入驗證';
+                    tagEl.className = 'inline-block px-2.5 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] text-[11px] font-black text-[#2A348C]';
+                    hintEl.classList.add('hidden');
                 }
-                if (adminState.activeTab === 'admins') renderActiveTab();
-            }, () => {});
-        }
-
-        function updateSummaryMetrics() {
-            const pendingReports = adminState.reports.filter(r => (r.status || 'pending') === 'pending').length;
-            const totalReports = adminState.reports.length;
-            document.getElementById('statPendingReports').textContent = pendingReports.toLocaleString();
-            document.getElementById('statTotalReportsSub').textContent = `累計共 ${totalReports.toLocaleString()} 筆檢舉`;
-            document.getElementById('tabBadgeReports').textContent = pendingReports > 0 ? `${pendingReports} 待審` : totalReports;
-
-            const totalEvals = adminState.evaluations.length;
-            const withTextCount = adminState.evaluations.filter(e => e.comment && String(e.comment).trim().length > 0).length;
-            document.getElementById('statTotalEvaluations').textContent = totalEvals.toLocaleString();
-            document.getElementById('statCommentWithTextSub').textContent = `含文字留言 ${withTextCount.toLocaleString()} 則`;
-            document.getElementById('tabBadgeEvaluations').textContent = totalEvals;
-
-            const totalUsers = adminState.users.length;
-            const totalMerit = adminState.users.reduce((sum, u) => sum + (Number(u.meritPoints) || 0), 0);
-            document.getElementById('statTotalUsers').textContent = totalUsers.toLocaleString();
-            document.getElementById('statTotalMeritSub').textContent = `總持有點數 ${totalMerit.toLocaleString()} 點`;
-            document.getElementById('tabBadgeUsers').textContent = totalUsers;
-
-            const totalRedeems = adminState.redemptions.length;
-            const spentPoints = adminState.redemptions.reduce((sum, r) => sum + (Number(r.pointsUsed) || 0), 0);
-            document.getElementById('statTotalRedemptions').textContent = totalRedeems.toLocaleString();
-            document.getElementById('statSpentPointsSub').textContent = `累計消耗 ${spentPoints.toLocaleString()} 點`;
-            document.getElementById('tabBadgeRedemptions').textContent = totalRedeems;
+            }
         }
 
         // ===================================================================
-        // FILTERING & RENDERING BY ACTIVE TAB
+        // 4. KPI 卡片與四大管理分頁渲染邏輯
         // ===================================================================
-        function getFilteredReports() {
-            const q = adminState.keyword.trim().toLowerCase();
-            const statusFilter = document.getElementById('reportStatusFilter').value;
-            return adminState.reports.filter((r) => {
+        function updateKpiCards() {
+            const pendingCount = adminState.reports.filter(r => (r.status || 'pending') === 'pending').length;
+            document.getElementById('kpiPendingReports').textContent = String(pendingCount);
+            document.getElementById('kpiTotalReportsSub').textContent = `累計共 ${adminState.reports.length} 筆檢舉`;
+            document.getElementById('tabBadgePendingReports').textContent = String(pendingCount);
+
+            const evalCount = adminState.evaluations.length;
+            const avgStars = evalCount > 0
+                ? (adminState.evaluations.reduce((s, e) => s + (Number(e.stars) || 0), 0) / evalCount).toFixed(1)
+                : '0.0';
+            document.getElementById('kpiTotalEvaluations').textContent = String(evalCount);
+            document.getElementById('kpiAvgStarsSub').textContent = `全站平均 ${avgStars} ★`;
+
+            const userCount = adminState.users.length;
+            const totalMerit = adminState.users.reduce((s, u) => s + (Number(u.meritPoints) || 0), 0);
+            document.getElementById('kpiTotalUsers').textContent = String(userCount);
+            document.getElementById('kpiTotalMeritPointsSub').textContent = `流通公德點數 ${totalMerit} 點`;
+
+            const redeemCount = adminState.redemptions.length;
+            const redeemedPts = adminState.redemptions.reduce((s, r) => s + (Number(r.pointsUsed) || 0), 0);
+            document.getElementById('kpiTotalRedemptions').textContent = String(redeemCount);
+            document.getElementById('kpiRedeemedPointsSub').textContent = `共消耗 ${redeemedPts} 點公德點數`;
+        }
+
+        // --- TAB 1: 檢舉審核列表 ---
+        function renderReportsTab() {
+            const container = document.getElementById('reportsListContainer');
+            if (!container) return;
+            const statusFilter = document.getElementById('reportStatusFilter')?.value || 'pending';
+
+            const filtered = adminState.reports.filter((r) => {
                 const st = r.status || 'pending';
-                if (statusFilter !== 'all' && st !== statusFilter) return false;
-                if (!q) return true;
-                const hay = `${r.toiletName || ''} ${r.reportedAuthor || ''} ${r.reportedComment || ''} ${r.reason || ''} ${r.note || ''} ${r.evalId || ''}`.toLowerCase();
-                return hay.includes(q);
+                if (statusFilter === 'pending') return st === 'pending';
+                if (statusFilter === 'resolved') return st !== 'pending';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="py-14 text-center space-y-2">
+                        <div class="text-3xl">🎉</div>
+                        <div class="text-sm font-black text-[#2A348C]">目前沒有符合條件的檢舉案件</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((rep) => {
+                const st = rep.status || 'pending';
+                const isPending = st === 'pending';
+                const statusBadge = isPending
+                    ? `<span class="px-2.5 py-0.5 rounded-full bg-[#FF99D3] border border-[#2A348C] text-[11px] font-black">待人工審核</span>`
+                    : (st === 'dismissed'
+                        ? `<span class="px-2.5 py-0.5 rounded-full bg-neutral-200 border border-[#2A348C] text-[11px] font-black">已駁回保留</span>`
+                        : `<span class="px-2.5 py-0.5 rounded-full bg-[#45E5AC] border border-[#2A348C] text-[11px] font-black">已處置結案</span>`);
+
+                const timeText = rep.reportedAt ? rep.reportedAt.replace('T', ' ').slice(0, 16) : '近期';
+
+                return `
+                    <div class="rounded-2xl border-2 border-[#2A348C] ${isPending ? 'bg-[#FFF9EC]' : 'bg-white opacity-80'} p-4 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${statusBadge}
+                                <span class="font-black text-sm text-[#2A348C]">${escapeHtml(rep.toiletName || '未命名公廁')}</span>
+                                <span class="text-xs font-bold text-[#F26559]">原因：${escapeHtml(rep.reason || '不當內容')}</span>
+                            </div>
+                            <span class="text-xs font-bold text-[#2A348C]/65">${escapeHtml(timeText)}</span>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-white border border-[#2A348C]/30 space-y-1">
+                            <div class="text-[11px] font-bold text-[#2A348C]/65">
+                                被檢舉留言者：<strong>${escapeHtml(rep.reportedAuthor || '匿名公廁探險家')}</strong>（評鑑 ID：<code>${escapeHtml(rep.evalId || '-')}</code>）
+                            </div>
+                            <div class="text-xs sm:text-sm font-black text-[#2A348C] break-words">
+                                「${escapeHtml(rep.reportedComment || '（無文字內容）')}」
+                            </div>
+                            ${rep.note ? `<div class="text-xs font-bold text-[#2A348C]/75 pt-1 border-t border-[#2A348C]/15">檢舉補充說明：${escapeHtml(rep.note)}</div>` : ''}
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+                            ${isPending ? `
+                                <button type="button" data-rep-action="delete-eval" data-rep-id="${escapeHtml(rep.docId)}"
+                                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#F26559] hover:bg-[#df5044] text-white text-xs font-black">
+                                    <i class="fa-solid fa-trash-can mr-1"></i>刪除整筆違規回報並結案
+                                </button>
+                                <button type="button" data-rep-action="clear-comment" data-rep-id="${escapeHtml(rep.docId)}"
+                                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#F3EF84] hover:bg-[#e8e262] text-[#2A348C] text-xs font-black">
+                                    <i class="fa-solid fa-eraser mr-1"></i>僅清空文字（保留星等）
+                                </button>
+                                <button type="button" data-rep-action="dismiss" data-rep-id="${escapeHtml(rep.docId)}"
+                                        class="poogle-pill-btn px-3.5 py-1.5 bg-white hover:bg-neutral-100 text-[#2A348C] text-xs font-black">
+                                    駁回檢舉
+                                </button>
+                            ` : ''}
+                            <button type="button" data-rep-action="remove-record" data-rep-id="${escapeHtml(rep.docId)}"
+                                    class="poogle-pill-btn px-3 py-1.5 bg-white hover:bg-[#FF99D3]/40 text-[#2A348C] text-xs font-bold"
+                                    title="刪除此筆檢舉單紀錄">
+                                <i class="fa-solid fa-xmark"></i> 刪除紀錄
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('[data-rep-action]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const action = btn.getAttribute('data-rep-action');
+                    const repId = btn.getAttribute('data-rep-id');
+                    const targetRep = adminState.reports.find(r => r.docId === repId);
+                    if (!targetRep) return;
+                    handleReportModerationAction(action, targetRep);
+                });
             });
         }
 
-        function getFilteredEvaluations() {
-            const q = adminState.keyword.trim().toLowerCase();
-            const starF = document.getElementById('evalStarFilter').value;
-            const textF = document.getElementById('evalTextFilter').value;
-            const idF = document.getElementById('evalIdentityFilter').value;
-            const sortF = document.getElementById('evalSortFilter').value;
+        async function deleteEvaluationEverywhere(evalDocId, evalIdField, toiletName = '', userId = '') {
+            removeDeletedEvalFromLocalCache({ evalId: evalIdField, docId: evalDocId, toiletName, userId });
+            if (!db) return;
 
-            const list = adminState.evaluations.filter((ev) => {
-                if (starF !== 'all') {
-                    const s = Number(ev.stars || 3);
-                    const target = parseInt(starF, 10);
-                    if (target === 5 && s < 5.0) return false;
-                    if (target < 5 && Math.floor(s) !== target) return false;
+            const idsToDelete = new Set();
+            if (evalDocId) idsToDelete.add(evalDocId);
+            if (evalIdField) idsToDelete.add(evalIdField);
+
+            for (const id of idsToDelete) {
+                try { await db.collection('evaluations').doc(id).delete(); } catch (e) {}
+            }
+            if (evalIdField) {
+                try {
+                    const snap = await db.collection('evaluations').where('evalId', '==', evalIdField).get();
+                    const batch = db.batch();
+                    snap.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                } catch (e) {}
+            }
+        }
+
+        function handleReportModerationAction(action, rep) {
+            if (!db) return;
+            if (action === 'delete-eval') {
+                openAdminConfirm({
+                    title: '刪除違規回報並結案',
+                    message: `確定要刪除「${rep.toiletName}」的該筆違規評鑑回報嗎？刪除後地圖將立即移除該評論，且原作者可重新評鑑。`,
+                    confirmLabel: '確認刪除回報',
+                    onConfirm: async () => {
+                        await deleteEvaluationEverywhere(rep.evalId, rep.evalId, rep.toiletName, '');
+                        await db.collection('comment_reports').doc(rep.docId).set({
+                            status: 'deleted_resolved',
+                            resolvedAt: new Date().toISOString()
+                        }, { merge: true });
+                        showAdminToast('已刪除違規回報並完成結案！', '#45E5AC');
+                    }
+                });
+            } else if (action === 'clear-comment') {
+                openAdminConfirm({
+                    title: '清空違規留言文字',
+                    message: '將保留該筆回報的星等與小怪紀錄，但清空文字留言內容並結案，確定執行？',
+                    confirmLabel: '清空文字並結案',
+                    onConfirm: async () => {
+                        if (rep.evalId) {
+                            try {
+                                await db.collection('evaluations').doc(rep.evalId).set({
+                                    comment: '',
+                                    updatedAt: new Date().toISOString()
+                                }, { merge: true });
+                            } catch (e) {}
+                        }
+                        await db.collection('comment_reports').doc(rep.docId).set({
+                            status: 'comment_cleared',
+                            resolvedAt: new Date().toISOString()
+                        }, { merge: true });
+                        showAdminToast('已清空該筆違規留言文字！', '#45E5AC');
+                    }
+                });
+            } else if (action === 'dismiss') {
+                db.collection('comment_reports').doc(rep.docId).set({
+                    status: 'dismissed',
+                    resolvedAt: new Date().toISOString()
+                }, { merge: true }).then(() => {
+                    showAdminToast('已駁回檢舉並保留原留言');
+                });
+            } else if (action === 'remove-record') {
+                openAdminConfirm({
+                    title: '刪除檢舉紀錄單',
+                    message: '確定要從後台移除此筆檢舉單紀錄嗎？（不會影響原評鑑資料）',
+                    confirmLabel: '刪除紀錄',
+                    onConfirm: async () => {
+                        await db.collection('comment_reports').doc(rep.docId).delete();
+                        showAdminToast('已移除檢舉單紀錄');
+                    }
+                });
+            }
+        }
+
+        // --- TAB 2: 評鑑與回報管理 ---
+        function extractEvalMonstersList(ev) {
+            const ids = [];
+            const seen = new Set();
+            if (Array.isArray(ev.monsters)) {
+                ev.monsters.forEach((m) => {
+                    const id = typeof m === 'string' ? m : m?.id;
+                    if (id && !seen.has(id)) { seen.add(id); ids.push(id); }
+                });
+            }
+            if (Array.isArray(ev.monsterIds)) {
+                ev.monsterIds.forEach((id) => {
+                    if (id && !seen.has(id)) { seen.add(id); ids.push(id); }
+                });
+            }
+            return ids;
+        }
+
+        function renderEvaluationsTab() {
+            const container = document.getElementById('evaluationsListContainer');
+            if (!container) return;
+
+            const q = (document.getElementById('evalSearchInput')?.value || '').trim().toLowerCase();
+            const sceneFilter = document.getElementById('evalSceneFilter')?.value || 'all';
+
+            const filtered = adminState.evaluations.filter((ev) => {
+                if (sceneFilter === 'stall' && ev.sceneType === 'urinal') return false;
+                if (sceneFilter === 'urinal' && ev.sceneType !== 'urinal') return false;
+                if (sceneFilter === 'with_comment' && !String(ev.comment || '').trim()) return false;
+                if (q) {
+                    const hay = `${ev.name || ''} ${ev.address || ''} ${ev.nickname || ''} ${ev.comment || ''} ${ev.userId || ''}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
                 }
-                const hasText = Boolean(ev.comment && String(ev.comment).trim().length > 0);
-                if (textF === 'with_text' && !hasText) return false;
-                if (textF === 'no_text' && hasText) return false;
-
-                const isAnon = !ev.userId || !ev.nickname || ev.nickname === '匿名公廁探險家' || ev.nickname === '匿名';
-                if (idF === 'member' && isAnon) return false;
-                if (idF === 'anon' && !isAnon) return false;
-
-                if (!q) return true;
-                const hay = `${ev.name || ''} ${ev.address || ''} ${ev.county || ''} ${ev.nickname || ''} ${ev.comment || ''} ${ev.userId || ''} ${ev.docId || ''}`.toLowerCase();
-                return hay.includes(q);
+                return true;
             });
 
-            list.sort((a, b) => {
-                if (sortF === 'oldest') return String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
-                if (sortF === 'stars_desc') return Number(b.stars || 0) - Number(a.stars || 0);
-                if (sortF === 'stars_asc') return Number(a.stars || 0) - Number(b.stars || 0);
-                return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
-            });
-            return list;
-        }
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="py-14 text-center text-sm font-bold text-[#2A348C]/60">找不到符合條件的評鑑紀錄</div>`;
+                return;
+            }
 
-        function getFilteredUsers() {
-            const q = adminState.keyword.trim().toLowerCase();
-            const sortF = document.getElementById('userSortFilter').value;
+            container.innerHTML = filtered.slice(0, 200).map((ev) => {
+                const rt = ev.ratings || {};
+                const sceneBadge = ev.sceneType === 'urinal'
+                    ? `<span class="px-2.5 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] text-[11px] font-black">小便斗</span>`
+                    : `<span class="px-2.5 py-0.5 rounded-full bg-[#FF99D3]/60 border border-[#2A348C] text-[11px] font-black">一般廁間</span>`;
+                const timeStr = (ev.updatedAt || ev.createdAt || '').replace('T', ' ').slice(0, 16) || '近期';
+                const monsterIds = extractEvalMonstersList(ev);
+                const monstersHtml = monsterIds.length > 0
+                    ? `<div class="flex flex-wrap items-center gap-1.5">
+                           <span class="text-[11px] font-bold text-[#2A348C]/65">擺放小怪：</span>
+                           ${monsterIds.map((id) => {
+                               const info = MONSTER_CATALOG_MAP[id] || { name: id, kind: '小怪' };
+                               const bg = info.kind === '小妖' ? 'bg-[#FF99D3]/45' : 'bg-[#59E1FF]/40';
+                               return `<span class="px-2 py-0.5 rounded-full ${bg} border border-[#2A348C] text-[10.5px] font-black">${escapeHtml(info.name)}</span>`;
+                           }).join('')}
+                       </div>`
+                    : '';
 
-            // 合併 user_profiles 以及曾經留過評論但尚未寫入 user_profiles 的會員帳號
-            const combinedMap = new Map();
-            adminState.users.forEach((u) => {
-                const uid = u.userId || u.docId;
-                if (uid) combinedMap.set(uid, { ...u, docId: u.docId || uid, userId: uid });
+                return `
+                    <div class="rounded-2xl border-2 border-[#2A348C] bg-[#FFF9EC]/65 p-4 space-y-2.5">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${sceneBadge}
+                                <span class="text-sm sm:text-base font-black text-[#2A348C]">${escapeHtml(ev.name || '未命名公廁')}</span>
+                                <span class="px-2.5 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] text-xs font-black">${Number(ev.stars || 3).toFixed(1)} ★</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-[#2A348C]/65">${escapeHtml(timeStr)}</span>
+                                <button type="button" data-eval-edit="${escapeHtml(ev.docId)}"
+                                        class="poogle-pill-btn px-3 py-1 bg-white hover:bg-[#F3EF84] text-xs font-black">
+                                    <i class="fa-solid fa-pen mr-1"></i>編輯留言
+                                </button>
+                                <button type="button" data-eval-del="${escapeHtml(ev.docId)}"
+                                        class="poogle-pill-btn px-3 py-1 bg-[#F26559] hover:bg-[#df5044] text-white text-xs font-black">
+                                    <i class="fa-solid fa-trash-can mr-1"></i>刪除回報
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-bold text-[#2A348C]/85">
+                            <span>評鑑者：<strong>${escapeHtml(ev.nickname || '匿名公廁探險家')}</strong> ${ev.userId ? `<code class="text-[10px] opacity-70">(${escapeHtml(ev.userId.slice(0, 10))}...)</code>` : '(未登入訪客)'}</span>
+                            <span>整潔衛生 ${rt.cleanliness ?? '-'}★ · 環境明亮 ${rt.lighting ?? '-'}★ · 設備完善 ${rt.equipment ?? rt.smell ?? '-'}★ · 空間寬敞 ${rt.space ?? '-'}★</span>
+                        </div>
+
+                        ${monstersHtml}
+
+                        ${ev.comment
+                            ? `<div class="p-2.5 rounded-xl bg-white border border-[#2A348C]/30 text-xs sm:text-sm font-bold break-words">💬 「${escapeHtml(ev.comment)}」</div>`
+                            : `<div class="text-xs italic font-bold text-[#2A348C]/45">（無文字留言）</div>`}
+                    </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('[data-eval-edit]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const docId = btn.getAttribute('data-eval-edit');
+                    const ev = adminState.evaluations.find(item => item.docId === docId);
+                    if (!ev) return;
+                    adminState.editingEvalTarget = ev;
+                    document.getElementById('editEvalToiletName').textContent = ev.name || '';
+                    document.getElementById('editEvalCommentInput').value = ev.comment || '';
+                    document.getElementById('editEvaluationModal').classList.remove('hidden');
+                });
             });
-            adminState.evaluations.forEach((ev) => {
-                if (ev.userId && !combinedMap.has(ev.userId)) {
-                    combinedMap.set(ev.userId, {
-                        docId: ev.userId,
-                        userId: ev.userId,
-                        displayName: ev.nickname || '已登入會員',
-                        email: '',
-                        meritPoints: 1,
-                        totalReports: 1,
-                        avatarType: ev.avatarType || 'red_toilet',
-                        updatedAt: ev.createdAt || ''
+
+            container.querySelectorAll('[data-eval-del]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const docId = btn.getAttribute('data-eval-del');
+                    const ev = adminState.evaluations.find(item => item.docId === docId);
+                    if (!ev) return;
+                    openAdminConfirm({
+                        title: '刪除此筆公廁回報',
+                        message: `確定要刪除「${ev.name}」（由 ${ev.nickname || '匿名'} 回報）嗎？刪除後使用者再次進入該公廁即可重新評鑑。`,
+                        confirmLabel: '確認刪除',
+                        onConfirm: async () => {
+                            await deleteEvaluationEverywhere(ev.docId, ev.evalId, ev.name, ev.userId);
+                            showAdminToast(`已刪除「${ev.name}」的回報紀錄！`, '#45E5AC');
+                        }
                     });
-                }
+                });
+            });
+        }
+
+        // --- TAB 3: 會員與點數管理 ---
+        function renderUsersTab() {
+            const container = document.getElementById('usersListContainer');
+            if (!container) return;
+
+            const q = (document.getElementById('userSearchInput')?.value || '').trim().toLowerCase();
+            const evalCountByUid = new Map();
+            adminState.evaluations.forEach((ev) => {
+                if (ev.userId) evalCountByUid.set(ev.userId, (evalCountByUid.get(ev.userId) || 0) + 1);
             });
 
-            const list = Array.from(combinedMap.values()).filter((u) => {
+            const filtered = adminState.users.filter((u) => {
                 if (!q) return true;
                 const hay = `${u.displayName || ''} ${u.email || ''} ${u.userId || u.docId || ''}`.toLowerCase();
                 return hay.includes(q);
             });
 
-            list.sort((a, b) => {
-                if (sortF === 'points_desc') return (Number(b.meritPoints) || 0) - (Number(a.meritPoints) || 0);
-                if (sortF === 'reports_desc') return (Number(b.totalReports) || 0) - (Number(a.totalReports) || 0);
-                if (sortF === 'name_asc') return String(a.displayName || '').localeCompare(String(b.displayName || ''), 'zh-Hant');
-                const timeA = String(a.lastLoginAt || a.updatedAt || '');
-                const timeB = String(b.lastLoginAt || b.updatedAt || '');
-                return timeB.localeCompare(timeA);
-            });
-            return list;
-        }
-
-        function getFilteredRedemptions() {
-            const q = adminState.keyword.trim().toLowerCase();
-            return adminState.redemptions.filter((r) => {
-                if (!q) return true;
-                const u = adminState.userMapById.get(r.userId);
-                const uName = u ? `${u.displayName || ''} ${u.email || ''}` : '';
-                const hay = `${r.itemName || ''} ${r.itemId || ''} ${r.userId || ''} ${uName}`.toLowerCase();
-                return hay.includes(q);
-            });
-        }
-
-        function renderActiveTab() {
-            const container = document.getElementById('adminDataSection');
-            if (!container) return;
-
-            document.getElementById('filtersForReports').classList.toggle('hidden', adminState.activeTab !== 'reports');
-            document.getElementById('filtersForEvaluations').classList.toggle('hidden', adminState.activeTab !== 'evaluations');
-            document.getElementById('filtersForUsers').classList.toggle('hidden', adminState.activeTab !== 'users');
-
-            if (adminState.activeTab === 'reports') {
-                renderReportsTab(container);
-            } else if (adminState.activeTab === 'evaluations') {
-                renderEvaluationsTab(container);
-            } else if (adminState.activeTab === 'users') {
-                renderUsersTab(container);
-            } else if (adminState.activeTab === 'redemptions') {
-                renderRedemptionsTab(container);
-            } else if (adminState.activeTab === 'admins') {
-                renderAdminsWhitelistTab(container);
-            }
-        }
-
-        // 1. RENDER REPORTS TAB
-        function renderReportsTab(container) {
-            const list = getFilteredReports();
-            if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="poogle-card bg-white rounded-3xl p-10 text-center space-y-2">
-                        <div class="text-3xl">🎉</div>
-                        <div class="font-extrabold text-base text-black">目前沒有符合條件的檢舉紀錄</div>
-                        <div class="text-xs text-neutral-500">所有被網友檢舉的留言都會即時顯示於此處供您人工審核</div>
-                    </div>`;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-sm font-bold text-[#2A348C]/60">找不到符合條件的會員檔案</div>`;
                 return;
             }
 
-            container.innerHTML = list.map((r) => {
-                const isPending = (r.status || 'pending') === 'pending';
-                const linkedEval = adminState.evalMapById.get(r.evalId);
-                const dateStr = r.reportedAt ? r.reportedAt.replace('T', ' ').slice(0, 16) : '近期';
-
-                const evalStatusBadge = linkedEval
-                    ? (linkedEval.comment
-                        ? `<span class="px-2.5 py-0.5 rounded-full bg-[#72D0FF]/40 border border-[#1E2270] text-[11px] font-bold">原始評論仍在線上（目前留言：「${escapeHtml(linkedEval.comment)}」）</span>`
-                        : `<span class="px-2.5 py-0.5 rounded-full bg-neutral-200 border border-[#1E2270] text-[11px] font-bold">原始評論文字已清空（僅存星等）</span>`)
-                    : `<span class="px-2.5 py-0.5 rounded-full bg-neutral-200 border border-[#1E2270] text-[11px] font-bold text-neutral-600">原始評論已被刪除</span>`;
-
-                return `
-                    <div class="poogle-card rounded-3xl p-5 ${isPending ? 'bg-[#FFF57E]/35' : 'bg-white'} space-y-3">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="px-3 py-0.5 rounded-full border-[1.5px] border-[#1E2270] text-xs font-extrabold ${isPending ? 'bg-[#FF85D0] text-black' : 'bg-[#3CE6B0] text-black'}">
-                                    ${isPending ? '⏳ 待人工審核' : '✅ 已審核處理'}
-                                </span>
-                                <span class="px-3 py-0.5 rounded-full bg-white border border-[#1E2270] text-xs font-extrabold text-[#1E2270]">
-                                    檢舉原因：${escapeHtml(r.reason || '未分類')}
-                                </span>
-                                <span class="text-xs font-bold text-neutral-500">檢舉時間：${escapeHtml(dateStr)}</span>
-                            </div>
-                            <span class="text-[11px] font-mono text-neutral-500">評論 ID: ${escapeHtml(r.evalId || '-')}</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                            <div class="p-3.5 rounded-2xl bg-white border-[1.5px] border-[#1E2270] space-y-1">
-                                <div class="text-[11px] font-bold text-neutral-500">公廁名稱與被檢舉留言者：</div>
-                                <div class="font-extrabold text-sm text-black">${escapeHtml(r.toiletName || '未知公廁')} — <span class="text-[#1E2270]">${escapeHtml(r.reportedAuthor || '匿名')}</span></div>
-                                <div class="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5 mt-1 break-words">
-                                    被檢舉內容：「${escapeHtml(r.reportedComment || '')}」
-                                </div>
-                            </div>
-
-                            <div class="p-3.5 rounded-2xl bg-white border-[1.5px] border-[#1E2270] flex flex-col justify-between space-y-2">
-                                <div>
-                                    <div class="text-[11px] font-bold text-neutral-500">檢舉人補充說明：</div>
-                                    <div class="text-xs font-bold text-black mt-0.5">${r.note ? escapeHtml(r.note) : '<span class="text-neutral-400">（無補充說明）</span>'}</div>
-                                </div>
-                                <div class="pt-1">${evalStatusBadge}</div>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap items-center justify-end gap-2 pt-1">
-                            ${linkedEval ? `
-                                <button type="button" onclick="window.adminOpenEditEval('${escapeHtml(linkedEval.docId)}')"
-                                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#72D0FF] hover:bg-[#5bc6ff] text-xs font-extrabold text-black flex items-center gap-1">
-                                    <i class="fa-solid fa-pen"></i><span>修改原留言內容</span>
-                                </button>
-                                <button type="button" onclick="window.adminClearCommentKeepStars('${escapeHtml(r.docId)}', '${escapeHtml(linkedEval.docId)}')"
-                                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#FFF57E] hover:bg-[#f7eb5e] text-xs font-extrabold text-black flex items-center gap-1">
-                                    <i class="fa-solid fa-eraser"></i><span>僅清空留言文字(保留星等)</span>
-                                </button>
-                                <button type="button" onclick="window.adminDeleteEvaluationAndResolveReport('${escapeHtml(r.docId)}', '${escapeHtml(linkedEval.docId)}')"
-                                        class="poogle-pill-btn px-3.5 py-1.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-xs font-extrabold text-black flex items-center gap-1">
-                                    <i class="fa-solid fa-trash-can"></i><span>刪除整筆違規評論</span>
-                                </button>
-                            ` : ''}
-                            <button type="button" onclick="window.adminToggleReportStatus('${escapeHtml(r.docId)}', '${isPending ? 'reviewed' : 'pending'}')"
-                                    class="poogle-pill-btn px-3.5 py-1.5 bg-[#3CE6B0] hover:bg-[#2fd49f] text-xs font-extrabold text-black flex items-center gap-1">
-                                <i class="fa-solid fa-check"></i><span>${isPending ? '保留評論並標記已審核' : '改回待審核狀態'}</span>
-                            </button>
-                            <button type="button" onclick="window.adminDeleteReportRecord('${escapeHtml(r.docId)}')"
-                                    class="poogle-pill-btn px-3 py-1.5 bg-white hover:bg-neutral-200 text-xs font-bold text-neutral-700 flex items-center gap-1">
-                                <i class="fa-solid fa-xmark"></i><span>刪除此檢舉紀錄</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 2. RENDER EVALUATIONS TAB
-        function renderEvaluationsTab(container) {
-            const list = getFilteredEvaluations();
-            if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="poogle-card bg-white rounded-3xl p-10 text-center space-y-2">
-                        <div class="font-extrabold text-base text-black">找不到符合篩選條件的公廁評論</div>
-                        <div class="text-xs text-neutral-500">請嘗試調整搜尋關鍵字或星等篩選器</div>
-                    </div>`;
-                return;
-            }
-
-            container.innerHTML = list.map((ev) => {
-                const rt = ev.ratings || {};
-                const dateStr = ev.createdAt ? ev.createdAt.replace('T', ' ').slice(0, 16) : '近期';
-                const isAnon = !ev.userId || !ev.nickname || ev.nickname === '匿名公廁探險家' || ev.nickname === '匿名';
-
-                return `
-                    <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div class="space-y-1.5 flex-1 min-w-0 w-full">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#FFF57E] border border-[#1E2270] text-xs font-black text-black">
-                                    ★ ${Number(ev.stars || 3).toFixed(1)}
-                                </span>
-                                <span class="font-extrabold text-sm sm:text-base text-black break-words">${escapeHtml(ev.name || '未命名公廁')}</span>
-                                <span class="px-2.5 py-0.5 rounded-full ${isAnon ? 'bg-neutral-200' : 'bg-[#72D0FF]/50'} border border-[#1E2270] text-[11px] font-bold text-black">
-                                    ${isAnon ? '👻 匿名：' : '👤 會員：'}${escapeHtml(ev.nickname || '匿名公廁探險家')}
-                                </span>
-                                <span class="text-xs text-neutral-500 font-medium">${escapeHtml(dateStr)}</span>
-                            </div>
-
-                            <div class="text-xs text-neutral-600 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                <span>📍 ${escapeHtml(ev.address || '無地址資料')}</span>
-                                <span>｜空間 ${rt.space ?? '-'}★・氣味 ${rt.smell ?? '-'}★・照明 ${rt.lighting ?? '-'}★・潔淨 ${rt.cleanliness ?? '-'}★</span>
-                                ${ev.userId ? `<span class="font-mono text-[11px] text-neutral-400">UID: ${escapeHtml(ev.userId)}</span>` : ''}
-                            </div>
-
-                            ${ev.comment
-                                ? `<div class="p-3 rounded-2xl bg-[#FCF6E8] border border-[#1E2270]/30 text-xs sm:text-sm font-bold text-black break-words mt-1">💬 「${escapeHtml(ev.comment)}」</div>`
-                                : `<div class="text-xs text-neutral-400 italic">（僅提交星等評分，無文字留言）</div>`
-                            }
-                        </div>
-
-                        <div class="flex items-center gap-2 shrink-0 self-end lg:self-center">
-                            <button type="button" onclick="window.adminOpenEditEval('${escapeHtml(ev.docId)}')"
-                                    class="poogle-pill-btn px-4 py-1.5 bg-[#72D0FF] hover:bg-[#5bc6ff] text-xs font-extrabold text-black flex items-center gap-1.5">
-                                <i class="fa-solid fa-pen"></i><span>編輯</span>
-                            </button>
-                            <button type="button" onclick="window.adminDeleteEvaluation('${escapeHtml(ev.docId)}')"
-                                    class="poogle-pill-btn px-4 py-1.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-xs font-extrabold text-black flex items-center gap-1.5">
-                                <i class="fa-solid fa-trash-can"></i><span>刪除</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 3. RENDER USERS TAB
-        function renderUsersTab(container) {
-            const list = getFilteredUsers();
-            if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="poogle-card bg-white rounded-3xl p-10 text-center space-y-2">
-                        <div class="font-extrabold text-base text-black">找不到符合條件的用戶帳戶</div>
-                        <div class="text-xs text-neutral-500">當使用者登入個人空間或完成評鑑時會自動建立帳戶資料</div>
-                    </div>`;
-                return;
-            }
-
-            container.innerHTML = list.map((u) => {
+            container.innerHTML = filtered.map((u) => {
                 const uid = u.userId || u.docId;
-                const userEvalsCount = adminState.evaluations.filter(e => e.userId === uid).length;
-                const unlockedBgs = Array.isArray(u.unlockedBackgrounds) ? u.unlockedBackgrounds.length : 3;
-                const rawTime = u.lastLoginAt || u.updatedAt || '';
-                const updatedStr = rawTime ? rawTime.replace('T', ' ').slice(0, 16) : '-';
-                const isZeroAction = (Number(u.meritPoints) || 0) === 0 && (Number(u.totalReports) || 0) === 0 && userEvalsCount === 0;
+                const liveEvalCount = evalCountByUid.get(uid) || 0;
+                const points = typeof u.meritPoints === 'number' ? u.meritPoints : liveEvalCount;
+                const reports = typeof u.totalReports === 'number' ? u.totalReports : liveEvalCount;
+                const lastLogin = (u.lastLoginAt || u.updatedAt || '').replace('T', ' ').slice(0, 16) || '無紀錄';
 
                 return `
-                    <div class="poogle-card bg-white rounded-3xl p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                        <div class="space-y-1.5 flex-1 min-w-0">
-                            <div class="flex flex-wrap items-center gap-2.5">
-                                <span class="font-extrabold text-base text-black">${escapeHtml(u.displayName || '未命名用戶')}</span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#FCF6E8] border border-[#1E2270] text-xs font-bold text-neutral-700">
-                                    ${escapeHtml(u.email || '無信箱紀錄')}
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#FFF57E] border border-[#1E2270] text-xs font-black text-[#1E2270]">
-                                    公德點數：${Number(u.meritPoints) || 0} 點
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#3CE6B0]/60 border border-[#1E2270] text-xs font-extrabold text-black">
-                                    總回報次數：${Number(u.totalReports) || 0} 次
-                                </span>
-                                ${isZeroAction ? `<span class="px-2.5 py-0.5 rounded-full bg-neutral-200 border border-[#1E2270] text-[11px] font-bold text-neutral-700">僅登入尚無動作</span>` : ''}
+                    <div class="rounded-2xl border-2 border-[#2A348C] bg-[#FFF9EC]/75 p-4 flex flex-col justify-between gap-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-base font-black text-[#2A348C] truncate">${escapeHtml(u.displayName || 'Google 會員')}</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-white border border-[#2A348C] text-[10px] font-extrabold">${escapeHtml(u.avatarType || 'free_toilet')}</span>
+                                </div>
+                                <div class="text-xs font-bold text-[#2A348C]/75 truncate mt-0.5">${escapeHtml(u.email || '未提供信箱')}</div>
+                                <div class="text-[10.5px] font-bold text-[#2A348C]/55 truncate mt-0.5">UID: <code>${escapeHtml(uid)}</code></div>
                             </div>
-
-                            <div class="text-xs text-neutral-600 flex flex-wrap items-center gap-x-4 gap-y-1">
-                                <span class="font-mono text-[11px]">UID: ${escapeHtml(uid)}</span>
-                                <span>頭貼：<code>${escapeHtml(u.avatarType || 'red_toilet')}</code></span>
-                                <span>目前雲端評論數：<strong>${userEvalsCount}</strong> 則</span>
-                                <span>已擁有背景數：<strong>${unlockedBgs}</strong> 款</span>
-                                <span>最後登入/更新：${escapeHtml(updatedStr)}</span>
+                            <div class="text-right shrink-0">
+                                <span class="inline-block px-3 py-1 rounded-xl bg-[#F3EF84] border-2 border-[#2A348C] text-xs font-black">
+                                    公德 ${points} 點
+                                </span>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2 shrink-0 self-end lg:self-center">
-                            <button type="button" onclick="window.adminOpenEditUser('${escapeHtml(u.docId)}')"
-                                    class="poogle-pill-btn px-4 py-1.5 bg-[#FFF57E] hover:bg-[#f7eb5e] text-xs font-extrabold text-black flex items-center gap-1.5">
-                                <i class="fa-solid fa-sliders"></i><span>修改點數 / 編輯帳戶</span>
+                        <div class="grid grid-cols-3 gap-2 text-center bg-white rounded-xl border border-[#2A348C]/25 p-2 text-xs font-bold">
+                            <div>
+                                <div class="text-[10px] opacity-65">帳面總回報</div>
+                                <div class="font-black text-sm">${reports} 次</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] opacity-65">雲端現存評鑑</div>
+                                <div class="font-black text-sm">${liveEvalCount} 筆</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] opacity-65">最後活動</div>
+                                <div class="font-extrabold text-[11px] truncate">${escapeHtml(lastLogin.slice(5) || '-')}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-end gap-2">
+                            <button type="button" data-user-edit="${escapeHtml(u.docId)}"
+                                    class="poogle-pill-btn px-3.5 py-1.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-xs font-black">
+                                <i class="fa-solid fa-sliders mr-1"></i>調整點數/回報數
                             </button>
-                            <button type="button" onclick="window.adminZeroUserQuick('${escapeHtml(u.docId)}')"
-                                    class="poogle-pill-btn px-3.5 py-1.5 bg-white hover:bg-[#72D0FF] text-xs font-extrabold text-black flex items-center gap-1">
-                                <i class="fa-solid fa-rotate-left"></i><span>一鍵歸零</span>
-                            </button>
-                            <button type="button" onclick="window.adminDeleteUser('${escapeHtml(u.docId)}')"
-                                    class="poogle-pill-btn px-3.5 py-1.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-xs font-extrabold text-black flex items-center gap-1">
-                                <i class="fa-solid fa-trash-can"></i><span>刪除</span>
+                            <button type="button" data-user-reset="${escapeHtml(u.docId)}"
+                                    class="poogle-pill-btn px-3 py-1.5 bg-white hover:bg-[#FF99D3]/45 text-xs font-black">
+                                <i class="fa-solid fa-rotate-left mr-1"></i>完整歸零
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            container.querySelectorAll('[data-user-edit]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const docId = btn.getAttribute('data-user-edit');
+                    const user = adminState.users.find(item => item.docId === docId);
+                    if (!user) return;
+                    adminState.editingUserTarget = user;
+                    document.getElementById('editModalUserName').textContent = user.displayName || 'Google 會員';
+                    document.getElementById('editModalUserEmail').textContent = user.email || user.docId;
+                    document.getElementById('editModalMeritInput').value = typeof user.meritPoints === 'number' ? user.meritPoints : 0;
+                    document.getElementById('editModalReportsInput').value = typeof user.totalReports === 'number' ? user.totalReports : 0;
+                    document.getElementById('editUserPointsModal').classList.remove('hidden');
+                });
+            });
+
+            container.querySelectorAll('[data-user-reset]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const docId = btn.getAttribute('data-user-reset');
+                    const user = adminState.users.find(item => item.docId === docId);
+                    if (!user || !db) return;
+                    const uid = user.userId || user.docId;
+                    openAdminConfirm({
+                        title: '完整歸零會員紀錄',
+                        message: `確定要將「${user.displayName || uid}」的公德點數、回報次數歸 0，並一併清空該帳號所有的評鑑與兌換紀錄嗎？`,
+                        confirmLabel: '確認完整歸零',
+                        onConfirm: async () => {
+                            const evalSnap = await db.collection('evaluations').where('userId', '==', uid).get();
+                            const redeemSnap = await db.collection('redemptions').where('userId', '==', uid).get();
+                            const batch = db.batch();
+                            evalSnap.forEach(d => batch.delete(d.ref));
+                            redeemSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+
+                            removeDeletedEvalFromLocalCache({ evalId: null, docId: null, toiletName: '', userId: uid });
+
+                            await db.collection('user_profiles').doc(user.docId).set({
+                                meritPoints: 0,
+                                totalReports: 0,
+                                _rawEvalCount: 0,
+                                _rawSpentPoints: 0,
+                                unlockedBackgrounds: ['bg_classic', 'bg_ocean_bubble', 'bg_peach_blossom'],
+                                resetHistoryAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            }, { merge: true });
+                            showAdminToast(`已完整歸零「${user.displayName || uid}」的所有紀錄！`, '#45E5AC');
+                        }
+                    });
+                });
+            });
         }
 
-        // 4. RENDER REDEMPTIONS TAB
-        function renderRedemptionsTab(container) {
-            const list = getFilteredRedemptions();
-            if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="poogle-card bg-white rounded-3xl p-10 text-center space-y-2">
-                        <div class="font-extrabold text-base text-black">目前沒有點數兌換紀錄</div>
-                    </div>`;
-                return;
-            }
+        // --- TAB 4: 白名單與兌換紀錄 ---
+        function renderWhitelistSettings() {
+            const box = document.getElementById('adminWhitelistContainer');
+            if (!box) return;
 
-            container.innerHTML = list.map((r) => {
-                const u = adminState.userMapById.get(r.userId);
-                const uLabel = u ? `${u.displayName || '用戶'} (${u.email || r.userId})` : (r.userId || '未知用戶');
-                const dateStr = r.createdAt ? r.createdAt.replace('T', ' ').slice(0, 16) : '近期';
+            const staticSet = new Set(ADMIN_ALLOWED_EMAILS.map(e => e.trim().toLowerCase()));
+            const allEmails = [
+                ...ADMIN_ALLOWED_EMAILS.map(e => ({ email: e.trim().toLowerCase(), isStatic: true })),
+                ...adminState.dynamicWhitelistEmails
+                    .map(e => String(e).trim().toLowerCase())
+                    .filter(e => e && !staticSet.has(e))
+                    .map(e => ({ email: e, isStatic: false }))
+            ];
 
-                return `
-                    <div class="poogle-card bg-white rounded-3xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="px-2.5 py-0.5 rounded-full bg-[#3CE6B0] border border-[#1E2270] text-xs font-extrabold text-black">
-                                    -${Number(r.pointsUsed) || 0} 點
-                                </span>
-                                <span class="font-extrabold text-sm text-black">${escapeHtml(r.itemName || r.itemId || '兌換商品')}</span>
-                                <span class="text-xs text-neutral-500">${escapeHtml(dateStr)}</span>
-                            </div>
-                            <div class="text-xs text-neutral-600">
-                                兌換用戶：<strong>${escapeHtml(uLabel)}</strong>
-                            </div>
-                        </div>
-                        <button type="button" onclick="window.adminDeleteRedemption('${escapeHtml(r.docId)}')"
-                                class="poogle-pill-btn px-3.5 py-1.5 bg-[#FF85D0] hover:bg-[#ff6ec7] text-xs font-extrabold text-black shrink-0">
-                            <i class="fa-solid fa-trash-can mr-1"></i>刪除紀錄
-                        </button>
+            box.innerHTML = allEmails.map((item) => `
+                <div class="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-[#FFF9EC] border-2 border-[#2A348C]">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i class="fa-solid fa-envelope text-xs text-[#2A348C]/70"></i>
+                        <span class="text-xs sm:text-sm font-black truncate">${escapeHtml(item.email)}</span>
                     </div>
-                `;
-            }).join('');
-        }
-
-        // 5. RENDER ADMIN WHITELIST SETTINGS TAB
-        function renderAdminsWhitelistTab(container) {
-            const staticHtml = ADMIN_ALLOWED_EMAILS.map(em => `
-                <div class="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-[#FCF6E8] border-[1.5px] border-[#1E2270]">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-lock text-[#1E2270]"></i>
-                        <span class="font-extrabold text-xs sm:text-sm text-black">${escapeHtml(em)}</span>
-                    </div>
-                    <span class="px-2.5 py-0.5 rounded-full bg-[#FFF57E] border border-[#1E2270] text-[11px] font-bold">程式碼內建白名單</span>
+                    ${item.isStatic
+                        ? `<span class="px-2.5 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] text-[10px] font-black shrink-0">系統內建</span>`
+                        : `<button type="button" data-remove-admin="${escapeHtml(item.email)}"
+                                   class="poogle-pill-btn px-2.5 py-0.5 bg-[#FF99D3] hover:bg-[#F26559] hover:text-white text-[11px] font-black shrink-0">
+                               移除
+                           </button>`}
                 </div>
             `).join('');
 
-            const dynamicHtml = adminState.dynamicWhitelistEmails.length === 0
-                ? `<div class="text-xs text-neutral-500 py-2">尚未新增額外的雲端管理員信箱</div>`
-                : adminState.dynamicWhitelistEmails.map(em => `
-                    <div class="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-white border-[1.5px] border-[#1E2270]">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-user-check text-emerald-600"></i>
-                            <span class="font-extrabold text-xs sm:text-sm text-black">${escapeHtml(em)}</span>
-                        </div>
-                        <button type="button" onclick="window.adminRemoveDynamicEmail('${escapeHtml(em)}')"
-                                class="poogle-pill-btn px-3 py-1 bg-[#FF85D0] text-[11px] font-extrabold text-black">
-                            移除權限
-                        </button>
-                    </div>
-                `).join('');
-
-            container.innerHTML = `
-                <div class="poogle-card bg-white rounded-3xl p-6 space-y-5">
-                    <div>
-                        <h3 class="text-lg font-extrabold text-black flex items-center gap-2">
-                            <i class="fa-solid fa-user-shield text-[#1E2270]"></i>
-                            <span>管理員 Google 帳號白名單管理</span>
-                        </h3>
-                        <p class="text-xs text-neutral-600 mt-1">
-                            您可以直接在下方輸入組員或共同管理員的 Google 信箱（Gmail），加入後對方即可從主頁右下角登入此管理後台。
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-xl">
-                        <input id="newAdminEmailInput" type="email" placeholder="輸入要授權的 Google 信箱 (例如 example@gmail.com)"
-                               class="poogle-input flex-1 px-4 py-2.5 rounded-full bg-[#FCF6E8] text-xs sm:text-sm font-bold text-black" />
-                        <button id="addDynamicAdminEmailBtn" type="button"
-                                class="poogle-pill-btn px-5 py-2.5 bg-[#3CE6B0] hover:bg-[#2fd49f] text-xs sm:text-sm font-extrabold text-black shrink-0">
-                            <i class="fa-solid fa-plus mr-1"></i>新增管理員信箱
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
-                        <div class="space-y-2">
-                            <div class="text-xs font-extrabold text-[#1E2270]">📌 程式碼固定白名單 (<code>ADMIN_ALLOWED_EMAILS</code>)：</div>
-                            <div class="space-y-2">${staticHtml}</div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="text-xs font-extrabold text-[#1E2270]">☁️ 後台動態新增的管理員名單 (同步於雲端)：</div>
-                            <div class="space-y-2">${dynamicHtml}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const addBtn = document.getElementById('addDynamicAdminEmailBtn');
-            if (addBtn) {
-                addBtn.addEventListener('click', async () => {
-                    const input = document.getElementById('newAdminEmailInput');
-                    const email = (input.value || '').trim().toLowerCase();
-                    if (!email || !email.includes('@')) {
-                        showAdminToast('請輸入有效的 Google Email 地址', '#FF85D0');
-                        return;
-                    }
-                    const nextSet = new Set([...adminState.dynamicWhitelistEmails.map(e => e.toLowerCase()), email]);
+            box.querySelectorAll('[data-remove-admin]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const targetEmail = btn.getAttribute('data-remove-admin');
+                    if (!db || !targetEmail) return;
+                    const nextList = adminState.dynamicWhitelistEmails.filter(e => String(e).trim().toLowerCase() !== targetEmail);
                     await db.collection('admin_settings').doc('whitelist').set({
-                        emails: Array.from(nextSet),
+                        emails: nextList,
                         updatedAt: new Date().toISOString()
                     }, { merge: true });
-                    input.value = '';
-                    showAdminToast(`✅ 已將 ${email} 加入管理員白名單！`);
+                    showAdminToast(`已移除 ${targetEmail} 的管理員權限`);
                 });
-            }
+            });
         }
 
-        // ===================================================================
-        // ADMIN CRUD ACTIONS (MODIFY & DELETE IN FIREBASE)
-        // ===================================================================
-        window.adminToggleReportStatus = async function(reportDocId, nextStatus) {
-            if (!db || !reportDocId) return;
-            await db.collection('comment_reports').doc(reportDocId).update({
-                status: nextStatus,
-                reviewedAt: new Date().toISOString()
-            });
-            showAdminToast(nextStatus === 'reviewed' ? '✅ 已標記為審核完成' : '⏳ 已改回待審核狀態');
-        };
-
-        window.adminDeleteReportRecord = function(reportDocId) {
-            openConfirmModal(
-                '刪除此筆檢舉紀錄？',
-                '這只會移除該筆「檢舉通知紀錄」，不會刪除原本的公廁評論。',
-                async () => {
-                    await db.collection('comment_reports').doc(reportDocId).delete();
-                    showAdminToast('🗑️ 已刪除該筆檢舉紀錄');
-                }
-            );
-        };
-
-        window.adminClearCommentKeepStars = function(reportDocId, evalDocId) {
-            openConfirmModal(
-                '清空違規留言文字（保留星等）？',
-                '這會將該筆評論的文字內容清空為空白，但保留該網友給予的四項環境星等，並將檢舉標記為已處理。',
-                async () => {
-                    await db.collection('evaluations').doc(evalDocId).update({
-                        comment: '',
-                        updatedAt: new Date().toISOString()
-                    });
-                    if (reportDocId) {
-                        await db.collection('comment_reports').doc(reportDocId).update({
-                            status: 'reviewed',
-                            reviewedAt: new Date().toISOString()
-                        });
-                    }
-                    showAdminToast('🧹 已清空違規留言文字並完成審核！');
-                }
-            );
-        };
-
-        window.adminDeleteEvaluationAndResolveReport = function(reportDocId, evalDocId) {
-            openConfirmModal(
-                '確定刪除整筆違規評論？',
-                '這會從雲端資料庫永久刪除該筆公廁評鑑與留言，並將此檢舉標記為已審核處理。',
-                async () => {
-                    await db.collection('evaluations').doc(evalDocId).delete();
-                    if (reportDocId) {
-                        await db.collection('comment_reports').doc(reportDocId).update({
-                            status: 'reviewed',
-                            reviewedAt: new Date().toISOString()
-                        });
-                    }
-                    showAdminToast('🗑️ 已永久刪除該筆違規評論！');
-                }
-            );
-        };
-
-        window.adminOpenEditEval = function(evalDocId) {
-            const ev = adminState.evalMapById.get(evalDocId);
-            if (!ev) return;
-            adminState.editingEvalId = ev.docId;
-
-            document.getElementById('editEvalToiletName').value = ev.name || '';
-            document.getElementById('editEvalNickname').value = ev.nickname || '';
-            document.getElementById('editEvalAddress').value = ev.address || '';
-            const rt = ev.ratings || {};
-            document.getElementById('editEvalSpace').value = String(rt.space ?? ev.stars ?? 3);
-            document.getElementById('editEvalSmell').value = String(rt.smell ?? ev.stars ?? 3);
-            document.getElementById('editEvalLighting').value = String(rt.lighting ?? ev.stars ?? 3);
-            document.getElementById('editEvalCleanliness').value = String(rt.cleanliness ?? ev.stars ?? 3);
-            document.getElementById('editEvalComment').value = ev.comment || '';
-
-            updateEditEvalAvgPreview();
-            document.getElementById('editEvaluationModal').classList.remove('hidden');
-        };
-
-        function updateEditEvalAvgPreview() {
-            const sp = Number(document.getElementById('editEvalSpace').value || 3);
-            const sm = Number(document.getElementById('editEvalSmell').value || 3);
-            const li = Number(document.getElementById('editEvalLighting').value || 3);
-            const cl = Number(document.getElementById('editEvalCleanliness').value || 3);
-            const avg = ((sp + sm + li + cl) / 4).toFixed(1);
-            document.getElementById('editEvalAvgPreview').textContent = `平均 ${avg} ★`;
+        function renderRecentRedemptions() {
+            const box = document.getElementById('recentRedemptionsContainer');
+            if (!box) return;
+            if (adminState.redemptions.length === 0) {
+                box.innerHTML = `<div class="py-6 text-center font-bold text-[#2A348C]/60">尚無兌換紀錄</div>`;
+                return;
+            }
+            box.innerHTML = adminState.redemptions.slice(0, 30).map((r) => {
+                const dateStr = (r.createdAt || '').replace('T', ' ').slice(0, 16) || '近期';
+                return `
+                    <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-[#FFF9EC] border border-[#2A348C]/40">
+                        <div class="min-w-0">
+                            <div class="font-black text-[#2A348C] truncate">${escapeHtml(r.itemName || r.itemId || '商店獎勵')}</div>
+                            <div class="text-[10.5px] font-bold text-[#2A348C]/60 truncate">UID: ${escapeHtml((r.userId || '').slice(0, 12))} · ${escapeHtml(dateStr)}</div>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-[#FF99D3]/50 border border-[#2A348C] font-black shrink-0">-${Number(r.pointsUsed || 0)} 點</span>
+                    </div>
+                `;
+            }).join('');
         }
 
-        window.adminDeleteEvaluation = function(evalDocId) {
-            const ev = adminState.evalMapById.get(evalDocId);
-            const title = ev ? `${ev.name}（${ev.nickname || '匿名'}）` : evalDocId;
-            openConfirmModal(
-                '確定刪除此筆評論？',
-                `即將從雲端永久刪除「<strong>${escapeHtml(title)}</strong>」的評鑑資料，刪除後無法復原。`,
-                async () => {
-                    await db.collection('evaluations').doc(evalDocId).delete();
-                    showAdminToast('🗑️ 已從雲端刪除該筆評論');
-                }
-            );
-        };
+        function exportEvaluationsToCsv() {
+            if (adminState.evaluations.length === 0) {
+                showAdminToast('目前沒有可匯出的評鑑資料', '#FF99D3');
+                return;
+            }
+            const headers = ['評鑑ID', '公廁名稱', '視角類型', '綜合星等', '整潔衛生', '環境明亮', '設備完善', '空間寬敞', '擺放小怪', '留言內容', '評鑑者暱稱', 'UserID', '建立時間'];
+            const escCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
 
-        window.adminOpenEditUser = function(userDocId) {
-            const u = adminState.userMapById.get(userDocId);
-            if (!u) return;
-            adminState.editingUserId = u.docId;
-
-            document.getElementById('editUserUidText').textContent = u.userId || u.docId;
-            document.getElementById('editUserDisplayName').value = u.displayName || '';
-            document.getElementById('editUserEmail').value = u.email || '';
-            document.getElementById('editUserMeritPoints').value = Number(u.meritPoints) || 0;
-            document.getElementById('editUserTotalReports').value = Number(u.totalReports) || 0;
-            document.getElementById('editUserAvatarType').value = u.avatarType || 'red_toilet';
-
-            const owned = new Set(Array.isArray(u.unlockedBackgrounds) ? u.unlockedBackgrounds : []);
-            document.querySelectorAll('.user-bg-checkbox').forEach((cb) => {
-                cb.checked = owned.has(cb.value);
+            const rows = adminState.evaluations.map((ev) => {
+                const rt = ev.ratings || {};
+                const monsters = extractEvalMonstersList(ev).map(id => MONSTER_CATALOG_MAP[id]?.name || id).join('、');
+                return [
+                    ev.evalId || ev.docId,
+                    ev.name || '',
+                    ev.sceneType === 'urinal' ? '小便斗' : '一般廁間',
+                    ev.stars ?? '',
+                    rt.cleanliness ?? '',
+                    rt.lighting ?? '',
+                    rt.equipment ?? rt.smell ?? '',
+                    rt.space ?? '',
+                    monsters,
+                    ev.comment || '',
+                    ev.nickname || '匿名',
+                    ev.userId || '',
+                    ev.updatedAt || ev.createdAt || ''
+                ].map(escCsv).join(',');
             });
 
-            document.getElementById('editUserModal').classList.remove('hidden');
-        };
-
-        window.adminZeroUserQuick = function(userDocId) {
-            const u = adminState.userMapById.get(userDocId);
-            if (!u) return;
-            openConfirmModal(
-                `將「${u.displayName || '此用戶'}」點數歸零？`,
-                '這會將該帳戶的「公德點數」與「總回報次數」立即設為 0 並同步至雲端。',
-                async () => {
-                    const userEvalsCount = adminState.evaluations.filter(e => e.userId === (u.userId || u.docId)).length;
-                    const userSpentCount = adminState.redemptions
-                        .filter(r => r.userId === (u.userId || u.docId))
-                        .reduce((s, r) => s + (Number(r.pointsUsed) || 0), 0);
-                    await db.collection('user_profiles').doc(userDocId).set({
-                        meritPoints: 0,
-                        totalReports: 0,
-                        _rawEvalCount: userEvalsCount,
-                        _rawSpentPoints: userSpentCount,
-                        resetHistoryAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-                    showAdminToast('✅ 已將該用戶的點數與回報次數歸 0');
-                }
-            );
-        };
-
-        window.adminDeleteUser = function(userDocId) {
-            const u = adminState.userMapById.get(userDocId);
-            const name = u ? (u.displayName || u.email || userDocId) : userDocId;
-            openConfirmModal(
-                '確定刪除此用戶帳戶資料？',
-                `即將刪除「<strong>${escapeHtml(name)}</strong>」的個人空間檔案與該帳號發表的測試評論紀錄。`,
-                async () => {
-                    const uid = u?.userId || userDocId;
-                    const evalSnap = await db.collection('evaluations').where('userId', '==', uid).get();
-                    const redeemSnap = await db.collection('redemptions').where('userId', '==', uid).get();
-                    const batch = db.batch();
-                    evalSnap.forEach(d => batch.delete(d.ref));
-                    redeemSnap.forEach(d => batch.delete(d.ref));
-                    batch.delete(db.collection('user_profiles').doc(userDocId));
-                    await batch.commit();
-                    showAdminToast('🗑️ 已完整刪除該用戶帳戶與相關紀錄');
-                }
-            );
-        };
-
-        window.adminDeleteRedemption = function(redeemDocId) {
-            openConfirmModal(
-                '刪除此筆兌換紀錄？',
-                '刪除後該筆商店兌換紀錄將從雲端移除。',
-                async () => {
-                    await db.collection('redemptions').doc(redeemDocId).delete();
-                    showAdminToast('🗑️ 已刪除兌換紀錄');
-                }
-            );
-        };
-
-        window.adminRemoveDynamicEmail = function(email) {
-            openConfirmModal(
-                '移除管理員權限？',
-                `確定要將 <strong>${escapeHtml(email)}</strong> 從雲端管理員白名單中移除嗎？`,
-                async () => {
-                    const next = adminState.dynamicWhitelistEmails.filter(e => e.toLowerCase() !== email.toLowerCase());
-                    await db.collection('admin_settings').doc('whitelist').set({
-                        emails: next,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-                    showAdminToast('已移除該信箱的管理員權限');
-                }
-            );
-        };
-
-        // ===================================================================
-        // CSV EXPORT FOR EXCEL REPORTING
-        // ===================================================================
-        function exportCurrentTabToCsv() {
-            let headers = [];
-            let rows = [];
-            let filename = 'poogle_admin_export.csv';
-
-            if (adminState.activeTab === 'reports') {
-                filename = '有所味_被檢舉留言報表.csv';
-                headers = ['狀態', '檢舉時間', '公廁名稱', '被檢舉留言者', '被檢舉留言內容', '檢舉原因', '補充說明', '評論ID'];
-                rows = getFilteredReports().map(r => [
-                    (r.status || 'pending') === 'pending' ? '待審核' : '已審核',
-                    r.reportedAt || '',
-                    r.toiletName || '',
-                    r.reportedAuthor || '',
-                    r.reportedComment || '',
-                    r.reason || '',
-                    r.note || '',
-                    r.evalId || ''
-                ]);
-            } else if (adminState.activeTab === 'evaluations') {
-                filename = '有所味_全國公廁評論總表.csv';
-                headers = ['發布時間', '公廁名稱', '地址', '評論者名稱', '用戶UID', '綜合星等', '空間寬敞度', '空氣清新度', '照明舒適度', '環境潔淨度', '留言內容'];
-                rows = getFilteredEvaluations().map(ev => {
-                    const rt = ev.ratings || {};
-                    return [
-                        ev.createdAt || '',
-                        ev.name || '',
-                        ev.address || '',
-                        ev.nickname || '',
-                        ev.userId || '匿名',
-                        ev.stars ?? '',
-                        rt.space ?? '',
-                        rt.smell ?? '',
-                        rt.lighting ?? '',
-                        rt.cleanliness ?? '',
-                        ev.comment || ''
-                    ];
-                });
-            } else if (adminState.activeTab === 'users') {
-                filename = '有所味_用戶帳戶與點數報表.csv';
-                headers = ['用戶名稱', 'Email', 'UID', '公德點數', '總回報次數', '頭貼款式', '最後更新時間'];
-                rows = getFilteredUsers().map(u => [
-                    u.displayName || '',
-                    u.email || '',
-                    u.userId || u.docId || '',
-                    u.meritPoints ?? 0,
-                    u.totalReports ?? 0,
-                    u.avatarType || 'red_toilet',
-                    u.updatedAt || ''
-                ]);
-            } else {
-                filename = '有所味_商店兌換紀錄表.csv';
-                headers = ['兌換時間', '用戶UID', '兌換商品名稱', '消耗點數'];
-                rows = getFilteredRedemptions().map(r => [
-                    r.createdAt || '',
-                    r.userId || '',
-                    r.itemName || '',
-                    r.pointsUsed ?? 0
-                ]);
-            }
-
-            const escapeCsvCell = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
-            const csvContent = '\uFEFF' + [headers.map(escapeCsvCell).join(','), ...rows.map(r => r.map(escapeCsvCell).join(','))].join('\r\n');
+            const csvContent = '\uFEFF' + [headers.map(escCsv).join(','), ...rows].join('\r\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `有所味_公廁評鑑後台報表_${new Date().toISOString().slice(0, 10)}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showAdminToast(`📥 已匯出 ${filename}`);
+            showAdminToast('已匯出 CSV 評鑑報表！', '#45E5AC');
         }
 
         // ===================================================================
-        // INITIALIZATION & EVENT BINDINGS
+        // 5. 事件綁定與啟動初始化
         // ===================================================================
         window.addEventListener('DOMContentLoaded', () => {
-            const authGuard = document.getElementById('adminAuthGuard');
-            const guardStatusText = document.getElementById('authGuardStatusText');
-            const guardEmailBox = document.getElementById('authGuardCurrentEmailBox');
-            const guardEmailText = document.getElementById('authGuardCurrentEmail');
+            initAdminHeaderLogo();
 
-            async function verifyUserAndUnlock(user) {
-                if (!user || !user.email) {
-                    authGuard.classList.remove('hidden');
-                    guardStatusText.textContent = '請先使用授權的管理員 Google 帳號登入。';
-                    guardEmailBox.classList.add('hidden');
-                    return;
-                }
-
-                // 先讀取一次雲端動態白名單再判斷
-                if (db) {
-                    try {
-                        const wlDoc = await db.collection('admin_settings').doc('whitelist').get();
-                        if (wlDoc.exists && Array.isArray(wlDoc.data()?.emails)) {
-                            adminState.dynamicWhitelistEmails = wlDoc.data().emails;
-                        }
-                    } catch (e) {}
-                }
-
-                if (isAuthorizedAdminEmail(user.email)) {
-                    adminState.currentUser = user;
-                    document.getElementById('headerAdminEmail').textContent = user.email;
-                    authGuard.classList.add('hidden');
-                    startAdminRealtimeListeners();
-                } else {
-                    authGuard.classList.remove('hidden');
-                    guardStatusText.textContent = '您目前登入的 Google 帳號不在管理員白名單內：';
-                    guardEmailText.textContent = user.email;
-                    guardEmailBox.classList.remove('hidden');
-                }
+            if (IS_SANDBOX_PREVIEW) {
+                document.getElementById('gatePreviewDemoBtn')?.classList.remove('hidden');
             }
 
+            // 監聽雲端動態管理員白名單
+            if (db) {
+                db.collection('admin_settings').doc('whitelist').onSnapshot((doc) => {
+                    adminState.dynamicWhitelistEmails = (doc.exists && Array.isArray(doc.data()?.emails))
+                        ? doc.data().emails
+                        : [];
+                    refreshAuthGateUI();
+                }, () => {});
+            }
+
+            // 先檢查本機快取登入狀態
+            try {
+                const cached = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
+                if (cached && cached.email) {
+                    adminState.currentUser = cached;
+                    refreshAuthGateUI();
+                }
+            } catch (e) {}
+
+            // 監聽 Firebase Auth 狀態
             if (auth) {
                 auth.onAuthStateChanged((user) => {
                     if (user) {
-                        verifyUserAndUnlock(user);
-                    } else {
-                        let cached = null;
-                        try { cached = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null'); } catch (e) {}
-                        verifyUserAndUnlock(cached);
+                        adminState.currentUser = {
+                            uid: user.uid,
+                            displayName: user.displayName || '管理員',
+                            email: user.email || ''
+                        };
+                    } else if (!IS_SANDBOX_PREVIEW) {
+                        adminState.currentUser = null;
                     }
+                    refreshAuthGateUI();
                 });
+            } else {
+                refreshAuthGateUI();
             }
 
-            document.getElementById('guardGoogleLoginBtn').addEventListener('click', async () => {
-                if (!auth) return;
+            // Google 登入與切換帳號
+            const triggerAdminGoogleLogin = async () => {
+                if (!auth) {
+                    showAdminToast('目前環境無法開啟 Google 視窗，可使用預覽測試模式', '#FF99D3');
+                    return;
+                }
                 const provider = new firebase.auth.GoogleAuthProvider();
                 provider.setCustomParameters({ prompt: 'select_account' });
                 try {
                     const res = await auth.signInWithPopup(provider);
                     if (res && res.user) {
-                        verifyUserAndUnlock(res.user);
+                        adminState.currentUser = {
+                            uid: res.user.uid,
+                            displayName: res.user.displayName || '管理員',
+                            email: res.user.email || ''
+                        };
+                        refreshAuthGateUI();
                     }
                 } catch (err) {
-                    console.warn('Admin login error:', err);
+                    showAdminToast('登入未完成或網域尚未加入 Firebase 授權清單', '#FF99D3');
                 }
+            };
+
+            document.getElementById('gateGoogleLoginBtn')?.addEventListener('click', triggerAdminGoogleLogin);
+            document.getElementById('adminSwitchAccountBtn')?.addEventListener('click', triggerAdminGoogleLogin);
+
+            // 預覽沙盒快速進入按鈕
+            document.getElementById('gatePreviewDemoBtn')?.addEventListener('click', () => {
+                adminState.currentUser = {
+                    uid: 'sandbox_admin_preview',
+                    displayName: '有所味測試管理員',
+                    email: ADMIN_ALLOWED_EMAILS[0]
+                };
+                refreshAuthGateUI();
+                showAdminToast('已進入預覽測試管理模式', '#45E5AC');
             });
 
-            document.getElementById('adminLogoutBtn').addEventListener('click', () => {
-                try { localStorage.removeItem('poogle_auth_user'); } catch (e) {}
-                if (auth) {
-                    auth.signOut().finally(() => { window.location.href = './index.html'; });
-                } else {
-                    window.location.href = './index.html';
-                }
-            });
-
-            // Tabs Switching
-            document.querySelectorAll('.admin-tab-btn').forEach((btn) => {
+            // 四大分頁切換
+            document.querySelectorAll('[data-admin-tab]').forEach((btn) => {
                 btn.addEventListener('click', () => {
-                    adminState.activeTab = btn.getAttribute('data-tab');
-                    document.querySelectorAll('.admin-tab-btn').forEach((b) => {
-                        const active = b.getAttribute('data-tab') === adminState.activeTab;
-                        b.className = `admin-tab-btn poogle-pill-btn px-4 py-2 ${active ? 'bg-[#FFF57E]' : 'bg-white hover:bg-[#FCF6E8]'} font-extrabold text-xs sm:text-sm flex items-center gap-2 shrink-0`;
+                    const tab = btn.getAttribute('data-admin-tab');
+                    adminState.activeTab = tab;
+                    document.querySelectorAll('[data-admin-tab]').forEach((b) => {
+                        b.classList.toggle('is-active', b.getAttribute('data-admin-tab') === tab);
                     });
-                    renderActiveTab();
+                    ['reports', 'evaluations', 'users', 'settings'].forEach((t) => {
+                        document.getElementById(`adminTab_${t}`)?.classList.toggle('hidden', t !== tab);
+                    });
                 });
             });
 
-            // Keyword Search & Filters
-            const kwInput = document.getElementById('globalKeywordInput');
-            const clearKwBtn = document.getElementById('clearKeywordBtn');
-            kwInput.addEventListener('input', (e) => {
-                adminState.keyword = e.target.value;
-                clearKwBtn.classList.toggle('hidden', !adminState.keyword);
-                renderActiveTab();
-            });
-            clearKwBtn.addEventListener('click', () => {
-                kwInput.value = '';
-                adminState.keyword = '';
-                clearKwBtn.classList.add('hidden');
-                renderActiveTab();
-            });
+            // 篩選與搜尋事件
+            document.getElementById('reportStatusFilter')?.addEventListener('change', renderReportsTab);
+            document.getElementById('evalSearchInput')?.addEventListener('input', renderEvaluationsTab);
+            document.getElementById('evalSceneFilter')?.addEventListener('change', renderEvaluationsTab);
+            document.getElementById('userSearchInput')?.addEventListener('input', renderUsersTab);
+            document.getElementById('exportEvaluationsCsvBtn')?.addEventListener('click', exportEvaluationsToCsv);
 
-            ['reportStatusFilter', 'evalStarFilter', 'evalTextFilter', 'evalIdentityFilter', 'evalSortFilter', 'userSortFilter'].forEach((id) => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('change', renderActiveTab);
-            });
-
-            // Edit Evaluation Modal Events
-            ['editEvalSpace', 'editEvalSmell', 'editEvalLighting', 'editEvalCleanliness'].forEach((id) => {
-                document.getElementById(id).addEventListener('change', updateEditEvalAvgPreview);
-            });
-
-            document.getElementById('clearEvalCommentTextBtn').addEventListener('click', () => {
-                document.getElementById('editEvalComment').value = '';
-            });
-
-            const closeEditEvalModal = () => {
-                adminState.editingEvalId = null;
-                document.getElementById('editEvaluationModal').classList.add('hidden');
+            // 編輯會員點數彈窗
+            const closeUserModal = () => {
+                adminState.editingUserTarget = null;
+                document.getElementById('editUserPointsModal').classList.add('hidden');
             };
-            document.getElementById('closeEditEvalModalBtn').addEventListener('click', closeEditEvalModal);
-            document.getElementById('cancelEditEvalBtn').addEventListener('click', closeEditEvalModal);
-
-            document.getElementById('saveEditEvalBtn').addEventListener('click', async () => {
-                if (!db || !adminState.editingEvalId) return;
-                const sp = Number(document.getElementById('editEvalSpace').value || 3);
-                const sm = Number(document.getElementById('editEvalSmell').value || 3);
-                const li = Number(document.getElementById('editEvalLighting').value || 3);
-                const cl = Number(document.getElementById('editEvalCleanliness').value || 3);
-                const avgStars = Number(((sp + sm + li + cl) / 4).toFixed(1));
-
-                await db.collection('evaluations').doc(adminState.editingEvalId).update({
-                    name: document.getElementById('editEvalToiletName').value.trim(),
-                    nickname: document.getElementById('editEvalNickname').value.trim() || '匿名公廁探險家',
-                    address: document.getElementById('editEvalAddress').value.trim(),
-                    stars: avgStars,
-                    ratings: { space: sp, smell: sm, lighting: li, cleanliness: cl },
-                    comment: document.getElementById('editEvalComment').value.trim(),
-                    updatedAt: new Date().toISOString()
-                });
-                closeEditEvalModal();
-                showAdminToast('✅ 已成功修改評論並同步至雲端！');
-            });
-
-            // Edit User Modal Events
-            const closeEditUserModal = () => {
-                adminState.editingUserId = null;
-                document.getElementById('editUserModal').classList.add('hidden');
-            };
-            document.getElementById('closeEditUserModalBtn').addEventListener('click', closeEditUserModal);
-            document.getElementById('cancelEditUserBtn').addEventListener('click', closeEditUserModal);
-
-            document.getElementById('zeroUserCountsQuickBtn').addEventListener('click', () => {
-                document.getElementById('editUserMeritPoints').value = 0;
-                document.getElementById('editUserTotalReports').value = 0;
-            });
-
-            document.getElementById('saveEditUserBtn').addEventListener('click', async () => {
-                if (!db || !adminState.editingUserId) return;
-                const uid = adminState.editingUserId;
-                const newPoints = Math.max(0, parseInt(document.getElementById('editUserMeritPoints').value, 10) || 0);
-                const newReports = Math.max(0, parseInt(document.getElementById('editUserTotalReports').value, 10) || 0);
-                const selectedBgs = ['bg_classic', 'bg_ocean_bubble', 'bg_peach_blossom'];
-                document.querySelectorAll('.user-bg-checkbox').forEach((cb) => {
-                    if (cb.checked) selectedBgs.push(cb.value);
-                });
-
-                const userEvalsCount = adminState.evaluations.filter(e => e.userId === uid).length;
-                const userSpentCount = adminState.redemptions
+            document.getElementById('closeEditUserModalBtn')?.addEventListener('click', closeUserModal);
+            document.getElementById('cancelEditUserBtn')?.addEventListener('click', closeUserModal);
+            document.getElementById('saveEditUserBtn')?.addEventListener('click', async () => {
+                const u = adminState.editingUserTarget;
+                if (!u || !db) return;
+                const uid = u.userId || u.docId;
+                const newPoints = Math.max(0, parseInt(document.getElementById('editModalMeritInput').value, 10) || 0);
+                const newReports = Math.max(0, parseInt(document.getElementById('editModalReportsInput').value, 10) || 0);
+                const rawEvalCount = adminState.evaluations.filter(e => e.userId === uid).length;
+                const rawSpentPoints = adminState.redemptions
                     .filter(r => r.userId === uid)
                     .reduce((s, r) => s + (Number(r.pointsUsed) || 0), 0);
 
-                await db.collection('user_profiles').doc(uid).set({
+                await db.collection('user_profiles').doc(u.docId).set({
                     userId: uid,
-                    displayName: document.getElementById('editUserDisplayName').value.trim() || 'Google 用戶',
-                    email: document.getElementById('editUserEmail').value.trim(),
                     meritPoints: newPoints,
                     totalReports: newReports,
-                    avatarType: document.getElementById('editUserAvatarType').value,
-                    unlockedBackgrounds: selectedBgs,
-                    _rawEvalCount: userEvalsCount,
-                    _rawSpentPoints: userSpentCount,
+                    _rawEvalCount: rawEvalCount,
+                    _rawSpentPoints: rawSpentPoints,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
 
-                closeEditUserModal();
-                showAdminToast('✅ 已儲存用戶點數與帳戶設定！');
+                closeUserModal();
+                showAdminToast(`已更新「${u.displayName || uid}」為 ${newPoints} 點 / ${newReports} 次回報！`, '#45E5AC');
             });
 
-            // Confirm Modal Events
-            const confirmModal = document.getElementById('adminConfirmModal');
-            document.getElementById('adminConfirmCancelBtn').addEventListener('click', () => {
-                adminState.confirmCallback = null;
-                confirmModal.classList.add('hidden');
-            });
-            document.getElementById('adminConfirmOkBtn').addEventListener('click', async () => {
-                const cb = adminState.confirmCallback;
-                adminState.confirmCallback = null;
-                confirmModal.classList.add('hidden');
-                if (typeof cb === 'function') await cb();
+            // 編輯單筆評鑑留言彈窗
+            const closeEvalModal = () => {
+                adminState.editingEvalTarget = null;
+                document.getElementById('editEvaluationModal').classList.add('hidden');
+            };
+            document.getElementById('closeEditEvalModalBtn')?.addEventListener('click', closeEvalModal);
+            document.getElementById('cancelEditEvalBtn')?.addEventListener('click', closeEvalModal);
+            document.getElementById('saveEditEvalBtn')?.addEventListener('click', async () => {
+                const ev = adminState.editingEvalTarget;
+                if (!ev || !db) return;
+                const nextComment = document.getElementById('editEvalCommentInput').value.trim();
+                await db.collection('evaluations').doc(ev.docId).set({
+                    comment: nextComment,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                closeEvalModal();
+                showAdminToast('已更新該筆評鑑留言內容！', '#45E5AC');
             });
 
-            // Export CSV Button
-            document.getElementById('exportCsvBtn').addEventListener('click', exportCurrentTabToCsv);
+            // 新增管理員白名單信箱
+            document.getElementById('addAdminEmailBtn')?.addEventListener('click', async () => {
+                const input = document.getElementById('newAdminEmailInput');
+                const cleanEmail = (input?.value || '').trim().toLowerCase();
+                if (!cleanEmail || !cleanEmail.includes('@')) {
+                    showAdminToast('請輸入有效的 Google Email 格式', '#FF99D3');
+                    return;
+                }
+                if (isEmailInAdminWhitelist(cleanEmail)) {
+                    showAdminToast('此信箱已在管理員白名單中');
+                    return;
+                }
+                if (!db) return;
+                const nextEmails = Array.from(new Set([...adminState.dynamicWhitelistEmails, cleanEmail]));
+                await db.collection('admin_settings').doc('whitelist').set({
+                    emails: nextEmails,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+                input.value = '';
+                showAdminToast(`已新增管理員授權：${cleanEmail}`, '#45E5AC');
+            });
+
+            // 清除本機評鑑快取按鈕
+            document.getElementById('clearLocalEvalCacheBtn')?.addEventListener('click', () => {
+                try {
+                    localStorage.removeItem('poogle_local_evaluations_v2');
+                } catch (e) {}
+                showAdminToast('已清除此瀏覽器的本機評鑑快取！', '#45E5AC');
+            });
+
+            // 通用確認視窗按鈕
+            document.getElementById('confirmModalCancelBtn')?.addEventListener('click', closeAdminConfirm);
+            document.getElementById('confirmModalOkBtn')?.addEventListener('click', async () => {
+                const fn = adminState.confirmCallback;
+                closeAdminConfirm();
+                if (typeof fn === 'function') {
+                    try { await fn(); } catch (err) { showAdminToast('執行失敗，請檢查網路或權限', '#FF99D3'); }
+                }
+            });
         });
     </script>
 </body>

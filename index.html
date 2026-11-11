@@ -4,12 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>有所味 Poopgle｜主頁</title>
+    <script>
+        // 攔截預覽沙盒中本機圖檔或跨網域腳本限制產生的空白錯誤事件
+        window.addEventListener('error', function(e) {
+            if (e && e.target && e.target !== window) {
+                if (typeof e.target.onerror === 'function') {
+                    try { e.target.onerror.call(e.target, e); } catch (err) {}
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+            if (e && (!e.error || e.message === 'Script error.' || (e.message && e.message.indexOf('ResizeObserver') !== -1))) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+            var isSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').indexOf('usercontent.goog') !== -1 ||
+                (window.location.hostname || '').indexOf('googleusercontent.com') !== -1
+            );
+            if (e && (!e.reason || !e.reason.message || isSandbox)) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+    </script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -26,8 +58,35 @@
             --poogle-red: #F26559;
             --poogle-ink: #2A348C;
         }
+        @font-face {
+            font-family: 'jf-openhuninn';
+            src: local('jf-openhuninn-2.1'),
+                 local('jf-openhuninn-2.0'),
+                 local('jf-openhuninn-1.1'),
+                 local('jf-openhuninn'),
+                 url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-web-font@1.1/font/jf-openhuninn.woff') format('woff'),
+                 url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-2.1.ttf') format('truetype');
+            font-display: swap;
+        }
+        body, svg text {
+            font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
+        }
+        button, a, input, select, textarea, svg, g, rect, path, circle, ellipse, polygon, use, image,
+        [role="button"], [tabindex] {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:focus, button:focus-visible,
+        a:focus, a:focus-visible,
+        input:focus, input:focus-visible,
+        select:focus, select:focus-visible,
+        [role="button"]:focus, [role="button"]:focus-visible,
+        [tabindex]:focus, [tabindex]:focus-visible,
+        svg *:focus, svg *:focus-visible {
+            outline: none !important;
+        }
         body {
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
             background-color: var(--poogle-mint-bg);
             color: var(--poogle-ink);
             overflow-x: hidden;
@@ -87,7 +146,7 @@
         }
 
         /* ========================================================= */
-        /* 緊急按鈕「個人空間」按壓與圓潤閃電彈出動畫                    */
+        /* 緊急按鈕「個人空間」按壓與圓潤閃電彈出動畫                     */
         /* ========================================================= */
         @keyframes emergencyPlatePress {
             0% { transform: scale(1); }
@@ -129,7 +188,7 @@
         }
 
         /* ========================================================= */
-        /* 紅色垃圾桶「公廁地圖」掀蓋與桶身回彈動畫                      */
+        /* 紅色垃圾桶「公廁地圖」掀蓋與桶身回彈動畫                       */
         /* ========================================================= */
         @keyframes trashLidPopOpen {
             0% {
@@ -169,7 +228,7 @@
         }
 
         /* ========================================================= */
-        /* 右下衛生紙捲筒「小怪圖鑑」彈跳與滾動連動動畫                */
+        /* 右下衛生紙捲筒「小怪圖鑑」彈跳與滾動連動動畫                   */
         /* ========================================================= */
         @keyframes tpTopRollBounce {
             0% {
@@ -248,7 +307,7 @@
         }
 
         /* ========================================================= */
-        /* 中央馬桶掀蓋與選項湧出連動動畫                              */
+        /* 中央馬桶掀蓋與選項湧出連動動畫                               */
         /* ========================================================= */
         /* 1. 馬桶蓋由平放透視角度向上掀開 */
         @keyframes toiletLidFlipOpen {
@@ -363,7 +422,7 @@
         }
 
         /* ========================================================= */
-        /* 中央馬桶「蓋上馬桶蓋」與內容物收回連動動畫                  */
+        /* 中央馬桶「蓋上馬桶蓋」與內容物收回連動動畫                   */
         /* ========================================================= */
         @keyframes toiletLidFlipClose {
             0% {
@@ -553,9 +612,52 @@
         #mobileCenterToiletGroup.is-pressed-glow {
             filter: url(#mobilePressGlow);
         }
+        /* ========================================================= */
+        /* 手機版專屬常駐微動畫：垃圾桶蓋飄動、便便旗幟轉動、衛生紙前後滾動 */
+        /* ========================================================= */
+        @keyframes mobileTrashLidIdleFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-9px); /* 僅向上微幅飄動，絕不往下遮擋文字 */
+            }
+        }
+        @keyframes mobilePoopFlagPivotRock {
+            0%, 100% {
+                transform: rotate(-2.2deg);
+            }
+            50% {
+                transform: rotate(3.2deg);
+            }
+        }
+        @keyframes mobileLyingTpRollRock {
+            0%, 100% {
+                transform: translateX(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateX(-9px) rotate(-3.5deg);
+            }
+        }
+        #mobileTrashCanLidFloat {
+            transform-origin: 80px 468px;
+            animation: mobileTrashLidIdleFloat 2.8s ease-in-out infinite;
+            will-change: transform;
+        }
+        #mobileStatusPoopFlagPivot {
+            /* 以粉紅便便中心 (650, 318) 為圓心上下微幅轉動 */
+            transform-origin: 650px 318px;
+            animation: mobilePoopFlagPivotRock 3.2s ease-in-out infinite;
+            will-change: transform;
+        }
+        #mobileLyingTpRollAnim {
+            transform-origin: 1068px 697px;
+            animation: mobileLyingTpRollRock 3.0s ease-in-out infinite;
+            will-change: transform;
+        }
 
         /* ========================================================= */
-        /* 右上角下拉式衛生紙捲筒選單展開動畫與選項互動              */
+        /* 右上角下拉式衛生紙捲筒選單展開動畫與選項互動               */
         /* ========================================================= */
         @keyframes tpDropdownUnroll {
             0% {
@@ -614,6 +716,145 @@
         .tp-menu-item:hover text {
             fill: #F26559;
         }
+
+        /* ========================================================= */
+        /* 公廁回報系統：九門轉盤定位 (01 -> 02) 與我要評鑑 (03) 動畫   */
+        /* ========================================================= */
+        #pinkLocateDoorBtn,
+        #mobilePinkLocateDoorBtn {
+            cursor: pointer;
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+        #pinkLocateDoorBtn:hover {
+            filter: url(#doorGlowFilter);
+        }
+        #mobilePinkLocateDoorBtn:hover,
+        #mobilePinkLocateDoorBtn:active {
+            filter: drop-shadow(0 0 10px rgba(255, 249, 236, 0.96));
+        }
+        .eval-type-card {
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+        }
+        .eval-type-card:hover,
+        .eval-type-card:active {
+            transform: translateY(-5px) scale(1.03);
+            filter: drop-shadow(0 0 10px rgba(255, 249, 236, 0.95));
+        }
+
+        /* 附近 100m 公廁選單捲軸隱藏與卡片互動樣式 */
+        .nearby-100m-no-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .nearby-100m-no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .nearby-100m-card {
+            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .nearby-100m-card:hover {
+            background-color: #FFF9EC !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 rgba(128, 228, 255, 0.55);
+        }
+        .nearby-100m-card:active {
+            transform: translateY(0px) scale(0.985);
+        }
+
+        /* 主頁下沉與定位門盤跳出轉場動畫 */
+        @keyframes homeStageSinkDown {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(95vh) scale(0.96);
+                opacity: 0;
+            }
+        }
+        @keyframes homeStageRiseBack {
+            0% {
+                transform: translateY(95vh) scale(0.96);
+                opacity: 0;
+            }
+            72% {
+                transform: translateY(-10px) scale(1.01);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes doorWheelJumpUp {
+            0% {
+                transform: translateY(92vh) scale(0.88);
+                opacity: 0;
+            }
+            70% {
+                transform: translateY(-22px) scale(1.02);
+                opacity: 1;
+            }
+            86% {
+                transform: translateY(8px) scale(0.995);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes doorWheelSinkDown {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(92vh) scale(0.9);
+                opacity: 0;
+            }
+        }
+        @keyframes reportHeaderFadeIn {
+            0% {
+                transform: translateY(-16px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .is-sinking-down {
+            pointer-events: none;
+            animation: homeStageSinkDown 0.46s cubic-bezier(0.4, 0, 0.85, 0.6) forwards;
+        }
+        .is-rising-back {
+            animation: homeStageRiseBack 0.56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        #reportDoorWheelSvg.is-jumping-up,
+        #mobileReportDoorWheelSvg.is-jumping-up {
+            animation: doorWheelJumpUp 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        #reportDoorWheelSvg.is-sinking-out,
+        #mobileReportDoorWheelSvg.is-sinking-out {
+            pointer-events: none;
+            animation: doorWheelSinkDown 0.42s cubic-bezier(0.4, 0, 0.85, 0.6) forwards;
+        }
+        #reportStageTopBar.is-fading-in {
+            animation: reportHeaderFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+        }
+        .poogle-return-home-ellipse {
+            border: 2px solid #2A348C;
+            border-radius: 50%;
+            background-color: #F3EF84;
+            color: #2A348C;
+            transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+        }
+        .poogle-return-home-ellipse:hover {
+            background-color: #FFF9EC;
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 4px 0 #2A348C;
+        }
     </style>
 </head>
 
@@ -659,70 +900,76 @@
         </div>
     </header>
 
-    <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；電腦版：頭貼維持右上角) -->
+    <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；進入公廁回報系統手機版時僅保留右上角漢堡選單) -->
     <div id="topRightNavContainer" class="absolute md:fixed top-[34px] md:top-[44px] left-[7.4%] right-[7.4%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
         <!-- 登入文字與頭貼按鈕 -->
         <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
             <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
             <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
-                <img src="./img/pfp/anonymous_1.png" alt="匿名訪客頭貼" class="w-full h-full object-cover block rounded-full" />
+                <img src="data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 104 104%22><circle cx=%2252%22 cy=%2252%22 r=%2252%22 fill=%22%232A348C%22/><path d=%22M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z%22 fill=%22%23FF99D3%22/></svg>" alt="匿名訪客頭貼" class="w-full h-full object-cover block rounded-full" />
             </span>
         </button>
 
         <!-- 右上角的雙橫線漢堡選單按鈕 (=) (僅手機版顯示 md:hidden) -->
         <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
-                class="flex md:hidden flex-col justify-center gap-[8px] sm:gap-[9px] p-1.5 focus:outline-none group transition-transform active:scale-95">
+                class="flex md:hidden flex-col justify-center gap-[8px] sm:gap-[9px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
             <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
         <!-- 下拉式衛生紙捲筒選單 (僅手機版點擊漢堡選單時展開，頂端無縫貼齊跑馬燈下緣並直接覆蓋漢堡選單) -->
         <div id="tpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-18px] sm:top-[-16px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-            <svg viewBox="0 0 212 548" class="w-full h-auto block overflow-visible">
+            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
                 <!-- 垂直下拉的衛生紙張本體 (頂端 y=0 直接貼齊跑馬燈底部無空隙) -->
-                <path d="M 3,448 L 3,0 L 208,0 L 208,448 Z"
+                <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                <!-- 選單項目 0：主頁 (新增於最頂端) -->
+                <g id="tpMenuHomeBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="34" width="180" height="48" fill="transparent" />
+                    <text x="22" y="65" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">主頁</text>
+                </g>
 
                 <!-- 選單項目 1：公廁回報系統 -->
                 <g id="tpMenuReportSystemBtn" class="tp-menu-item" role="button" tabindex="0">
-                    <rect x="8" y="42" width="180" height="48" fill="transparent" />
-                    <text x="22" y="73" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
+                    <rect x="8" y="98" width="180" height="48" fill="transparent" />
+                    <text x="22" y="129" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
                 </g>
 
                 <!-- 選單項目 2：公廁地圖 -->
                 <g id="tpMenuMapBtn" class="tp-menu-item" role="button" tabindex="0">
-                    <rect x="8" y="108" width="180" height="48" fill="transparent" />
-                    <text x="22" y="139" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
+                    <rect x="8" y="162" width="180" height="48" fill="transparent" />
+                    <text x="22" y="193" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
                 </g>
 
                 <!-- 選單項目 3：公廁現況版 -->
                 <g id="tpMenuStatusBoardBtn" class="tp-menu-item" role="button" tabindex="0">
-                    <rect x="8" y="174" width="180" height="48" fill="transparent" />
-                    <text x="22" y="205" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                    <rect x="8" y="226" width="180" height="48" fill="transparent" />
+                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
                 </g>
 
                 <!-- 選單項目 4：小怪圖鑑 -->
                 <g id="tpMenuMonsterDexBtn" class="tp-menu-item" role="button" tabindex="0">
-                    <rect x="8" y="240" width="180" height="48" fill="transparent" />
-                    <text x="22" y="271" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
+                    <rect x="8" y="290" width="180" height="48" fill="transparent" />
+                    <text x="22" y="321" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
                 </g>
 
                 <!-- 選單項目 5：個人空間 -->
                 <g id="tpMenuPersonalSpaceBtn" class="tp-menu-item" role="button" tabindex="0">
-                    <rect x="8" y="306" width="180" height="48" fill="transparent" />
-                    <text x="22" y="337" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
+                    <rect x="8" y="354" width="180" height="48" fill="transparent" />
+                    <text x="22" y="385" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
                 </g>
 
                 <!-- 底部橫向衛生紙捲筒圓柱體 -->
-                <path d="M 34,360 L 177,360 A 31,88 0 0,1 177,536 L 34,536 Z"
+                <path d="M 34,420 L 177,420 A 31,88 0 0,1 177,596 L 34,596 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                 <!-- 衛生紙捲筒左側橢圓端面 -->
-                <ellipse cx="34" cy="448" rx="31" ry="88"
+                <ellipse cx="34" cy="508" rx="31" ry="88"
                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
 
                 <!-- 衛生紙捲筒左側亮黃色紙軸心 (#F3EF84) -->
-                <ellipse cx="31" cy="448" rx="9" ry="26"
+                <ellipse cx="31" cy="508" rx="9" ry="26"
                          fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
             </svg>
         </div>
@@ -781,7 +1028,7 @@
             <!-- 0. 頂端水平置中：「有所味」Logo (精準對齊畫布中心 x=215 並保留輕柔上下飄動) -->
             <g class="pointer-events-none" transform="translate(215, 160)">
                 <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
-                    <image href="./img/logo.png" x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                    <image x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
                 </g>
             </g>
 
@@ -840,35 +1087,41 @@
 
                 <!-- 手機版選項 2：公廁現況版 (左上歪頭粉紅便便 + #FFF383 大聲公旗幟) -->
                 <g id="mobileOpenStatusBoardBtn" class="poogle-zone" role="button" aria-label="公廁現況版">
-                    <g transform="rotate(-7, 650, 318)">
-                        <path d="M 646,238
-                                 C 639,254 635,257 624,259
-                                 C 604,263 595,280 603,297
-                                 C 582,306 575,332 586,354
-                                 C 596,374 620,377 650,375
-                                 C 680,373 706,368 715,348
-                                 C 724,326 712,299 689,293
-                                 C 695,276 684,257 663,256
-                                 C 654,255 651,251 646,238 Z"
-                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
-                        <ellipse cx="634" cy="297" rx="14.5" ry="18" fill="#FFF9EC" />
-                        <ellipse cx="663" cy="296" rx="14.5" ry="18" fill="#FFF9EC" />
-                        <path d="M 619.5,297 C 619.5,273 648.5,273 648.5,296 C 648.5,272 677.5,272 677.5,296"
-                              fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="630.5" cy="299" rx="10" ry="13" fill="#2A348C" />
-                        <ellipse cx="666.5" cy="298" rx="10" ry="13" fill="#2A348C" />
-                        <path d="M 639,317 Q 650,316 661,317 C 662,338 638,338 639,317 Z"
-                              fill="#45E5AC" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
-                        <path d="M 641,326 Q 650,320 659,326 C 657,337 643,337 641,326 Z"
-                              fill="#F26559" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
-                    </g>
+                    <!-- 新增：固定不隨動畫晃動的透明點擊感應框 -->
+                    <rect x="572" y="236" width="332" height="148" rx="22" fill="transparent" />
 
-                    <polygon points="689,313 899,284 885,369 689,339"
-                             fill="#FFF383" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
-                    <g transform="rotate(1.5, 792, 327)">
-                        <text x="792" y="334" fill="#2A348C" font-size="23" font-weight="900" letter-spacing="2" text-anchor="middle">
-                            公廁現況版
-                        </text>
+                    <!-- 新增：以大便中心 (650, 318) 為圓心上下微幅轉動的群組 -->
+                    <g id="mobileStatusPoopFlagPivot">
+                        <g transform="rotate(-7, 650, 318)">
+                            <path d="M 646,238
+                                     C 639,254 635,257 624,259
+                                     C 604,263 595,280 603,297
+                                     C 582,306 575,332 586,354
+                                     C 596,374 620,377 650,375
+                                     C 680,373 706,368 715,348
+                                     C 724,326 712,299 689,293
+                                     C 695,276 684,257 663,256
+                                     C 654,255 651,251 646,238 Z"
+                                  fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                            <ellipse cx="634" cy="297" rx="14.5" ry="18" fill="#FFF9EC" />
+                            <ellipse cx="663" cy="296" rx="14.5" ry="18" fill="#FFF9EC" />
+                            <path d="M 619.5,297 C 619.5,273 648.5,273 648.5,296 C 648.5,272 677.5,272 677.5,296"
+                                  fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="630.5" cy="299" rx="10" ry="13" fill="#2A348C" />
+                            <ellipse cx="666.5" cy="298" rx="10" ry="13" fill="#2A348C" />
+                            <path d="M 639,317 Q 650,316 661,317 C 662,338 638,338 639,317 Z"
+                                  fill="#45E5AC" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
+                            <path d="M 641,326 Q 650,320 659,326 C 657,337 643,337 641,326 Z"
+                                  fill="#F26559" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                        </g>
+
+                        <polygon points="689,313 899,284 885,369 689,339"
+                                 fill="#FFF383" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                        <g transform="rotate(1.5, 792, 327)">
+                            <text x="792" y="334" fill="#2A348C" font-size="23" font-weight="900" letter-spacing="2" text-anchor="middle">
+                                公廁現況版
+                            </text>
+                        </g>
                     </g>
                 </g>
             </g>
@@ -886,10 +1139,12 @@
                     公廁地圖
                 </text>
 
-                <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈) -->
-                <path d="M 29,462 L 29,475 A 51,19 0 0,0 131,475 L 131,462"
-                      fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                <ellipse cx="80" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+               <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈，持續微幅上下飄動不擋文字) -->
+                <g id="mobileTrashCanLidFloat">
+                    <path d="M 29,462 L 29,475 A 51,19 0 0,0 131,475 L 131,462"
+                          fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <ellipse cx="80" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                </g>
             </g>
 
             <!-- 馬桶左右兩側水平對齊的橢圓小手/小腳 (以 x=215 對稱：cx=143 與 cx=287) -->
@@ -910,7 +1165,7 @@
                     </g>
 
                     <!-- 左下水平橫放衛生紙捲 -->
-                    <g>
+                    <g id="mobileLyingTpRollAnim">
                         <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
                               fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
                         <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
@@ -1207,8 +1462,8 @@
                             <!-- 右側兩道深靛藍斜紋 -->
                             <polygon points="123,-24 143,-24 121,24 101,24" fill="#2A348C" />
                             <polygon points="174,-24 194,-24 172,24 152,24" fill="#2A348C" />
-                            <!-- 中央「馬桶維修中 請勿使用」文字 -->
-                            <text x="0" y="1" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
+                            <!-- 中央「馬桶維修中 請勿使用」文字 (斜體 10 度) -->
+                            <text x="0" y="1" transform="skewX(-10)" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
                                 馬桶維修中 請勿使用
                             </text>
                         </g>
@@ -1350,7 +1605,7 @@
 
                 <!-- 4. 「有所味」Logo (1:1 對齊圖例：位於水箱上蓋頂端中央、沖水孔上方；馬桶打開時維持原位) -->
                 <g id="toiletMainLogoGroup" class="pointer-events-none">
-                    <image href="./img/logo.png" x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                    <image x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
                 </g>
             </g>
 
@@ -1514,6 +1769,393 @@
     </main>
 
     <!-- =================================================================== -->
+    <!-- 5C. REPORT LOCATE & CATEGORY STAGE (電腦版維持原轉盤；手機版 1:1 還原 手機ui-23 / 24 / 25) -->
+    <!-- =================================================================== -->
+    <section id="reportFlowStage" class="hidden flex-1 md:min-h-0 w-full flex items-end justify-center overflow-hidden relative z-20 select-none">
+
+        <!-- 頂部導覽列 (僅電腦版顯示 md:flex；手機版依 手機ui-23~25 僅保留右上角雙橫線漢堡選單) -->
+        <div id="reportStageTopBar" class="hidden md:flex absolute top-[22px] sm:top-[32px] left-[4%] right-[4%] sm:left-[3.9%] sm:right-[6.4%] z-30 items-center justify-between pointer-events-none">
+            <button id="reportStageLogoBtn" type="button" class="group pointer-events-auto focus:outline-none transition-transform duration-200 hover:scale-105" title="返回有所味主頁">
+                <svg viewBox="0 0 294 116" class="w-[148px] sm:w-[195px] md:w-[218px] h-auto overflow-visible block">
+                    <image x="0" y="0" width="294" height="116" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                </svg>
+            </button>
+
+            <button id="reportStageReturnHomeBtn" type="button"
+                    class="poogle-return-home-ellipse pointer-events-auto w-[108px] h-[54px] sm:w-[132px] sm:h-[66px] text-sm sm:text-[18px] font-bold tracking-wider flex items-center justify-center focus:outline-none">
+                返回主頁
+            </button>
+        </div>
+
+        <!-- 畫面 01 -> 02 -> 03 容器 -->
+        <div id="reportDoorWheelScreen" class="w-full h-[calc(100vh-16px)] sm:h-[calc(100vh-18px)] flex items-end justify-center overflow-hidden relative">
+
+            <!-- =========================================================== -->
+            <!-- 📱 手機版專屬回報舞台 (< 768px：1:1 還原 手機ui-23, 24, 25)   -->
+            <!-- =========================================================== -->
+            <svg id="mobileReportDoorWheelSvg" viewBox="0 0 430 932" preserveAspectRatio="xMidYMax meet" class="block md:hidden w-full h-full max-w-full max-h-full select-none">
+                <defs>
+                    <clipPath id="mobileDoorWheelViewportClip">
+                        <rect x="-400" y="-400" width="1230" height="1732" />
+                    </clipPath>
+                    <!-- 手機版米白門元件 (放大 1 倍：尺寸 154x228，轉盤半徑 R=395) -->
+                    <g id="mobileCreamToiletDoorUnit">
+                        <rect x="-77" y="-509" width="154" height="228" rx="22"
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                        <circle cx="43" cy="-380" r="11"
+                                fill="#FFF9EC" stroke="#2A348C" stroke-width="2" />
+                    </g>
+                </defs>
+
+                <g clip-path="url(#mobileDoorWheelViewportClip)">
+                    <!-- 1. 手機ui-23.jpg：右下圓心 (cx=332, cy=955) 的放大版九扇門轉盤 -->
+                    <g id="mobileDoorWheelCenterAnchor" transform="translate(332, 955)">
+                        <g id="mobileDoorWheelRotatingGroup" transform="rotate(0)">
+                            <use id="mobileWheelDoor_40" href="#mobileCreamToiletDoorUnit" transform="rotate(40)" />
+                            <use id="mobileWheelDoor_80" href="#mobileCreamToiletDoorUnit" transform="rotate(80)" />
+                            <use id="mobileWheelDoor_120" href="#mobileCreamToiletDoorUnit" transform="rotate(120)" />
+                            <use id="mobileWheelDoor_160" href="#mobileCreamToiletDoorUnit" transform="rotate(160)" />
+                            <use id="mobileWheelDoor_200" href="#mobileCreamToiletDoorUnit" transform="rotate(200)" />
+                            <use id="mobileWheelDoor_240" href="#mobileCreamToiletDoorUnit" transform="rotate(240)" />
+                            <use id="mobileWheelDoor_280" href="#mobileCreamToiletDoorUnit" transform="rotate(280)" />
+                            <use id="mobileWheelDoor_320" href="#mobileCreamToiletDoorUnit" transform="rotate(320)" />
+
+                            <!-- 正上方 0° 粉紅門：「定位 所在位置」 (放大 1 倍) -->
+                            <g id="mobilePinkLocateDoorBtn" role="button" tabindex="0" aria-label="定位所在位置">
+                                <rect x="-77" y="-509" width="154" height="228" rx="22"
+                                      fill="#FF99D3" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                                <text x="0" y="-393" fill="#2A348C" font-size="38" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                    定位
+                                </text>
+                                <text x="0" y="-360" fill="#2A348C" font-size="18.5" font-weight="800" letter-spacing="2.2" text-anchor="middle">
+                                    所在位置
+                                </text>
+                            </g>
+                        </g>
+                    </g>
+
+                    <!-- 手機版階段轉盤大圓心 (cx=215, cy=980) -->
+                    <g id="mobileStageWheelPivotAnchor" transform="translate(215, 980)">
+
+                         <!-- 2. 手機ui-24.jpg：「我要評鑑...」附近 100m 公廁選單 (整體放大 1/3，無右側黃色捲軸，支援手指上下滑動) -->
+                      <g id="mobileNearby100mMenuWheelRotator" transform="rotate(-135)">
+                          <g id="mobileNearby100mMenuWheelGroup" class="hidden" transform="translate(-215, -980)">
+                              <g id="mobileNearby100mMenuUprightBox">
+                                  <text x="215" y="252" fill="#2A348C" font-size="37.5" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                      我要評鑑...
+                                  </text>
+
+                                  <foreignObject x="15" y="296" width="400" height="462">
+                                      <div xmlns="http://www.w3.org/1999/xhtml"
+                                           style="width:400px; height:462px; background:#2A348C; border-radius:19px; position:relative; overflow:hidden; display:flex; padding:28px 26px 0px 26px; box-sizing:border-box;">
+                                          <div id="mobileNearby100mScrollViewport"
+                                               class="nearby-100m-no-scrollbar"
+                                               style="width:100%; height:100%; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding-bottom:24px; display:flex; flex-direction:column; gap:17px;">
+                                              <!-- 由 JS 動態產生手機版附近 100m 公廁卡片 -->
+                                          </div>
+                                      </div>
+                                  </foreignObject>
+                              </g>
+                          </g>
+                      </g>
+
+
+                        <!-- 3. 手機ui-25.jpg：左側直排「我在使用・・・」+ 右側上下垂直排列「小便斗（上） / 一般廁間（下）」 -->
+                        <g id="mobileWheelReplacedCategoryRotator" transform="rotate(-135)">
+                            <g id="mobileWheelReplacedCategoryGroup" class="hidden" transform="translate(-215, -980)">
+                                <g id="mobileCategoryUprightBox">
+                                    <!-- 左側直式文字：我在使用・・・ -->
+                                    <g fill="#2A348C" font-size="25" font-weight="900" text-anchor="middle">
+                                        <text x="118" y="405">我</text>
+                                        <text x="118" y="441">在</text>
+                                        <text x="118" y="477">使</text>
+                                        <text x="118" y="513">用</text>
+                                        <circle cx="118" cy="545" r="2.7" />
+                                        <circle cx="118" cy="568" r="2.7" />
+                                        <circle cx="118" cy="591" r="2.7" />
+                                    </g>
+
+                                    <!-- 上方選項：小便斗 (點擊進入 rating.html?type=urinal) -->
+                                    <g id="mobileEvalCardUrinalPos" transform="translate(226, 314) scale(0.68)" class="cursor-pointer" role="button" tabindex="0" aria-label="評鑑小便斗">
+                                        <g class="eval-type-card">
+                                            <!-- 小便斗頂部感應器方盒 -->
+                                            <path d="M -50,-142 L -50,-162 Q -50,-174 -38,-174 L 38,-174 Q 50,-174 50,-162 L 50,-142 Z"
+                                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                            <!-- 小便斗米白陶瓷外體 -->
+                                            <path d="M -66,-142 L 66,-142 Q 92,-142 92,-116 L 92,16 C 92,78 54,114 0,114 C -54,114 -92,78 -92,16 L -92,-116 Q -92,-142 -66,-142 Z"
+                                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                            <!-- 小便斗內部藍色水池 -->
+                                            <path d="M -44,-118 L 44,-118 Q 68,-118 68,-94 L 68,-26 C 68,18 38,38 0,38 C -38,38 -68,18 -68,-26 L -68,-94 Q -68,-118 -44,-118 Z"
+                                                  fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                            <!-- 小便斗內部下方弧線 -->
+                                            <path d="M -34,30 Q 0,16 34,30"
+                                                  fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" />
+
+                                            <!-- 小便斗正面微笑表情 -->
+                                            <path d="M -23,48 C -23,63 -1,63 0,48 C 1,63 23,63 23,48"
+                                                  fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M -23,67 Q 0,72 23,67"
+                                                  fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+
+                                            <!-- 小便斗左右橢圓小腳 -->
+                                            <ellipse cx="-71" cy="95" rx="21.5" ry="12.5"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+                                            <ellipse cx="71" cy="95" rx="21.5" ry="12.5"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                            <!-- 下方亮黃膠囊標籤：小便斗 -->
+                                            <rect x="-71" y="136" width="142" height="52" rx="26"
+                                                  fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" />
+                                            <text x="0" y="163" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="3" text-anchor="middle" dominant-baseline="central">
+                                                小便斗
+                                            </text>
+                                        </g>
+                                    </g>
+
+                                    <!-- 下方選項：一般廁間 (點擊進入 rating.html?type=stall) -->
+                                    <g id="mobileEvalCardStallPos" transform="translate(228, 662) scale(0.68)" class="cursor-pointer" role="button" tabindex="0" aria-label="評鑑一般廁間">
+                                        <g class="eval-type-card">
+                                            <!-- 掀開的馬桶上蓋 -->
+                                            <ellipse cx="0" cy="-112" rx="98" ry="114"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                            <!-- 馬桶下半部底座 -->
+                                            <path d="M -105,-2 C -108,68 -68,114 0,114 C 68,114 108,68 105,-2 Z"
+                                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                            <!-- 馬桶坐墊外圈 -->
+                                            <ellipse cx="0" cy="-2" rx="105" ry="30"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                            <!-- 馬桶內部藍色水池 -->
+                                            <ellipse cx="0" cy="-2" rx="69" ry="18.5"
+                                                     fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" />
+
+                                            <!-- 馬桶正面微笑表情 -->
+                                            <path d="M -23,44 C -23,59 -1,59 0,44 C 1,59 23,59 23,44"
+                                                  fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M -23,63 Q 0,68 23,63"
+                                                  fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+
+                                            <!-- 馬桶左右橢圓小腳 -->
+                                            <ellipse cx="-66" cy="91" rx="21.5" ry="12.5"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+                                            <ellipse cx="66" cy="91" rx="21.5" ry="12.5"
+                                                     fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                            <!-- 下方粉紅膠囊標籤：一般廁間 -->
+                                            <rect x="-71" y="136" width="142" height="52" rx="26"
+                                                  fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" />
+                                            <text x="0" y="163" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">
+                                                一般廁間
+                                            </text>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+
+                    </g>
+                </g>
+            </svg>
+
+            <!-- =========================================================== -->
+            <!-- 💻 電腦版回報舞台 (>= 768px：維持原本九門轉盤與橫向雙卡片)  -->
+            <!-- =========================================================== -->
+            <svg id="reportDoorWheelSvg" viewBox="0 0 1440 780" preserveAspectRatio="xMidYMax meet" class="hidden md:block w-full h-full max-w-full max-h-full select-none">
+                <defs>
+                    <filter id="doorGlowFilter" x="-25%" y="-25%" width="150%" height="150%">
+                        <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#FFF9EC" flood-opacity="0.95" />
+                    </filter>
+                    <clipPath id="doorWheelViewportClip">
+                        <rect x="-500" y="-500" width="2440" height="1280" />
+                    </clipPath>
+                    <!-- 標準米白門元件 (含門把，中心對齊轉盤半徑 R=350) -->
+                    <g id="creamToiletDoorUnit">
+                        <rect x="-77" y="-464" width="154" height="228" rx="22"
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                        <circle cx="43" cy="-335" r="11"
+                                fill="#FFF9EC" stroke="#2A348C" stroke-width="2" />
+                    </g>
+                </defs>
+
+                <g clip-path="url(#doorWheelViewportClip)">
+                    <!-- 九扇門順時針旋轉群組 (圓心位於 cx=720, cy=724，每扇門間隔 40 度) -->
+                    <g id="doorWheelCenterAnchor" transform="translate(720, 724)">
+                        <g id="doorWheelRotatingGroup" transform="rotate(0)">
+                            <!-- 8 扇米白色門 (40°, 80°, 120°, 160°, 200°, 240°, 280°, 320°) -->
+                            <use id="wheelDoor_40" href="#creamToiletDoorUnit" transform="rotate(40)" />
+                            <use id="wheelDoor_80" href="#creamToiletDoorUnit" transform="rotate(80)" />
+                            <use id="wheelDoor_120" href="#creamToiletDoorUnit" transform="rotate(120)" />
+                            <use id="wheelDoor_160" href="#creamToiletDoorUnit" transform="rotate(160)" />
+                            <use id="wheelDoor_200" href="#creamToiletDoorUnit" transform="rotate(200)" />
+                            <use id="wheelDoor_240" href="#creamToiletDoorUnit" transform="rotate(240)" />
+                            <use id="wheelDoor_280" href="#creamToiletDoorUnit" transform="rotate(280)" />
+                            <use id="wheelDoor_320" href="#creamToiletDoorUnit" transform="rotate(320)" />
+
+                            <!-- 正上方 0° 粉紅門：「定位 所在位置」 (點擊後開始順時針轉動定位) -->
+                            <g id="pinkLocateDoorBtn" role="button" tabindex="0" aria-label="定位所在位置">
+                                <rect x="-77" y="-464" width="154" height="228" rx="22"
+                                      fill="#FF99D3" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                                <text x="0" y="-348" fill="#2A348C" font-size="38" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                    定位
+                                </text>
+                                <text x="0" y="-315" fill="#2A348C" font-size="18.5" font-weight="800" letter-spacing="2.2" text-anchor="middle">
+                                    所在位置
+                                </text>
+                            </g>
+                        </g>
+                    </g>
+
+                    <!-- 階段轉盤大圓心 (cx=720, cy=980)：先順時針轉入「附近 100m 公廁選單」，選好後再順時針轉入「一般廁間 / 小便斗」 -->
+                    <g id="stageWheelPivotAnchor" transform="translate(720, 980)">
+
+                        <!-- 步驟 1 轉入項目：「我要評鑑...」附近 100m 公廁選單 -->
+                        <g id="nearby100mMenuWheelRotator" transform="rotate(-135)">
+                            <g id="nearby100mMenuWheelGroup" class="hidden" transform="translate(-720, -980)">
+                                <g id="nearby100mMenuUprightBox">
+                                    <!-- 頂部置中標題：我要評鑑... -->
+                                    <text x="720" y="248" fill="#2A348C" font-size="35" font-weight="900" letter-spacing="5" text-anchor="middle">
+                                        我要評鑑...
+                                    </text>
+
+                                    <!-- 深藍圓角選單容器 (#2A348C) + 白色公廁卡片列表 + 右側專屬黃色捲軸 -->
+                                    <foreignObject x="458" y="298" width="524" height="330">
+                                        <div xmlns="http://www.w3.org/1999/xhtml"
+                                             style="width:524px; height:330px; background:#2A348C; border-radius:18px; position:relative; overflow:hidden; display:flex; padding:26px 48px 0px 52px; box-sizing:border-box;">
+                                            <!-- 可捲動卡片清單 (底部貼齊深藍框下緣自然裁切) -->
+                                            <div id="nearby100mScrollViewport"
+                                                 class="nearby-100m-no-scrollbar"
+                                                 style="width:100%; height:100%; overflow-y:auto; overflow-x:hidden; padding-right:6px; padding-bottom:22px; display:flex; flex-direction:column; gap:16px;">
+                                                <!-- 由 JS 動態產生附近 100m 公廁卡片 -->
+                                            </div>
+
+                                            <!-- 右側專屬黃色膠囊捲軸 (1:1 還原截圖比例與配色) -->
+                                            <div id="nearby100mScrollbarBox"
+                                                 style="position:absolute; right:16px; top:26px; width:16px; height:148px; border-radius:9999px; background:#FFF9EC; border:2px solid #59E1FF; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:3px 0; user-select:none;">
+                                                <button id="nearby100mScrollUpBtn" type="button" aria-label="向上捲動"
+                                                        style="background:transparent; border:none; padding:0; color:#FF85D6; font-size:8px; line-height:1; cursor:pointer;">▲</button>
+                                                <div id="nearby100mScrollTrack"
+                                                     style="position:relative; flex:1; width:100%; margin:2px 0; display:flex; justify-content:center; cursor:pointer;">
+                                                    <div id="nearby100mScrollThumb"
+                                                         style="width:9px; height:56px; border-radius:9999px; background:#F3EF84; cursor:grab; transform:translateY(0px);"></div>
+                                                </div>
+                                                <button id="nearby100mScrollDownBtn" type="button" aria-label="向下捲動"
+                                                        style="background:transparent; border:none; padding:0; color:#FF85D6; font-size:8px; line-height:1; cursor:pointer;">▼</button>
+                                            </div>
+                                        </div>
+                                    </foreignObject>
+                                </g>
+                            </g>
+                        </g>
+
+                        <!-- 步驟 2 轉入項目：選好公廁後順時針轉出的「一般廁間 ｜ 我在使用・・・ ｜ 小便斗」 -->
+                        <g id="wheelReplacedCategoryRotator" transform="rotate(-135)">
+                            <g id="wheelReplacedCategoryGroup" class="hidden" transform="translate(-720, -980)">
+
+                                <!-- 中央直式文字：我在使用・・・ -->
+                                <g fill="#2A348C" font-size="33" font-weight="900" text-anchor="middle">
+                                    <text x="726" y="298">我</text>
+                                    <text x="726" y="346">在</text>
+                                    <text x="726" y="394">使</text>
+                                    <text x="726" y="442">用</text>
+                                    <circle cx="726" cy="482" r="3.6" />
+                                    <circle cx="726" cy="513" r="3.6" />
+                                    <circle cx="726" cy="544" r="3.6" />
+                                </g>
+
+                                <!-- 左側選項：一般廁間 (點擊進入 rating.html?type=stall) -->
+                                <g id="evalCardStallPos" transform="translate(524, 456)" class="cursor-pointer" role="button" tabindex="0" aria-label="評鑑一般廁間">
+                                    <g class="eval-type-card">
+                                        <!-- 掀開的馬桶上蓋 -->
+                                        <ellipse cx="0" cy="-112" rx="98" ry="114"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                        <!-- 馬桶下半部底座 -->
+                                        <path d="M -105,-2 C -108,68 -68,114 0,114 C 68,114 108,68 105,-2 Z"
+                                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                        <!-- 馬桶坐墊外圈 -->
+                                        <ellipse cx="0" cy="-2" rx="105" ry="30"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                        <!-- 馬桶內部藍色水池 -->
+                                        <ellipse cx="0" cy="-2" rx="69" ry="18.5"
+                                                 fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" />
+
+                                        <!-- 馬桶正面微笑表情 -->
+                                        <path d="M -23,44 C -23,59 -1,59 0,44 C 1,59 23,59 23,44"
+                                              fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M -23,63 Q 0,68 23,63"
+                                              fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+
+                                        <!-- 馬桶左右橢圓小腳 -->
+                                        <ellipse cx="-66" cy="91" rx="21.5" ry="12.5"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+                                        <ellipse cx="66" cy="91" rx="21.5" ry="12.5"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                        <!-- 下方粉紅膠囊標籤：一般廁間 -->
+                                        <rect x="-74" y="142" width="148" height="54" rx="27"
+                                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" />
+                                        <text x="0" y="170" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">
+                                            一般廁間
+                                        </text>
+                                    </g>
+                                </g>
+
+                                <!-- 右側選項：小便斗 (點擊進入 rating.html?type=urinal) -->
+                                <g id="evalCardUrinalPos" transform="translate(928, 456)" class="cursor-pointer" role="button" tabindex="0" aria-label="評鑑小便斗">
+                                    <g class="eval-type-card">
+                                        <!-- 小便斗頂部感應器方盒 -->
+                                        <path d="M -50,-142 L -50,-162 Q -50,-174 -38,-174 L 38,-174 Q 50,-174 50,-162 L 50,-142 Z"
+                                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                        <!-- 小便斗米白陶瓷外體 -->
+                                        <path d="M -66,-142 L 66,-142 Q 92,-142 92,-116 L 92,16 C 92,78 54,114 0,114 C -54,114 -92,78 -92,16 L -92,-116 Q -92,-142 -66,-142 Z"
+                                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                        <!-- 小便斗內部藍色水池 -->
+                                        <path d="M -44,-118 L 44,-118 Q 68,-118 68,-94 L 68,-26 C 68,18 38,38 0,38 C -38,38 -68,18 -68,-26 L -68,-94 Q -68,-118 -44,-118 Z"
+                                              fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                                        <!-- 小便斗內部下方弧線 -->
+                                        <path d="M -34,30 Q 0,16 34,30"
+                                              fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" />
+
+                                        <!-- 小便斗正面微笑表情 -->
+                                        <path d="M -23,48 C -23,63 -1,63 0,48 C 1,63 23,63 23,48"
+                                              fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M -23,67 Q 0,72 23,67"
+                                              fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+
+                                        <!-- 小便斗左右橢圓小腳 -->
+                                        <ellipse cx="-71" cy="95" rx="21.5" ry="12.5"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+                                        <ellipse cx="71" cy="95" rx="21.5" ry="12.5"
+                                                 fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+
+                                        <!-- 下方亮黃膠囊標籤：小便斗 -->
+                                        <rect x="-74" y="142" width="148" height="54" rx="27"
+                                              fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" />
+                                        <text x="0" y="170" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="3" text-anchor="middle" dominant-baseline="central">
+                                            小便斗
+                                        </text>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </section>
+
+    <!-- =================================================================== -->
     <!-- MODALS (施工中、會員登入、網路定位、管理員驗證)                        -->
     <!-- =================================================================== -->
 
@@ -1563,7 +2205,12 @@
                 </div>
 
                 <button id="googleLoginBtn" type="button" class="poogle-pill-btn w-full py-3 rounded-full bg-[#FFF9EC] text-[#2A348C] font-extrabold text-sm flex items-center justify-center gap-3 hover:bg-[#F3EF84] transition-colors">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5" />
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0" aria-hidden="true">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                    </svg>
                     使用 Google 帳號登入
                 </button>
                 <button id="logoutBtn" type="button" class="hidden poogle-pill-btn w-full py-3 rounded-full bg-[#FF99D3] text-[#2A348C] font-extrabold text-sm flex items-center justify-center gap-2 mt-2">
@@ -1637,7 +2284,12 @@
                     </a>
                     <button id="adminGoogleLoginBtn" type="button"
                             class="poogle-pill-btn w-full py-3 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] text-[#2A348C] font-extrabold text-sm flex items-center justify-center gap-2.5">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-4 h-4" />
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" aria-hidden="true">
+                            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                        </svg>
                         <span id="adminGoogleLoginBtnText">使用管理員 Google 帳號登入</span>
                     </button>
                 </div>
@@ -1657,7 +2309,6 @@
 
         // ===================================================================
         // 👾 小怪圖片清單設定區 (對應 ./img/ 底下的四個分類資料夾)
-        // 💡 已全部改為英文檔名，不論在 GitHub Pages 或未來購買正式網域 (.com / .tw) 皆 100% 穩定讀取！
         // ===================================================================
         const MONSTER_FOLDER_CONFIG = {
             consumable: [
@@ -1702,13 +2353,12 @@
             ]
         };
 
-        // 若未來綁定自訂網域但仍架設於 GitHub Pages，可於此填入您的 GitHub 帳號與倉庫名稱作為備援（選填）
         const GITHUB_REPO_FALLBACK = {
-            owner: "", // 例如 "poogle-team"
-            repo: ""   // 例如 "poogle-toilet"
+            owner: "",
+            repo: ""
         };
 
-        // 內建備援向量圖 Data URI（皆採用標準 7 色計畫，支援新英文命名對應）
+        // 內建備援向量圖 Data URI
         const FALLBACK_MONSTER_SVGS = {
             "urinal_clean": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -68,-76 Q -65,-52 -88,-48 Q -65,-46 -62,-22 Q -59,-46 -38,-50 Q -61,-52 -68,-76 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M 74,18 Q 74,40 55,44 Q 74,48 74,70 Q 78,48 96,44 Q 78,40 74,18 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M -28,-38 C -28,-66 -24,-78 -6,-82 C 12,-86 28,-85 38,-78 C 46,-72 46,-54 44,-34 C 58,-30 64,-18 60,2 C 56,22 50,36 62,54 C 76,74 74,104 54,124 C 32,144 -8,144 -34,126 C -64,104 -72,48 -58,-2 C -50,-28 -36,-38 -28,-38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -10,-22 C 2,-22 10,-16 20,-22 C 34,-20 40,-4 32,16 C 24,36 24,52 38,68 C 52,84 42,108 14,110 C -18,112 -32,96 -34,58 C -36,16 -26,-22 -10,-22 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8" stroke-linejoin="round"/><path d="M -6,-62 C -6,-78 12,-78 12,-66 C 12,-78 30,-78 30,-62" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="3" cy="-56" rx="7" ry="9" fill="#2A348C"/><ellipse cx="21" cy="-56" rx="7" ry="9" fill="#2A348C"/><path d="M 3,-40 Q 12,-41 21,-40 C 22,-20 2,-20 3,-40 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2"/><circle cx="12" cy="-29" r="7.5" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
             "urinal_sensor_broke": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -32,-88 L 32,-88 C 46,-88 54,-72 60,-22 C 78,-16 88,16 82,48 C 94,50 96,68 82,70 C 84,78 74,80 72,72 C 72,82 62,82 62,74 L 62,106 C 62,136 36,148 0,148 C -36,148 -62,136 -62,106 L -58,34 C -74,26 -76,-10 -54,-18 C -48,-68 -44,-88 -32,-88 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><rect x="-28" y="-76" width="56" height="34" rx="7" fill="#2A348C"/><line x1="-19" y1="-67" x2="19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><line x1="19" y1="-67" x2="-19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><ellipse cx="-10" cy="-27" rx="9" ry="11" fill="#2A348C"/><ellipse cx="10" cy="-27" rx="9" ry="11" fill="#2A348C"/><path d="M -22,-14 Q -8,-10 0,-18 Q 8,-10 22,-14" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/><ellipse cx="0" cy="64" rx="40" ry="54" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -54,-18 C -36,-22 -24,-6 -28,12 C -34,34 -56,42 -68,26" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8" stroke-linecap="round"/></svg>`),
@@ -1728,7 +2378,6 @@
             hardware: FALLBACK_MONSTER_SVGS["mirror_dirty"]
         };
 
-        // 自動掃描 ./img/ 四個資料夾底下的所有圖檔（同時支援快取、本地 Live Server 目錄與 GitHub Pages API）
         async function discoverFolderImagesFromServer(folder) {
             const cacheKey = `poogle_folder_files_v2_${folder}`;
             try {
@@ -1741,7 +2390,6 @@
 
             const foundFiles = [];
 
-            // 1. 若部署於 GitHub Pages (*.github.io) 或有設定 GITHUB_REPO_FALLBACK，透過 GitHub API 讀取資料夾內的真實圖檔清單
             const host = window.location.hostname || '';
             const ghOwner = host.endsWith('.github.io') ? host.replace('.github.io', '') : (GITHUB_REPO_FALLBACK.owner || '');
             if (ghOwner) {
@@ -1772,7 +2420,6 @@
                 } catch (e) {}
             }
 
-            // 2. 本地伺服器 (如 VS Code Live Server) 目錄掃描
             try {
                 const res = await fetch(`./img/${folder}/`, { cache: 'no-store' });
                 if (!res.ok) return foundFiles;
@@ -1823,6 +2470,18 @@
 
         function resolveMonsterImageUrl(monsterObj) {
             if (monsterObj.resolvedUrl) return Promise.resolve(monsterObj.resolvedUrl);
+            const isPreviewSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (isPreviewSandbox) {
+                monsterObj.resolvedUrl = monsterObj.fallbackSvg;
+                monsterObj.isRealFile = false;
+                return Promise.resolve(monsterObj.fallbackSvg);
+            }
             return new Promise((resolve) => {
                 let idx = 0;
                 let settled = false;
@@ -1834,7 +2493,6 @@
                     resolve(url);
                 };
 
-                // 逾時保護：避免 GitHub Pages 單一圖檔請求卡住導致全部泡泡空白
                 const timeoutId = setTimeout(() => {
                     finish(monsterObj.fallbackSvg, false);
                 }, 2500);
@@ -1893,22 +2551,28 @@
         }
 
         function initLogoImagesWithFallback() {
-            const logoCandidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png', 'img/logo.PNG'];
-            let idx = 0;
+            const symbolEl = document.getElementById('youSuoWeiLogoVector');
             const applyUrlToAllLogos = (url) => {
                 document.querySelectorAll('.poogle-logo-img').forEach((el) => {
                     el.setAttribute('href', url);
                 });
             };
+            if (symbolEl) {
+                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+                applyUrlToAllLogos(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
+            }
+            const isPreviewSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (isPreviewSandbox) return;
+            const logoCandidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png', 'img/logo.PNG'];
+            let idx = 0;
             const tryNext = () => {
-                if (idx >= logoCandidates.length) {
-                    const symbolEl = document.getElementById('youSuoWeiLogoVector');
-                    if (symbolEl) {
-                        const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
-                        applyUrlToAllLogos(`data:image/svg+xml;utf8,${encodeURIComponent(svgStr)}`);
-                    }
-                    return;
-                }
+                if (idx >= logoCandidates.length) return;
                 const testUrl = logoCandidates[idx++];
                 const probe = new Image();
                 probe.onload = () => applyUrlToAllLogos(testUrl);
@@ -1918,7 +2582,7 @@
             tryNext();
         }
 
-        // 生成滿版全寬度漸變圓點陣列（維持原本舒展密度，且游標周圍網點具向外擴張放大效果）
+        // 生成滿版全寬度漸變圓點陣列（支援手機版與電腦版響應式間距，且游標/觸控周圍網點具向外擴張放大效果）
         let halftoneDotStates = [];
         let halftoneCursorX = null;
         let halftoneCursorY = null;
@@ -1933,18 +2597,19 @@
             const vh = Math.max(window.innerHeight || 780, 480);
             svgEl.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
 
-            const rows = 22;
-            const topY = Math.max(76, vh * 0.112);
-            const bottomY = vh - 12;
+            const isMobile = vw < 768;
+            const rows = isMobile ? 21 : 22;
+            const topY = isMobile ? Math.max(180, vh * 0.285) : Math.max(76, vh * 0.112);
+            const bottomY = vh - 14;
             const dy = (bottomY - topY) / (rows - 1);
 
-            const spacingX = Math.max(36, dy * 1.38);
+            const spacingX = isMobile ? Math.max(25, vw / 15.2) : Math.max(36, dy * 1.38);
             const cols = Math.ceil(vw / spacingX) + 2;
             const totalGridWidth = (cols - 1) * spacingX;
             const startX = (vw - totalGridWidth) / 2;
 
-            const topR = 1.65;
-            const bottomR = 6.75;
+            const topR = isMobile ? 1.15 : 1.65;
+            const bottomR = isMobile ? 4.4 : 6.75;
 
             const frag = document.createDocumentFragment();
             const nextStates = [];
@@ -1993,7 +2658,6 @@
                     halftoneCursorX = null;
                     halftoneCursorY = null;
                 });
-                // 支援手機觸控滑動時的網點向外擴張與放大效果
                 window.addEventListener('touchstart', (e) => {
                     if (e.touches && e.touches.length > 0) {
                         halftoneCursorX = e.touches[0].clientX;
@@ -2130,12 +2794,56 @@
             return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
         }
 
+        const resolvedPfpUrlCache = new Map();
+        function probeAndUpgradePfpImages() {
+            const isPreviewSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (isPreviewSandbox) return;
+            document.querySelectorAll('img[data-pfp-key]').forEach((imgEl) => {
+                const cleanKey = imgEl.getAttribute('data-pfp-key');
+                if (!cleanKey || imgEl.dataset.probedKey === cleanKey) return;
+                imgEl.dataset.probedKey = cleanKey;
+
+                if (resolvedPfpUrlCache.has(cleanKey)) {
+                    const cachedUrl = resolvedPfpUrlCache.get(cleanKey);
+                    if (cachedUrl) imgEl.src = cachedUrl;
+                    return;
+                }
+
+                const candidates = [
+                    `./img/pfp/${encodeURIComponent(cleanKey)}.png`,
+                    `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`
+                ];
+                let idx = 0;
+                const tryNext = () => {
+                    if (idx >= candidates.length) {
+                        resolvedPfpUrlCache.set(cleanKey, null);
+                        return;
+                    }
+                    const testUrl = candidates[idx++];
+                    const probe = new Image();
+                    probe.onload = () => {
+                        resolvedPfpUrlCache.set(cleanKey, testUrl);
+                        imgEl.src = testUrl;
+                    };
+                    probe.onerror = () => tryNext();
+                    probe.src = testUrl;
+                };
+                tryNext();
+            });
+        }
+
         function buildPfpImageHtml(pfpKey, altText = '有所味頭貼') {
             const cleanKey = String(pfpKey || DEFAULT_LOGGED_IN_PFP).replace(/\.(png|PNG|jpg|JPG|svg|SVG|webp|WEBP)$/i, '');
-            const primarySrc = `./img/pfp/${encodeURIComponent(cleanKey)}.png`;
-            const upperExtSrc = `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`;
-            const fallbackDataUri = getFallbackPinkPoopSvgDataUri();
-            return `<img src="${primarySrc}" alt="${escapeHtml(altText)}" class="w-full h-full object-cover block rounded-full" onerror="if(!this.dataset.triedUpper){this.dataset.triedUpper='1';this.src='${upperExtSrc}';}else{this.onerror=null;this.src='${fallbackDataUri}';}" />`;
+            const cachedUrl = resolvedPfpUrlCache.get(cleanKey);
+            const initialSrc = cachedUrl || getFallbackPinkPoopSvgDataUri();
+            setTimeout(probeAndUpgradePfpImages, 0);
+            return `<img src="${initialSrc}" data-pfp-key="${escapeHtml(cleanKey)}" alt="${escapeHtml(altText)}" class="w-full h-full object-cover block rounded-full" />`;
         }
 
         function getAnonymousAvatarHtml(forceNew = false) {
@@ -2143,7 +2851,7 @@
             return buildPfpImageHtml(anonKey, '匿名訪客頭貼');
         }
 
-        function getPoogleAvatarSvg(avatarType, uidSuffix = 'home') {
+        function getPoogleAvatarSvg(avatarType) {
             const normalized = normalizeLoggedInAvatarType(avatarType);
             return buildPfpImageHtml(normalized, '會員頭貼');
         }
@@ -2224,7 +2932,6 @@
                 const folders = ['urinal', 'consumable', 'stall', 'hardware'];
                 const folderItemsMap = { urinal: [], consumable: [], stall: [], hardware: [] };
 
-                // 0. 頁面一載入立即先填入內建備援小怪，確保泡泡在圖片載入期間絕不空白
                 const initialFallbackKeys = Object.keys(FALLBACK_MONSTER_SVGS);
                 for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
                     const fbUrl = FALLBACK_MONSTER_SVGS[initialFallbackKeys[slot % initialFallbackKeys.length]];
@@ -2234,7 +2941,6 @@
                     }
                 }
 
-                // 1. 掃描四個資料夾底下的真實圖檔 (含 GitHub API 支援) + 結合設定清單
                 await Promise.all(folders.map(async (folder) => {
                     const discovered = await discoverFolderImagesFromServer(folder);
                     const configured = MONSTER_FOLDER_CONFIG[folder] || [];
@@ -2314,7 +3020,6 @@
             // 游標靠近四大區域的泡泡避讓與選項顯示控制
             // ===================================================================
             const bubblesGroup = document.getElementById('bubblesGroup');
-            const topLeftLogoSvgGroup = document.getElementById('topLeftLogoSvgGroup');
 
             // 1. 個人空間
             const zonePersonalSpace = document.getElementById('zonePersonalSpace');
@@ -2330,7 +3035,6 @@
             const trashCanOpenGroup = document.getElementById('trashCanOpenGroup');
             const trashCanOpenLid = document.getElementById('trashCanOpenLid');
             const trashCanOpenBase = document.getElementById('trashCanOpenBase');
-            const trashCanMapText = document.getElementById('trashCanMapText');
 
             // 3. 中央馬桶 (公廁回報系統 & 公廁現況版)
             const zoneCenterToilet = document.getElementById('zoneCenterToilet');
@@ -2376,12 +3080,6 @@
             }
 
             function resetOptionsOnly(skipToiletInstantReset = false) {
-                if (topLeftLogoSvgGroup) {
-                    topLeftLogoSvgGroup.classList.add('hidden');
-                    topLeftLogoSvgGroup.classList.remove('is-animating');
-                }
-
-                // 重置個人空間
                 if (optionPersonalSpace) {
                     optionPersonalSpace.classList.add('hidden');
                     optionPersonalSpace.classList.remove('is-animating');
@@ -2394,14 +3092,11 @@
                 if (personalSpaceStickerText) personalSpaceStickerText.setAttribute('font-weight', '700');
                 if (switchRedButton) switchRedButton.classList.remove('is-animating');
 
-                // 重置公廁地圖垃圾桶
                 if (trashCanClosedGroup) trashCanClosedGroup.classList.remove('hidden');
                 if (trashCanOpenGroup) trashCanOpenGroup.classList.add('hidden');
                 if (trashCanOpenLid) trashCanOpenLid.classList.remove('is-animating');
                 if (trashCanOpenBase) trashCanOpenBase.classList.remove('is-animating');
-                if (trashCanMapText) trashCanMapText.classList.remove('is-animating');
 
-                // 重置中央馬桶
                 if (!skipToiletInstantReset) {
                     clearToiletCloseAnimationState();
                     if (toiletMainLogoGroup) toiletMainLogoGroup.classList.remove('is-jumping-up');
@@ -2419,7 +3114,6 @@
                     if (toiletLowerBaseGroup) toiletLowerBaseGroup.removeAttribute('filter');
                 }
 
-                // 重置小怪圖鑑衛生紙
                 if (optionMonsterDexText) optionMonsterDexText.classList.remove('is-animating');
                 if (idleLabelMonsterDex) idleLabelMonsterDex.setAttribute('font-weight', '700');
                 if (toiletPaperStackGroup) toiletPaperStackGroup.removeAttribute('filter');
@@ -2432,7 +3126,6 @@
                 clearToiletCloseAnimationState();
 
                 if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.remove('hidden');
-
                 if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.remove('is-animating');
                 if (openReportSystemBtn) openReportSystemBtn.classList.remove('is-animating');
                 if (openStatusBoardBtn) openStatusBoardBtn.classList.remove('is-animating');
@@ -2516,7 +3209,6 @@
                     }
                     if (trashCanOpenLid) trashCanOpenLid.classList.add('is-animating');
                     if (trashCanOpenBase) trashCanOpenBase.classList.add('is-animating');
-                    if (trashCanMapText) trashCanMapText.classList.add('is-animating');
                 } else if (zoneName === 'toilet') {
                     if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.add('hidden');
                     if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.remove('hidden');
@@ -2559,7 +3251,7 @@
             zoneMonsterDex?.addEventListener('mouseleave', resetAllZonesToIdle);
 
             // ===================================================================
-            // 游標靠近泡泡時「微微漂走」+ 靠近選項時「自動避讓彈出物」+ 點擊泡泡「破掉並浮出新泡泡」
+            // 游標靠近泡泡時「微微漂走」+ 點擊泡泡「破掉並浮出新泡泡」
             // ===================================================================
             const homeStageSvg = document.getElementById('homeStageSvg');
             const bubbleStates = Array.from(document.querySelectorAll('.bubble-unit')).map((el, idx) => ({
@@ -2679,7 +3371,6 @@
                 });
             });
 
-            // 手機版 3 顆小怪泡泡點擊破泡與重生互動
             document.querySelectorAll('.mobile-bubble-unit').forEach((mbEl) => {
                 mbEl.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2744,7 +3435,6 @@
                 const repelRadius = 210;
                 const maxDrift = 24;
 
-                // 0. 當馬桶是蓋上的狀態時，讓馬桶的兩顆眼珠跟著游標平滑轉動
                 const isToiletClosed = (activeHoverZone !== 'toilet') && toiletFaceIdle && !toiletFaceIdle.classList.contains('hidden');
                 toiletIdlePupils.forEach((pupil) => {
                     if (!pupil.el) return;
@@ -2817,7 +3507,6 @@
                     }
                 });
 
-                // 泡泡防重疊保護機制
                 const minBubbleDist = 204;
                 for (let i = 0; i < bubbleStates.length; i++) {
                     for (let j = i + 1; j < bubbleStates.length; j++) {
@@ -2845,7 +3534,6 @@
                     }
                 }
 
-                // 僅在座標實際變化時才更新 DOM
                 bubbleStates.forEach((b) => {
                     const nextDx = b.curDx + (b.targetDx - b.curDx) * 0.095;
                     const nextDy = b.curDy + (b.targetDy - b.curDy) * 0.095;
@@ -2877,10 +3565,23 @@
             let pendingPersonalSpaceRedirect = false;
             let profileUnsubscribe = null;
 
-            const homeClickAudio = new Audio('./sfx/home_click.mp3');
-            homeClickAudio.preload = 'auto';
+            let homeClickAudio = null;
+            const isStrictPreviewEnv = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (!isStrictPreviewEnv) {
+                fetch('./sfx/home_click.mp3', { method: 'HEAD' }).then((res) => {
+                    if (res && res.ok) {
+                        homeClickAudio = new Audio('./sfx/home_click.mp3');
+                        homeClickAudio.preload = 'auto';
+                    }
+                }).catch(() => {});
+            }
 
-            // 手機版按下選項時的柔和微白光回饋（若點擊馬桶內的子選項，則讓整座馬桶一起發光）
             const resolveMobileGlowTarget = (el) => {
                 if (!el) return null;
                 if (el.id === 'mobileOpenReportSystemBtn' || el.id === 'mobileOpenStatusBoardBtn') {
@@ -2895,45 +3596,39 @@
                 target.classList.add('is-pressed-glow');
                 setTimeout(() => {
                     target.classList.remove('is-pressed-glow');
-                }, 380);
+                }, 420);
             };
 
-            document.querySelectorAll('#mobileStageSvg .poogle-zone').forEach((zoneEl) => {
-                const target = resolveMobileGlowTarget(zoneEl);
-                if (!target) return;
-                zoneEl.addEventListener('pointerdown', () => {
-                    target.classList.add('is-pressed-glow');
-                });
-                zoneEl.addEventListener('pointerup', () => {
-                    setTimeout(() => target.classList.remove('is-pressed-glow'), 260);
-                });
-                zoneEl.addEventListener('pointercancel', () => {
-                    target.classList.remove('is-pressed-glow');
-                });
-                zoneEl.addEventListener('mouseleave', () => {
-                    target.classList.remove('is-pressed-glow');
-                });
-            });
-
-            const playHomeClickSfx = (navigateCallback) => {
+            function playHomeClickSfx(onComplete) {
+                let called = false;
+                const done = () => {
+                    if (!called) {
+                        called = true;
+                        if (typeof onComplete === 'function') onComplete();
+                    }
+                };
+                if (!homeClickAudio) {
+                    done();
+                    return;
+                }
                 try {
                     homeClickAudio.currentTime = 0;
                     const playPromise = homeClickAudio.play();
-                    if (typeof navigateCallback === 'function') {
-                        if (playPromise !== undefined) {
-                            playPromise
-                                .then(() => setTimeout(navigateCallback, 200))
-                                .catch(() => setTimeout(navigateCallback, 160));
-                        } else {
-                            setTimeout(navigateCallback, 200);
-                        }
+                    if (playPromise && typeof playPromise.then === 'function') {
+                        playPromise.then(() => {
+                            setTimeout(done, 190);
+                        }).catch(() => {
+                            done();
+                        });
+                    } else {
+                        setTimeout(done, 190);
                     }
-                } catch (e) {
-                    if (typeof navigateCallback === 'function') setTimeout(navigateCallback, 160);
+                } catch (err) {
+                    done();
                 }
-            };
+            }
 
-            // 1. 點擊「公廁地圖 (紅色垃圾桶)」 -> 發光並進入 map.html
+            // 1. 點擊「公廁地圖」 -> 發光並跳轉至 ./map.html
             const handleGoMap = (e) => {
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 playHomeClickSfx(() => {
@@ -2943,35 +3638,1059 @@
             zoneMapTrashCan?.addEventListener('click', handleGoMap);
             document.getElementById('mobileZoneMapTrashCan')?.addEventListener('click', handleGoMap);
 
-            // 2. 點擊「公廁回報系統」 -> 發光並開啟網路定位彈窗
-            const locateMethodModal = document.getElementById('locateMethodModal');
+            // ===================================================================
+            // 2. 點擊「公廁回報系統」 -> 同步支援電腦版與手機版 (手機ui-23 -> 24 -> 25)
+            // ===================================================================
+            const mainHomeStageEl = document.querySelector('main');
+            const topRightNavContainerEl = document.getElementById('topRightNavContainer');
+            const homeLoginBtnEl = document.getElementById('homeLoginBtn');
+            const openAdminPortalBtnEl = document.getElementById('openAdminPortalBtn');
+            const reportFlowStageEl = document.getElementById('reportFlowStage');
+            const reportDoorWheelSvgEl = document.getElementById('reportDoorWheelSvg');
+            const mobileReportDoorWheelSvgEl = document.getElementById('mobileReportDoorWheelSvg');
+            const reportStageTopBarEl = document.getElementById('reportStageTopBar');
+
+            // 電腦版轉盤元件
+            const doorWheelRotatingGroupEl = document.getElementById('doorWheelRotatingGroup');
+            const nearby100mMenuWheelRotatorEl = document.getElementById('nearby100mMenuWheelRotator');
+            const nearby100mMenuWheelGroupEl = document.getElementById('nearby100mMenuWheelGroup');
+            const nearby100mMenuUprightBoxEl = document.getElementById('nearby100mMenuUprightBox');
+            const nearby100mScrollViewportEl = document.getElementById('nearby100mScrollViewport');
+            const nearby100mScrollTrackEl = document.getElementById('nearby100mScrollTrack');
+            const nearby100mScrollThumbEl = document.getElementById('nearby100mScrollThumb');
+            const wheelReplacedCategoryRotatorEl = document.getElementById('wheelReplacedCategoryRotator');
+            const pinkLocateDoorBtnEl = document.getElementById('pinkLocateDoorBtn');
+            const wheelReplacedCategoryGroupEl = document.getElementById('wheelReplacedCategoryGroup');
+            const evalCardStallPosEl = document.getElementById('evalCardStallPos');
+            const evalCardUrinalPosEl = document.getElementById('evalCardUrinalPos');
+            const wheelDoor40El = document.getElementById('wheelDoor_40');
+            const wheelDoor80El = document.getElementById('wheelDoor_80');
+            const wheelDoor120El = document.getElementById('wheelDoor_120');
+            const wheelDoor160El = document.getElementById('wheelDoor_160');
+            const wheelDoor200El = document.getElementById('wheelDoor_200');
+            const wheelDoor240El = document.getElementById('wheelDoor_240');
+            const wheelDoor280El = document.getElementById('wheelDoor_280');
+            const wheelDoor320El = document.getElementById('wheelDoor_320');
+
+            // 手機版轉盤元件 (對應 手機ui-23, 24, 25)
+            const mobileDoorWheelRotatingGroupEl = document.getElementById('mobileDoorWheelRotatingGroup');
+            const mobilePinkLocateDoorBtnEl = document.getElementById('mobilePinkLocateDoorBtn');
+            const mobileNearby100mMenuWheelRotatorEl = document.getElementById('mobileNearby100mMenuWheelRotator');
+            const mobileNearby100mMenuWheelGroupEl = document.getElementById('mobileNearby100mMenuWheelGroup');
+            const mobileNearby100mMenuUprightBoxEl = document.getElementById('mobileNearby100mMenuUprightBox');
+            const mobileNearby100mScrollViewportEl = document.getElementById('mobileNearby100mScrollViewport');
+            const mobileWheelReplacedCategoryRotatorEl = document.getElementById('mobileWheelReplacedCategoryRotator');
+            const mobileWheelReplacedCategoryGroupEl = document.getElementById('mobileWheelReplacedCategoryGroup');
+            const mobileCategoryUprightBoxEl = document.getElementById('mobileCategoryUprightBox');
+            const mobileEvalCardStallPosEl = document.getElementById('mobileEvalCardStallPos');
+            const mobileEvalCardUrinalPosEl = document.getElementById('mobileEvalCardUrinalPos');
+            const mobileWheelDoor40El = document.getElementById('mobileWheelDoor_40');
+            const mobileWheelDoor80El = document.getElementById('mobileWheelDoor_80');
+            const mobileWheelDoor120El = document.getElementById('mobileWheelDoor_120');
+            const mobileWheelDoor160El = document.getElementById('mobileWheelDoor_160');
+            const mobileWheelDoor200El = document.getElementById('mobileWheelDoor_200');
+            const mobileWheelDoor240El = document.getElementById('mobileWheelDoor_240');
+            const mobileWheelDoor280El = document.getElementById('mobileWheelDoor_280');
+            const mobileWheelDoor320El = document.getElementById('mobileWheelDoor_320');
+
+            let isDoorWheelAnimating = false;
+            let isStageTransitioning = false;
+            let doorWheelAnimFrameId = null;
+            let lastLocatedToiletData = null;
+            let locatedNearby100mToilets = [];
+            let userEvaluatedToiletsMap = new Map();
+            let cachedPublicToiletsList = null;
+            let inMemoryHomeDeviceId = null;
+
+            const getOrCreateHomeDeviceReporterId = () => {
+                try {
+                    let id = localStorage.getItem('poogle_device_reporter_id');
+                    if (!id) {
+                        id = `dev_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+                        localStorage.setItem('poogle_device_reporter_id', id);
+                    }
+                    return id;
+                } catch (e) {
+                    if (!inMemoryHomeDeviceId) {
+                        inMemoryHomeDeviceId = `dev_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+                    }
+                    return inMemoryHomeDeviceId;
+                }
+            };
+
+            const getActiveHomeUser = () => {
+                if (auth && auth.currentUser && auth.currentUser.uid) {
+                    return auth.currentUser;
+                }
+                try {
+                    const cached = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
+                    if (cached && cached.uid) return cached;
+                } catch (e) {}
+                return null;
+            };
+
+            const isSameHomeReporterRecord = (record, activeUid, deviceId) => {
+                if (!record) return false;
+                if (activeUid && record.userId && record.userId === activeUid) return true;
+                if (record.deviceReporterId && record.deviceReporterId === deviceId) return true;
+                return false;
+            };
+
+            const fetchUserEvaluatedToiletsMap = async () => {
+                const evaluatedMap = new Map();
+                const activeUser = getActiveHomeUser();
+                const activeUid = activeUser?.uid || null;
+                const deviceId = getOrCreateHomeDeviceReporterId();
+
+                const putLatestRecord = (rec) => {
+                    const tName = String(rec?.name || '').trim();
+                    if (!tName) return;
+                    const prev = evaluatedMap.get(tName);
+                    if (!prev) {
+                        evaluatedMap.set(tName, rec);
+                        return;
+                    }
+                    const prevTime = String(prev.updatedAt || prev.createdAt || '');
+                    const nextTime = String(rec.updatedAt || rec.createdAt || '');
+                    if (nextTime >= prevTime) {
+                        evaluatedMap.set(tName, rec);
+                    }
+                };
+
+                let cloudQuerySucceeded = false;
+                const cloudEvalIds = new Set();
+
+                if (db) {
+                    try {
+                        const queries = [];
+                        if (activeUid) {
+                            queries.push(db.collection('evaluations').where('userId', '==', activeUid).get());
+                        }
+                        if (deviceId) {
+                            queries.push(db.collection('evaluations').where('deviceReporterId', '==', deviceId).get());
+                        }
+                        if (queries.length > 0) {
+                            const snapshots = await Promise.race([
+                                Promise.all(queries),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2500))
+                            ]);
+                            cloudQuerySucceeded = true;
+                            snapshots.forEach((snap) => {
+                                snap.forEach((doc) => {
+                                    const data = doc.data() || {};
+                                    const id = data.evalId || doc.id;
+                                    cloudEvalIds.add(id);
+                                    putLatestRecord({ id: doc.id, evalId: id, ...data });
+                                });
+                            });
+                        }
+                    } catch (err) {
+                        cloudQuerySucceeded = false;
+                    }
+                }
+
+                try {
+                    const rawLocal = localStorage.getItem('poogle_local_evaluations_v2');
+                    const localList = rawLocal ? JSON.parse(rawLocal) : [];
+                    if (Array.isArray(localList)) {
+                        let needCleanLocal = false;
+                        const keptLocal = [];
+                        localList.forEach((item) => {
+                            if (!item) return;
+                            const isMine = isSameHomeReporterRecord(item, activeUid, deviceId) || (!activeUid && !item.userId && !item.deviceReporterId);
+                            if (!isMine) {
+                                keptLocal.push(item);
+                                return;
+                            }
+                            const id = item.evalId || item.id;
+                            if (cloudQuerySucceeded && item.cloudSynced !== false && id && !cloudEvalIds.has(id)) {
+                                needCleanLocal = true;
+                                return;
+                            }
+                            keptLocal.push(item);
+                            if (!id || !cloudEvalIds.has(id)) {
+                                putLatestRecord(item);
+                            }
+                        });
+                        if (needCleanLocal) {
+                            localStorage.setItem('poogle_local_evaluations_v2', JSON.stringify(keptLocal));
+                        }
+                    }
+                } catch (e) {}
+
+                return evaluatedMap;
+            };
+
+            const MAP_IDB_NAME = 'TaiwanPublicToiletMapDB_v9';
+            const MAP_IDB_STORE = 'dataset_cache';
+
+            const calcGeoDistanceMeters = (lat1, lon1, lat2, lon2) => {
+                if (!Number.isFinite(lat1) || !Number.isFinite(lon1) || !Number.isFinite(lat2) || !Number.isFinite(lon2)) return Infinity;
+                const R = 6371000;
+                const toRad = Math.PI / 180;
+                const dLat = (lat2 - lat1) * toRad;
+                const dLon = (lon2 - lon1) * toRad;
+                const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLon / 2) ** 2;
+                return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+            };
+
+            const decodeCsvBuffer = (buffer) => {
+                try { return new TextDecoder('utf-8', { fatal: true }).decode(buffer); }
+                catch (e) {
+                    try { return new TextDecoder('big5').decode(buffer); }
+                    catch (e2) { return new TextDecoder('utf-8').decode(buffer); }
+                }
+            };
+
+            const parseSimpleCsvRows = (text) => {
+                const rows = [];
+                let row = [], val = '', inQ = false;
+                for (let i = 0; i < text.length; i++) {
+                    const c = text[i];
+                    if (inQ) {
+                        if (c === '"') {
+                            if (i + 1 < text.length && text[i + 1] === '"') { val += '"'; i++; }
+                            else inQ = false;
+                        } else val += c;
+                    } else {
+                        if (c === '"') inQ = true;
+                        else if (c === ',') { row.push(val.trim()); val = ''; }
+                        else if (c === '\r' || c === '\n') {
+                            if (c === '\r' && i + 1 < text.length && text[i + 1] === '\n') i++;
+                            row.push(val.trim()); val = '';
+                            if (row.length > 1 || (row.length === 1 && row[0] !== '')) rows.push(row);
+                            row = [];
+                        } else val += c;
+                    }
+                }
+                if (val !== '' || row.length > 0) {
+                    row.push(val.trim());
+                    if (row.length > 1 || (row.length === 1 && row[0] !== '')) rows.push(row);
+                }
+                return rows;
+            };
+
+            const parseToiletCsvText = (text) => {
+                const rows = parseSimpleCsvRows(text.replace(/^\uFEFF/, ''));
+                if (rows.length < 2) return [];
+                const headers = rows[0].map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+                const findIdx = (exact, partial) => {
+                    const idx = headers.findIndex(h => exact.includes(h));
+                    return idx >= 0 ? idx : headers.findIndex(h => partial.some(p => h.includes(p)));
+                };
+                const nameIdx = findIdx(['name', '建檔名稱', '公廁名稱'], ['name', '名稱']);
+                const addrIdx = findIdx(['address', '地址'], ['address', '地址']);
+                const latIdx = findIdx(['latitude', 'lat', '緯度'], ['lat', '緯度']);
+                const lngIdx = findIdx(['longitude', 'lng', 'lon', '經度'], ['lon', 'lng', '經度']);
+                const execIdx = findIdx(['exec', 'administration', '管理單位', '主管機關'], ['exec', 'administration', '管理', '機關']);
+
+                const list = [];
+                for (let i = 1; i < rows.length; i++) {
+                    const cols = rows[i];
+                    if (!cols.some(c => c !== '')) continue;
+                    const address = (addrIdx >= 0 && cols[addrIdx]) ? cols[addrIdx] : '';
+                    const name = (nameIdx >= 0 && cols[nameIdx]) ? cols[nameIdx] : (address || `公廁 #${i}`);
+                    const exec = (execIdx >= 0 && cols[execIdx]) ? cols[execIdx] : '環境管理單位';
+                    let lat = latIdx >= 0 ? parseFloat(cols[latIdx]) : NaN;
+                    let lng = lngIdx >= 0 ? parseFloat(cols[lngIdx]) : NaN;
+                    if (Number.isFinite(lat) && Number.isFinite(lng) && lat > 90 && lng >= 10 && lng <= 40) {
+                        const tmp = lat; lat = lng; lng = tmp;
+                    }
+                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                        list.push({ name, address, exec, lat, lng });
+                    }
+                }
+                return list;
+            };
+
+            const ensurePublicToiletsLoaded = async () => {
+                if (Array.isArray(cachedPublicToiletsList) && cachedPublicToiletsList.length > 0) {
+                    return cachedPublicToiletsList;
+                }
+                const fromIdb = await new Promise((resolve) => {
+                    let settled = false;
+                    const done = (v) => { if (!settled) { settled = true; resolve(v); } };
+                    const t = setTimeout(() => done(null), 1200);
+                    try {
+                        const req = indexedDB.open(MAP_IDB_NAME, 1);
+                        req.onsuccess = () => {
+                            try {
+                                const idb = req.result;
+                                if (!idb.objectStoreNames.contains(MAP_IDB_STORE)) { clearTimeout(t); done(null); return; }
+                                const tx = idb.transaction(MAP_IDB_STORE, 'readonly');
+                                const getReq = tx.objectStore(MAP_IDB_STORE).get('main_csv_dataset');
+                                getReq.onsuccess = () => { clearTimeout(t); done(getReq.result?.records || null); };
+                                getReq.onerror = () => { clearTimeout(t); done(null); };
+                            } catch (e) { clearTimeout(t); done(null); }
+                        };
+                        req.onerror = () => { clearTimeout(t); done(null); };
+                    } catch (e) { clearTimeout(t); done(null); }
+                });
+
+                if (Array.isArray(fromIdb) && fromIdb.length > 0) {
+                    cachedPublicToiletsList = fromIdb;
+                    return cachedPublicToiletsList;
+                }
+
+                const csvCandidates = ['./全國公廁建檔資料.csv', '全國公廁建檔資料.csv', encodeURI('./全國公廁建檔資料.csv'), './toilets.csv'];
+                for (const url of csvCandidates) {
+                    try {
+                        const res = await fetch(url);
+                        if (!res.ok) continue;
+                        const buf = await res.arrayBuffer();
+                        const parsed = parseToiletCsvText(decodeCsvBuffer(buf));
+                        if (parsed.length > 0) {
+                            cachedPublicToiletsList = parsed;
+                            return cachedPublicToiletsList;
+                        }
+                    } catch (e) {}
+                }
+                return [];
+            };
+
+            const requestUserGpsCoords = () => {
+                return new Promise((resolve) => {
+                    if (!navigator.geolocation) {
+                        resolve(null);
+                        return;
+                    }
+                    let settled = false;
+                    const done = (coords) => { if (!settled) { settled = true; resolve(coords); } };
+                    const timer = setTimeout(() => done(null), 4200);
+
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => { clearTimeout(timer); done(pos.coords); },
+                        () => {
+                            navigator.geolocation.getCurrentPosition(
+                                (pos2) => { clearTimeout(timer); done(pos2.coords); },
+                                () => { clearTimeout(timer); done(null); },
+                                { enableHighAccuracy: false, timeout: 2500, maximumAge: 60000 }
+                            );
+                        },
+                        { enableHighAccuracy: true, timeout: 3000, maximumAge: 15000 }
+                    );
+                });
+            };
+
+            const locateNearestPublicToilet = async () => {
+                const [coords, toilets] = await Promise.all([
+                    requestUserGpsCoords(),
+                    ensurePublicToiletsLoaded()
+                ]);
+
+                const fallbackDemoCandidates = [
+                    { name: '銘傳大學設計大樓女廁', exec: '銘傳大學總務處', address: '桃園市龜山區德明路5號', lat: 24.9852, lng: 121.3418, distance: 12 },
+                    { name: '銘傳大學設計大樓男廁', exec: '銘傳大學總務處', address: '桃園市龜山區德明路5號', lat: 24.98525, lng: 121.34185, distance: 18 },
+                    { name: '龜山區大同公園女廁', exec: '龜山區公所', address: '桃園市龜山區大同路與德明路口', lat: 24.9881, lng: 121.3402, distance: 45 },
+                    { name: '龜山區大同公園男廁', exec: '龜山區公所', address: '桃園市龜山區大同路與德明路口', lat: 24.9883, lng: 121.3405, distance: 52 },
+                    { name: '桃鶯公園無障礙廁所', exec: '桃園區公所', address: '330桃園市桃園區建國里桃鶯路', lat: 24.9786, lng: 121.3264, distance: 86 }
+                ];
+
+                let candidateList = [];
+
+                if (coords && Array.isArray(toilets) && toilets.length > 0) {
+                    const withDist = [];
+                    for (let i = 0; i < toilets.length; i++) {
+                        const t = toilets[i];
+                        const d = calcGeoDistanceMeters(coords.latitude, coords.longitude, t.lat, t.lng);
+                        if (Number.isFinite(d)) {
+                            withDist.push({
+                                name: t.name || '公廁名稱',
+                                exec: t.exec || '環境管理單位',
+                                address: t.address || '無詳細地址',
+                                lat: t.lat,
+                                lng: t.lng,
+                                userLat: coords.latitude,
+                                userLng: coords.longitude,
+                                distance: Math.round(d)
+                            });
+                        }
+                    }
+                    withDist.sort((a, b) => a.distance - b.distance);
+                    const within100m = withDist.filter(item => item.distance <= 100);
+                    candidateList = within100m.length > 0 ? within100m : withDist.slice(0, 6);
+                } else if (Array.isArray(toilets) && toilets.length > 0) {
+                    const refLat = Number(toilets[0].lat);
+                    const refLng = Number(toilets[0].lng);
+                    const sampleList = [];
+                    for (let i = 0; i < toilets.length; i++) {
+                        const t = toilets[i];
+                        const d = calcGeoDistanceMeters(refLat, refLng, t.lat, t.lng);
+                        if (d <= 100) {
+                            sampleList.push({
+                                name: t.name || '公廁名稱',
+                                exec: t.exec || '環境管理單位',
+                                address: t.address || '無詳細地址',
+                                lat: t.lat,
+                                lng: t.lng,
+                                userLat: refLat,
+                                userLng: refLng,
+                                distance: Math.max(5, Math.round(d))
+                            });
+                        }
+                        if (sampleList.length >= 12) break;
+                    }
+                    candidateList = sampleList.length > 0
+                        ? sampleList.sort((a, b) => a.distance - b.distance)
+                        : toilets.slice(0, 5).map((t, idx) => ({
+                            name: t.name || '公廁名稱',
+                            exec: t.exec || '環境管理單位',
+                            address: t.address || '無詳細地址',
+                            lat: t.lat,
+                            lng: t.lng,
+                            userLat: t.lat,
+                            userLng: t.lng,
+                            distance: 12 + idx * 18
+                        }));
+                } else {
+                    candidateList = fallbackDemoCandidates.map(item => ({
+                        ...item,
+                        userLat: fallbackDemoCandidates[0].lat,
+                        userLng: fallbackDemoCandidates[0].lng
+                    }));
+                }
+
+                const seenKeys = new Set();
+                locatedNearby100mToilets = candidateList.filter((item) => {
+                    const k = `${item.name}__${item.address}`;
+                    if (seenKeys.has(k)) return false;
+                    seenKeys.add(k);
+                    return true;
+                });
+
+                const matched = locatedNearby100mToilets[0] || fallbackDemoCandidates[0];
+                lastLocatedToiletData = matched;
+                try {
+                    sessionStorage.setItem('poogle_located_toilet', JSON.stringify(matched));
+                    localStorage.setItem('poogle_located_toilet', JSON.stringify(matched));
+                } catch (e) {}
+                return locatedNearby100mToilets;
+            };
+
+            const syncNearby100mCustomScrollbar = () => {
+                if (!nearby100mScrollViewportEl || !nearby100mScrollTrackEl || !nearby100mScrollThumbEl) return;
+                const maxScroll = nearby100mScrollViewportEl.scrollHeight - nearby100mScrollViewportEl.clientHeight;
+                const trackH = nearby100mScrollTrackEl.clientHeight || 112;
+                const thumbH = Math.max(28, Math.min(trackH * 0.48, trackH));
+                nearby100mScrollThumbEl.style.height = `${thumbH}px`;
+
+                if (maxScroll <= 1) {
+                    nearby100mScrollThumbEl.style.transform = 'translateY(0px)';
+                    return;
+                }
+                const ratio = Math.min(1, Math.max(0, nearby100mScrollViewportEl.scrollTop / maxScroll));
+                const maxTop = Math.max(0, trackH - thumbH);
+                nearby100mScrollThumbEl.style.transform = `translateY(${(ratio * maxTop).toFixed(1)}px)`;
+            };
+
+            const formatNearbyDistBadge = (meters) => {
+                const d = Number(meters);
+                if (!Number.isFinite(d)) return '00m';
+                if (d < 1000) return `${String(Math.max(1, Math.round(d))).padStart(2, '0')}m`;
+                return `${(d / 1000).toFixed(1)}km`;
+            };
+
+            const navigateToRatingPageWithToilet = (evalType) => {
+                const params = new URLSearchParams();
+                params.set('type', evalType);
+                if (lastLocatedToiletData) {
+                    if (lastLocatedToiletData.name) params.set('name', lastLocatedToiletData.name);
+                    if (lastLocatedToiletData.exec) params.set('manager', lastLocatedToiletData.exec);
+                    if (lastLocatedToiletData.address) params.set('address', lastLocatedToiletData.address);
+                    if (Number.isFinite(Number(lastLocatedToiletData.lat))) params.set('lat', String(lastLocatedToiletData.lat));
+                    if (Number.isFinite(Number(lastLocatedToiletData.lng))) params.set('lng', String(lastLocatedToiletData.lng));
+                    if (Number.isFinite(Number(lastLocatedToiletData.userLat))) params.set('ulat', String(lastLocatedToiletData.userLat));
+                    if (Number.isFinite(Number(lastLocatedToiletData.userLng))) params.set('ulng', String(lastLocatedToiletData.userLng));
+                }
+                window.location.href = `./rating.html?${params.toString()}`;
+            };
+
+            // 選好 100m 公廁後：順時針將公廁選單轉出右下角，同時順時針轉入「小便斗 / 一般廁間」
+            const transitionClockwiseFrom100mMenuToEvalCards = (chosenToilet) => {
+                if (isDoorWheelAnimating) return;
+                isDoorWheelAnimating = true;
+                playHomeClickSfx();
+
+                if (chosenToilet) {
+                    lastLocatedToiletData = chosenToilet;
+                    try {
+                        sessionStorage.setItem('poogle_located_toilet', JSON.stringify(chosenToilet));
+                        localStorage.setItem('poogle_located_toilet', JSON.stringify(chosenToilet));
+                    } catch (e) {}
+                }
+
+                // 同時設定電腦版與手機版的「小便斗 / 一般廁間」起始角度 (-130°)
+                if (wheelReplacedCategoryRotatorEl) {
+                    wheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-130)');
+                }
+                wheelReplacedCategoryGroupEl?.classList.remove('hidden');
+
+                if (mobileWheelReplacedCategoryRotatorEl) {
+                    mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-130)');
+                }
+                mobileWheelReplacedCategoryGroupEl?.classList.remove('hidden');
+
+                const durationMs = 920;
+                const startTime = performance.now();
+                const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                const step = (now) => {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(1, elapsed / durationMs);
+                    const eased = easeInOutCubic(progress);
+
+                    // 1. 附近 100m 公廁選單由 0° 順時針轉向 +125° 離開畫面右下角 (同步電腦版與手機版)
+                    const menuOutDeg = 125 * eased;
+                    if (nearby100mMenuWheelRotatorEl) {
+                        nearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuOutDeg.toFixed(2)})`);
+                    }
+                    if (nearby100mMenuUprightBoxEl) {
+                        nearby100mMenuUprightBoxEl.setAttribute('transform', `translate(720, 455) rotate(${(-24 * eased).toFixed(2)}) translate(-720, -455)`);
+                    }
+                    if (mobileNearby100mMenuWheelRotatorEl) {
+                        mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuOutDeg.toFixed(2)})`);
+                    }
+                    if (mobileNearby100mMenuUprightBoxEl) {
+                        mobileNearby100mMenuUprightBoxEl.setAttribute('transform', `translate(215, 520) rotate(${(-22 * eased).toFixed(2)}) translate(-215, -520)`);
+                    }
+                    if (menuOutDeg >= 112) {
+                        nearby100mMenuWheelGroupEl?.classList.add('hidden');
+                        mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
+                    }
+
+                    // 2. 馬桶與小便斗由 -130° 順時針轉至 0° 畫面正中央並平滑回正
+                    const cardsInDeg = -130 * (1 - eased);
+                    const remainRatio = 1 - eased;
+
+                    if (wheelReplacedCategoryRotatorEl) {
+                        wheelReplacedCategoryRotatorEl.setAttribute('transform', `rotate(${cardsInDeg.toFixed(2)})`);
+                    }
+                    if (evalCardStallPosEl) {
+                        evalCardStallPosEl.setAttribute('transform', `translate(524, 456) rotate(${(-28 * remainRatio).toFixed(2)})`);
+                    }
+                    if (evalCardUrinalPosEl) {
+                        evalCardUrinalPosEl.setAttribute('transform', `translate(928, 456) rotate(${(28 * remainRatio).toFixed(2)})`);
+                    }
+
+                    if (mobileWheelReplacedCategoryRotatorEl) {
+                        mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', `rotate(${cardsInDeg.toFixed(2)})`);
+                    }
+                    if (mobileCategoryUprightBoxEl) {
+                        mobileCategoryUprightBoxEl.setAttribute('transform', `translate(215, 500) rotate(${(24 * remainRatio).toFixed(2)}) translate(-215, -500)`);
+                    }
+
+                    if (progress < 1) {
+                        doorWheelAnimFrameId = requestAnimationFrame(step);
+                    } else {
+                        doorWheelAnimFrameId = null;
+                        nearby100mMenuWheelGroupEl?.classList.add('hidden');
+                        mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
+
+                        if (wheelReplacedCategoryRotatorEl) wheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(0)');
+                        if (evalCardStallPosEl) evalCardStallPosEl.setAttribute('transform', 'translate(524, 456) rotate(0)');
+                        if (evalCardUrinalPosEl) evalCardUrinalPosEl.setAttribute('transform', 'translate(928, 456) rotate(0)');
+
+                        if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(0)');
+                        if (mobileCategoryUprightBoxEl) mobileCategoryUprightBoxEl.setAttribute('transform', 'rotate(0)');
+
+                        isDoorWheelAnimating = false;
+                    }
+                };
+
+                doorWheelAnimFrameId = requestAnimationFrame(step);
+            };
+
+            const bindNearbyCardClicks = (containerEl, items, evalMap) => {
+                if (!containerEl) return;
+                containerEl.querySelectorAll('[data-nearby-idx]').forEach((cardEl) => {
+                    cardEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (isDoorWheelAnimating) return;
+                        const idx = parseInt(cardEl.getAttribute('data-nearby-idx') || '0', 10);
+                        const chosen = items[idx];
+                        if (!chosen) return;
+
+                        const cleanName = String(chosen.name || '').trim();
+                        const existingEval = evalMap instanceof Map ? evalMap.get(cleanName) : null;
+
+                        if (existingEval) {
+                            isDoorWheelAnimating = true;
+                            lastLocatedToiletData = chosen;
+                            try {
+                                sessionStorage.setItem('poogle_located_toilet', JSON.stringify(chosen));
+                                localStorage.setItem('poogle_located_toilet', JSON.stringify(chosen));
+                            } catch (err) {}
+                            const targetSceneType = (existingEval.sceneType === 'urinal') ? 'urinal' : 'stall';
+                            playHomeClickSfx(() => {
+                                navigateToRatingPageWithToilet(targetSceneType);
+                            });
+                            return;
+                        }
+
+                        transitionClockwiseFrom100mMenuToEvalCards(chosen);
+                    });
+                });
+            };
+
+            const renderNearby100mMenuCards = (list, evalMap = userEvaluatedToiletsMap) => {
+              const items = Array.isArray(list) && list.length > 0 ? list : [];
+
+              // 1. 渲染電腦版卡片（支援多行完整顯示，不截斷文字）
+              if (nearby100mScrollViewportEl) {
+                  nearby100mScrollViewportEl.innerHTML = items.map((t, idx) => {
+                      const tName = String(t.name || `公廁 ${idx + 1}`).trim();
+                      const existingEval = evalMap instanceof Map ? evalMap.get(tName) : null;
+                      const cleanAddr = String(t.address || '無詳細地址').replace(/^地址\s*[:：]?\s*/, '').trim();
+                      const distText = formatNearbyDistBadge(t.distance);
+                      return `
+                          <div data-nearby-idx="${idx}"
+                               class="nearby-100m-card"
+                               style="width:100%; min-height:66px; background:#FFFFFF; border-radius:10px; padding:11px 18px 11px 20px; display:flex; align-items:center; justify-content:space-between; gap:14px; cursor:pointer; box-sizing:border-box; flex-shrink:0;">
+                              <div style="min-width:0; flex:1; text-align:left;">
+                                  <div style="color:#2A348C; font-size:16px; font-weight:900; letter-spacing:1.2px; line-height:1.35; word-break:break-word;">
+                                      <span>${escapeHtml(tName)}</span>${existingEval ? `<span style="color:#F26559; font-size:12px; font-weight:800; letter-spacing:1px; margin-left:5px; white-space:nowrap; display:inline-block;">(已評鑑)</span>` : ''}
+                                  </div>
+                                  <div style="color:#2A348C; font-size:11.5px; font-weight:700; letter-spacing:0.8px; margin-top:4px; line-height:1.35; word-break:break-word;">
+                                      地址${escapeHtml(cleanAddr)}
+                                  </div>
+                              </div>
+                              <span style="flex-shrink:0; min-width:68px; height:34px; padding:0 12px; border-radius:9999px; background:#59E1FF; border:1.8px solid #2A348C; color:#2A348C; font-size:13.5px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
+                                  ${escapeHtml(distText)}
+                              </span>
+                          </div>
+                      `;
+                  }).join('');
+                  nearby100mScrollViewportEl.scrollTop = 0;
+                  setTimeout(syncNearby100mCustomScrollbar, 25);
+                  bindNearbyCardClicks(nearby100mScrollViewportEl, items, evalMap);
+              }
+
+              // 2. 渲染手機版卡片（整體放大 1/3 ＋ 支援多行完整顯示，不截斷文字）
+              if (mobileNearby100mScrollViewportEl) {
+                  mobileNearby100mScrollViewportEl.innerHTML = items.map((t, idx) => {
+                      const tName = String(t.name || `公廁 ${idx + 1}`).trim();
+                      const existingEval = evalMap instanceof Map ? evalMap.get(tName) : null;
+                      const cleanAddr = String(t.address || '無詳細地址').replace(/^地址\s*[:：]?\s*/, '').trim();
+                      const distText = formatNearbyDistBadge(t.distance);
+                      return `
+                          <div data-nearby-idx="${idx}"
+                               class="nearby-100m-card"
+                               style="width:100%; min-height:76px; background:#FFFFFF; border-radius:11px; padding:12px 16px 12px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; box-sizing:border-box; flex-shrink:0;">
+                              <div style="min-width:0; flex:1; text-align:left;">
+                                  <div style="color:#2A348C; font-size:17.5px; font-weight:900; letter-spacing:1.2px; line-height:1.35; word-break:break-word;">
+                                      <span>${escapeHtml(tName)}</span>${existingEval ? `<span style="color:#F26559; font-size:12.5px; font-weight:800; letter-spacing:0.8px; margin-left:5px; white-space:nowrap; display:inline-block;">(已評鑑)</span>` : ''}
+                                  </div>
+                                  <div style="color:#2A348C; font-size:12.5px; font-weight:700; letter-spacing:0.8px; margin-top:4px; line-height:1.35; word-break:break-word;">
+                                      地址${escapeHtml(cleanAddr)}
+                                  </div>
+                              </div>
+                              <span style="flex-shrink:0; min-width:74px; height:38px; padding:0 12px; border-radius:9999px; background:#59E1FF; border:1.9px solid #2A348C; color:#2A348C; font-size:15px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
+                                  ${escapeHtml(distText)}
+                              </span>
+                          </div>
+                      `;
+                  }).join('');
+                  mobileNearby100mScrollViewportEl.scrollTop = 0;
+                  bindNearbyCardClicks(mobileNearby100mScrollViewportEl, items, evalMap);
+              }
+          };
+
+
+            nearby100mScrollViewportEl?.addEventListener('scroll', syncNearby100mCustomScrollbar);
+            document.getElementById('nearby100mScrollUpBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                nearby100mScrollViewportEl?.scrollBy({ top: -110, behavior: 'smooth' });
+            });
+            document.getElementById('nearby100mScrollDownBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                nearby100mScrollViewportEl?.scrollBy({ top: 110, behavior: 'smooth' });
+            });
+            nearby100mScrollTrackEl?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!nearby100mScrollViewportEl || !nearby100mScrollTrackEl || e.target === nearby100mScrollThumbEl) return;
+                const rect = nearby100mScrollTrackEl.getBoundingClientRect();
+                const clickRatio = Math.min(1, Math.max(0, (e.clientY - rect.top) / Math.max(1, rect.height)));
+                nearby100mScrollViewportEl.scrollTop = clickRatio * (nearby100mScrollViewportEl.scrollHeight - nearby100mScrollViewportEl.clientHeight);
+            });
+
+            let isDraggingNearby100mThumb = false;
+            let nearbyThumbStartClientY = 0;
+            let nearbyThumbStartScrollTop = 0;
+
+            nearby100mScrollThumbEl?.addEventListener('pointerdown', (e) => {
+                isDraggingNearby100mThumb = true;
+                nearbyThumbStartClientY = e.clientY;
+                nearbyThumbStartScrollTop = nearby100mScrollViewportEl ? nearby100mScrollViewportEl.scrollTop : 0;
+                try { nearby100mScrollThumbEl.setPointerCapture(e.pointerId); } catch (err) {}
+                e.stopPropagation();
+            });
+            window.addEventListener('pointermove', (e) => {
+                if (!isDraggingNearby100mThumb || !nearby100mScrollViewportEl || !nearby100mScrollTrackEl || !nearby100mScrollThumbEl) return;
+                const rect = nearby100mScrollTrackEl.getBoundingClientRect();
+                const thumbRect = nearby100mScrollThumbEl.getBoundingClientRect();
+                const maxThumbMove = Math.max(1, rect.height - thumbRect.height);
+                const maxScroll = Math.max(1, nearby100mScrollViewportEl.scrollHeight - nearby100mScrollViewportEl.clientHeight);
+                const dy = e.clientY - nearbyThumbStartClientY;
+                nearby100mScrollViewportEl.scrollTop = nearbyThumbStartScrollTop + (dy / maxThumbMove) * maxScroll;
+            });
+            window.addEventListener('pointerup', () => {
+                isDraggingNearby100mThumb = false;
+            });
+
+            const resetDoorWheelToStage01 = () => {
+                if (doorWheelAnimFrameId) {
+                    cancelAnimationFrame(doorWheelAnimFrameId);
+                    doorWheelAnimFrameId = null;
+                }
+                isDoorWheelAnimating = false;
+
+                // 重置電腦版門盤
+                if (doorWheelRotatingGroupEl) doorWheelRotatingGroupEl.setAttribute('transform', 'rotate(0)');
+                if (nearby100mMenuWheelRotatorEl) nearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                if (nearby100mMenuUprightBoxEl) nearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                nearby100mMenuWheelGroupEl?.classList.add('hidden');
+
+                if (wheelReplacedCategoryRotatorEl) wheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-135)');
+                if (evalCardStallPosEl) evalCardStallPosEl.setAttribute('transform', 'translate(524, 456) rotate(-28)');
+                if (evalCardUrinalPosEl) evalCardUrinalPosEl.setAttribute('transform', 'translate(928, 456) rotate(28)');
+                if (pinkLocateDoorBtnEl) {
+                    pinkLocateDoorBtnEl.classList.remove('hidden');
+                    pinkLocateDoorBtnEl.style.pointerEvents = 'auto';
+                }
+                wheelDoor40El?.classList.remove('hidden');
+                wheelDoor80El?.classList.remove('hidden');
+                wheelDoor120El?.classList.remove('hidden');
+                wheelDoor160El?.classList.remove('hidden');
+                wheelDoor200El?.classList.remove('hidden');
+                wheelDoor240El?.classList.remove('hidden');
+                wheelDoor280El?.classList.remove('hidden');
+                wheelDoor320El?.classList.remove('hidden');
+                wheelReplacedCategoryGroupEl?.classList.add('hidden');
+
+                // 重置手機版門盤 (回到 手機ui-23 初始狀態)
+                if (mobileDoorWheelRotatingGroupEl) mobileDoorWheelRotatingGroupEl.setAttribute('transform', 'rotate(0)');
+                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                if (mobileNearby100mMenuUprightBoxEl) mobileNearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
+
+                if (mobileWheelReplacedCategoryRotatorEl) mobileWheelReplacedCategoryRotatorEl.setAttribute('transform', 'rotate(-135)');
+                if (mobileCategoryUprightBoxEl) mobileCategoryUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                if (mobilePinkLocateDoorBtnEl) {
+                    mobilePinkLocateDoorBtnEl.classList.remove('hidden');
+                    mobilePinkLocateDoorBtnEl.style.pointerEvents = 'auto';
+                }
+                mobileWheelDoor40El?.classList.remove('hidden');
+                mobileWheelDoor80El?.classList.remove('hidden');
+                mobileWheelDoor120El?.classList.remove('hidden');
+                mobileWheelDoor160El?.classList.remove('hidden');
+                mobileWheelDoor200El?.classList.remove('hidden');
+                mobileWheelDoor240El?.classList.remove('hidden');
+                mobileWheelDoor280El?.classList.remove('hidden');
+                mobileWheelDoor320El?.classList.remove('hidden');
+                mobileWheelReplacedCategoryGroupEl?.classList.add('hidden');
+            };
+
             const handleOpenLocateModal = (e) => {
                 if (e) {
                     e.stopPropagation();
                     if (e.currentTarget) triggerPressGlow(e.currentTarget);
                 }
+                if (isStageTransitioning) return;
+
+                // 若已經在公廁回報系統畫面中（例如從手機版漢堡選單再次點選「公廁回報系統」），直接重置回定位門盤第一階段
+                if (reportFlowStageEl && !reportFlowStageEl.classList.contains('hidden')) {
+                    playHomeClickSfx();
+                    resetDoorWheelToStage01();
+                    return;
+                }
+
+                isStageTransitioning = true;
                 playHomeClickSfx();
+                resetDoorWheelToStage01();
+
+                mainHomeStageEl?.classList.remove('is-rising-back');
+                void mainHomeStageEl?.offsetWidth;
+                mainHomeStageEl?.classList.add('is-sinking-down');
+
+                // 手機版依據 手機ui-23~25 保留右上角雙橫線漢堡選單，僅隱藏左上角登入頭貼按鈕；電腦版則隱藏右上角登入鈕並顯示專屬返回列
+                homeLoginBtnEl?.classList.add('hidden');
+                topRightNavContainerEl?.classList.add('md:hidden');
+                openAdminPortalBtnEl?.classList.add('hidden');
+
                 setTimeout(() => {
-                    locateMethodModal?.classList.remove('hidden');
-                }, 140);
+                    mainHomeStageEl?.classList.add('hidden');
+                    mainHomeStageEl?.classList.remove('is-sinking-down');
+
+                    reportFlowStageEl?.classList.remove('hidden');
+                    if (reportDoorWheelSvgEl) {
+                        reportDoorWheelSvgEl.classList.remove('is-sinking-out', 'is-jumping-up');
+                        void reportDoorWheelSvgEl.offsetWidth;
+                        reportDoorWheelSvgEl.classList.add('is-jumping-up');
+                    }
+                    if (mobileReportDoorWheelSvgEl) {
+                        mobileReportDoorWheelSvgEl.classList.remove('is-sinking-out', 'is-jumping-up');
+                        void mobileReportDoorWheelSvgEl.offsetWidth;
+                        mobileReportDoorWheelSvgEl.classList.add('is-jumping-up');
+                    }
+                    if (reportStageTopBarEl) {
+                        reportStageTopBarEl.classList.remove('is-fading-in');
+                        void reportStageTopBarEl.offsetWidth;
+                        reportStageTopBarEl.classList.add('is-fading-in');
+                    }
+
+                    setTimeout(() => {
+                        isStageTransitioning = false;
+                    }, 620);
+                }, 400);
             };
+
+            const handleReturnHomeFromReportStage = (e) => {
+                if (e) e.stopPropagation();
+                if (isStageTransitioning) return;
+                isStageTransitioning = true;
+                playHomeClickSfx();
+
+                if (doorWheelAnimFrameId) {
+                    cancelAnimationFrame(doorWheelAnimFrameId);
+                    doorWheelAnimFrameId = null;
+                }
+                isDoorWheelAnimating = false;
+
+                if (reportDoorWheelSvgEl) {
+                    reportDoorWheelSvgEl.classList.remove('is-jumping-up');
+                    void reportDoorWheelSvgEl.offsetWidth;
+                    reportDoorWheelSvgEl.classList.add('is-sinking-out');
+                }
+                if (mobileReportDoorWheelSvgEl) {
+                    mobileReportDoorWheelSvgEl.classList.remove('is-jumping-up');
+                    void mobileReportDoorWheelSvgEl.offsetWidth;
+                    mobileReportDoorWheelSvgEl.classList.add('is-sinking-out');
+                }
+
+                setTimeout(() => {
+                    reportFlowStageEl?.classList.add('hidden');
+                    reportDoorWheelSvgEl?.classList.remove('is-sinking-out');
+                    mobileReportDoorWheelSvgEl?.classList.remove('is-sinking-out');
+                    resetDoorWheelToStage01();
+
+                    mainHomeStageEl?.classList.remove('hidden', 'is-sinking-down');
+                    void mainHomeStageEl?.offsetWidth;
+                    mainHomeStageEl?.classList.add('is-rising-back');
+
+                    homeLoginBtnEl?.classList.remove('hidden');
+                    topRightNavContainerEl?.classList.remove('hidden', 'md:hidden');
+                    openAdminPortalBtnEl?.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        mainHomeStageEl?.classList.remove('is-rising-back');
+                        isStageTransitioning = false;
+                    }, 560);
+                }, 360);
+            };
+
+            document.getElementById('reportStageLogoBtn')?.addEventListener('click', handleReturnHomeFromReportStage);
+            document.getElementById('reportStageReturnHomeBtn')?.addEventListener('click', handleReturnHomeFromReportStage);
+
             document.getElementById('openReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
             document.getElementById('mobileOpenReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
 
-            zoneCenterToilet?.addEventListener('click', () => {
-                playHomeClickSfx();
-                locateMethodModal?.classList.remove('hidden');
+            zoneCenterToilet?.addEventListener('click', (e) => {
+                handleOpenLocateModal(e);
             });
 
-            document.getElementById('closeLocateMethodBtn')?.addEventListener('click', () => {
-                locateMethodModal?.classList.add('hidden');
-            });
-            locateMethodModal?.addEventListener('click', (e) => {
-                if (e.target === locateMethodModal) locateMethodModal.classList.add('hidden');
-            });
-            document.getElementById('startNetworkLocateBtn')?.addEventListener('click', () => {
-                const labelEl = document.getElementById('startNetworkLocateText');
-                if (labelEl) labelEl.textContent = '定位啟動中...';
+            // 若由其他頁面選單帶 ?openReport=1 進入主頁，自動切換至公廁回報定位門盤畫面
+            try {
+                const initParams = new URLSearchParams(window.location.search);
+                if (initParams.get('openReport') === '1') {
+                    window.history.replaceState(null, '', window.location.pathname);
+                    resetDoorWheelToStage01();
+                    mainHomeStageEl?.classList.add('hidden');
+                    homeLoginBtnEl?.classList.add('hidden');
+                    topRightNavContainerEl?.classList.add('md:hidden');
+                    openAdminPortalBtnEl?.classList.add('hidden');
+                    reportFlowStageEl?.classList.remove('hidden');
+                }
+            } catch (e) {}
+
+            // 動畫輔助函式：同步順時針旋轉電腦版與手機版門盤
+            const animateDoorWheelClockwise = (startDeg, endDeg, durationMs, easingFn, onUpdateDeg, onComplete) => {
+                const startTime = performance.now();
+                const tick = (now) => {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(1, elapsed / durationMs);
+                    const eased = easingFn(progress);
+                    const currentDeg = startDeg + (endDeg - startDeg) * eased;
+                    if (doorWheelRotatingGroupEl) {
+                        doorWheelRotatingGroupEl.setAttribute('transform', `rotate(${currentDeg.toFixed(2)})`);
+                    }
+                    if (mobileDoorWheelRotatingGroupEl) {
+                        mobileDoorWheelRotatingGroupEl.setAttribute('transform', `rotate(${currentDeg.toFixed(2)})`);
+                    }
+                    if (typeof onUpdateDeg === 'function') {
+                        onUpdateDeg(currentDeg, eased, progress);
+                    }
+                    if (progress < 1) {
+                        doorWheelAnimFrameId = requestAnimationFrame(tick);
+                    } else {
+                        doorWheelAnimFrameId = null;
+                        if (typeof onComplete === 'function') onComplete();
+                    }
+                };
+                doorWheelAnimFrameId = requestAnimationFrame(tick);
+            };
+
+            // 點擊粉紅門「定位 所在位置」 (同時支援電腦版與 手機ui-23)
+            const handleStartPinkDoorLocate = (e) => {
+                if (e) e.stopPropagation();
+                if (isDoorWheelAnimating) return;
+                resetDoorWheelToStage01();
+                isDoorWheelAnimating = true;
+                if (pinkLocateDoorBtnEl) pinkLocateDoorBtnEl.style.pointerEvents = 'none';
+                if (mobilePinkLocateDoorBtnEl) mobilePinkLocateDoorBtnEl.style.pointerEvents = 'none';
+                playHomeClickSfx();
+
+                const locateTaskPromise = Promise.all([
+                    locateNearestPublicToilet(),
+                    fetchUserEvaluatedToiletsMap()
+                ]);
+
+                const easeInSteady = (t) => 0.35 * t * t + 0.65 * t;
+                animateDoorWheelClockwise(
+                    0,
+                    180,
+                    2000,
+                    easeInSteady,
+                    (deg) => {
+                        if (deg >= 130) {
+                            pinkLocateDoorBtnEl?.classList.add('hidden');
+                            mobilePinkLocateDoorBtnEl?.classList.add('hidden');
+                        }
+                    },
+                    async () => {
+                        let list100m = [];
+                        let evalMap = new Map();
+                        try {
+                            const [locatedList, fetchedEvalMap] = await locateTaskPromise;
+                            list100m = locatedList || [];
+                            evalMap = fetchedEvalMap || new Map();
+                        } catch (err) {}
+                        userEvaluatedToiletsMap = evalMap;
+                        renderNearby100mMenuCards(list100m, userEvaluatedToiletsMap);
+
+                        pinkLocateDoorBtnEl?.classList.add('hidden');
+                        wheelDoor320El?.classList.add('hidden');
+                        wheelDoor40El?.classList.add('hidden');
+                        if (nearby100mMenuWheelRotatorEl) {
+                            nearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                        }
+                        nearby100mMenuWheelGroupEl?.classList.remove('hidden');
+
+                        mobilePinkLocateDoorBtnEl?.classList.add('hidden');
+                        mobileWheelDoor320El?.classList.add('hidden');
+                        mobileWheelDoor40El?.classList.add('hidden');
+                        if (mobileNearby100mMenuWheelRotatorEl) {
+                            mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(-135)');
+                        }
+                        mobileNearby100mMenuWheelGroupEl?.classList.remove('hidden');
+
+                        const easeOutSmooth = (t) => 1 - Math.pow(1 - t, 2.35);
+                        animateDoorWheelClockwise(
+                            180,
+                            405,
+                            1020,
+                            easeOutSmooth,
+                            (doorDeg, easedProgress) => {
+                                const menuInDeg = -135 * (1 - easedProgress);
+                                const remainRatio = 1 - easedProgress;
+
+                                if (nearby100mMenuWheelRotatorEl) {
+                                    nearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuInDeg.toFixed(2)})`);
+                                }
+                                if (nearby100mMenuUprightBoxEl) {
+                                    nearby100mMenuUprightBoxEl.setAttribute('transform', `translate(720, 455) rotate(${(24 * remainRatio).toFixed(2)}) translate(-720, -455)`);
+                                }
+
+                                if (mobileNearby100mMenuWheelRotatorEl) {
+                                    mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', `rotate(${menuInDeg.toFixed(2)})`);
+                                }
+                                if (mobileNearby100mMenuUprightBoxEl) {
+                                    mobileNearby100mMenuUprightBoxEl.setAttribute('transform', `translate(215, 520) rotate(${(22 * remainRatio).toFixed(2)}) translate(-215, -520)`);
+                                }
+
+                                if (doorDeg >= 210) {
+                                    wheelDoor280El?.classList.add('hidden');
+                                    mobileWheelDoor280El?.classList.add('hidden');
+                                }
+                                if (doorDeg >= 250) {
+                                    wheelDoor240El?.classList.add('hidden');
+                                    mobileWheelDoor240El?.classList.add('hidden');
+                                }
+                                if (doorDeg >= 290) {
+                                    wheelDoor200El?.classList.add('hidden');
+                                    mobileWheelDoor200El?.classList.add('hidden');
+                                }
+                                if (doorDeg >= 330) {
+                                    wheelDoor160El?.classList.add('hidden');
+                                    mobileWheelDoor160El?.classList.add('hidden');
+                                }
+                                if (doorDeg >= 370) {
+                                    wheelDoor120El?.classList.add('hidden');
+                                    mobileWheelDoor120El?.classList.add('hidden');
+                                }
+                                if (doorDeg >= 402) {
+                                    wheelDoor80El?.classList.add('hidden');
+                                    mobileWheelDoor80El?.classList.add('hidden');
+                                }
+                            },
+                            () => {
+                                if (nearby100mMenuWheelRotatorEl) nearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(0)');
+                                if (nearby100mMenuUprightBoxEl) nearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                                if (mobileNearby100mMenuWheelRotatorEl) mobileNearby100mMenuWheelRotatorEl.setAttribute('transform', 'rotate(0)');
+                                if (mobileNearby100mMenuUprightBoxEl) mobileNearby100mMenuUprightBoxEl.setAttribute('transform', 'rotate(0)');
+                                syncNearby100mCustomScrollbar();
+                                isDoorWheelAnimating = false;
+                            }
+                        );
+                    }
+                );
+            };
+
+            pinkLocateDoorBtnEl?.addEventListener('click', handleStartPinkDoorLocate);
+            mobilePinkLocateDoorBtnEl?.addEventListener('click', handleStartPinkDoorLocate);
+
+            // 點擊「一般廁間」或「小便斗」 (同時支援電腦版與 手機ui-25)
+            const handleSelectStall = (e) => {
+                e.stopPropagation();
+                if (isDoorWheelAnimating) return;
+                playHomeClickSfx(() => {
+                    navigateToRatingPageWithToilet('stall');
+                });
+            };
+            const handleSelectUrinal = (e) => {
+                e.stopPropagation();
+                if (isDoorWheelAnimating) return;
+                playHomeClickSfx(() => {
+                    navigateToRatingPageWithToilet('urinal');
+                });
+            };
+
+            evalCardStallPosEl?.addEventListener('click', handleSelectStall);
+            evalCardUrinalPosEl?.addEventListener('click', handleSelectUrinal);
+            mobileEvalCardStallPosEl?.addEventListener('click', handleSelectStall);
+            mobileEvalCardUrinalPosEl?.addEventListener('click', handleSelectUrinal);
+
+            window.addEventListener('pageshow', async () => {
+                isDoorWheelAnimating = false;
+                isStageTransitioning = false;
+                const isMenuVisible =
+                    (nearby100mMenuWheelGroupEl && !nearby100mMenuWheelGroupEl.classList.contains('hidden')) ||
+                    (mobileNearby100mMenuWheelGroupEl && !mobileNearby100mMenuWheelGroupEl.classList.contains('hidden'));
+                if (isMenuVisible && locatedNearby100mToilets.length > 0) {
+                    try {
+                        userEvaluatedToiletsMap = await fetchUserEvaluatedToiletsMap();
+                        renderNearby100mMenuCards(locatedNearby100mToilets, userEvaluatedToiletsMap);
+                    } catch (err) {}
+                }
             });
 
             // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 發光並顯示施工中彈窗
@@ -2997,7 +4716,7 @@
                 if (e.target === underConstructionModal) underConstructionModal.classList.add('hidden');
             });
 
-            // 4. 點擊「個人空間」 -> 發光並判斷登入狀態（已登入跳轉 profile.html，未登入彈出登入視窗）
+            // 4. 點擊「個人空間」 -> 發光並判斷登入狀態
             const handleOpenPersonalSpace = (e) => {
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 let cachedUser = null;
@@ -3082,7 +4801,15 @@
 
             topHamburgerBtn?.addEventListener('click', toggleTpDropdownMenu);
 
-            // 點擊衛生紙捲筒選單內的 5 個選項
+            document.getElementById('tpMenuHomeBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeTpDropdownMenu(false);
+                if (reportFlowStageEl && !reportFlowStageEl.classList.contains('hidden')) {
+                    handleReturnHomeFromReportStage(e);
+                } else {
+                    playHomeClickSfx();
+                }
+            });
             document.getElementById('tpMenuReportSystemBtn')?.addEventListener('click', (e) => {
                 closeTpDropdownMenu(false);
                 handleOpenLocateModal(e);
@@ -3106,7 +4833,6 @@
                 handleOpenPersonalSpace();
             });
 
-            // 點擊下拉選單以外的任何空間時，自動帶動畫收起衛生紙捲筒選單（使用 Capture 階段確保不被內部元件阻擋）
             document.addEventListener('pointerdown', (e) => {
                 if (!tpRollDropdownMenu || !tpRollDropdownMenu.classList.contains('is-open')) return;
                 if (tpRollDropdownMenu.contains(e.target)) return;
@@ -3131,16 +4857,15 @@
             const errorDetail = document.getElementById('loginErrorDetail');
             const switchLocalhostBtn = document.getElementById('switchToLocalhostBtn');
 
-            // 預設先顯示隨機匿名頭貼 (anonymous_1 / anonymous_2 / anonymous_3)
             if (avatarCircle) {
                 avatarCircle.innerHTML = getAnonymousAvatarHtml(false);
             }
 
             const renderUserPoogleAvatar = (avatarType) => {
                 const chosen = normalizeLoggedInAvatarType(avatarType);
-                if (avatarCircle) avatarCircle.innerHTML = getPoogleAvatarSvg(chosen, 'header');
+                if (avatarCircle) avatarCircle.innerHTML = getPoogleAvatarSvg(chosen);
                 if (modalAvatarBox) {
-                    modalAvatarBox.innerHTML = getPoogleAvatarSvg(chosen, 'modal');
+                    modalAvatarBox.innerHTML = getPoogleAvatarSvg(chosen);
                 }
             };
 
