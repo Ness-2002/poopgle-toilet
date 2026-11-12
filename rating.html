@@ -5275,10 +5275,10 @@
             layer.appendChild(frag);
         }
 
-        // 計算單隻雨鞋 SVG Path（保持頂部水平切齊 y=292，邁步時腳跟抬起傾斜、支撐時鞋底貼平）
-        function buildBootSvgPath(offsetX, tiltDeg) {
-            const groundY = 478;
-            const topCutY = 292;
+// 計算單隻雨鞋 SVG Path（邁步傾斜時整體稍微抬高，變平時貼回地面）
+        function buildBootSvgPath(offsetX, tiltDeg, liftY = 0) {
+            const groundY = 478 - liftY;
+            const topCutY = 292 - liftY;
             const pivotX = 720 + offsetX + 26;
             const pivotY = groundY;
             const rad = (tiltDeg * Math.PI) / 180;
@@ -5294,7 +5294,7 @@
                 ];
             };
 
-            // 腳筒前後邊線與 y = topCutY 水平線求交點，確保鞋口永遠水平切齊
+            // 腳筒前後邊線與 y = topCutY 水平線求交點，確保鞋口保持水平切齊並隨抬腳同步升高
             const intersectTopY = (localX) => {
                 const [bx, by] = rotPt(localX, 0);
                 const [tx, ty] = rotPt(localX, -220);
@@ -5339,22 +5339,31 @@
             const cycleDuration = 1100; // 完整左右邁步週期 (毫秒)
             const strideHalfSpan = 38;  // 前後跨步幅度
             const maxTiltDeg = 14.5;    // 邁步時雨鞋前傾角度
+            const maxLiftY = 26;        // 邁步傾斜時雨鞋抬高的高度 (數值越大抬越高)
 
             const computeLegPose = (phase) => {
-                // phase: 0 ~ 0.5 為抬腳跟向前邁步 (01->03)，0.5 ~ 1.0 為平踩向後滑動支撐 (04->06)
+                // phase: 0 ~ 0.5 為抬腳向前邁步，0.5 ~ 1.0 為平踩向後支撐
                 if (phase < 0.5) {
                     const p = phase / 0.5;
                     const easeP = 0.5 - 0.5 * Math.cos(p * Math.PI);
                     const offsetX = -strideHalfSpan + easeP * (strideHalfSpan * 2);
-                    const tilt = p < 0.15
-                        ? (p / 0.15) * maxTiltDeg
-                        : (p > 0.88 ? ((1 - p) / 0.12) * maxTiltDeg : maxTiltDeg);
-                    return { offsetX, tilt };
+
+                    // 傾斜與抬高比例：起步時平滑抬起(0->1)，邁步至前方變平時同步放下(1->0)
+                    let liftRatio = 1;
+                    if (p < 0.18) {
+                        liftRatio = 0.5 - 0.5 * Math.cos((p / 0.18) * Math.PI);
+                    } else if (p > 0.82) {
+                        liftRatio = 0.5 - 0.5 * Math.cos(((1 - p) / 0.18) * Math.PI);
+                    }
+
+                    const tilt = liftRatio * maxTiltDeg;
+                    const liftY = liftRatio * maxLiftY;
+                    return { offsetX, tilt, liftY };
                 } else {
                     const p = (phase - 0.5) / 0.5;
                     const easeP = 0.5 - 0.5 * Math.cos(p * Math.PI);
                     const offsetX = strideHalfSpan - easeP * (strideHalfSpan * 2);
-                    return { offsetX, tilt: 0 };
+                    return { offsetX, tilt: 0, liftY: 0 };
                 }
             };
 
@@ -5363,8 +5372,8 @@
                 const backPose = computeLegPose(t);
                 const frontPose = computeLegPose((t + 0.5) % 1.0);
 
-                backBootEl.setAttribute('d', buildBootSvgPath(backPose.offsetX, backPose.tilt));
-                frontBootEl.setAttribute('d', buildBootSvgPath(frontPose.offsetX, frontPose.tilt));
+                backBootEl.setAttribute('d', buildBootSvgPath(backPose.offsetX, backPose.tilt, backPose.liftY));
+                frontBootEl.setAttribute('d', buildBootSvgPath(frontPose.offsetX, frontPose.tilt, frontPose.liftY));
 
                 if (shadowEl) {
                     const spread = Math.abs(backPose.offsetX - frontPose.offsetX);
