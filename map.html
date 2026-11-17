@@ -196,21 +196,23 @@
         }
         @media (min-width: 768px) {
             .squat-toilet-shell {
-                --shell-h: min(85vh, 52vw, 760px);
-                --shell-pad: calc(var(--shell-h) * 0.082);
-                --right-r: calc(var(--shell-h) * 0.295);
+                --shell-h: max(480px, min(82vh, 50vw, 720px));
+                --shell-pad: calc(var(--shell-h) * 0.055);
+                --right-r: calc(var(--shell-h) * 0.268);
                 min-height: 480px;
                 height: var(--shell-h) !important;
                 padding-top: var(--shell-pad) !important;
                 padding-bottom: var(--shell-pad) !important;
                 padding-right: var(--shell-pad) !important;
-                padding-left: calc(var(--shell-h) * 0.355) !important;
+                /* 列表往右推開避開左側圓弧白框，右側 flex-1 地圖會自動縮小對應寬度 */
+                padding-left: calc(var(--shell-h) * 0.335) !important;
                 border-top-left-radius: calc(var(--shell-h) * 0.5) !important;
                 border-bottom-left-radius: calc(var(--shell-h) * 0.5) !important;
                 border-top-right-radius: var(--right-r) !important;
                 border-bottom-right-radius: var(--right-r) !important;
             }
             .squat-toilet-map-well {
+                min-width: 0;
                 border-top-left-radius: 0px !important;
                 border-bottom-left-radius: 0px !important;
                 border-top-right-radius: calc(var(--right-r) - var(--shell-pad)) !important;
@@ -297,13 +299,32 @@
     </style>
 </head>
 
-<body class="min-h-screen md:h-screen w-full md:overflow-hidden select-none relative flex items-start md:items-center justify-center pt-[112px] pb-10 px-3 sm:px-6 md:p-0">
+<body class="min-h-screen md:h-screen w-full md:overflow-hidden select-none relative flex items-start md:items-center justify-center pt-[112px] pb-10 px-3 sm:px-6 md:pt-[84px] md:pb-4 md:px-0">    <!-- 電腦版頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (手機版隱藏) -->
+    <header class="hidden md:block w-full fixed top-0 left-0 z-50">
+        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-7 xl:gap-10 text-[#1E2470] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+                <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
+                <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+                <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('mapUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
+                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('mapUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
+                <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
+            </div>
+        </nav>
 
-    <!-- 電腦版右上角「返回主頁」亮黃橢圓按鈕 (手機版隱藏) -->
-    <a href="./index.html" id="mapTopRightReturnHomeBtn"
-       class="poogle-return-home-ellipse hidden md:flex fixed top-[28px] right-[4.8%] z-40 w-[132px] h-[66px] text-[18px] font-bold tracking-wider items-center justify-center no-underline focus:outline-none">
-        返回主頁
-    </a>
+        <!-- 左上角 LOGO（與 profile.html 相同大小與位置，自然覆蓋於導覽列上方） -->
+        <div class="absolute inset-x-0 top-0 pointer-events-none z-40">
+            <div class="w-full max-w-[1440px] mx-auto relative px-6">
+                <a href="./index.html" class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味主頁">
+                    <img id="mapDesktopLogoImg"
+                         data-local-src="./img/logo.png"
+                         src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20280%20110%22%3E%3Cg%20stroke%3D%22%231E2470%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M26%2C58%20C14%2C48%2018%2C26%2038%2C24%20C48%2C10%2076%2C12%2084%2C26%20C98%2C12%20130%2C8%20144%2C26%20C160%2C14%20188%2C18%20196%2C34%20C214%2C20%20248%2C24%20256%2C46%20C270%2C58%20266%2C86%20246%2C92%20C232%2C98%20208%2C96%20194%2C88%20C178%2C98%20148%2C98%20134%2C88%20C118%2C98%2092%2C98%2078%2C88%20C58%2C98%2028%2C94%2022%2C74%20Z%22%20fill%3D%22%23FFFFFF%22%20stroke-width%3D%223.5%22%2F%3E%3Ctext%20x%3D%2230%22%20y%3D%2276%22%20font-family%3D%22sans-serif%22%20font-size%3D%2256%22%20font-weight%3D%22900%22%20fill%3D%22%2380D8FF%22%20stroke%3D%22%231E2470%22%20stroke-width%3D%223%22%20letter-spacing%3D%224%22%3E%E6%9C%89%E6%89%80%E5%91%B3%3C%2Ftext%3E%3C%2Fsvg%3E"
+                         alt="有所味 Logo"
+                         class="w-[195px] h-auto object-contain" />
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- 手機版右上角漢堡選單與下拉式衛生紙捲筒選單 -->
     <div id="mapMobileNavContainer" class="fixed top-[34px] right-[7.4%] z-50 flex md:hidden items-center justify-end">
@@ -448,8 +469,8 @@
       <div class="absolute -top-[84px] md:-top-[44px] lg:-top-[52px] xl:-top-[56px] left-1/2 -translate-x-1/2 z-30 flex flex-col md:flex-row items-center md:items-end gap-0 md:gap-2.5 lg:gap-3 pointer-events-none select-none whitespace-nowrap">
           <!-- 上方/左側：「有所味」圓潤白邊貼紙 Logo (可點擊返回主頁) -->
           <a href="./index.html"
-             class="pointer-events-auto group focus:outline-none block shrink-0"
-             title="返回有所味主頁">
+            class="pointer-events-auto group focus:outline-none block md:hidden shrink-0"
+            title="返回有所味主頁">
               <svg viewBox="-32 -28 610 246" class="w-[146px] sm:w-[158px] md:w-[146px] lg:w-[178px] xl:w-[196px] h-auto overflow-visible transition-transform duration-200 group-hover:scale-105">
 
                     <defs>
@@ -572,8 +593,8 @@
                                    class="w-full bg-transparent border-none text-[#2A348C] placeholder-[#2A348C]/45 text-[11.5px] font-bold tracking-wider focus:outline-none" />
                         </div>
 
-                        <!-- 電腦版：顯示「公廁列表」標題與間數 -->
-                        <span id="listHeaderTitle" class="hidden md:inline text-[#2A348C] text-[16px] lg:text-[17px] font-black tracking-[0.2em]">公廁列表</span>
+                        <!-- 電腦版：固定顯示「公廁列表」標題 -->
+                        <span id="listHeaderTitle" style="display: none;" class="md:!inline-block text-[#2A348C] text-[16px] lg:text-[17px] font-black tracking-[0.2em]">公廁列表</span>
                         <span id="datasetCountBadge" class="hidden md:inline absolute right-2.5 text-[11px] font-extrabold text-[#2A348C]/75"></span>
                     </div>
 
@@ -1010,6 +1031,8 @@
                 const probe = new Image();
                 probe.onload = () => {
                     if (logoImgEl) logoImgEl.setAttribute('href', url);
+                    const desktopLogo = document.getElementById('mapDesktopLogoImg');
+                    if (desktopLogo) desktopLogo.src = url;
                 };
                 probe.onerror = () => probeLogo();
                 probe.src = url;
@@ -2401,14 +2424,13 @@
             }
 
             results.sort((a, b) => {
-                if (state.radiusFilter !== '0' && state.userLat !== null) {
-                    return a.distance - b.distance;
+                // 取得目前定位後，一律依照距離「由近到遠」排序
+                if (state.userLat !== null && state.userLng !== null) {
+                    const distA = Number.isFinite(a.distance) ? a.distance : Infinity;
+                    const distB = Number.isFinite(b.distance) ? b.distance : Infinity;
+                    if (distA !== distB) return distA - distB;
                 }
-                const hasRevA = Boolean(getToiletReviewStats(a.name)?.count);
-                const hasRevB = Boolean(getToiletReviewStats(b.name)?.count);
-                if (hasRevA !== hasRevB) return hasRevA ? -1 : 1;
-                if (state.userLat !== null && state.userLng !== null) return a.distance - b.distance;
-                return 0;
+                return a.idx - b.idx;
             });
 
             state.filteredToilets = results;

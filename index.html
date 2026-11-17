@@ -576,11 +576,14 @@
             animation: bubbleBurstPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .bubble-monster-slot {
-            transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.24s ease;
+            transform-origin: 0px 0px;
+            will-change: transform, opacity;
+            transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease-out;
         }
         .bubble-monster-slot.is-swapping {
             transform: scale(0.55);
             opacity: 0;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s ease-in;
         }
 
         .poogle-pill-btn {
@@ -856,53 +859,122 @@
             transform: translateY(-2px) scale(1.04);
             box-shadow: 0 4px 0 #2A348C;
         }
+        /* 隱藏導覽列在小螢幕橫向滑動時的捲軸 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 定位畫面左上角 Logo：貼紙白框＋深藍細線濾鏡 */
+        .report-logo-sticker {
+            filter: url(#logoStickerOutline);
+            -webkit-filter: url(#logoStickerOutline);
+        }
     </style>
 </head>
 
 <body class="min-h-screen md:h-screen w-screen overflow-x-hidden overflow-y-auto md:overflow-hidden select-none relative flex flex-col">
 
-    <!-- 1. TOP MARQUEE BAR (POOPGLE 跑馬燈：高度與文字縮小 1/2，獨立渲染層防止卡頓) -->
-    <header class="poopgle-header-bar sticky top-0 w-full h-4 sm:h-[18px] bg-[#2A348C] overflow-hidden flex items-center shrink-0 z-40">
-        <div class="poopgle-marquee-track items-center">
-            <!-- 第一組 -->
-            <div class="flex items-center shrink-0">
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+    <!-- 1. TOP NAVBAR + MARQUEE BAR (上方粉紅導覽列 + 下方 POOPGLE 跑馬燈) -->
+    <header class="sticky top-0 w-full shrink-0 z-40 flex flex-col">
+        <!-- 與 profile.html 一致的粉紅導覽列 (電腦版顯示，手機版保留右上角漢堡選單) -->
+        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#FF85D0] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+                <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
+                <a href="#" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+                <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+                <a href="#" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+                <a href="#" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+                <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
-            <!-- 第二組 (無縫銜接) -->
-            <div class="flex items-center shrink-0" aria-hidden="true">
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
-                <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+        </nav>
+
+        <!-- 移至 Navbar 底下的 POOPGLE 跑馬燈 -->
+        <div class="poopgle-header-bar w-full h-4 sm:h-[18px] bg-[#2A348C] overflow-hidden flex items-center">
+            <div class="poopgle-marquee-track items-center">
+                <!-- 第一組 -->
+                <div class="flex items-center shrink-0">
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                </div>
+                <!-- 第二組 (無縫銜接) -->
+                <div class="flex items-center shrink-0" aria-hidden="true">
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                    <span class="poopgle-marquee-text font-black leading-none tracking-[0.14em] mx-6 sm:mx-8">POOPGLE</span>
+                </div>
+            </div>
+        </div>
+        <!-- 定位 Logo 專屬「白框＋深藍細線」SVG 濾鏡定義 -->
+        <svg class="fixed top-0 left-0 w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
+            <defs>
+                <filter id="logoStickerOutline" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
+                    <!-- 1. 沿 Logo 邊緣向外擴張出圓潤白框 -->
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2.8" result="whiteBlur" />
+                    <feComponentTransfer in="whiteBlur" result="whiteMask">
+                        <feFuncA type="linear" slope="20" intercept="-1" />
+                    </feComponentTransfer>
+                    <feFlood flood-color="#FFFFFF" flood-opacity="1" result="whiteColor" />
+                    <feComposite in="whiteColor" in2="whiteMask" operator="in" result="whiteOutline" />
+
+                    <!-- 2. 沿白框外圍再包覆一圈 #2A348C 深藍細線 -->
+                    <feGaussianBlur in="whiteMask" stdDeviation="1.05" result="navyBlur" />
+                    <feComponentTransfer in="navyBlur" result="navyMask">
+                        <feFuncA type="linear" slope="9" intercept="-0.35" />
+                    </feComponentTransfer>
+                    <feFlood flood-color="#2A348C" flood-opacity="1" result="navyColor" />
+                    <feComposite in="navyColor" in2="navyMask" operator="in" result="navyOutline" />
+
+                    <!-- 3. 依序疊合：深藍細線 ➔ 白框 ➔ 原始 Logo -->
+                    <feMerge>
+                        <feMergeNode in="navyOutline" />
+                        <feMergeNode in="whiteOutline" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+
+        <!-- 進入公廁回報／定位時顯示的左上角 LOGO（位置與尺寸同 profile.html，附白框與深藍細線） -->
+        <div id="reportStageTopBar" class="hidden absolute inset-x-0 top-0 pointer-events-none z-50">
+            <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
+                <button id="reportStageLogoBtn" type="button"
+                        class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-50 overflow-visible focus:outline-none transition-transform duration-200 hover:scale-105"
+                        title="回到有所味主頁">
+                    <img alt="有所味 Logo" class="poogle-logo-img report-logo-sticker w-[150px] sm:w-[195px] h-auto object-contain block" />
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；進入公廁回報系統手機版時僅保留右上角漢堡選單) -->
-    <div id="topRightNavContainer" class="absolute md:fixed top-[34px] md:top-[44px] left-[7.4%] right-[7.4%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
+    <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；電腦版：登入頭貼下移至跑馬燈下方) -->
+    <div id="topRightNavContainer" class="absolute md:fixed top-[34px] md:top-[86px] left-[7.4%] right-[7.4%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
         <!-- 登入文字與頭貼按鈕 -->
         <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
             <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
@@ -1402,11 +1474,11 @@
                           fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     <ellipse cx="353" cy="510" rx="71" ry="26" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
 
-                    <g fill="#2A348C" font-size="18.5" font-weight="700" text-anchor="middle" dominant-baseline="central">
-                        <text x="353" y="605">公</text>
-                        <text x="353" y="625">廁</text>
-                        <text x="353" y="645">地</text>
-                        <text x="353" y="665">圖</text>
+                    <g fill="#2A348C" font-size="24.7" font-weight="700" text-anchor="middle" dominant-baseline="central">
+                        <text x="353" y="595">公</text>
+                        <text x="353" y="622">廁</text>
+                        <text x="353" y="649">地</text>
+                        <text x="353" y="676">圖</text>
                     </g>
                 </g>
 
@@ -1417,11 +1489,11 @@
                               fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         <ellipse cx="353" cy="554" rx="71" ry="28" fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" />
 
-                        <g fill="#2A348C" font-size="18.5" font-weight="900" text-anchor="middle" dominant-baseline="central">
-                            <text x="353" y="615">公</text>
-                            <text x="353" y="635">廁</text>
-                            <text x="353" y="655">地</text>
-                            <text x="353" y="675">圖</text>
+                        <g fill="#2A348C" font-size="24.7" font-weight="900" text-anchor="middle" dominant-baseline="central">
+                            <text x="353" y="605">公</text>
+                            <text x="353" y="632">廁</text>
+                            <text x="353" y="659">地</text>
+                            <text x="353" y="686">圖</text>
                         </g>
                     </g>
 
@@ -1450,7 +1522,7 @@
                 <g id="toiletClosedUpperGroup" class="pointer-events-none">
                     <!-- 水箱主體 -->
                     <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
 
                     <!-- 水箱上的「馬桶維修中 請勿使用」黃藍斜紋封鎖條 (裁切貼齊水箱邊界) -->
                     <g clip-path="url(#toiletTankClip)">
@@ -1472,26 +1544,26 @@
 
                     <!-- 水箱外框重繪一層確保邊界線完整俐落 -->
                     <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z"
-                          fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                          fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
 
                     <!-- 水箱圓角上蓋 -->
-                    <rect x="512" y="189" width="416" height="89" rx="15" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                    <rect x="512" y="189" width="416" height="89" rx="15" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
                     <!-- 水箱上蓋中央圓角沖水孔槽 -->
-                    <rect x="653" y="206.5" width="134" height="34.5" rx="10.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                    <rect x="653" y="206.5" width="134" height="34.5" rx="10.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
                 </g>
 
                 <!-- 1B. 游標靠近時上半部：掀開的直立橢圓馬桶蓋 (1:1 還原 5主頁馬桶.svg) -->
                 <g id="toiletOpenUpperGroup" class="hidden pointer-events-none" filter="url(#whiteGlow)">
-                    <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                    <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
                 </g>
 
                 <!-- 2. 馬桶下半部底座、雙腳與表情 (底部貼齊畫面最下方 y=779.1) -->
                 <g id="toiletLowerBaseGroup" class="pointer-events-none">
                     <path d="M 501.2,538 C 495,608 510,688 553,735 L 575,779.1 L 865,779.1 L 887,735 C 930,688 945,608 938.8,538 Z"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
 
-                    <ellipse cx="574.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                    <ellipse cx="865.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                    <ellipse cx="574.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
+                    <ellipse cx="865.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
 
                     <!-- 待機表情 (雙眼隨游標轉動) -->
                     <g id="toiletFaceIdle">
@@ -1522,17 +1594,17 @@
                              A 220,71.5 0 0,0 938.5,544
                              C 940.5,539 941,532 938.8,526
                              L 930,517.5 L 510,517.5 Z"
-                          fill="#80E4FF" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
-                    <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
+                    <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
                 </g>
 
                 <!-- 3B. 游標靠近馬桶時：打開的坐墊圈 + 湖水藍水花(公廁回報系統) + 粉紅便便旗幟(公廁現況版) -->
                 <g id="toiletOpenOptionsGroup" class="hidden">
                     <!-- 坐墊外圈 -->
-                    <ellipse cx="720" cy="539" rx="220" ry="63" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" class="pointer-events-none" />
+                    <ellipse cx="720" cy="539" rx="220" ry="63" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" class="pointer-events-none" />
                     <!-- 水池底色與兩側邊框弧線 -->
                     <ellipse cx="720" cy="539" rx="144.5" ry="40.5" fill="#80E4FF" stroke="none" class="pointer-events-none" />
-                    <path d="M 607,514 A 144.5,40.5 0 1,0 822,511" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" class="pointer-events-none" />
+                    <path d="M 607,514 A 144.5,40.5 0 1,0 822,511" fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linecap="round" class="pointer-events-none" />
 
                     <!-- 選項 1：公廁回報系統 (湖水藍水花，Hover 時微微放大) -->
                     <g id="openReportSystemBtn" class="cursor-pointer" role="button" aria-label="公廁回報系統">
@@ -1652,7 +1724,7 @@
                     </g>
                 </g>
             </g>
-
+            
             <!-- =============================================================== -->
             <!-- F. 6 FLOATING MONSTER BUBBLES (1:1 還原泡泡反光樣式 + 向外移動 1/4) -->
             <!-- =============================================================== -->
@@ -1774,22 +1846,9 @@
     <!-- =================================================================== -->
     <section id="reportFlowStage" class="hidden flex-1 md:min-h-0 w-full flex items-end justify-center overflow-hidden relative z-20 select-none">
 
-        <!-- 頂部導覽列 (僅電腦版顯示 md:flex；手機版依 手機ui-23~25 僅保留右上角雙橫線漢堡選單) -->
-        <div id="reportStageTopBar" class="hidden md:flex absolute top-[22px] sm:top-[32px] left-[4%] right-[4%] sm:left-[3.9%] sm:right-[6.4%] z-30 items-center justify-between pointer-events-none">
-            <button id="reportStageLogoBtn" type="button" class="group pointer-events-auto focus:outline-none transition-transform duration-200 hover:scale-105" title="返回有所味主頁">
-                <svg viewBox="0 0 294 116" class="w-[148px] sm:w-[195px] md:w-[218px] h-auto overflow-visible block">
-                    <image x="0" y="0" width="294" height="116" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
-                </svg>
-            </button>
-
-            <button id="reportStageReturnHomeBtn" type="button"
-                    class="poogle-return-home-ellipse pointer-events-auto w-[108px] h-[54px] sm:w-[132px] sm:h-[66px] text-sm sm:text-[18px] font-bold tracking-wider flex items-center justify-center focus:outline-none">
-                返回主頁
-            </button>
-        </div>
 
        <!-- 畫面 01 -> 02 -> 03 容器 (改用 100dvh 避免被手機瀏覽器下方工具列遮擋) -->
-        <div id="reportDoorWheelScreen" class="w-full h-[calc(100dvh-16px)] sm:h-[calc(100dvh-18px)] flex items-center md:items-end justify-center overflow-hidden relative">
+        <div id="reportDoorWheelScreen" class="w-full h-[calc(100dvh-16px)] sm:h-[calc(100dvh-18px)] md:h-[calc(100dvh-66px)] flex items-center md:items-end justify-center overflow-hidden relative">
 
             <!-- 周圍 100m 內無公廁時的「您距離公廁太遠」提示畫面 -->
             <div id="tooFarFromToiletView" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center px-6 text-center select-none">
@@ -2373,92 +2432,8 @@
             repo: ""
         };
 
-        // 內建備援向量圖 Data URI
-        const FALLBACK_MONSTER_SVGS = {
-            "urinal_clean": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -68,-76 Q -65,-52 -88,-48 Q -65,-46 -62,-22 Q -59,-46 -38,-50 Q -61,-52 -68,-76 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M 74,18 Q 74,40 55,44 Q 74,48 74,70 Q 78,48 96,44 Q 78,40 74,18 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><path d="M -28,-38 C -28,-66 -24,-78 -6,-82 C 12,-86 28,-85 38,-78 C 46,-72 46,-54 44,-34 C 58,-30 64,-18 60,2 C 56,22 50,36 62,54 C 76,74 74,104 54,124 C 32,144 -8,144 -34,126 C -64,104 -72,48 -58,-2 C -50,-28 -36,-38 -28,-38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -10,-22 C 2,-22 10,-16 20,-22 C 34,-20 40,-4 32,16 C 24,36 24,52 38,68 C 52,84 42,108 14,110 C -18,112 -32,96 -34,58 C -36,16 -26,-22 -10,-22 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8" stroke-linejoin="round"/><path d="M -6,-62 C -6,-78 12,-78 12,-66 C 12,-78 30,-78 30,-62" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="3" cy="-56" rx="7" ry="9" fill="#2A348C"/><ellipse cx="21" cy="-56" rx="7" ry="9" fill="#2A348C"/><path d="M 3,-40 Q 12,-41 21,-40 C 22,-20 2,-20 3,-40 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2"/><circle cx="12" cy="-29" r="7.5" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
-            "urinal_sensor_broke": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 260"><path d="M -32,-88 L 32,-88 C 46,-88 54,-72 60,-22 C 78,-16 88,16 82,48 C 94,50 96,68 82,70 C 84,78 74,80 72,72 C 72,82 62,82 62,74 L 62,106 C 62,136 36,148 0,148 C -36,148 -62,136 -62,106 L -58,34 C -74,26 -76,-10 -54,-18 C -48,-68 -44,-88 -32,-88 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><rect x="-28" y="-76" width="56" height="34" rx="7" fill="#2A348C"/><line x1="-19" y1="-67" x2="19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><line x1="19" y1="-67" x2="-19" y2="-51" stroke="#F26559" stroke-width="5" stroke-linecap="round"/><ellipse cx="-10" cy="-27" rx="9" ry="11" fill="#2A348C"/><ellipse cx="10" cy="-27" rx="9" ry="11" fill="#2A348C"/><path d="M -22,-14 Q -8,-10 0,-18 Q 8,-10 22,-14" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/><ellipse cx="0" cy="64" rx="40" ry="54" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -54,-18 C -36,-22 -24,-6 -28,12 C -34,34 -56,42 -68,26" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8" stroke-linecap="round"/></svg>`),
-            "panel_not_ok": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 230"><path d="M -52,66 C -58,76 -52,86 -44,82 C -42,92 -30,92 -28,84 C -24,94 -12,88 -16,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 22,66 C 20,88 32,94 36,84 C 38,92 50,92 52,82 C 60,86 66,76 58,66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M -55,0 C -58,-25 -46,-38 -34,-42 C -32,-70 -14,-82 0,-72 C 14,-82 32,-70 34,-42 C 48,-38 60,-22 55,0 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="8" cy="-52" rx="9.5" ry="13" fill="#FFF9EC"/><ellipse cx="-9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><ellipse cx="9.5" cy="-50" rx="6.5" ry="8.5" fill="#2A348C"/><path d="M -11,-34 L 11,-34 C 13,-10 -13,-10 -11,-34 Z" fill="#2A348C"/><ellipse cx="0" cy="-22" rx="7.2" ry="7.8" fill="#F26559"/><rect x="-86" y="-8" width="172" height="76" rx="2" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><rect x="-86" y="10" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/><rect x="-86" y="45" width="19" height="14" fill="#F3EF84" stroke="#2A348C" stroke-width="3.4"/></svg>`),
-            "panel_ok": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-115 -115 230 230"><path d="M -38,-96 L -62,-92 C -78,-88 -96,-48 -96,4 C -96,56 -78,86 -62,92 L -38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M -38,-96 C -22,-55 -22,45 -38,98 C -72,45 -72,-55 -38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 L 62,-92 C 78,-88 96,-48 96,4 C 96,56 78,86 62,92 L 38,98 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.8"/><path d="M 38,-96 C 22,-55 22,45 38,98 C 72,45 72,-55 38,-96 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.8"/><path d="M 0,-68 C 10,-68 15,-62 18,-56 C 28,-52 34,-44 30,-36 C 44,-22 44,12 24,26 C 34,30 36,38 28,38 C 30,44 22,46 19,38 C 21,46 12,48 9,36 C 6,28 -6,28 -9,36 C -12,48 -21,46 -19,38 C -22,46 -30,44 -28,38 C -36,38 -34,30 -24,26 C -44,12 -44,-22 -30,-36 C -34,-44 -28,-52 -18,-56 C -15,-62 -10,-68 0,-68 Z" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><path d="M -9,-48 C -9,-40 0,-40 0,-50 C 0,-40 9,-40 9,-48" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/><path d="M -11,-38 Q 0,-31 11,-38" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round"/></svg>`),
-            "pee_floor": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 225 285"><path d="M -22,-68 C -36,-76 -54,-64 -52,-42 C -50,-28 -36,-22 -34,-10 C -32,4 -44,8 -54,0 C -62,-6 -68,0 -62,8 C -68,8 -70,16 -62,20 C -68,24 -64,34 -54,34 C -44,34 -42,46 -52,56 C -66,68 -68,82 -70,96 C -72,108 -90,112 -88,125 C -86,138 -62,135 -48,136 C -30,138 -20,162 2,162 C 26,162 36,136 58,136 C 82,136 102,132 102,115 C 102,98 82,92 68,84 C 56,76 62,60 60,44 C 58,30 44,26 48,14 C 52,4 66,-2 62,-10 C 68,-12 66,-20 58,-20 C 62,-26 54,-32 46,-26 C 36,-18 28,-22 32,-38 C 36,-52 46,-66 38,-82 C 28,-100 -2,-98 -16,-78 C -18,-72 -20,-68 -22,-68 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><ellipse cx="-12" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><ellipse cx="4" cy="-48" rx="9" ry="11" fill="#FFF9EC"/><circle cx="-11" cy="-48" r="6" fill="#2A348C"/><circle cx="5" cy="-48" r="6" fill="#2A348C"/><path d="M -16,-25 Q -3,-30 10,-25 C 6,2 -8,2 -16,-25 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-3" cy="-14" rx="7" ry="9" fill="#F26559" stroke="#2A348C" stroke-width="3"/></svg>`),
-            "stinky": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 -105 240 250"><path d="M -28,-66 C -38,-90 28,-90 20,-66 C 14,-56 14,-48 26,-44 C 52,-38 58,-4 44,12 C 38,18 32,20 32,22 C 66,26 84,66 72,102 C 60,132 -60,132 -72,102 C -84,66 -66,26 -32,22 C -32,20 -38,18 -44,12 C -58,-4 -52,-38 -26,-44 C -14,-48 -14,-56 -28,-66 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="4" stroke-linejoin="round"/><path d="M -36,-22 C -36,-35 -6,-35 0,-26 C 6,-35 36,-35 36,-22 C 36,-9 6,-9 0,-18 C -6,-9 -36,-9 -36,-22 Z" fill="#FFF9EC"/><ellipse cx="-21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><ellipse cx="21" cy="-21" rx="10" ry="7.2" fill="#2A348C"/><path d="M -28,2 Q 0,15 28,2" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/></svg>`),
-            "mirror_dirty": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><g transform="rotate(6)"><rect x="-46" y="-58" width="92" height="118" rx="14" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><rect x="-32" y="-36" width="64" height="82" rx="6" fill="#80E4FF" stroke="#2A348C" stroke-width="3.5"/><path d="M -16,-58 C -16,-78 16,-78 16,-58" fill="#FF99D3" stroke="#2A348C" stroke-width="3.5"/><ellipse cx="-6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><ellipse cx="6" cy="-58" rx="4.5" ry="6" fill="#2A348C"/><path d="M 6,-36 L 6,2 C 6,10 14,10 14,2 L 14,-36 Z" fill="#45E5AC" stroke="#2A348C" stroke-width="2.8"/><path d="M -28,24 C -18,16 -8,28 2,22 C 12,16 22,28 28,20 L 28,44 L -28,44 Z" fill="#FFF9EC" opacity="0.85"/></g></svg>`),
-            "paper_yes": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><path d="M -46,-36 L -46,44 A 46,18 0 0,0 46,44 L 46,-36 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="46" ry="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="0" cy="-36" rx="16" ry="6" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2"/><path d="M 32,-12 L 66,8 L 54,58 L 24,38 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="-12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><ellipse cx="12" cy="2" rx="7" ry="9.5" fill="#2A348C"/><path d="M -10,20 Q 0,30 10,20" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round"/></svg>`),
-            "soap_yes": `data:image/svg+xml;utf8,` + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220"><rect x="-12" y="-72" width="24" height="22" rx="5" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.5"/><path d="M 0,-72 L 0,-86 L 32,-86 L 36,-76" fill="none" stroke="#2A348C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="-44" y="-50" width="88" height="114" rx="28" fill="#FF99D3" stroke="#2A348C" stroke-width="3.8"/><ellipse cx="-13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><ellipse cx="13" cy="-8" rx="7.5" ry="10" fill="#2A348C"/><path d="M -12,14 Q 0,24 12,14" fill="none" stroke="#2A348C" stroke-width="3.5" stroke-linecap="round"/><circle cx="48" cy="-58" r="9" fill="#80E4FF" stroke="#2A348C" stroke-width="3"/><circle cx="62" cy="-38" r="6" fill="#80E4FF" stroke="#2A348C" stroke-width="2.8"/></svg>`)
-        };
-
-        const FOLDER_DEFAULT_FALLBACK = {
-            urinal: FALLBACK_MONSTER_SVGS["urinal_clean"],
-            stall: FALLBACK_MONSTER_SVGS["pee_floor"],
-            consumable: FALLBACK_MONSTER_SVGS["paper_yes"],
-            hardware: FALLBACK_MONSTER_SVGS["mirror_dirty"]
-        };
-
-        async function discoverFolderImagesFromServer(folder) {
-            const cacheKey = `poogle_folder_files_v2_${folder}`;
-            try {
-                const cached = sessionStorage.getItem(cacheKey);
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-                }
-            } catch (e) {}
-
-            const foundFiles = [];
-
-            const host = window.location.hostname || '';
-            const ghOwner = host.endsWith('.github.io') ? host.replace('.github.io', '') : (GITHUB_REPO_FALLBACK.owner || '');
-            if (ghOwner) {
-                try {
-                    const pathParts = window.location.pathname.split('/').filter(Boolean);
-                    const repo = GITHUB_REPO_FALLBACK.repo || (pathParts.length > 0 ? pathParts[0] : `${ghOwner}.github.io`);
-                    const apiUrls = [
-                        `https://api.github.com/repos/${ghOwner}/${repo}/contents/img/${folder}`,
-                        `https://api.github.com/repos/${ghOwner}/${ghOwner}.github.io/contents/img/${folder}`
-                    ];
-                    for (const apiUrl of apiUrls) {
-                        const apiRes = await fetch(apiUrl);
-                        if (apiRes.ok) {
-                            const items = await apiRes.json();
-                            if (Array.isArray(items)) {
-                                items.forEach((item) => {
-                                    if (item && item.type === 'file' && /\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i.test(item.name)) {
-                                        foundFiles.push(item.name);
-                                    }
-                                });
-                                if (foundFiles.length > 0) {
-                                    try { sessionStorage.setItem(cacheKey, JSON.stringify(foundFiles)); } catch (e) {}
-                                    return foundFiles;
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {}
-            }
-
-            try {
-                const res = await fetch(`./img/${folder}/`, { cache: 'no-store' });
-                if (!res.ok) return foundFiles;
-                const contentType = res.headers.get('content-type') || '';
-                if (!contentType.includes('text/html')) return foundFiles;
-                const html = await res.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                doc.querySelectorAll('a').forEach((a) => {
-                    const rawHref = a.getAttribute('href') || '';
-                    if (!rawHref || rawHref.startsWith('?') || rawHref === '../') return;
-                    const decoded = decodeURIComponent(rawHref.split('?')[0]);
-                    const parts = decoded.split('/').filter(Boolean);
-                    const fileName = parts[parts.length - 1] || '';
-                    if (/\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i.test(fileName)) {
-                        foundFiles.push(fileName);
-                    }
-                });
-                if (foundFiles.length > 0) {
-                    try { sessionStorage.setItem(cacheKey, JSON.stringify(foundFiles)); } catch (e) {}
-                }
-            } catch (e) {}
-            return foundFiles;
-        }
+        // 全域保存已預載解碼的 Image 實體，防止瀏覽器 GC 釋放快取造成重新 loading
+        const preloadedMonsterImageCache = new Map();
 
         function createMonsterItem(folder, fileName) {
             const baseName = fileName.replace(/\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i, '');
@@ -2478,52 +2453,46 @@
                 baseName,
                 candidates: Array.from(new Set(candidates)),
                 resolvedUrl: null,
-                isRealFile: false,
-                fallbackSvg: FALLBACK_MONSTER_SVGS[baseName] || FOLDER_DEFAULT_FALLBACK[folder] || FALLBACK_MONSTER_SVGS["urinal_clean"]
+                isRealFile: false
             };
         }
 
         function resolveMonsterImageUrl(monsterObj) {
-            if (monsterObj.resolvedUrl) return Promise.resolve(monsterObj.resolvedUrl);
-            const isPreviewSandbox = (
-                window.location.protocol === 'about:' ||
-                window.location.protocol === 'blob:' ||
-                window.location.protocol === 'data:' ||
-                (window.location.hostname || '').includes('usercontent.goog') ||
-                (window.location.hostname || '').includes('googleusercontent.com')
-            );
-            if (isPreviewSandbox) {
-                monsterObj.resolvedUrl = monsterObj.fallbackSvg;
-                monsterObj.isRealFile = false;
-                return Promise.resolve(monsterObj.fallbackSvg);
+            if (monsterObj.resolvedUrl && preloadedMonsterImageCache.has(monsterObj.resolvedUrl)) {
+                return Promise.resolve(monsterObj.resolvedUrl);
             }
             return new Promise((resolve) => {
                 let idx = 0;
                 let settled = false;
-                const finish = (url, isReal) => {
+                const finish = (url, isReal, imgInstance) => {
                     if (settled) return;
                     settled = true;
                     monsterObj.resolvedUrl = url;
                     monsterObj.isRealFile = isReal;
+                    if (url && imgInstance) {
+                        preloadedMonsterImageCache.set(url, imgInstance);
+                    }
                     resolve(url);
                 };
-
-                const timeoutId = setTimeout(() => {
-                    finish(monsterObj.fallbackSvg, false);
-                }, 2500);
 
                 const tryNext = () => {
                     if (settled) return;
                     if (idx >= monsterObj.candidates.length) {
-                        clearTimeout(timeoutId);
-                        finish(monsterObj.fallbackSvg, false);
+                        finish(null, false, null);
                         return;
                     }
                     const testUrl = monsterObj.candidates[idx++];
                     const probe = new Image();
+                    probe.decoding = 'async';
                     probe.onload = () => {
-                        clearTimeout(timeoutId);
-                        finish(testUrl, true);
+                        // 強制先完成點陣圖解碼，避免放進 SVG 時出現逐行載入過程
+                        if (typeof probe.decode === 'function') {
+                            probe.decode()
+                                .catch(() => {})
+                                .finally(() => finish(testUrl, true, probe));
+                        } else {
+                            finish(testUrl, true, probe);
+                        }
                     };
                     probe.onerror = () => {
                         tryNext();
@@ -2538,6 +2507,39 @@
             if (!imgEl || !url) return;
             imgEl.setAttribute('href', url);
             imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+        }
+
+        // 確保舊圖完全縮小淡出、且新圖材質已提交至 SVG 渲染層後才放大彈出
+        function swapSvgMonsterImageSmoothly(slotGroup, imgEl, nextUrl) {
+            if (!slotGroup || !imgEl || !nextUrl) return;
+            slotGroup.classList.add('is-swapping');
+
+            setTimeout(() => {
+                let revealed = false;
+                const revealNewImage = () => {
+                    if (revealed) return;
+                    revealed = true;
+                    // 等待兩個繪製幀，確保瀏覽器已將新圖片繪入 SVG <image>，徹底消除舊圖閃回
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            slotGroup.classList.remove('is-swapping');
+                        });
+                    });
+                };
+
+                const onSvgImgLoad = () => {
+                    imgEl.removeEventListener('load', onSvgImgLoad);
+                    revealNewImage();
+                };
+                imgEl.addEventListener('load', onSvgImgLoad, { once: true });
+                setSvgImageHref(imgEl, nextUrl);
+
+                // 若瀏覽器因快取同步完成未觸發 SVG load 事件，於 40ms 後平滑接手顯示
+                setTimeout(() => {
+                    imgEl.removeEventListener('load', onSvgImgLoad);
+                    revealNewImage();
+                }, 40);
+            }, 210);
         }
 
         const firebaseConfig = {
@@ -2569,7 +2571,11 @@
             const symbolEl = document.getElementById('youSuoWeiLogoVector');
             const applyUrlToAllLogos = (url) => {
                 document.querySelectorAll('.poogle-logo-img').forEach((el) => {
-                    el.setAttribute('href', url);
+                    if (el.tagName && el.tagName.toLowerCase() === 'img') {
+                        el.src = url;
+                    } else {
+                        el.setAttribute('href', url);
+                    }
                 });
             };
             if (symbolEl) {
@@ -2945,58 +2951,91 @@
 
             async function initAndStartMonsterRotation() {
                 const folders = ['urinal', 'consumable', 'stall', 'hardware'];
-                const folderItemsMap = { urinal: [], consumable: [], stall: [], hardware: [] };
 
-                const initialFallbackKeys = Object.keys(FALLBACK_MONSTER_SVGS);
+                // 初始載入期間先將小怪圖層設為隱藏，不顯示任何暫時性向量圖
                 for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
-                    const fbUrl = FALLBACK_MONSTER_SVGS[initialFallbackKeys[slot % initialFallbackKeys.length]];
-                    setSvgImageHref(document.getElementById(`bubbleMonsterImg_${slot}`), fbUrl);
+                    document.getElementById(`bubbleMonsterSlot_${slot}`)?.classList.add('is-swapping');
                     if (slot < 3) {
-                        setSvgImageHref(document.getElementById(`mobileBubbleMonsterImg_${slot}`), fbUrl);
+                        document.getElementById(`mobileBubbleMonsterSlot_${slot}`)?.classList.add('is-swapping');
                     }
                 }
 
-                await Promise.all(folders.map(async (folder) => {
-                    const discovered = await discoverFolderImagesFromServer(folder);
+                // 建立所有小怪項目清單
+                const allDraftItems = [];
+                folders.forEach((folder) => {
                     const configured = MONSTER_FOLDER_CONFIG[folder] || [];
-                    const mergedNames = Array.from(new Set([...discovered, ...configured]));
+                    configured.forEach((name) => {
+                        allDraftItems.push(createMonsterItem(folder, name));
+                    });
+                });
 
-                    const items = mergedNames.map(name => createMonsterItem(folder, name));
-                    await Promise.all(items.map(m => resolveMonsterImageUrl(m)));
+                const draftDeck = buildBalancedRotationDeck(allDraftItems);
+                const firstSixIndices = draftDeck.slice(0, BUBBLE_COUNT);
+                const firstSixSet = new Set(firstSixIndices);
 
-                    const realItems = items.filter(m => m.isRealFile);
-                    folderItemsMap[folder] = realItems.length > 0 ? realItems : items.slice(0, 2);
-                }));
+                // 1. 優先並行預載並解碼首屏 6 顆泡泡的小怪，讓主頁第一時間完整呈現
+                await Promise.all(firstSixIndices.map(idx => resolveMonsterImageUrl(allDraftItems[idx])));
 
-                monsterPool = [
-                    ...folderItemsMap.urinal,
-                    ...folderItemsMap.consumable,
-                    ...folderItemsMap.stall,
-                    ...folderItemsMap.hardware
-                ];
-                if (monsterPool.length === 0) return;
+                const initialValidMonsters = firstSixIndices
+                    .map(idx => allDraftItems[idx])
+                    .filter(m => m && m.isRealFile && m.resolvedUrl);
 
-                rotationDeck = buildBalancedRotationDeck(monsterPool);
-                for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
-                    const mIdx = rotationDeck[slot % rotationDeck.length];
-                    currentSlotMonsterIdx[slot] = mIdx;
-                    const url = monsterPool[mIdx].resolvedUrl || monsterPool[mIdx].fallbackSvg;
-                    const imgEl = document.getElementById(`bubbleMonsterImg_${slot}`);
-                    if (imgEl) {
-                        setSvgImageHref(imgEl, url);
-                    }
-                    if (slot < 3) {
-                        const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slot}`);
-                        if (mobileImgEl) {
-                            setSvgImageHref(mobileImgEl, url);
+                if (initialValidMonsters.length > 0) {
+                    monsterPool = [...initialValidMonsters];
+                    for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
+                        const mIdx = slot % monsterPool.length;
+                        currentSlotMonsterIdx[slot] = mIdx;
+                        const url = monsterPool[mIdx].resolvedUrl;
+
+                        const slotGroup = document.getElementById(`bubbleMonsterSlot_${slot}`);
+                        const imgEl = document.getElementById(`bubbleMonsterImg_${slot}`);
+                        if (imgEl && slotGroup) {
+                            setSvgImageHref(imgEl, url);
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    slotGroup.classList.remove('is-swapping');
+                                });
+                            });
+                        }
+                        if (slot < 3) {
+                            const mobileSlotGroup = document.getElementById(`mobileBubbleMonsterSlot_${slot}`);
+                            const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slot}`);
+                            if (mobileImgEl && mobileSlotGroup) {
+                                setSvgImageHref(mobileImgEl, url);
+                                requestAnimationFrame(() => {
+                                    requestAnimationFrame(() => {
+                                        mobileSlotGroup.classList.remove('is-swapping');
+                                    });
+                                });
+                            }
                         }
                     }
                 }
-                deckCursor = BUBBLE_COUNT % rotationDeck.length;
 
+                // 2. 背景預載並解碼剩餘所有小怪圖片，完成後自動擴充進輪播池
+                const remainingItems = allDraftItems.filter((_, idx) => !firstSixSet.has(idx));
+                await Promise.all(remainingItems.map(m => resolveMonsterImageUrl(m)));
+
+                const allLoadedMonsters = allDraftItems.filter(m => m.isRealFile && m.resolvedUrl);
+                if (allLoadedMonsters.length > 0) {
+                    monsterPool = allLoadedMonsters;
+                    // 對齊目前場上 6 顆泡泡在新 monsterPool 中的索引
+                    for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
+                        const curImg = document.getElementById(`bubbleMonsterImg_${slot}`);
+                        const curHref = curImg ? curImg.getAttribute('href') : null;
+                        const foundIdx = monsterPool.findIndex(m => m.resolvedUrl === curHref);
+                        if (foundIdx !== -1) currentSlotMonsterIdx[slot] = foundIdx;
+                    }
+                    rotationDeck = buildBalancedRotationDeck(monsterPool);
+                    deckCursor = BUBBLE_COUNT % rotationDeck.length;
+                } else {
+                    return;
+                }
+
+                // 3. 啟動平滑無閃爍的小怪氣泡替換輪播
                 setInterval(() => {
                     const bgGroup = document.getElementById('bubblesGroup');
-                    if (!bgGroup || bgGroup.classList.contains('is-popped')) return;
+                    if (!bgGroup || bgGroup.classList.contains('is-popped') || monsterPool.length === 0) return;
 
                     const slotToSwap = nextRotateBubbleSlot % BUBBLE_COUNT;
                     nextRotateBubbleSlot++;
@@ -3007,25 +3046,22 @@
 
                     const slotGroup = document.getElementById(`bubbleMonsterSlot_${slotToSwap}`);
                     const imgEl = document.getElementById(`bubbleMonsterImg_${slotToSwap}`);
-                    const mobileSlotIdx = slotToSwap % 3;
-                    const mobileSlotGroup = document.getElementById(`mobileBubbleMonsterSlot_${mobileSlotIdx}`);
-                    const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${mobileSlotIdx}`);
-                    if (!slotGroup || !imgEl) return;
+                    if (!slotGroup || !imgEl || slotGroup.classList.contains('is-swapping')) return;
 
                     const nextMonsterIdx = pickNextUniqueMonsterIdx();
+                    const nextUrl = monsterPool[nextMonsterIdx]?.resolvedUrl;
+                    if (!nextUrl) return;
 
-                    slotGroup.classList.add('is-swapping');
-                    if (slotToSwap < 3 && mobileSlotGroup) mobileSlotGroup.classList.add('is-swapping');
-                    setTimeout(() => {
-                        currentSlotMonsterIdx[slotToSwap] = nextMonsterIdx;
-                        const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
-                        setSvgImageHref(imgEl, nextUrl);
-                        slotGroup.classList.remove('is-swapping');
-                        if (slotToSwap < 3 && mobileImgEl && mobileSlotGroup) {
-                            setSvgImageHref(mobileImgEl, nextUrl);
-                            mobileSlotGroup.classList.remove('is-swapping');
+                    currentSlotMonsterIdx[slotToSwap] = nextMonsterIdx;
+                    swapSvgMonsterImageSmoothly(slotGroup, imgEl, nextUrl);
+
+                    if (slotToSwap < 3) {
+                        const mobileSlotGroup = document.getElementById(`mobileBubbleMonsterSlot_${slotToSwap}`);
+                        const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slotToSwap}`);
+                        if (mobileSlotGroup && mobileImgEl) {
+                            swapSvgMonsterImageSmoothly(mobileSlotGroup, mobileImgEl, nextUrl);
                         }
-                    }, 270);
+                    }
                 }, 2400);
             }
 
@@ -3359,11 +3395,13 @@
                         if (monsterPool.length > 0) {
                             const nextMonsterIdx = pickNextUniqueMonsterIdx();
                             currentSlotMonsterIdx[b.slotIndex] = nextMonsterIdx;
+                            const slotGroup = document.getElementById(`bubbleMonsterSlot_${b.slotIndex}`);
                             const imgEl = document.getElementById(`bubbleMonsterImg_${b.slotIndex}`);
-                            if (imgEl) {
-                                const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
+                            const nextUrl = monsterPool[nextMonsterIdx]?.resolvedUrl;
+                            if (imgEl && nextUrl) {
                                 setSvgImageHref(imgEl, nextUrl);
                             }
+                            slotGroup?.classList.remove('is-swapping');
                         }
 
                         b.curDx = 0;
@@ -3404,11 +3442,13 @@
                         if (monsterPool.length > 0) {
                             const nextMonsterIdx = pickNextUniqueMonsterIdx();
                             currentSlotMonsterIdx[slotIdx] = nextMonsterIdx;
-                            const nextUrl = monsterPool[nextMonsterIdx].resolvedUrl || monsterPool[nextMonsterIdx].fallbackSvg;
+                            const nextUrl = monsterPool[nextMonsterIdx]?.resolvedUrl;
                             const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slotIdx}`);
-                            if (mobileImgEl) setSvgImageHref(mobileImgEl, nextUrl);
+                            if (mobileImgEl && nextUrl) setSvgImageHref(mobileImgEl, nextUrl);
                             const desktopImgEl = document.getElementById(`bubbleMonsterImg_${slotIdx}`);
-                            if (desktopImgEl) setSvgImageHref(desktopImgEl, nextUrl);
+                            if (desktopImgEl && nextUrl) setSvgImageHref(desktopImgEl, nextUrl);
+                            document.getElementById(`mobileBubbleMonsterSlot_${slotIdx}`)?.classList.remove('is-swapping');
+                            document.getElementById(`bubbleMonsterSlot_${slotIdx}`)?.classList.remove('is-swapping');
                         }
 
                         mbEl.classList.remove('is-single-popped');
@@ -4334,7 +4374,7 @@
 
                 // 隱藏「距離公廁太遠」畫面並恢復頂部導覽列
                 tooFarFromToiletViewEl?.classList.add('hidden');
-                reportStageTopBarEl?.classList.remove('!hidden');
+                
 
                 // 重置電腦版門盤
                 if (doorWheelRotatingGroupEl) doorWheelRotatingGroupEl.setAttribute('transform', 'rotate(0)');
@@ -4425,6 +4465,7 @@
                     }
                     if (reportStageTopBarEl) {
                         reportStageTopBarEl.classList.remove('is-fading-in');
+                        reportStageTopBarEl.classList.add('md:block');
                         void reportStageTopBarEl.offsetWidth;
                         reportStageTopBarEl.classList.add('is-fading-in');
                     }
@@ -4460,6 +4501,7 @@
 
                 setTimeout(() => {
                     reportFlowStageEl?.classList.add('hidden');
+                    reportStageTopBarEl?.classList.remove('md:block', 'is-fading-in');
                     reportDoorWheelSvgEl?.classList.remove('is-sinking-out');
                     mobileReportDoorWheelSvgEl?.classList.remove('is-sinking-out');
                     resetDoorWheelToStage01();
@@ -4480,7 +4522,6 @@
             };
 
             document.getElementById('reportStageLogoBtn')?.addEventListener('click', handleReturnHomeFromReportStage);
-            document.getElementById('reportStageReturnHomeBtn')?.addEventListener('click', handleReturnHomeFromReportStage);
 
             document.getElementById('openReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
             document.getElementById('mobileOpenReportSystemBtn')?.addEventListener('click', handleOpenLocateModal);
@@ -4499,6 +4540,7 @@
                     topRightNavContainerEl?.classList.add('md:hidden');
                     openAdminPortalBtnEl?.classList.add('hidden');
                     reportFlowStageEl?.classList.remove('hidden');
+                    reportStageTopBarEl?.classList.add('md:block');
                 }
             } catch (e) {}
 
@@ -4644,7 +4686,6 @@
                                     }
                                     syncNearby100mCustomScrollbar();
                                 } else {
-                                    reportStageTopBarEl?.classList.add('!hidden');
                                     tooFarFromToiletViewEl?.classList.remove('hidden');
                                 }
                                 isDoorWheelAnimating = false;
@@ -4853,6 +4894,36 @@
                 e.stopPropagation();
                 closeTpDropdownMenu(false);
                 handleOpenPersonalSpace();
+            });
+
+            // 頂部粉紅 Navbar 選項綁定
+            document.getElementById('desktopNavHomeBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (reportFlowStageEl && !reportFlowStageEl.classList.contains('hidden')) {
+                    handleReturnHomeFromReportStage(e);
+                } else {
+                    playHomeClickSfx();
+                }
+            });
+            document.getElementById('desktopNavReportBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleOpenLocateModal(e);
+            });
+            document.getElementById('desktopNavMapBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleGoMap(e);
+            });
+            document.getElementById('desktopNavStatusBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                openUnderConstruction(e);
+            });
+            document.getElementById('desktopNavDexBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                openUnderConstruction(e);
+            });
+            document.getElementById('desktopNavProfileBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleOpenPersonalSpace(e);
             });
 
             document.addEventListener('pointerdown', (e) => {

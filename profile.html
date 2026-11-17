@@ -4,43 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>有所味 Poogle｜個人空間</title>
-    <script>
-        window.addEventListener('error', function(e) {
-            if (e && e.target && e.target !== window) {
-                if (typeof e.target.onerror === 'function') {
-                    try { e.target.onerror.call(e.target, e); } catch (err) {}
-                }
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                return;
-            }
-            if (e && (!e.error || e.message === 'Script error.' || (e.message && e.message.indexOf('ResizeObserver') !== -1))) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-            }
-        }, true);
-        window.addEventListener('unhandledrejection', function(e) {
-            var isSandbox = (
-                window.location.protocol === 'about:' ||
-                window.location.protocol === 'blob:' ||
-                window.location.protocol === 'data:' ||
-                (window.location.hostname || '').indexOf('usercontent.goog') !== -1 ||
-                (window.location.hostname || '').indexOf('googleusercontent.com') !== -1
-            );
-            if (e && (!e.reason || !e.reason.message || isSandbox)) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-            }
-        }, true);
-    </script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- 預先載入關鍵本機圖片，避免畫面出現圖片替換閃爍 -->
+    <link rel="preload" as="image" href="./img/logo.png">
+    <link rel="preload" as="image" href="./img/pfp/free_toilet.png">
+    <link rel="preload" as="image" href="./img/pfp/free_squat.png">
+    <link rel="preload" as="image" href="./img/pfp/free_urinal.png">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -48,14 +22,14 @@
 
     <style>
         :root {
-            --poogle-cream: #FCF6E8;
-            --poogle-yellow: #FFF57E;
-            --poogle-blue: #72D0FF;
-            --poogle-pink: #FF85D0;
-            --poogle-green: #3CE6B0;
-            --poogle-gray: #D6D6D6;
-            --poogle-navy: #1E2270;
+            --poogle-cream: #FCF5E5;
+            --poogle-navy: #1E2470;
+            --poogle-cyan: #3FE0FF;
+            --poogle-pink: #FF78CB;
+            --poogle-yellow: #F7EC65;
+            --poogle-coral: #FF5A52;
         }
+
         @font-face {
             font-family: 'jf-openhuninn';
             src: local('jf-openhuninn-2.1'),
@@ -66,415 +40,742 @@
                  url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-2.1.ttf') format('truetype');
             font-display: swap;
         }
+
         body {
             font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
             background-color: var(--poogle-cream);
-            color: #18181B;
+            color: var(--poogle-navy);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
-        button, a, input, select, textarea, svg, [role="button"], [tabindex] {
+
+        button, a {
             outline: none !important;
             -webkit-tap-highlight-color: transparent;
         }
-        button:focus, button:focus-visible,
-        a:focus, a:focus-visible,
-        input:focus, input:focus-visible,
-        select:focus, select:focus-visible,
-        [role="button"]:focus, [role="button"]:focus-visible,
-        [tabindex]:focus, [tabindex]:focus-visible {
-            outline: none !important;
-        }
-        .poogle-ellipse-btn {
-            border: 2px solid #1E2270;
-            border-radius: 50%;
-            transition: transform 0.16s ease, background-color 0.16s ease;
-        }
-        .poogle-ellipse-btn:hover {
-            transform: translateY(-2px) scale(1.03);
-        }
-        .poogle-pill-btn {
-            border: 1.8px solid #1E2270;
+
+        /* 頂部深藍膠囊標題 */
+        .section-pill-title {
+            background-color: var(--poogle-navy);
+            color: #FFFFFF;
             border-radius: 9999px;
-            transition: all 0.16s ease;
+            height: 44px;
+            padding: 0 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            white-space: nowrap;
         }
-        .poogle-pill-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-        }
-        .poogle-card {
-            border: 2px solid #1E2270;
-        }
-        /* Custom scrollbar matching map.html */
-        .poogle-scroll::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
-        }
-        .poogle-scroll::-webkit-scrollbar-track {
-            background: #FCF6E8;
+
+        /* 歷史紀錄虛線膠囊列 */
+        .history-dashed-row {
+            border: 2px dashed var(--poogle-cyan);
             border-radius: 9999px;
         }
-        .poogle-scroll::-webkit-scrollbar-thumb {
-            background: #72D0FF;
-            border: 1.5px solid #1E2270;
+
+        /* 功德點數中央垂直圓點虛線 */
+        .merit-dotted-divider {
+            background-image: radial-gradient(circle, var(--poogle-navy) 2.2px, transparent 2.5px);
+            background-position: center;
+            background-size: 6px 14px;
+            background-repeat: repeat-y;
+            width: 6px;
+        }
+
+        /* 歷史紀錄滾動條美化 */
+        .receipt-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .receipt-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .receipt-scroll::-webkit-scrollbar-thumb {
+            background: #3FE0FF;
             border-radius: 9999px;
+        }
+
+        /* 衛生紙捲筒載入展開動畫 */
+        @keyframes unrollSheetClip {
+            0% {
+                clip-path: inset(0 0 148px 0);
+            }
+            100% {
+                clip-path: inset(0 0 0px 0);
+            }
+        }
+
+        @keyframes unrollCylinderDown {
+            0% {
+                transform: translateY(-148px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .toilet-sheet-unroll {
+            animation: unrollSheetClip 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-play-state: paused;
+        }
+
+        .toilet-roll-unroll {
+            animation: unrollCylinderDown 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-play-state: paused;
+        }
+
+        /* 畫面就緒前先保持奶油底色隱藏，圖片就緒後瞬間平滑顯現並啟動動畫 */
+        body.page-cloak {
+            opacity: 0;
+        }
+        body.page-ready {
+            opacity: 1;
+            transition: opacity 0.22s ease-out;
+        }
+        body.page-ready .toilet-sheet-unroll,
+        body.page-ready .toilet-roll-unroll {
+            animation-play-state: running;
+        }
+
+        /* 獎品櫥窗粉紅店員探頭動畫 */
+        .pink-clerk-peek {
+            transform: translateY(78px);
+            transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .pink-clerk-peek.is-peeking {
+            transform: translateY(4px);
+        }
+
+        /* 彈窗開啟過渡動畫 */
+        @keyframes modalPopIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.94);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .poogle-modal-card {
+            animation: modalPopIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* 隱藏導覽列在小螢幕橫向滑動時的捲軸 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
 
-<body class="min-h-screen w-full bg-[#FCF6E8] select-none relative pb-16">
+<body class="page-cloak min-h-screen w-full flex flex-col justify-between select-none relative">
 
     <!-- =================================================================== -->
-    <!-- TOP HEADER: LOGO, LOGOUT & HOME BUTTON                              -->
+    <!-- 頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO                              -->
     <!-- =================================================================== -->
-    <header class="w-full max-w-[1440px] mx-auto pt-7 px-8 sm:px-14 flex items-center justify-between">
-        <div class="flex items-center gap-5 sm:gap-8">
-            <a href="./index.html" id="profileLogoLink" class="group inline-block focus:outline-none" title="回到有所味主頁">
-                <img data-local-src="./img/logo.png"
-                     src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20260%2095%22%3E%3Ctext%20x%3D%2210%22%20y%3D%2265%22%20font-size%3D%2250%22%20font-weight%3D%22bold%22%20fill%3D%22%2372D0FF%22%20stroke%3D%22%231E2270%22%20stroke-width%3D%223%22%3E%E6%9C%89%E6%89%80%E5%91%B3%3C%2Ftext%3E%3C%2Fsvg%3E"
-                     alt="有所味 Logo"
-                     class="w-[130px] sm:w-[165px] h-auto object-contain transition-transform duration-200 group-hover:scale-105" />
-            </a>
-            <button id="headerLogoutBtn" type="button"
-                    class="poogle-pill-btn px-4 py-1.5 bg-white hover:bg-[#FF85D0] text-xs sm:text-sm font-extrabold text-black flex items-center gap-1.5 focus:outline-none mt-1">
-                <i class="fa-solid fa-right-from-bracket text-[#1E2270]"></i>
-                <span>登出</span>
-            </button>
-        </div>
-
-        <a href="./index.html" id="profileHomeBtn"
-           class="poogle-ellipse-btn w-[108px] h-[54px] sm:w-[126px] sm:h-[64px] bg-[#72D0FF] hover:bg-[#5bc6ff] text-black text-base sm:text-[18px] font-bold flex items-center justify-center no-underline shrink-0">
-            主頁
-        </a>
-    </header>
-
-    <!-- =================================================================== -->
-    <!-- MAIN CONTENT CONTAINER                                              -->
-    <!-- =================================================================== -->
-    <main class="w-full max-w-[1180px] mx-auto px-6 sm:px-12 mt-6 sm:mt-8">
-
-        <!-- 1. TOP PROFILE & MERIT POINTS SECTION -->
-        <section class="flex flex-col lg:flex-row items-center lg:items-center justify-center gap-10 lg:gap-14 relative">
-
-            <!-- Left Column: Circular Toilet Avatar & Google Account Info (Read-Only) -->
-            <div class="flex flex-col items-center shrink-0 w-[260px]">
-                <!-- Avatar Circle (No shadow; shows white photo icon on hover during edit mode) -->
-                <div id="profileAvatarBtn"
-                     class="w-[168px] h-[168px] sm:w-[184px] sm:h-[184px] rounded-full border-2 border-[#1E2270] overflow-hidden bg-[#FCF6E8] relative group transition-transform">
-                    <div id="profileAvatarSvgContainer" class="w-full h-full">
-                        <!-- Dynamically rendered PFP image -->
-                    </div>
-                    <!-- Edit Mode Hover Overlay with White Photo Icon -->
-                    <div id="avatarEditHoverOverlay"
-                         class="hidden absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white cursor-pointer">
-                        <i class="fa-regular fa-image text-white text-4xl"></i>
-                    </div>
-                </div>
-
-                <!-- Read-Only Google Account Name & Email (No shadow) -->
-                <div class="mt-4 text-center space-y-1.5 w-full">
-                    <div id="displayUserNameText" class="text-2xl sm:text-[26px] font-extrabold text-black tracking-wide truncate px-2">
-                        載入中...
-                    </div>
-                    <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white border-[1.5px] border-[#1E2270] max-w-full">
-                        <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" aria-hidden="true">
-                            <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
-                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
-                            <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
-                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
-                        </svg>
-                        <span id="displayUserEmailText" class="text-xs sm:text-[13px] font-bold text-neutral-700 truncate">
-                            google@gmail.com
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Yellow Merit Points Card, Edit Profile Button & Tilted Poogle Collectible Card -->
-            <div class="relative flex flex-col items-start w-full max-w-[660px]">
-                <div class="relative w-full flex items-center">
-                    <!-- Yellow Merit Points Box (No shadow) -->
-                    <div class="poogle-card w-full sm:w-[460px] min-h-[162px] sm:min-h-[176px] rounded-[24px] bg-[#FFF57E] px-7 sm:px-10 py-6 flex flex-col justify-center relative overflow-hidden">
-                        <div class="flex flex-wrap items-center gap-2 mb-2.5">
-                            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white border-[1.5px] border-[#1E2270] text-[11px] font-bold text-[#1E2270] w-fit">
-                                <i class="fa-solid fa-wand-magic-sparkles text-[#FF85D0]"></i>
-                                <span>每評鑑 1 間公廁自動 +1 點</span>
-                            </div>
-                            <button id="openTestAdminModalBtn" type="button"
-                                    class="poogle-pill-btn inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FF85D0]/45 hover:bg-[#FF85D0] text-[11px] font-bold text-[#1E2270] focus:outline-none"
-                                    title="測試階段快速歸零或調整點數與回報次數">
-                                <i class="fa-solid fa-sliders"></i>
-                                <span>測試歸零/調整</span>
-                            </button>
-                        </div>
-                        <div class="text-2xl sm:text-[32px] font-extrabold text-black tracking-wide leading-tight flex items-baseline gap-2">
-                            <span>公德點數 :</span>
-                            <span id="meritPointsCount" class="text-[#1E2270] font-black">0</span>
-                        </div>
-                        <div class="text-sm sm:text-[16px] font-bold text-neutral-800 mt-2 tracking-wide flex items-center gap-2">
-                            <span>總回報次數 : <span id="totalReportsCount" class="text-black font-extrabold">0</span> 次</span>
-                        </div>
-                    </div>
-
-                    <!-- Overlapping Tilted Collectible Polaroid Card on the Right (No shadow) -->
-                    <div class="hidden sm:flex flex-col justify-between w-[220px] md:w-[245px] h-[250px] md:h-[275px] bg-white rounded-[20px] border-2 border-[#1E2270] p-4 absolute right-1 md:right-3 -top-8 pointer-events-none"
-                         style="transform: rotate(-10deg);">
-                        <div class="w-full h-[165px] md:h-[185px] rounded-[12px] bg-[#FCF6E8] border-[1.5px] border-[#1E2270] flex flex-col items-center justify-center relative overflow-hidden">
-                            <div class="w-16 h-16 rounded-full bg-[#3CE6B0] border-2 border-[#1E2270] flex items-center justify-center text-2xl text-[#1E2270]">
-                                <i class="fa-solid fa-restroom"></i>
-                            </div>
-                            <span class="mt-2.5 text-xs font-extrabold text-[#1E2270] tracking-wider">公廁探險榮譽證</span>
-                            <span class="px-2.5 py-0.5 mt-1 rounded-full bg-[#FF85D0] border border-[#1E2270] text-[10px] font-bold text-black">POOGLE PASS</span>
-                        </div>
-                        <div class="flex items-center justify-between px-1 pt-2">
-                            <span class="text-[11px] font-extrabold text-neutral-600">有所味實地認證</span>
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#3CE6B0] border border-[#1E2270]"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Edit Profile Controls Row (Below Yellow Box, No shadow, Normal font weight) -->
-                <div class="mt-4 w-full sm:w-[460px] flex items-center justify-center">
-                    <button id="startEditProfileBtn" type="button"
-                            class="poogle-pill-btn w-full max-w-[300px] py-2 bg-[#72D0FF] hover:bg-[#5bc6ff] text-black font-normal text-xs sm:text-sm flex items-center justify-center gap-2 focus:outline-none">
-                        <i class="fa-regular fa-pen-to-square"></i>
-                        <span>編輯個人檔案</span>
-                    </button>
-
-                    <div id="editingActionBtns" class="hidden flex items-center justify-center gap-4 w-full">
-                        <button id="finishEditProfileBtn" type="button"
-                                class="poogle-pill-btn px-7 py-2 bg-[#72D0FF] hover:bg-[#5bc6ff] text-black font-normal text-xs sm:text-sm focus:outline-none">
-                            完成編輯
-                        </button>
-                        <button id="cancelEditProfileBtn" type="button"
-                                class="poogle-pill-btn px-7 py-2 bg-transparent text-black font-normal text-xs sm:text-sm focus:outline-none">
-                            放棄編輯
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- 2. BOTTOM SECTION: REDEMPTION SHOP & HISTORY RECORDS -->
-        <section class="mt-14 sm:mt-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-8 items-stretch">
-
-            <!-- Left Box: 兌換商店 (No shadow) -->
-            <div id="shopCardBox" class="poogle-card relative bg-white rounded-[28px] h-[400px] sm:h-[430px] pt-12 pb-6 px-6 sm:px-9 flex flex-col transition-colors duration-200">
-                <!-- Tilted Corner Label (No shadow) -->
-                <div id="shopCornerTag" class="absolute -top-5 -left-3 sm:-left-5 w-[148px] sm:w-[162px] h-[52px] sm:h-[56px] bg-[#FFF57E] border-2 border-[#1E2270] rounded-2xl flex items-center justify-center gap-1.5 z-10 transition-colors duration-200"
-                     style="transform: rotate(-16deg);">
-                    <i class="fa-solid fa-store text-[#1E2270] text-xs"></i>
-                    <span class="text-xs sm:text-[15px] font-extrabold text-black tracking-wider">兌換商店</span>
-                </div>
-
-                <!-- Scrollable Shop Grid -->
-                <div id="shopContentContainer" class="w-full h-full overflow-y-auto poogle-scroll pt-2 pr-1">
-                    <div id="shopItemsGrid" class="grid grid-cols-2 gap-x-6 gap-y-7 justify-items-center pb-2">
-                        <!-- Dynamically rendered shop items -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Box: 歷史紀錄 (No shadow) -->
-            <div id="historyCardBox" class="poogle-card relative bg-white rounded-[28px] h-[400px] sm:h-[430px] pt-12 pb-6 px-6 sm:px-9 flex flex-col transition-colors duration-200">
-                <!-- Tilted Corner Label (No shadow) -->
-                <div id="historyCornerTag" class="absolute -top-5 -left-3 sm:-left-5 w-[148px] sm:w-[162px] h-[52px] sm:h-[56px] bg-[#72D0FF] border-2 border-[#1E2270] rounded-2xl flex items-center justify-center gap-1.5 z-10 transition-colors duration-200"
-                     style="transform: rotate(-16deg);">
-                    <i class="fa-solid fa-clock-rotate-left text-[#1E2270] text-xs"></i>
-                    <span class="text-xs sm:text-[15px] font-extrabold text-black tracking-wider">歷史紀錄</span>
-                </div>
-
-                <!-- Table Header for Daily Points Breakdown -->
-                <div id="historyTableHeader" class="flex items-center justify-between px-3 pb-2.5 mb-2 border-b-2 border-[#1E2270]/15 text-[11px] sm:text-xs font-extrabold text-neutral-600 shrink-0">
-                    <span>日期</span>
-                    <div class="flex items-center gap-3 sm:gap-5">
-                        <span class="w-12 text-center">獲得</span>
-                        <span class="w-12 text-center">扣除</span>
-                        <span class="w-16 text-right">當日總計</span>
-                    </div>
-                </div>
-
-                <!-- Scrollable History List -->
-                <div id="historyContentContainer" class="w-full flex-1 overflow-y-auto poogle-scroll pt-1 pr-1 space-y-3">
-                    <div class="w-full h-full flex items-center justify-center text-neutral-400 text-sm sm:text-base font-bold">
-                        目前沒有歷史紀錄
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-    </main>
-
-    <!-- =================================================================== -->
-    <!-- MODAL: CHOOSE AVATAR ("你的頭貼")                                   -->
-    <!-- =================================================================== -->
-    <div id="chooseAvatarModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FCF6E8] rounded-[28px] max-w-lg w-full border-2 border-[#1E2270] p-6 sm:p-8 relative text-center space-y-6">
-            <button id="closeChooseAvatarModalBtn" type="button"
-                    class="poogle-pill-btn absolute top-5 right-5 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center focus:outline-none"
-                    aria-label="關閉">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div>
-                <h3 class="text-xl sm:text-2xl font-normal text-black tracking-wide">你的頭貼</h3>
-            </div>
-
-            <div id="avatarOptionsGrid" class="grid grid-cols-3 gap-4 sm:gap-6 pt-1">
-                <!-- Populated dynamically with the 3 free avatars -->
-            </div>
-
-            <div class="pt-2 flex items-center justify-center gap-3">
-                <button id="confirmAvatarSelectBtn" type="button"
-                        class="poogle-pill-btn px-8 py-2.5 bg-[#3CE6B0] hover:bg-[#2fd49f] text-black font-normal text-xs sm:text-sm focus:outline-none">
-                    套用頭貼
-                </button>
-            </div>
-        </div>
+    <header class="w-full relative z-35 mb-6 sm:mb-8 lg:mb-10">
+        <!-- 粉紅導覽列：調整高度與上下間距，使高度貼合文字並保留適當間距 -->
+        <nav class="w-full h-[40px] sm:h-[48px] bg-[#FF85D0] flex items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+    <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+        <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
+        <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+        <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+        <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
+        <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
+        <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
     </div>
-
-    <!-- =================================================================== -->
-    <!-- MODAL: CONFIRM DISCARD EDIT ("確定放棄？")                          -->
-    <!-- =================================================================== -->
-    <div id="discardEditModal" class="hidden fixed inset-0 z-50 bg-black/35 backdrop-blur-[1px] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[24px] sm:rounded-[30px] max-w-[386px] w-full px-6 py-8 sm:px-9 sm:py-10 shadow-2xl flex flex-col items-center justify-center text-center">
-            <div class="space-y-1.5 text-black text-sm sm:text-[17px] font-normal tracking-wide leading-relaxed">
-                <p>確定放棄?</p>
-                <p>您的操作將<span class="underline underline-offset-4 decoration-2">不會</span>被儲存</p>
-            </div>
-            <div class="flex flex-row items-center justify-center gap-4 sm:gap-8 mt-7 sm:mt-9 w-full">
-                <button id="confirmDiscardEditBtn" type="button"
-                        class="w-[120px] sm:w-[136px] h-[36px] sm:h-[42px] rounded-full bg-transparent border-[1.5px] border-[#1E2270] text-black text-xs sm:text-[15px] font-normal flex items-center justify-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_0_#1E2270] focus:outline-none">
-                    放棄更改
-                </button>
-                <button id="continueEditProfileBtn" type="button"
-                        class="w-[120px] sm:w-[136px] h-[36px] sm:h-[42px] rounded-full bg-[#80FF72] hover:bg-[#6ef560] border-[1.5px] border-[#1E2270] text-black text-xs sm:text-[15px] font-normal flex items-center justify-center transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_0_#1E2270] focus:outline-none">
-                    繼續編輯
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- =================================================================== -->
-    <!-- MODAL: REQUIRE GOOGLE LOGIN POPUP (IF ACCESSED LOGGED OUT)          -->
-    <!-- =================================================================== -->
-    <div id="requireLoginModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FCF6E8] rounded-[28px] max-w-sm w-full border-2 border-[#1E2270] p-6 text-center space-y-4">
-            <div class="w-14 h-14 rounded-full bg-[#72D0FF] border-2 border-[#1E2270] mx-auto flex items-center justify-center text-xl text-[#1E2270]">
-                <i class="fa-solid fa-user-lock"></i>
-            </div>
-            <h3 class="text-lg font-extrabold text-black">需要登入 Google 帳號</h3>
-            <p class="text-xs sm:text-sm text-neutral-700 leading-relaxed">
-                「個人空間」需要登入 Google 帳號才能使用，請先完成登入！
-            </p>
-            <div class="flex flex-col gap-2.5 pt-1">
-                <button id="profileGoogleLoginBtn" type="button"
-                        class="poogle-pill-btn w-full py-2.5 bg-white hover:bg-neutral-50 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2.5">
-                    <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0" aria-hidden="true">
-                        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
-                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
-                        <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
-                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
-                    </svg>
-                    <span>使用 Google 帳號登入</span>
-                </button>
-                <button id="profilePreviewGuestBtn" type="button"
-                        class="poogle-pill-btn w-full py-2 rounded-full bg-[#FFF57E] hover:bg-[#f7eb5e] text-black font-extrabold text-xs sm:text-sm">
-                    預覽測試個人空間（免登入體驗）
-                </button>
-                <a href="./index.html"
-                   class="poogle-pill-btn w-full py-2 rounded-full bg-[#D6D6D6] text-black font-bold text-xs sm:text-sm no-underline">
-                    返回主頁
+</nav>
+        <!-- 左上角 LOGO（允許超出導覽列高度，自然覆蓋於上方） -->
+        <div class="absolute inset-x-0 top-0 pointer-events-none z-40">
+            <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
+                <a href="./index.html" class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味主頁">
+                    <img id="profileLogoImg"
+                         data-local-src="./img/logo.png"
+                         src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20280%20110%22%3E%3Cg%20stroke%3D%22%231E2470%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M26%2C58%20C14%2C48%2018%2C26%2038%2C24%20C48%2C10%2076%2C12%2084%2C26%20C98%2C12%20130%2C8%20144%2C26%20C160%2C14%20188%2C18%20196%2C34%20C214%2C20%20248%2C24%20256%2C46%20C270%2C58%20266%2C86%20246%2C92%20C232%2C98%20208%2C96%20194%2C88%20C178%2C98%20148%2C98%20134%2C88%20C118%2C98%2092%2C98%2078%2C88%20C58%2C98%2028%2C94%2022%2C74%20Z%22%20fill%3D%22%23FFFFFF%22%20stroke-width%3D%223.5%22%2F%3E%3Ctext%20x%3D%2230%22%20y%3D%2276%22%20font-family%3D%22sans-serif%22%20font-size%3D%2256%22%20font-weight%3D%22900%22%20fill%3D%22%2380D8FF%22%20stroke%3D%22%231E2470%22%20stroke-width%3D%223%22%20letter-spacing%3D%224%22%3E%E6%9C%89%E6%89%80%E5%91%B3%3C%2Ftext%3E%3C%2Fsvg%3E"
+                         alt="有所味 Logo"
+                         class="w-[150px] sm:w-[195px] h-auto object-contain" />
                 </a>
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- =================================================================== -->
-    <!-- MODAL: CONFIRM SHOP REDEMPTION                                      -->
+    <!-- 上半部：使用者稱號、頭貼、Lv.1 徽章、變更頭貼按鈕、升級提示         -->
     <!-- =================================================================== -->
-    <div id="redeemConfirmModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FCF6E8] rounded-[28px] max-w-sm w-full border-2 border-[#1E2270] p-6 text-center space-y-4">
-            <div class="w-14 h-14 rounded-full bg-[#FFF57E] border-2 border-[#1E2270] mx-auto flex items-center justify-center text-xl text-[#1E2270]">
-                <i class="fa-solid fa-gift"></i>
+    <section class="w-full max-w-[1280px] mx-auto px-4 pt-10 sm:pt-12 lg:pt-4 flex flex-col items-center text-center clear-both">
+        <!-- 使用者名稱與稱號 (字距縮小 1/3) -->
+        <h1 class="text-2xl sm:text-[33px] font-extrabold text-[#1E2470] tracking-[0.093em] leading-snug">
+            <span id="displayUserNameText">OOO</span>，<span id="displayUserTitleText">探廁小白</span>
+        </h1>
+
+        <!-- 圓形馬桶頭貼 + 右下角 Lv.1 徽章 -->
+        <div class="relative mt-5 w-[172px] h-[172px] sm:w-[186px] sm:h-[186px]">
+            <div id="profileAvatarContainer" class="w-full h-full rounded-full border-[2.2px] border-[#1E2470] overflow-hidden bg-[#F7EC65] flex items-center justify-center">
+                <img id="profileAvatarImg"
+                     src="./img/pfp/free_toilet.png"
+                     data-local-src="./img/pfp/free_toilet.png"
+                     alt="個人頭貼"
+                     class="w-full h-full object-cover block" />
+                <!-- 內建頭貼 SVG 容器（預設隱藏，僅在無圖檔環境作為最終備援） -->
+                <div id="profileAvatarFallbackSvg" class="w-full h-full hidden"></div>
             </div>
-            <h3 id="redeemModalTitle" class="text-lg font-extrabold text-black">確認兌換獎勵？</h3>
-            <p id="redeemModalDesc" class="text-xs sm:text-sm text-neutral-700 leading-relaxed"></p>
-            <div class="flex items-center justify-center gap-3 pt-2">
-                <button id="cancelRedeemBtn" type="button"
-                        class="poogle-pill-btn flex-1 py-2.5 bg-[#D6D6D6] hover:bg-[#c4c4c4] text-black font-extrabold text-xs sm:text-sm">
-                    取消
-                </button>
-                <button id="confirmRedeemBtn" type="button"
-                        class="poogle-pill-btn flex-1 py-2.5 bg-[#3CE6B0] hover:bg-[#2fd49f] text-black font-extrabold text-xs sm:text-sm">
-                    確認兌換
-                </button>
+
+            <!-- Lv. 深藍圓章 -->
+            <div id="displayUserLevelBadge" class="absolute bottom-1 right-0 w-[44px] h-[44px] rounded-full bg-[#1E2470] text-[#FCF5E5] flex items-center justify-center text-sm font-extrabold tracking-tight">
+                Lv.1
             </div>
         </div>
-    </div>
+
+        <!-- 變更頭貼按鈕 (縮小 1/3 並改為細體字) -->
+        <button id="openChangeAvatarModalBtn"
+                type="button"
+                class="mt-4 w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-transparent hover:bg-[#1E2470]/5 text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+            變更頭貼
+        </button>
+
+        <!-- 稱號進度提示文字 (文字變細 1 級) -->
+        <p id="levelProgressHint" class="mt-4 text-[#1E2470] font-medium tracking-[0.12em] text-sm sm:text-[16px]">
+            再評論<span id="reportsToNextLevelCount">4</span>間，即可獲得<span id="nextLevelTitleText" class="text-base sm:text-[21px] font-bold mx-0.5">「推門試探者」</span>稱號
+        </p>
+    </section>
 
     <!-- =================================================================== -->
-    <!-- MODAL: TEST STAGE RESET / ADJUST POINTS & REPORTS                   -->
+    <!-- 下半部三大區塊：兌換商店 ｜ 歷史紀錄 ｜ 我的功德點數                 -->
     <!-- =================================================================== -->
-    <div id="testAdminModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FCF6E8] rounded-[28px] max-w-md w-full border-2 border-[#1E2270] p-6 sm:p-7 relative space-y-4">
-            <button id="closeTestAdminModalBtn" type="button"
-                    class="poogle-pill-btn absolute top-5 right-5 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center focus:outline-none">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+    <main class="w-full max-w-[1340px] mx-auto px-6 sm:px-12 mt-10 lg:mt-12 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-10 items-end">
 
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-full bg-[#FF85D0] border-2 border-[#1E2270] flex items-center justify-center text-[#1E2270] text-base shrink-0">
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
+            <!-- =========================================================== -->
+            <!-- 1. 左欄：兌換商店 (依據 個人空間配件-17.svg & 18.svg)         -->
+            <!-- =========================================================== -->
+            <div class="relative w-full max-w-[360px] mx-auto flex flex-col items-center">
+                <!-- 頂部膠囊標題 (純展示不可點擊) -->
+                <div class="section-pill-title relative z-20 -mb-[22px] cursor-default select-none pointer-events-none">
+                    兌換商店
                 </div>
-                <div>
-                    <h3 class="text-base sm:text-lg font-extrabold text-black">測試用：點數與回報數後台同步控制</h3>
-                    <p class="text-[11px] text-neutral-600">此處修改會直接同步寫入 Firebase 的 <code>user_profiles</code> 集合</p>
-                </div>
-            </div>
 
-            <div class="p-4 rounded-2xl bg-white border-[1.5px] border-[#1E2270] space-y-3">
-                <div class="flex items-center justify-between gap-3">
-                    <label for="testInputMeritPoints" class="text-xs sm:text-sm font-extrabold text-black">設定公德點數：</label>
-                    <input id="testInputMeritPoints" type="number" min="0" max="9999" value="0"
-                           class="w-28 px-3 py-1.5 rounded-xl bg-[#FCF6E8] border-[1.5px] border-[#1E2270] text-sm font-black text-center focus:outline-none" />
-                </div>
-                <div class="flex items-center justify-between gap-3">
-                    <label for="testInputTotalReports" class="text-xs sm:text-sm font-extrabold text-black">設定總回報次數：</label>
-                    <input id="testInputTotalReports" type="number" min="0" max="9999" value="0"
-                           class="w-28 px-3 py-1.5 rounded-xl bg-[#FCF6E8] border-[1.5px] border-[#1E2270] text-sm font-black text-center focus:outline-none" />
-                </div>
-                <div class="pt-1 flex items-center gap-2">
-                    <button id="applyCustomCountsBtn" type="button"
-                            class="poogle-pill-btn w-full py-2 bg-[#72D0FF] hover:bg-[#5bc6ff] text-black font-extrabold text-xs sm:text-sm">
-                        套用自訂數值（同步至後台）
+                <!-- 商店本體 (對應 個人空間配件-17.svg，底部貼齊下緣) -->
+                <div class="w-full h-[320px] relative select-none">
+                    <svg viewBox="0 0 320 300" preserveAspectRatio="none" class="w-full h-full block">
+                        <defs>
+                            <!-- 左側獎品櫥窗裁切範圍，底部貼齊 y=268 黃色檯面上緣 -->
+                            <clipPath id="leftPrizeWindowClip">
+                                <rect x="36" y="186" width="82.67" height="82" />
+                            </clipPath>
+                            <clipPath id="pinkClerkLeftEyeClip">
+                                <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
+                            <clipPath id="pinkClerkRightEyeClip">
+                                <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
+                            <clipPath id="clerkLeftEyeClip">
+                                <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
+                            <clipPath id="clerkRightEyeClip">
+                                <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
+                        </defs>
+
+                        <!-- 商店米色主牆面 (底部貼齊，無底邊框或貼底) -->
+                        <path d="M 3 300 L 3 3 L 317 3 L 317 300"
+                              fill="#FCF5E5"
+                              stroke="#1E2470"
+                              stroke-width="2.2"
+                              stroke-linejoin="round" />
+
+                        <!-- 四格圓弧遮雨棚 (藍、粉、藍、粉) -->
+                        <path d="M 3 3 H 81.5 V 112 A 39.25 39.25 0 0 1 3 112 Z"
+                              fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                        <path d="M 81.5 3 H 160 V 112 A 39.25 39.25 0 0 1 81.5 112 Z"
+                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                        <path d="M 160 3 H 238.5 V 112 A 39.25 39.25 0 0 1 160 112 Z"
+                              fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                        <path d="M 238.5 3 H 317 V 112 A 39.25 39.25 0 0 1 238.5 112 Z"
+                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+
+                        <!-- 三格白色櫥窗底色 -->
+                        <rect x="36" y="186" width="82.67" height="82" fill="#FFFFFF" />
+                        <rect x="118.67" y="186" width="82.66" height="82" fill="#FFFFFF" />
+                        <rect x="201.33" y="186" width="82.67" height="82" fill="#FFFFFF" />
+
+                        <!-- 左側獎品櫥窗內的粉紅店員 (Hover 時柔和上升，底部延伸至檯面後不露切口) -->
+                        <g clip-path="url(#leftPrizeWindowClip)">
+                            <g id="pinkClerkGroup" transform="translate(48.3, 198)">
+                                <g id="pinkClerkPeekInner" class="pink-clerk-peek">
+                                    <!-- 無邊框粉紅色圓頭與向下延伸的梯形身體 -->
+                                    <circle cx="29" cy="27" r="21.5" fill="#FF78CB" />
+                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#FF78CB" />
+                                    <!-- 雙眼米白眼白 -->
+                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <!-- 深藍大眼珠 -->
+                                    <g clip-path="url(#pinkClerkLeftEyeClip)">
+                                        <ellipse id="pinkClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                    </g>
+                                    <g clip-path="url(#pinkClerkRightEyeClip)">
+                                        <ellipse id="pinkClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                    </g>
+                                    <!-- 粗深藍上眼瞼弧線 -->
+                                    <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
+                                          fill="none"
+                                          stroke="#1E2470"
+                                          stroke-width="2.8"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round" />
+                                </g>
+                            </g>
+                        </g>
+
+                        <!-- 中間櫥窗內的藍色小店員 (對應 個人空間配件-18.svg，眼睛支援游標追蹤) -->
+                        <g id="shopClerkGroup" transform="translate(131, 198)">
+                            <!-- 無邊框水藍色圓頭與梯形身體 -->
+                            <circle cx="29" cy="27" r="21.5" fill="#3FE0FF" />
+                            <path d="M 13 40 L 7 69 L 51 69 L 45 40 Z" fill="#3FE0FF" />
+                            <!-- 雙眼米白眼白 (相連) -->
+                            <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                            <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                            <!-- 深藍大眼珠 (跟隨游標移動) -->
+                            <g clip-path="url(#clerkLeftEyeClip)">
+                                <ellipse id="clerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                            </g>
+                            <g clip-path="url(#clerkRightEyeClip)">
+                                <ellipse id="clerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                            </g>
+                            <!-- 粗深藍上眼瞼弧線 -->
+                            <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
+                                  fill="none"
+                                  stroke="#1E2470"
+                                  stroke-width="2.8"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round" />
+                        </g>
+
+                        <!-- 三格白色櫥窗外框線 -->
+                        <rect x="36" y="186" width="82.67" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
+                        <rect x="118.67" y="186" width="82.66" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
+                        <rect x="201.33" y="186" width="82.67" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
+
+                        <!-- 櫥窗底部黃色凸出檯面 -->
+                        <rect x="30" y="268" width="260" height="19" fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                    </svg>
+
+                    <!-- 櫥窗上方的三個分類按鈕：獎品 / 規則 / 稱號 -->
+                    <div class="absolute left-[11.25%] right-[11.25%] top-[53%] grid grid-cols-3 text-center z-10">
+                        <button id="prizeLabelBtn" type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                            獎品
+                        </button>
+                        <button type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                            規則
+                        </button>
+                        <button type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                            稱號
+                        </button>
+                    </div>
+
+                    <!-- 左側「獎品窗戶」透明點擊與 Hover 感應區 (涵蓋「獎品」文字與左側櫥窗) -->
+                    <button id="prizeWindowHitBtn"
+                            type="button"
+                            aria-label="開啟獎品專區"
+                            class="absolute left-[11.25%] top-[52%] w-[25.85%] h-[37.5%] z-20 bg-transparent cursor-pointer focus:outline-none">
                     </button>
                 </div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-[#FFF57E]/65 border-[1.5px] border-[#1E2270] space-y-2.5">
-                <div class="text-xs font-extrabold text-[#1E2270]">快速歸零選項（測試常用）</div>
-                <button id="quickZeroCountsOnlyBtn" type="button"
-                        class="poogle-pill-btn w-full py-2 bg-white hover:bg-neutral-100 text-black font-extrabold text-xs sm:text-sm">
-                    <i class="fa-solid fa-rotate-left mr-1"></i>將「公德點數」與「總回報次數」歸 0
-                </button>
-                <button id="quickZeroAndDeleteHistoryBtn" type="button"
-                        class="poogle-pill-btn w-full py-2 bg-[#FF85D0] hover:bg-[#ff6ec7] text-black font-extrabold text-xs sm:text-sm">
-                    <i class="fa-solid fa-trash-can mr-1"></i>完整歸 0（同時清空此帳號的歷史紀錄與測試評論）
-                </button>
+            <!-- =========================================================== -->
+            <!-- 2. 中欄：歷史紀錄 (依據 個人空間配件-16, 15, 14.svg)          -->
+            <!-- =========================================================== -->
+            <div class="relative w-full max-w-[390px] mx-auto flex flex-col items-center">
+                <!-- 頂部膠囊標題 (對齊衛生紙張中心，純展示不可點擊) -->
+                <div class="w-full pl-[8%] flex justify-center relative z-20 -mb-[24px]">
+                    <div class="section-pill-title cursor-default select-none pointer-events-none">
+                        歷史紀錄
+                    </div>
+                </div>
+
+                <!-- 衛生紙捲筒主體容器 (對應 個人空間配件-16.svg) -->
+                <div class="w-full h-[322px] relative">
+                    <!-- 個人空間配件-16.svg：捲筒衛生紙 (載入時往下捲動展開，最終滾筒一半超出畫面底部) -->
+                    <svg viewBox="0 0 360 282" preserveAspectRatio="none" class="w-full h-full absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                        <!-- 上方鋸齒狀衛生紙張 (隨滾筒向下拉出展開) -->
+                        <g class="toilet-sheet-unroll">
+                            <path d="M 35 282
+                                     L 35 16
+                                     L 46.14 4 L 57.28 16 L 68.42 4 L 79.57 16 L 90.71 4 L 101.85 16 L 113 4 L 124.14 16 L 135.28 4 L 146.42 16 L 157.57 4 L 168.71 16 L 179.85 4 L 191 16 L 202.14 4 L 213.28 16 L 224.42 4 L 235.57 16 L 246.71 4 L 257.85 16 L 269 4 L 280.14 16 L 291.28 4 L 302.42 16 L 313.57 4 L 324.71 16 L 335.85 4 L 347 16
+                                     L 347 282 Z"
+                                  fill="#FFFFFF"
+                                  stroke="#1E2470"
+                                  stroke-width="2.2"
+                                  stroke-linejoin="round" />
+                        </g>
+
+                        <!-- 下方立體衛生紙滾筒群組 (載入時往下滾動，停在 y=282 底部剛好露出上半部一半) -->
+                        <g class="toilet-roll-unroll">
+                            <!-- 滾筒白色主體 (中心位於 y=282，上下半徑 86，剛好一半超出畫面下緣) -->
+                            <path d="M 305 196
+                                     L 46 196
+                                     A 42 86 0 0 0 46 368
+                                     L 305 368 Z"
+                                  fill="#FFFFFF"
+                                  stroke="#1E2470"
+                                  stroke-width="2.2"
+                                  stroke-linejoin="round" />
+
+                            <!-- 滾筒右側米色橢圓截面 (中心 y=282 貼齊畫面下緣，呈現正半圓) -->
+                            <ellipse cx="305" cy="282" rx="42" ry="86"
+                                     fill="#FCF5E5"
+                                     stroke="#1E2470"
+                                     stroke-width="2.2" />
+
+                            <!-- 滾筒內部黃色紙軸心 (中心 y=282 貼齊畫面下緣，露出上半部軸心) -->
+                            <ellipse cx="308" cy="282" rx="9" ry="18"
+                                     fill="#F7EC65"
+                                     stroke="#1E2470"
+                                     stroke-width="2.2" />
+                        </g>
+                    </svg>
+
+                    <!-- 右側藍色放大鏡 (對應 個人空間配件-15.svg：內外圓心精準對齊於 (38, 38)) -->
+                    <div class="absolute -right-8 top-[32px] w-[78px] h-[78px] z-20 pointer-events-none">
+                        <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
+                            <path fill-rule="evenodd"
+                                  d="M 65.86 55.68
+                                     L 86.2 76.02
+                                     A 7.2 7.2 0 0 1 76.02 86.2
+                                     L 55.68 65.86
+                                     A 33 33 0 1 1 65.86 55.68 Z
+                                     M 38 17.5
+                                     A 20.5 20.5 0 1 0 38 58.5
+                                     A 20.5 20.5 0 1 0 38 17.5 Z"
+                                  fill="#3FE0FF"
+                                  stroke="#1E2470"
+                                  stroke-width="2.4"
+                                  stroke-linejoin="round" />
+                        </svg>
+                    </div>
+
+                    <!-- 收據內容區 (隨衛生紙向下展開同步顯現) -->
+                    <div class="toilet-sheet-unroll relative z-10 pl-[13%] pr-[7%] pt-10 flex flex-col gap-2.5 h-[192px] overflow-hidden">
+                        <!-- 表格標題 -->
+                        <div class="grid grid-cols-4 text-center text-[#1E2470] font-extrabold text-sm sm:text-[15px] tracking-widest px-2 shrink-0">
+                            <span>日期</span>
+                            <span>獲得</span>
+                            <span>扣除</span>
+                            <span>剩餘</span>
+                        </div>
+
+                        <!-- 動態歷史紀錄列表容器 -->
+                        <div id="historyListContainer" class="flex flex-col gap-2.5 overflow-y-auto receipt-scroll pr-0.5 pb-1 max-h-[115px]">
+                            <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                                載入紀錄中...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 左下角戴眼鏡的粉紅便便角色 (隨衛生紙捲筒一同向下滾動到位) -->
+                    <div class="toilet-roll-unroll absolute -left-2 bottom-[22px] w-[106px] h-[102px] z-20 pointer-events-none">
+                        <div class="w-full h-full" style="transform: rotate(-8deg);">
+                            <svg viewBox="0 0 150 145" class="w-full h-full overflow-visible">
+                                <!-- 粉紅便便身體 (頂部尖角與雙層圓弧) -->
+                                <path d="M 72 12
+                                         C 75 18, 79 25, 83 27
+                                         C 101 28, 111 41, 109 57
+                                         C 127 63, 137 79, 136 98
+                                         C 135 120, 112 134, 74 134
+                                         C 36 134, 10 120, 9 98
+                                         C 8 79, 20 63, 36 57
+                                         C 34 41, 44 28, 62 27
+                                         C 66 25, 69 18, 72 12 Z"
+                                      fill="#FF78CB"
+                                      stroke="#1E2470"
+                                      stroke-width="2.6"
+                                      stroke-linejoin="round" />
+
+                                <!-- 米白眼白 (無邊框，微露於鏡框上方) -->
+                                <ellipse cx="56" cy="64" rx="14" ry="15" fill="#FCF5E5" />
+                                <ellipse cx="86" cy="64" rx="14" ry="15" fill="#FCF5E5" />
+
+                                <!-- 深藍大眼珠 -->
+                                <ellipse cx="55" cy="64" rx="9.5" ry="11.5" fill="#1E2470" />
+                                <ellipse cx="87" cy="64" rx="9.5" ry="11.5" fill="#1E2470" />
+
+                                <!-- 深藍圓框眼鏡與左右鏡腳 -->
+                                <ellipse cx="55" cy="67" rx="16.5" ry="12" transform="rotate(4 55 67)"
+                                         fill="none" stroke="#1E2470" stroke-width="3.2" />
+                                <ellipse cx="88" cy="67" rx="16.5" ry="12" transform="rotate(-4 88 67)"
+                                         fill="none" stroke="#1E2470" stroke-width="3.2" />
+                                <line x1="42" y1="60" x2="29" y2="56" stroke="#1E2470" stroke-width="3.2" stroke-linecap="round" />
+                                <line x1="101" y1="60" x2="115" y2="56" stroke="#1E2470" stroke-width="3.2" stroke-linecap="round" />
+
+                                <!-- 吐出的紅舌頭與微彎嘴型 -->
+                                <path d="M 78 83 C 77 93, 87 94, 90 85 Z"
+                                      fill="#FF5A52" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <path d="M 52 85 Q 72 80 92 85"
+                                      fill="none" stroke="#1E2470" stroke-width="2.4" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================== -->
+            <!-- 3. 右欄：我的功德點數                                       -->
+            <!-- =========================================================== -->
+            <div class="relative w-full max-w-[360px] mx-auto flex flex-col items-center">
+                <!-- 頂部膠囊標題 (純展示不可點擊) -->
+                <div class="section-pill-title relative z-20 -mb-[22px] cursor-default select-none pointer-events-none">
+                    我的功德點數
+                </div>
+
+                <!-- 功德點數外框 (米色背景、中間垂直虛線分隔、底部貼齊下緣) -->
+                <div class="w-full h-[320px] bg-[#FCF5E5] border-t-[2.4px] border-x-[2.4px] border-[#1E2470] grid grid-cols-[1fr_auto_1fr] items-stretch pt-8 pb-6 px-3">
+
+                    <!-- 左半欄：功德點數 (0快速上升動畫) + 已回報次數 -->
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-[132px] h-[132px] rounded-full bg-[#3FE0FF] flex items-center justify-center relative">
+                            <div class="flex items-baseline text-[#1E2470] leading-none">
+                                <span id="meritPointsCount" class="text-[56px] sm:text-[64px] font-black tracking-tighter">0</span>
+                                <span class="text-base font-extrabold ml-0.5">點</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 text-[#1E2470] text-base sm:text-[17px] font-extrabold tracking-widest">
+                            已回報<span id="totalReportsCount">0</span>次
+                        </div>
+                    </div>
+
+                    <!-- 中央垂直圓點虛線 -->
+                    <div class="merit-dotted-divider h-full my-1"></div>
+
+                    <!-- 右半欄：動態顯示最接近可兌換的獎品 Icon 與差距點數 -->
+                    <div class="flex flex-col items-center justify-center text-center px-2">
+                        <div id="nextPrizeIconContainer" class="w-[132px] h-[132px] flex items-center justify-center">
+                            <!-- 由 JS 根據目前點數動態渲染最接近的獎品 SVG -->
+                        </div>
+                        <div class="mt-3 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-widest leading-relaxed">
+                            <p id="nextPrizeDiffText">您還差5點</p>
+                            <p id="nextPrizeNameText" class="mt-1">可兌換所味紙巾</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- POPUP 1: 兌換商店 - 獎品專區 (放大 1/4，內部項目暫無功能)            -->
+    <!-- =================================================================== -->
+    <div id="prizeShopModal" class="hidden fixed inset-0 z-50 bg-black/55 flex items-center justify-center p-4">
+        <div class="poogle-modal-card relative w-full max-w-[568px] bg-white rounded-[38px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-10 pb-8 px-6 sm:px-11">
+            <!-- 頂部置中深藍膠囊標題 -->
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap">
+                兌換商店
+            </div>
+
+            <!-- 右上角深藍圓形關閉按鈕 -->
+            <button id="closePrizeShopModalBtn"
+                    type="button"
+                    aria-label="關閉兌換商店"
+                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <!-- 副標題：獎品專區 -->
+            <h2 class="text-center text-[#1E2470] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
+                獎品專區
+            </h2>
+
+            <!-- 2x2 獎品網格 (純視覺展示，暫無點擊兌換功能) -->
+            <div class="grid grid-cols-2 gap-x-5 sm:gap-x-11 gap-y-5 sm:gap-y-6 justify-items-center">
+
+                <!-- 1. 一滴香 (10點) -->
+                <div class="flex flex-col items-center">
+                    <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
+                        <!-- 點狀水藍外圓環 -->
+                        <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
+                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <!-- 一滴香瓶身插畫 -->
+                            <g transform="translate(0, -6)">
+                                <!-- 黃色長圓蓋 -->
+                                <path d="M 86 48 C 86 34 114 34 114 48 L 114 78 C 114 82 86 82 86 78 Z"
+                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 粉紅瓶身 -->
+                                <path d="M 86 74 C 74 80 66 105 66 120 C 66 138 80 144 100 144 C 120 144 134 138 134 120 C 134 105 126 80 114 74 C 106 78 94 78 86 74 Z"
+                                      fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 中央水滴圖案 -->
+                                <path d="M 100 100 C 96 108 94 113 94 117 A 6 6 0 0 0 106 117 C 106 113 104 108 100 100 Z"
+                                      fill="#2CE5B5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
+                            </g>
+                        </svg>
+                        <!-- 底部水藍點數圓章 -->
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                            10點
+                        </div>
+                    </div>
+                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                        一滴香
+                    </span>
+                </div>
+
+                <!-- 2. 所味紙巾 (5點) -->
+                <div class="flex flex-col items-center">
+                    <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
+                        <!-- 點狀水藍外圓環 -->
+                        <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
+                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <!-- 所味紙巾盒插畫 -->
+                            <g transform="translate(0, -4)">
+                                <!-- 水藍面紙盒 -->
+                                <rect x="50" y="72" width="100" height="54" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 抽出的白色紙巾 -->
+                                <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 抽取口橫線 -->
+                                <line x1="58" y1="98" x2="142" y2="98" stroke="#1E2470" stroke-width="2.2" stroke-linecap="round" />
+                            </g>
+                        </svg>
+                        <!-- 底部水藍點數圓章 -->
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                            5點
+                        </div>
+                    </div>
+                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                        所味紙巾
+                    </span>
+                </div>
+
+                <!-- 3. 所味慕斯 (25點) -->
+                <div class="flex flex-col items-center">
+                    <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
+                        <!-- 點狀水藍外圓環 -->
+                        <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
+                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <!-- 所味慕斯壓瓶插畫 -->
+                            <g transform="translate(0, -4)">
+                                <!-- 黃色壓頭噴嘴 -->
+                                <path d="M 104 49 L 122 49 C 125 49 127 54 127 55 L 104 55 Z"
+                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 黃色壓頭頸部 -->
+                                <path d="M 86 50 C 86 41 110 41 110 50 L 110 68 L 86 68 Z"
+                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 粉紅瓶身 -->
+                                <path d="M 82 66 C 68 74 60 102 60 118 C 60 138 76 146 98 146 C 120 146 136 138 136 118 C 136 102 128 74 114 66 Z"
+                                      fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <!-- 兩顆水藍泡泡 -->
+                                <circle cx="92" cy="104" r="12" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" />
+                                <circle cx="110" cy="118" r="7.5" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" />
+                            </g>
+                        </svg>
+                        <!-- 底部水藍點數圓章 -->
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                            25點
+                        </div>
+                    </div>
+                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                        所味慕斯
+                    </span>
+                </div>
+
+                <!-- 4. 所味吊飾 (50點) -->
+                <div class="flex flex-col items-center">
+                    <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
+                        <!-- 點狀水藍外圓環 -->
+                        <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
+                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <!-- 水藍便便問號吊飾插畫 -->
+                            <g transform="translate(0, -4)">
+                                <path d="M 100 50
+                                         C 103 55, 106 60, 109 61
+                                         C 122 62, 130 71, 128 83
+                                         C 141 88, 148 99, 147 113
+                                         C 146 130, 129 140, 100 140
+                                         C 71 140, 54 130, 53 113
+                                         C 52 99, 59 88, 72 83
+                                         C 70 71, 78 62, 91 61
+                                         C 94 60, 97 55, 100 50 Z"
+                                      fill="#3FE0FF"
+                                      stroke="#1E2470"
+                                      stroke-width="2.2"
+                                      stroke-linejoin="round" />
+                                <text x="100" y="119" text-anchor="middle" fill="#1E2470" font-size="52" font-weight="900">?</text>
+                            </g>
+                        </svg>
+                        <!-- 底部水藍點數圓章 -->
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                            50點
+                        </div>
+                    </div>
+                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                        所味吊飾
+                    </span>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification (No shadow) -->
-    <div id="profileToast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-[#FFF57E] text-black px-4 py-3 rounded-2xl border-2 border-[#1E2270] flex items-center gap-2.5 text-xs sm:text-sm font-bold">
-        <i id="profileToastIcon" class="fa-solid fa-circle-info text-[#1E2270] text-base"></i>
-        <span id="profileToastText">提示訊息</span>
-    </div>
+    <!-- =================================================================== -->
+    <!-- POPUP 2: 變更頭貼 (縮小 1/3，點擊頭貼立即套用且不閃爍備援圖)        -->
+    <!-- =================================================================== -->
+    <div id="changeAvatarModal" class="hidden fixed inset-0 z-50 bg-black/55 flex items-center justify-center p-4">
+        <div class="poogle-modal-card relative w-full max-w-[520px] bg-white rounded-[30px] sm:rounded-[38px] border-[2px] border-[#1E2470] pt-8 pb-8 px-4 sm:px-8">
+            <!-- 頂部置中深藍膠囊標題 -->
+            <div class="absolute -top-[15px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[30px] px-7 flex items-center justify-center text-xs sm:text-[14px] font-extrabold tracking-[0.16em] whitespace-nowrap">
+                變更頭貼
+            </div>
 
+            <!-- 右上角深藍圓形關閉按鈕 -->
+            <button id="closeChangeAvatarModalBtn"
+                    type="button"
+                    aria-label="關閉變更頭貼"
+                    class="absolute -top-2 -right-2 w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                <svg viewBox="0 0 32 32" class="w-4 h-4 sm:w-5 sm:h-5">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <!-- 副標題：你的頭貼 -->
+            <h2 class="text-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
+                你的頭貼
+            </h2>
+
+            <!-- 三款頭貼選擇區 -->
+            <div id="avatarModalOptionsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3.5 items-center justify-items-center">
+                <!-- 由 JS 初始化一次並透過切換狀態更新，避免重繪閃爍 -->
+            </div>
+        </div>
+    </div>
+    <!-- 施工中彈窗 (點擊「公廁現況版 / 小怪圖鑑」時顯示) -->
+    <div id="profileUnderConstructionModal"
+        onclick="if(event.target === this) this.classList.add('hidden')"
+        class="hidden fixed inset-0 z-50 bg-[#1E2470]/45 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-modal-card bg-[#FCF5E5] rounded-[28px] max-w-sm w-full border-2 border-[#1E2470] shadow-[0_8px_0_#1E2470] px-6 py-10 relative flex flex-col items-center justify-center text-center">
+            <button type="button"
+                    aria-label="關閉"
+                    onclick="document.getElementById('profileUnderConstructionModal').classList.add('hidden')"
+                    class="w-9 h-9 rounded-full bg-[#FCF5E5] hover:bg-[#F7EC65] border-[2px] border-[#1E2470] absolute top-4 right-4 flex items-center justify-center cursor-pointer">
+                <svg viewBox="0 0 24 24" class="w-4 h-4">
+                    <path d="M 6 6 L 18 18 M 18 6 L 6 18" stroke="#1E2470" stroke-width="3" stroke-linecap="round" />
+                </svg>
+            </button>
+            <div class="text-2xl sm:text-3xl font-extrabold text-[#1E2470] tracking-wider py-2">
+                ⚠️施工中⚠️
+            </div>
+        </div>
+    </div>
     <script>
+        // ===================================================================
+        // Firebase 初始化與全域狀態
+        // ===================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCfUm1MLY9C3Q3ukfCrvxU5ypjpqCbvU2A",
             authDomain: "toilet-rating-grad-proj.firebaseapp.com",
@@ -498,23 +799,209 @@
             console.warn('Firebase init error:', err);
         }
 
-        // 移除舊版自訂名稱快取，確保名稱與信箱 100% 跟隨 Google 帳戶
-        try {
-            localStorage.removeItem('poogle_custom_profile_v1');
-        } catch (e) {}
-
-        // ===================================================================
-        // 👤 頭貼系統設定 (對應 ./img/pfp/ 內的免費三款頭貼，預設為 free_toilet)
-        // ===================================================================
         const DEFAULT_LOGGED_IN_PFP = 'free_toilet';
         const FREE_LOGGED_IN_PFP_LIST = ['free_toilet', 'free_squat', 'free_urinal'];
+        const resolvedAvatarUrlMap = {};
 
-        const AVATAR_PRESETS = [
-            { id: 'free_toilet', name: '坐式馬桶' },
-            { id: 'free_squat', name: '蹲式馬桶' },
-            { id: 'free_urinal', name: '小便斗' }
+        // ===================================================================
+        // 等級與稱號制度對照表 (依累積回報/評論間數判定)
+        // ===================================================================
+        const LEVEL_TIERS = [
+            { level: 1, min: 0, max: 3, title: '探廁小白' },
+            { level: 2, min: 4, max: 7, title: '推門試探者' },
+            { level: 3, min: 8, max: 16, title: '初級探廁家' },
+            { level: 4, min: 17, max: 25, title: '街頭遊俠' },
+            { level: 5, min: 26, max: 34, title: '巷弄衛生推手' },
+            { level: 6, min: 35, max: 43, title: '乾淨大隊長' },
+            { level: 7, min: 44, max: 52, title: '文明守「味」' },
+            { level: 8, min: 53, max: 61, title: '五星級顧問' },
+            { level: 9, min: 62, max: 70, title: '有所味首席代表' },
+            { level: 10, min: 71, max: Infinity, title: '究極所味之神' }
         ];
 
+        function getLevelProgression(totalReports) {
+            const count = Math.max(0, parseInt(totalReports, 10) || 0);
+            let currentIdx = 0;
+            for (let i = 0; i < LEVEL_TIERS.length; i++) {
+                if (count >= LEVEL_TIERS[i].min && count <= LEVEL_TIERS[i].max) {
+                    currentIdx = i;
+                    break;
+                }
+            }
+            const currentTier = LEVEL_TIERS[currentIdx];
+            const nextTier = currentIdx + 1 < LEVEL_TIERS.length ? LEVEL_TIERS[currentIdx + 1] : null;
+            const remainingToNext = nextTier ? Math.max(1, nextTier.min - count) : 0;
+
+            return {
+                currentTier,
+                nextTier,
+                remainingToNext
+            };
+        }
+
+        function renderUserLevelUI(totalReports) {
+            const { currentTier, nextTier, remainingToNext } = getLevelProgression(totalReports);
+
+            const titleEl = document.getElementById('displayUserTitleText');
+            if (titleEl) {
+                titleEl.textContent = currentTier.title;
+            }
+
+            const badgeEl = document.getElementById('displayUserLevelBadge');
+            if (badgeEl) {
+                badgeEl.textContent = `Lv.${currentTier.level}`;
+            }
+
+            const progressHintEl = document.getElementById('levelProgressHint');
+            if (progressHintEl) {
+                if (nextTier) {
+                    progressHintEl.innerHTML = `再評論<span id="reportsToNextLevelCount">${remainingToNext}</span>間，即可獲得<span id="nextLevelTitleText" class="text-base sm:text-[21px] font-bold mx-0.5">「${escapeHtml(nextTier.title)}」</span>稱號`;
+                } else {
+                    progressHintEl.innerHTML = `已達成最高等級<span class="text-base sm:text-[21px] font-bold mx-0.5">「${escapeHtml(currentTier.title)}」</span>稱號！`;
+                }
+            }
+        }
+
+        // ===================================================================
+        // 最接近可兌換獎品與對應 Icon 渲染邏輯
+        // ===================================================================
+        const PRIZE_ITEMS = [
+            { id: 'prize_tissue', name: '所味紙巾', cost: 5 },
+            { id: 'prize_drop', name: '一滴香', cost: 10 },
+            { id: 'prize_mousse', name: '所味慕斯', cost: 25 },
+            { id: 'prize_charm', name: '所味吊飾', cost: 50 }
+        ];
+
+        function getPrizeSvgMarkup(prizeId) {
+            if (prizeId === 'prize_drop') {
+                return `
+                    <svg viewBox="45 30 110 122" class="w-[108px] h-[108px] overflow-visible">
+                        <path d="M 86 48 C 86 34 114 34 114 48 L 114 78 C 114 82 86 82 86 78 Z"
+                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                        <path d="M 86 74 C 74 80 66 105 66 120 C 66 138 80 144 100 144 C 120 144 134 138 134 120 C 134 105 126 80 114 74 C 106 78 94 78 86 74 Z"
+                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                        <path d="M 100 100 C 96 108 94 113 94 117 A 6 6 0 0 0 106 117 C 106 113 104 108 100 100 Z"
+                              fill="#2CE5B5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                    </svg>
+                `;
+            }
+            if (prizeId === 'prize_mousse') {
+                return `
+                    <svg viewBox="45 35 110 120" class="w-[108px] h-[108px] overflow-visible">
+                        <path d="M 104 49 L 122 49 C 125 49 127 54 127 55 L 104 55 Z"
+                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                        <path d="M 86 50 C 86 41 110 41 110 50 L 110 68 L 86 68 Z"
+                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                        <path d="M 82 66 C 68 74 60 102 60 118 C 60 138 76 146 98 146 C 120 146 136 138 136 118 C 136 102 128 74 114 66 Z"
+                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                        <circle cx="92" cy="104" r="12" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" />
+                        <circle cx="110" cy="118" r="7.5" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" />
+                    </svg>
+                `;
+            }
+            if (prizeId === 'prize_charm') {
+                return `
+                    <svg viewBox="42 40 116 112" class="w-[108px] h-[108px] overflow-visible">
+                        <path d="M 100 50
+                                 C 103 55, 106 60, 109 61
+                                 C 122 62, 130 71, 128 83
+                                 C 141 88, 148 99, 147 113
+                                 C 146 130, 129 140, 100 140
+                                 C 71 140, 54 130, 53 113
+                                 C 52 99, 59 88, 72 83
+                                 C 70 71, 78 62, 91 61
+                                 C 94 60, 97 55, 100 50 Z"
+                              fill="#3FE0FF"
+                              stroke="#1E2470"
+                              stroke-width="2.4"
+                              stroke-linejoin="round" />
+                        <text x="100" y="119" text-anchor="middle" fill="#1E2470" font-size="52" font-weight="900">?</text>
+                    </svg>
+                `;
+            }
+            // 預設：所味紙巾 (5點)
+            return `
+                <svg viewBox="42 48 116 92" class="w-[108px] h-[108px] overflow-visible">
+                    <rect x="50" y="72" width="100" height="54" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                    <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                    <line x1="58" y1="98" x2="142" y2="98" stroke="#1E2470" stroke-width="2.4" stroke-linecap="round" />
+                </svg>
+            `;
+        }
+
+        function renderClosestPrizeUI(currentPoints) {
+            const pts = Math.max(0, parseInt(currentPoints, 10) || 0);
+            // 找出下一個尚未達標、最接近可兌換的獎品；若已達最高獎品門檻則顯示最高獎品
+            let targetPrize = PRIZE_ITEMS.find((item) => item.cost > pts);
+            let diffPoints = 0;
+
+            if (targetPrize) {
+                diffPoints = targetPrize.cost - pts;
+            } else {
+                targetPrize = PRIZE_ITEMS[PRIZE_ITEMS.length - 1];
+                diffPoints = 0;
+            }
+
+            const iconContainer = document.getElementById('nextPrizeIconContainer');
+            const diffTextEl = document.getElementById('nextPrizeDiffText');
+            const nameTextEl = document.getElementById('nextPrizeNameText');
+
+            if (iconContainer && iconContainer.dataset.prizeId !== targetPrize.id) {
+                iconContainer.dataset.prizeId = targetPrize.id;
+                iconContainer.innerHTML = getPrizeSvgMarkup(targetPrize.id);
+            }
+            if (diffTextEl) {
+                diffTextEl.textContent = `您還差${diffPoints}點`;
+            }
+            if (nameTextEl) {
+                nameTextEl.textContent = `可兌換${targetPrize.name}`;
+            }
+        }
+
+        const profileState = {
+            uid: null,
+            displayName: 'OOO',
+            email: '',
+            photoURL: '',
+            avatarType: DEFAULT_LOGGED_IN_PFP,
+            evaluations: [],
+            redemptions: [],
+            profileDoc: null,
+            evalLoaded: false,
+            redeemLoaded: false,
+            profileLoaded: false,
+            currentPoints: 0,
+            totalReports: 0,
+            displayedPoints: 0,
+            pointsAnimFrameId: null,
+            hasAnimatedInitialLoad: false,
+            profileUnsubscribe: null,
+            evalUnsubscribe: null,
+            redeemUnsubscribe: null
+        };
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function isSandboxEnv() {
+            return (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+        }
+
+        // ===================================================================
+        // 頭貼正規化與渲染 (支援 ./img/pfp/*.png 與內建三款馬桶 SVG 備援)
+        // ===================================================================
         function normalizeLoggedInAvatarType(avatarType) {
             const legacyMap = {
                 'red_toilet': 'free_toilet',
@@ -529,65 +1016,138 @@
             return DEFAULT_LOGGED_IN_PFP;
         }
 
-        function getFallbackPfpSvgDataUri() {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104"><circle cx="52" cy="52" r="52" fill="#2A348C"/><path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="#FF99D3"/></svg>`;
-            return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+        function getAvatarFallbackSvgMarkup(avatarKey) {
+            if (avatarKey === 'free_squat') {
+                return `
+                    <svg viewBox="0 0 200 200" class="w-full h-full block">
+                        <!-- 粉紅磁磚透視背景 -->
+                        <rect width="200" height="200" fill="#FF85D0" />
+                        <!-- 後牆格線 -->
+                        <path d="M 35 0 L 35 66 M 68 0 L 68 66 M 100 0 L 100 66 M 132 0 L 132 66 M 165 0 L 165 66" stroke="#1E2470" stroke-width="1.2" />
+                        <path d="M 0 33 L 200 33 M 0 66 L 200 66" stroke="#1E2470" stroke-width="1.2" />
+                        <!-- 地板放射透視格線 -->
+                        <path d="M 35 66 L -15 160 M 68 66 L 25 200 M 100 66 L 100 200 M 132 66 L 175 200 M 165 66 L 215 160" stroke="#1E2470" stroke-width="1.2" />
+                        <path d="M 0 96 L 200 96 M 0 130 L 200 130 M 0 168 L 200 168" stroke="#1E2470" stroke-width="1.2" />
+
+                        <!-- 蹲式馬桶本體外罩 -->
+                        <path d="M 46 146 C 46 92 72 52 100 52 C 128 52 154 92 154 146 C 154 176 132 192 100 192 C 68 192 46 176 46 146 Z"
+                              fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
+                        <!-- 上方淺藍水池凹槽 -->
+                        <path d="M 64 114 C 70 74 84 58 100 58 C 116 58 130 74 136 114 Z"
+                              fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                        <!-- 圓滾滾臉頰主體 -->
+                        <ellipse cx="100" cy="146" rx="54" ry="44" fill="#FCF5E5" stroke="#1E2470" stroke-width="2" />
+
+                        <!-- 大眼睛與眼眶線 -->
+                        <ellipse cx="87" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
+                        <ellipse cx="88" cy="145" rx="7.5" ry="10" fill="#1E2470" />
+                        <ellipse cx="113" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
+                        <ellipse cx="112" cy="145" rx="7.5" ry="10" fill="#1E2470" />
+                        <path d="M 76 156 Q 87 164 98 155 M 102 155 Q 113 164 124 156" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
+
+                        <!-- 微笑嘴巴 -->
+                        <path d="M 92 167 C 92 176 108 176 108 167" fill="none" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" />
+
+                        <!-- 托腮雙手 -->
+                        <path d="M 48 166 C 48 154 60 154 62 162 C 64 155 72 156 73 164 C 75 158 83 160 82 170 L 82 188 C 65 186 52 178 48 166 Z"
+                              fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M 152 166 C 152 154 140 154 138 162 C 136 155 128 156 127 164 C 125 158 117 160 118 170 L 118 188 C 135 186 148 178 152 166 Z"
+                              fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                    </svg>
+                `;
+            }
+            if (avatarKey === 'free_urinal') {
+                return `
+                    <svg viewBox="0 0 200 200" class="w-full h-full block">
+                        <!-- 翠綠磁磚透視背景 -->
+                        <rect width="200" height="200" fill="#3CE6A8" />
+                        <path d="M 42 0 L 10 200 M 78 0 L 62 200 M 122 0 L 138 200 M 158 0 L 190 200" stroke="#1E2470" stroke-width="1.2" />
+                        <path d="M 0 38 L 200 38 M 0 76 L 200 76 M 0 114 L 200 114 M 0 152 L 200 152 M 0 184 L 200 184" stroke="#1E2470" stroke-width="1.2" />
+
+                        <!-- 小便斗本體 -->
+                        <path d="M 60 40 C 60 22 140 22 140 40 L 132 72 C 146 76 150 84 148 102 L 134 166 C 128 186 114 192 100 192 C 86 192 72 186 66 166 L 52 102 C 50 84 54 76 68 72 Z"
+                              fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
+                        <!-- 頂部弧線與感應窗 -->
+                        <path d="M 60 40 Q 100 24 140 40" fill="none" stroke="#1E2470" stroke-width="1.8" />
+                        <rect x="89" y="37" width="22" height="6" rx="2" fill="#1E2470" />
+
+                        <!-- 眼睛與張嘴紅舌表情 -->
+                        <path d="M 82 54 Q 91 50 98 56 M 102 56 Q 109 50 118 54" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
+                        <ellipse cx="91" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
+                        <ellipse cx="92" cy="64" rx="5" ry="6.5" fill="#1E2470" />
+                        <ellipse cx="109" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
+                        <ellipse cx="108" cy="64" rx="5" ry="6.5" fill="#1E2470" />
+                        <path d="M 93 78 Q 100 76 107 78 Q 105 86 100 86 Q 95 86 93 78 Z" fill="#FF5A52" stroke="#1E2470" stroke-width="1.6" stroke-linejoin="round" />
+
+                        <!-- 中央藍色水池區域 -->
+                        <path d="M 68 102 C 68 92 80 92 88 95 Q 100 99 112 95 C 120 92 132 92 132 102 L 124 156 C 120 174 110 180 100 180 C 90 180 80 174 76 156 Z"
+                              fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M 76 150 C 82 166 91 170 100 170 C 109 170 118 166 124 150" fill="none" stroke="#1E2470" stroke-width="1.8" />
+
+                        <!-- 兩側小手扶著邊緣 -->
+                        <path d="M 67 120 C 74 119 75 126 68 128 C 75 128 76 135 69 137 C 76 137 76 144 69 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M 133 120 C 126 119 125 126 132 128 C 125 128 124 135 131 137 C 124 137 124 144 131 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                `;
+            }
+            // 預設坐式馬桶 (free_toilet)
+            return `
+                <svg viewBox="0 0 200 200" class="w-full h-full block">
+                    <defs>
+                        <pattern id="yellowTilePattern" width="25" height="25" patternUnits="userSpaceOnUse">
+                            <rect width="25" height="25" fill="#F7EE7F" />
+                            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
+                        </pattern>
+                    </defs>
+                    <rect width="200" height="200" fill="url(#yellowTilePattern)" />
+                    <path d="M 0 132 L 200 132 M 0 152 L 200 152 M 0 174 L 200 174" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
+                    <path d="M 45 132 L 10 200 M 75 132 L 58 200 M 125 132 L 142 200 M 155 132 L 190 200" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
+                    <ellipse cx="100" cy="54" rx="28" ry="44" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" />
+                    <circle cx="84" cy="40" r="2.5" fill="none" stroke="#1E2470" stroke-width="1.8" />
+                    <circle cx="116" cy="40" r="2.5" fill="none" stroke="#1E2470" stroke-width="1.8" />
+                    <path d="M 74 146 L 68 178 C 68 190 132 190 132 178 L 126 146 Z" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                    <path d="M 86 162 C 92 161 93 167 88 169 C 94 170 93 177 86 176" fill="none" stroke="#1E2470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 114 162 C 108 161 107 167 112 169 C 106 170 107 177 114 176" fill="none" stroke="#1E2470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 48 96 C 48 142 72 158 100 158 C 128 158 152 142 152 96 Z" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                    <ellipse cx="100" cy="95" rx="53" ry="22" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" />
+                    <ellipse cx="100" cy="95" rx="40" ry="14" fill="#7AD9FF" stroke="#1E2470" stroke-width="2" />
+                    <ellipse cx="92" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="2" />
+                    <ellipse cx="93" cy="131" rx="4.2" ry="6" fill="#1E2470" />
+                    <circle cx="91.5" cy="129" r="1.3" fill="#FFFFFF" />
+                    <ellipse cx="108" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="2" />
+                    <ellipse cx="107" cy="131" rx="4.2" ry="6" fill="#1E2470" />
+                    <circle cx="105.5" cy="129" r="1.3" fill="#FFFFFF" />
+                    <path d="M 94 143 Q 100 146 106 143 Q 104 150 100 150 Q 96 150 94 143 Z" fill="#FF5A52" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                </svg>
+            `;
         }
 
-        const profileResolvedAssetCache = new Map();
-        function upgradeProfileLocalImages() {
-            const isPreviewSandbox = (
-                window.location.protocol === 'about:' ||
-                window.location.protocol === 'blob:' ||
-                window.location.protocol === 'data:' ||
-                (window.location.hostname || '').includes('usercontent.goog') ||
-                (window.location.hostname || '').includes('googleusercontent.com')
-            );
-            if (isPreviewSandbox) return;
-            document.querySelectorAll('img[data-local-src]').forEach((imgEl) => {
-                const rawSrc = imgEl.getAttribute('data-local-src');
-                if (!rawSrc || imgEl.dataset.probed === rawSrc) return;
-                imgEl.dataset.probed = rawSrc;
-                if (profileResolvedAssetCache.has(rawSrc)) {
-                    const cached = profileResolvedAssetCache.get(rawSrc);
-                    if (cached) imgEl.src = cached;
-                    return;
-                }
-                const probe = new Image();
-                probe.onload = () => {
-                    profileResolvedAssetCache.set(rawSrc, rawSrc);
-                    imgEl.src = rawSrc;
-                };
-                probe.onerror = () => {
-                    profileResolvedAssetCache.set(rawSrc, null);
-                };
-                probe.src = rawSrc;
-            });
+        // 預先解析並快取三款頭貼圖片路徑，避免切換時出現底層備援頭貼閃爍
+        function preloadSingleAvatarAsset(key) {
+            if (resolvedAvatarUrlMap[key]) return Promise.resolve(resolvedAvatarUrlMap[key]);
+            if (isSandboxEnv()) return Promise.resolve(null);
 
-            document.querySelectorAll('img[data-pfp-key]').forEach((imgEl) => {
-                const cleanKey = imgEl.getAttribute('data-pfp-key');
-                if (!cleanKey || imgEl.dataset.probedKey === cleanKey) return;
-                imgEl.dataset.probedKey = cleanKey;
-                if (profileResolvedAssetCache.has(cleanKey)) {
-                    const cached = profileResolvedAssetCache.get(cleanKey);
-                    if (cached) imgEl.src = cached;
-                    return;
-                }
-                const candidates = [
-                    `./img/pfp/${encodeURIComponent(cleanKey)}.png`,
-                    `./img/pfp/${encodeURIComponent(cleanKey)}.PNG`
-                ];
-                let idx = 0;
+            const candidates = [
+                `./img/pfp/${encodeURIComponent(key)}.png`,
+                `./img/pfp/${encodeURIComponent(key)}.PNG`
+            ];
+            let idx = 0;
+
+            return new Promise((resolve) => {
                 const tryNext = () => {
                     if (idx >= candidates.length) {
-                        profileResolvedAssetCache.set(cleanKey, null);
+                        resolve(null);
                         return;
                     }
                     const testUrl = candidates[idx++];
                     const probe = new Image();
                     probe.onload = () => {
-                        profileResolvedAssetCache.set(cleanKey, testUrl);
-                        imgEl.src = testUrl;
+                        resolvedAvatarUrlMap[key] = testUrl;
+                        if (typeof probe.decode === 'function') {
+                            probe.decode().catch(() => {}).finally(() => resolve(testUrl));
+                        } else {
+                            resolve(testUrl);
+                        }
                     };
                     probe.onerror = () => tryNext();
                     probe.src = testUrl;
@@ -596,94 +1156,224 @@
             });
         }
 
-        function getPoogleAvatarSvg(avatarType, uidSuffix = 'main') {
-            const normalized = normalizeLoggedInAvatarType(avatarType);
-            const cleanKey = String(normalized).replace(/\.(png|PNG|jpg|JPG|svg|SVG|webp|WEBP)$/i, '');
-            const initialSrc = profileResolvedAssetCache.get(cleanKey) || getFallbackPfpSvgDataUri();
-            setTimeout(upgradeProfileLocalImages, 0);
-            return `<img src="${initialSrc}" data-pfp-key="${escapeHtml(cleanKey)}" alt="${escapeHtml(cleanKey)}" class="w-full h-full object-cover block rounded-full" />`;
+        function preloadAllFreeAvatars() {
+            return Promise.allSettled(FREE_LOGGED_IN_PFP_LIST.map((k) => preloadSingleAvatarAsset(k)));
         }
 
-        const SHOP_ITEMS = [
-            { id: 'bg_royal_gold', type: 'background', name: '【背景】皇家金殿', cost: 1, icon: 'fa-crown', color: '#FFE066', previewBg: '#FFF9DB', previewLine: '#B87D00' },
-            { id: 'bg_matcha_zen', type: 'background', name: '【背景】宇治抹茶', cost: 2, icon: 'fa-leaf', color: '#C7E8B5', previewBg: '#EFF7EC', previewLine: '#5C8D3E' },
-            { id: 'bg_lavender_night', type: 'background', name: '【背景】星夜紫羅蘭', cost: 3, icon: 'fa-moon', color: '#D8B4FE', previewBg: '#F3ECFF', previewLine: '#6B21A8' },
-            { id: 'bg_cyber_neon', type: 'background', name: '【背景】霓虹賽博', cost: 5, icon: 'fa-gamepad', color: '#00F5D4', previewBg: '#1E1B4B', previewLine: '#FF2A85' },
-            { id: 'item_tissue', type: 'item', name: '隨身袖珍面紙包', cost: 2, icon: 'fa-box-tissue', color: '#72D0FF' },
-            { id: 'item_spray', type: 'item', name: '香氛消臭噴霧', cost: 5, icon: 'fa-spray-can-sparkles', color: '#FF85D0' },
-            { id: 'item_soap', type: 'item', name: '有所味洗手慕斯', cost: 8, icon: 'fa-pump-soap', color: '#3CE6B0' },
-            { id: 'item_badge', type: 'item', name: '黃金馬桶榮譽徽章', cost: 12, icon: 'fa-award', color: '#FFF57E' }
-        ];
+        async function persistSelectedAvatarToCloud(avatarType) {
+            const normalized = normalizeLoggedInAvatarType(avatarType);
+            profileState.avatarType = normalized;
 
-        const profileState = {
-            uid: null,
-            displayName: '用戶名稱',
-            email: '尚未登入',
-            avatarType: DEFAULT_LOGGED_IN_PFP,
-            savedAvatarType: DEFAULT_LOGGED_IN_PFP,
-            tempModalAvatarType: DEFAULT_LOGGED_IN_PFP,
-            isEditing: false,
-            pendingRedirectHome: false,
-            evaluations: [],
-            redemptions: [],
-            unlockedBgIds: new Set(['bg_classic', 'bg_ocean_bubble', 'bg_peach_blossom']),
-            profileDoc: null,
-            evalLoaded: false,
-            redeemLoaded: false,
-            profileLoaded: false,
-            currentPoints: 0,
-            totalReports: 0,
-            pendingRedeemItem: null,
-            profileUnsubscribe: null,
-            evalUnsubscribe: null,
-            redeemUnsubscribe: null
-        };
+            try {
+                if (profileState.uid) {
+                    localStorage.setItem(`poogle_avatar_${profileState.uid}`, normalized);
+                }
+                localStorage.setItem('poogle_latest_avatar', normalized);
+                const cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
+                if (cachedUser) {
+                    cachedUser.avatarType = normalized;
+                    localStorage.setItem('poogle_auth_user', JSON.stringify(cachedUser));
+                }
+            } catch (e) {}
 
-        function syncUnlockedBackgroundsCache() {
-            const unlocked = new Set(['bg_classic', 'bg_ocean_bubble', 'bg_peach_blossom']);
-            const resetAtIso = profileState.profileDoc?.resetHistoryAt || null;
+            if (db && profileState.uid) {
+                try {
+                    await db.collection('user_profiles').doc(profileState.uid).set({
+                        userId: profileState.uid,
+                        avatarType: normalized,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
 
-            if (Array.isArray(profileState.profileDoc?.unlockedBackgrounds)) {
-                profileState.profileDoc.unlockedBackgrounds.forEach(id => unlocked.add(id));
+                    const snap = await db.collection('evaluations').where('userId', '==', profileState.uid).get();
+                    if (!snap.empty) {
+                        const batch = db.batch();
+                        snap.forEach((doc) => {
+                            batch.update(doc.ref, { avatarType: normalized });
+                        });
+                        await batch.commit();
+                    }
+                } catch (err) {
+                    console.warn('Persist avatar to cloud warning:', err);
+                }
+            }
+        }
+
+        function renderChangeAvatarModalOptions() {
+            const grid = document.getElementById('avatarModalOptionsGrid');
+            if (!grid) return;
+
+            const currentAvatar = normalizeLoggedInAvatarType(profileState.avatarType);
+
+            // 若彈窗內的選項尚未建立，僅在第一次建立 DOM，後續點擊只更新外框與文字狀態，徹底杜絕圖片重新載入閃爍
+            if (!grid.dataset.initialized) {
+                grid.dataset.initialized = 'true';
+                grid.innerHTML = FREE_LOGGED_IN_PFP_LIST.map((avatarId) => {
+                    const imgSrc = resolvedAvatarUrlMap[avatarId] || `./img/pfp/${encodeURIComponent(avatarId)}.png`;
+                    const useFallbackInSandbox = isSandboxEnv() && !resolvedAvatarUrlMap[avatarId];
+                    return `
+                        <button type="button"
+                                data-select-avatar="${avatarId}"
+                                class="w-[144px] min-h-[172px] rounded-[14px] px-2.5 pt-3.5 pb-2.5 flex flex-col items-center justify-start transition-colors cursor-pointer">
+                            <div class="w-[114px] h-[114px] sm:w-[120px] sm:h-[120px] rounded-full border-[2px] border-[#1E2470] overflow-hidden shrink-0 flex items-center justify-center bg-[#FCF5E5]">
+                                <img data-modal-pfp="${avatarId}"
+                                     src="${useFallbackInSandbox ? '' : imgSrc}"
+                                     alt="${avatarId}"
+                                     class="w-full h-full object-cover ${useFallbackInSandbox ? 'hidden' : 'block'}" />
+                                <div data-modal-fallback="${avatarId}" class="w-full h-full ${useFallbackInSandbox ? 'block' : 'hidden'}">
+                                    ${getAvatarFallbackSvgMarkup(avatarId)}
+                                </div>
+                            </div>
+                            <span data-modal-label="${avatarId}" class="mt-2.5 text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-[0.16em]">
+                                目前頭貼
+                            </span>
+                        </button>
+                    `;
+                }).join('');
+
+                grid.querySelectorAll('img[data-modal-pfp]').forEach((imgEl) => {
+                    imgEl.addEventListener('error', () => {
+                        imgEl.classList.add('hidden');
+                        const fb = imgEl.nextElementSibling;
+                        if (fb) fb.classList.remove('hidden');
+                    });
+                });
+
+                grid.querySelectorAll('[data-select-avatar]').forEach((btn) => {
+                    btn.addEventListener('click', async () => {
+                        const selectedId = normalizeLoggedInAvatarType(btn.getAttribute('data-select-avatar'));
+                        profileState.avatarType = selectedId;
+                        renderChangeAvatarModalOptions();
+                        await renderProfileHeaderAndAvatar();
+                        await persistSelectedAvatarToCloud(selectedId);
+                    });
+                });
             }
 
-            profileState.redemptions.forEach((r) => {
-                if (resetAtIso && r.createdAt && r.createdAt <= resetAtIso) return;
-                if (r.itemId && String(r.itemId).startsWith('bg_')) {
-                    unlocked.add(r.itemId);
+            // 更新目前選中頭貼的米色外框與「目前頭貼」標籤
+            grid.querySelectorAll('[data-select-avatar]').forEach((btn) => {
+                const avatarId = btn.getAttribute('data-select-avatar');
+                const isCurrent = avatarId === currentAvatar;
+                const labelEl = btn.querySelector('[data-modal-label]');
+
+                if (isCurrent) {
+                    btn.classList.add('bg-[#FCF5E5]', 'border-[1.6px]', 'border-[#1E2470]');
+                    btn.classList.remove('bg-transparent', 'border-transparent', 'hover:bg-[#FCF5E5]/55');
+                    if (labelEl) {
+                        labelEl.classList.remove('opacity-0', 'select-none');
+                        labelEl.classList.add('opacity-100');
+                    }
+                } else {
+                    btn.classList.remove('bg-[#FCF5E5]', 'border-[#1E2470]');
+                    btn.classList.add('bg-transparent', 'border-[1.6px]', 'border-transparent', 'hover:bg-[#FCF5E5]/55');
+                    if (labelEl) {
+                        labelEl.classList.remove('opacity-100');
+                        labelEl.classList.add('opacity-0', 'select-none');
+                    }
                 }
             });
+        }
 
-            profileState.unlockedBgIds = unlocked;
-            if (profileState.uid) {
-                try {
-                    localStorage.setItem(`poogle_unlocked_bgs_${profileState.uid}`, JSON.stringify(Array.from(unlocked)));
-                    localStorage.setItem('poogle_unlocked_bgs_latest', JSON.stringify(Array.from(unlocked)));
-                } catch (e) {}
+        function renderProfileHeaderAndAvatar() {
+            const nameEl = document.getElementById('displayUserNameText');
+            if (nameEl) {
+                nameEl.textContent = profileState.displayName || 'OOO';
             }
+
+            const normalizedKey = normalizeLoggedInAvatarType(profileState.avatarType);
+            profileState.avatarType = normalizedKey;
+            const cleanKey = String(normalizedKey).replace(/\.(png|PNG|jpg|JPG|svg|SVG|webp|WEBP)$/i, '');
+
+            const imgEl = document.getElementById('profileAvatarImg');
+            const svgContainer = document.getElementById('profileAvatarFallbackSvg');
+
+            if (!imgEl) return Promise.resolve();
+
+            // 若在雲端預覽沙盒且無本機檔案，才使用備援 SVG
+            if (isSandboxEnv() && !resolvedAvatarUrlMap[cleanKey]) {
+                imgEl.classList.add('hidden');
+                if (svgContainer) {
+                    svgContainer.innerHTML = getAvatarFallbackSvgMarkup(cleanKey);
+                    svgContainer.classList.remove('hidden');
+                }
+                return Promise.resolve();
+            }
+
+            // 若已預載完成，直接替換圖片路徑，絕不顯示底層備援 SVG
+            if (resolvedAvatarUrlMap[cleanKey]) {
+                if (svgContainer) svgContainer.classList.add('hidden');
+                imgEl.src = resolvedAvatarUrlMap[cleanKey];
+                imgEl.classList.remove('hidden');
+                return Promise.resolve();
+            }
+
+            return preloadSingleAvatarAsset(cleanKey).then((resolvedUrl) => {
+                if (resolvedUrl) {
+                    if (svgContainer) svgContainer.classList.add('hidden');
+                    imgEl.src = resolvedUrl;
+                    imgEl.classList.remove('hidden');
+                } else {
+                    imgEl.classList.add('hidden');
+                    if (svgContainer) {
+                        svgContainer.innerHTML = getAvatarFallbackSvgMarkup(cleanKey);
+                        svgContainer.classList.remove('hidden');
+                    }
+                }
+            });
         }
 
-        let toastTimer = null;
-        function showProfileToast(msg, bg = '#FFF57E') {
-            const box = document.getElementById('profileToast');
-            const txt = document.getElementById('profileToastText');
-            if (!box || !txt) return;
-            box.style.backgroundColor = bg;
-            txt.textContent = msg;
-            box.classList.remove('hidden');
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => box.classList.add('hidden'), 3200);
+        // ===================================================================
+        // 功德點數：從 0 快速上升至目標點數的動畫
+        // ===================================================================
+        function animateMeritPointsTo(targetValue, forceFromZero = false) {
+            const countEl = document.getElementById('meritPointsCount');
+            if (!countEl) return;
+
+            const endVal = Math.max(0, parseInt(targetValue, 10) || 0);
+            const startVal = forceFromZero ? 0 : profileState.displayedPoints;
+
+            if (profileState.pointsAnimFrameId) {
+                cancelAnimationFrame(profileState.pointsAnimFrameId);
+                profileState.pointsAnimFrameId = null;
+            }
+
+            if (endVal === 0 && startVal === 0) {
+                countEl.textContent = '0';
+                profileState.displayedPoints = 0;
+                return;
+            }
+
+            const duration = 750; // 0.75 秒內快速跳動上升至總點數
+            const startTime = performance.now();
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                // Ease-out 曲線：前段快速衝刺、末段平滑停在目標數字
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.round(startVal + (endVal - startVal) * eased);
+
+                countEl.textContent = String(currentVal);
+                profileState.displayedPoints = currentVal;
+
+                if (progress < 1) {
+                    profileState.pointsAnimFrameId = requestAnimationFrame(step);
+                } else {
+                    countEl.textContent = String(endVal);
+                    profileState.displayedPoints = endVal;
+                    profileState.pointsAnimFrameId = null;
+                }
+            }
+
+            if (forceFromZero) {
+                countEl.textContent = '0';
+                profileState.displayedPoints = 0;
+            }
+            profileState.pointsAnimFrameId = requestAnimationFrame(step);
         }
 
-        function escapeHtml(str) {
-            return String(str ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
+        // ===================================================================
+        // 日期格式轉換與點數/歷史紀錄計算
+        // ===================================================================
         function toLocalDateKey(isoOrDateStr) {
             const d = isoOrDateStr ? new Date(isoOrDateStr) : new Date();
             if (isNaN(d.getTime())) {
@@ -696,239 +1386,13 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        function renderProfileAvatar() {
-            const container = document.getElementById('profileAvatarSvgContainer');
-            if (!container) return;
-            profileState.avatarType = normalizeLoggedInAvatarType(profileState.avatarType);
-            container.innerHTML = getPoogleAvatarSvg(profileState.avatarType, 'profile_main');
-        }
-
-        function renderAvatarModalOptions() {
-            const grid = document.getElementById('avatarOptionsGrid');
-            if (!grid) return;
-
-            const currentTemp = normalizeLoggedInAvatarType(profileState.tempModalAvatarType);
-            profileState.tempModalAvatarType = currentTemp;
-
-            grid.innerHTML = AVATAR_PRESETS.map((preset) => {
-                const isSelected = currentTemp === preset.id;
-                return `
-                    <button type="button" data-avatar-opt="${preset.id}"
-                            class="flex flex-col items-center gap-2.5 p-3 rounded-2xl border-2 ${isSelected ? 'border-[#1E2270] bg-[#FFF57E]/65 scale-105' : 'border-transparent hover:border-[#1E2270]/40 hover:bg-white/60'} transition focus:outline-none">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-[#1E2270] overflow-hidden bg-[#FCF6E8]">
-                            ${getPoogleAvatarSvg(preset.id, `opt_${preset.id}`)}
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full ${isSelected ? 'bg-[#3CE6B0]' : 'bg-white'} border border-[#1E2270] text-[11px] font-normal text-black">
-                            ${isSelected ? '目前選擇' : '免費選擇'}
-                        </span>
-                    </button>
-                `;
-            }).join('');
-
-            grid.querySelectorAll('[data-avatar-opt]').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    profileState.tempModalAvatarType = normalizeLoggedInAvatarType(btn.getAttribute('data-avatar-opt'));
-                    renderAvatarModalOptions();
-                });
-            });
-        }
-
-        function setEditProfileMode(editing) {
-            profileState.isEditing = editing;
-            const startBtn = document.getElementById('startEditProfileBtn');
-            const editBtns = document.getElementById('editingActionBtns');
-            const hoverOverlay = document.getElementById('avatarEditHoverOverlay');
-            const avatarBtn = document.getElementById('profileAvatarBtn');
-            const shopCardBox = document.getElementById('shopCardBox');
-            const shopCornerTag = document.getElementById('shopCornerTag');
-            const shopContainer = document.getElementById('shopContentContainer');
-            const historyCardBox = document.getElementById('historyCardBox');
-            const historyCornerTag = document.getElementById('historyCornerTag');
-            const historyContainer = document.getElementById('historyContentContainer');
-
-            if (editing) {
-                startBtn.classList.add('hidden');
-                editBtns.classList.remove('hidden');
-                hoverOverlay.classList.remove('hidden');
-                avatarBtn.classList.add('cursor-pointer');
-                if (shopCardBox) {
-                    shopCardBox.classList.remove('bg-white');
-                    shopCardBox.classList.add('bg-[#E4E4E7]');
-                }
-                if (shopCornerTag) {
-                    shopCornerTag.classList.remove('bg-[#FFF57E]');
-                    shopCornerTag.classList.add('bg-[#D6D6D6]');
-                }
-                if (shopContainer) {
-                    shopContainer.classList.remove('overflow-y-auto');
-                    shopContainer.classList.add('overflow-hidden', 'pointer-events-none', 'select-none');
-                }
-                if (historyCardBox) {
-                    historyCardBox.classList.remove('bg-white');
-                    historyCardBox.classList.add('bg-[#E4E4E7]');
-                }
-                if (historyCornerTag) {
-                    historyCornerTag.classList.remove('bg-[#72D0FF]');
-                    historyCornerTag.classList.add('bg-[#D6D6D6]');
-                }
-                if (historyContainer) {
-                    historyContainer.classList.remove('overflow-y-auto');
-                    historyContainer.classList.add('overflow-hidden', 'pointer-events-none', 'select-none');
-                }
-            } else {
-                startBtn.classList.remove('hidden');
-                editBtns.classList.add('hidden');
-                hoverOverlay.classList.add('hidden');
-                avatarBtn.classList.remove('cursor-pointer');
-                if (shopCardBox) {
-                    shopCardBox.classList.remove('bg-[#E4E4E7]');
-                    shopCardBox.classList.add('bg-white');
-                }
-                if (shopCornerTag) {
-                    shopCornerTag.classList.remove('bg-[#D6D6D6]');
-                    shopCornerTag.classList.add('bg-[#FFF57E]');
-                }
-                if (shopContainer) {
-                    shopContainer.classList.remove('overflow-hidden', 'pointer-events-none', 'select-none');
-                    shopContainer.classList.add('overflow-y-auto');
-                }
-                if (historyCardBox) {
-                    historyCardBox.classList.remove('bg-[#E4E4E7]');
-                    historyCardBox.classList.add('bg-white');
-                }
-                if (historyCornerTag) {
-                    historyCornerTag.classList.remove('bg-[#D6D6D6]');
-                    historyCornerTag.classList.add('bg-[#72D0FF]');
-                }
-                if (historyContainer) {
-                    historyContainer.classList.remove('overflow-hidden', 'pointer-events-none', 'select-none');
-                    historyContainer.classList.add('overflow-y-auto');
-                }
+        function formatToMonthDay(dateKey) {
+            // 將 YYYY-MM-DD 轉為設計稿的 MM/DD 格式
+            const parts = String(dateKey || '').split('-');
+            if (parts.length === 3) {
+                return `${parts[1]}/${parts[2]}`;
             }
-            recalculateAndRenderPointsAndHistory();
-        }
-
-        async function persistSelectedAvatar(avatarType) {
-            const normalized = normalizeLoggedInAvatarType(avatarType);
-            if (!profileState.uid) return;
-            try {
-                localStorage.setItem(`poogle_avatar_${profileState.uid}`, normalized);
-                localStorage.setItem('poogle_latest_avatar', normalized);
-                const cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
-                if (cachedUser) {
-                    cachedUser.avatarType = normalized;
-                    localStorage.setItem('poogle_auth_user', JSON.stringify(cachedUser));
-                } else {
-                    localStorage.setItem('poogle_auth_user', JSON.stringify({
-                        uid: profileState.uid,
-                        displayName: profileState.displayName,
-                        email: profileState.email,
-                        avatarType: normalized
-                    }));
-                }
-            } catch (e) {}
-
-            if (db) {
-                try {
-                    await db.collection('user_profiles').doc(profileState.uid).set({
-                        userId: profileState.uid,
-                        avatarType: normalized,
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true });
-
-                    // 同步更新該使用者已發布過的評論頭貼欄位
-                    const snap = await db.collection('evaluations').where('userId', '==', profileState.uid).get();
-                    const batch = db.batch();
-                    snap.forEach((doc) => {
-                        batch.update(doc.ref, { avatarType: normalized });
-                    });
-                    await batch.commit();
-                } catch (err) {
-                    console.warn('Persist avatar to cloud warning:', err);
-                }
-            }
-        }
-
-        function renderGoogleAccountInfo() {
-            document.getElementById('displayUserNameText').textContent = profileState.displayName || 'Google 用戶';
-            document.getElementById('displayUserEmailText').textContent = profileState.email || '';
-        }
-
-        function renderShopItems() {
-            const grid = document.getElementById('shopItemsGrid');
-            if (!grid) return;
-
-            syncUnlockedBackgroundsCache();
-
-            grid.innerHTML = SHOP_ITEMS.map((item, idx) => {
-                const isLocked = profileState.isEditing;
-                const isBgItem = item.type === 'background';
-                const isAlreadyOwned = isBgItem && profileState.unlockedBgIds.has(item.id);
-                const canAfford = !isLocked && !isAlreadyOwned && profileState.currentPoints >= item.cost;
-                const circleBg = isLocked ? '#CFCFD4' : (isAlreadyOwned ? '#3CE6B0' : (canAfford ? item.color : '#E4E4E7'));
-                const pillBg = isLocked ? 'bg-[#D6D6D6]' : (isAlreadyOwned ? 'bg-[#3CE6B0]' : (canAfford ? 'bg-[#FFF57E]' : 'bg-[#D6D6D6]'));
-                const disabledAttr = isLocked ? 'disabled' : '';
-
-                const previewGraphicHtml = isBgItem
-                    ? `<div class="w-[96px] h-[96px] sm:w-[108px] sm:h-[108px] rounded-full border-2 border-[#1E2270] overflow-hidden relative flex items-center justify-center ${isLocked ? 'opacity-60' : 'group-hover:scale-105'} transition-transform"
-                            style="background-color: ${item.previewBg};">
-                           <svg viewBox="0 0 100 100" class="w-full h-full absolute inset-0">
-                               <line x1="0" y1="62" x2="100" y2="90" stroke="${item.previewLine}" stroke-width="2.2" opacity="0.75" />
-                               <line x1="0" y1="78" x2="100" y2="104" stroke="${item.previewLine}" stroke-width="2.2" opacity="0.75" />
-                               <line x1="0" y1="82" x2="85" y2="52" stroke="${item.previewLine}" stroke-width="2.2" opacity="0.75" />
-                               <line x1="20" y1="95" x2="100" y2="65" stroke="${item.previewLine}" stroke-width="2.2" opacity="0.75" />
-                           </svg>
-                           <div class="relative z-10 w-11 h-11 rounded-full border-[1.8px] border-[#1E2270] flex items-center justify-center text-lg text-[#1E2270]"
-                                style="background-color: ${item.color};">
-                               <i class="fa-solid ${isAlreadyOwned ? 'fa-check' : item.icon}"></i>
-                           </div>
-                       </div>`
-                    : `<div class="w-[96px] h-[96px] sm:w-[108px] sm:h-[108px] rounded-full border-2 border-[#1E2270] flex items-center justify-center text-2xl sm:text-3xl ${isLocked ? 'text-neutral-500' : 'text-[#1E2270] group-hover:scale-105'} transition-transform"
-                            style="background-color: ${circleBg};">
-                           <i class="fa-solid ${item.icon}"></i>
-                       </div>`;
-
-                return `
-                    <button type="button" data-shop-idx="${idx}" ${disabledAttr}
-                            class="flex flex-col items-center gap-2.5 group focus:outline-none w-full max-w-[148px] p-2 rounded-2xl ${isLocked ? 'cursor-default opacity-60 pointer-events-none' : 'hover:bg-[#FCF6E8]'} transition">
-                        ${previewGraphicHtml}
-                        <div class="text-center leading-snug">
-                            <div class="text-xs sm:text-[13px] font-bold ${isLocked ? 'text-neutral-500' : 'text-black'}">${escapeHtml(item.name)}</div>
-                            <div class="inline-block mt-1 px-2.5 py-0.5 rounded-full ${pillBg} border border-[#1E2270] text-[11px] font-bold ${isLocked ? 'text-neutral-500' : 'text-black'}">
-                                ${isAlreadyOwned ? '✓ 已解鎖背景' : `${item.cost} 點`}
-                            </div>
-                        </div>
-                    </button>
-                `;
-            }).join('');
-
-            grid.querySelectorAll('[data-shop-idx]').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    if (profileState.isEditing) return;
-                    const idx = parseInt(btn.getAttribute('data-shop-idx'), 10);
-                    const item = SHOP_ITEMS[idx];
-                    if (!item) return;
-
-                    if (item.type === 'background' && profileState.unlockedBgIds.has(item.id)) {
-                        try {
-                            localStorage.setItem('poogle_selected_card_bg', item.id);
-                        } catch (e) {}
-                        showProfileToast(`🎨 已將「${item.name}」設為您的預設評鑑背景！下次評鑑時將自動套用`, '#3CE6B0');
-                        return;
-                    }
-
-                    if (profileState.currentPoints < item.cost) {
-                        showProfileToast(`公德點數不足！還需要 ${item.cost - profileState.currentPoints} 點才能兌換「${item.name}」`, '#FF85D0');
-                        return;
-                    }
-
-                    profileState.pendingRedeemItem = item;
-                    document.getElementById('redeemModalTitle').textContent = `兌換「${item.name}」`;
-                    const extraHint = item.type === 'background' ? '<br><span class="text-[#1E2270] font-bold">解鎖後即可在「公廁評鑑」自由套用此背景！</span>' : '';
-                    document.getElementById('redeemModalDesc').innerHTML = `將消耗 <strong>${item.cost} 點</strong> 公德點數（目前擁有 ${profileState.currentPoints} 點），確定要兌換嗎？${extraHint}`;
-                    document.getElementById('redeemConfirmModal').classList.remove('hidden');
-                });
-            });
+            return dateKey;
         }
 
         function reconcileAndSyncProfileCounts() {
@@ -994,6 +1458,15 @@
 
             profileState.currentPoints = finalPoints;
             profileState.totalReports = finalReports;
+
+            if (profileState.uid) {
+                try {
+                    localStorage.setItem(`poogle_cached_stats_${profileState.uid}`, JSON.stringify({
+                        meritPoints: finalPoints,
+                        totalReports: finalReports
+                    }));
+                } catch (e) {}
+            }
         }
 
         function recalculateAndRenderPointsAndHistory() {
@@ -1002,12 +1475,24 @@
             const currentPoints = profileState.currentPoints;
             const totalReports = profileState.totalReports;
 
-            document.getElementById('meritPointsCount').textContent = String(currentPoints);
-            document.getElementById('totalReportsCount').textContent = String(totalReports);
+            // 更新已回報次數與對應等級稱號、升級進度提示
+            const reportsEl = document.getElementById('totalReportsCount');
+            if (reportsEl) {
+                reportsEl.textContent = String(totalReports);
+            }
+            renderUserLevelUI(totalReports);
+            renderClosestPrizeUI(currentPoints);
 
-            renderShopItems();
+            // 更新功德點數（首次載入固定從 0 快速上升至總點數，後續變動則平滑跳動至新點數）
+            if (!profileState.hasAnimatedInitialLoad && (currentPoints > 0 || (profileState.evalLoaded && profileState.redeemLoaded && profileState.profileLoaded))) {
+                profileState.hasAnimatedInitialLoad = true;
+                animateMeritPointsTo(currentPoints, true);
+            } else if (profileState.hasAnimatedInitialLoad && currentPoints !== profileState.displayedPoints) {
+                animateMeritPointsTo(currentPoints, false);
+            }
 
-            const historyContainer = document.getElementById('historyContentContainer');
+            // 渲染歷史紀錄列表
+            const historyContainer = document.getElementById('historyListContainer');
             if (!historyContainer) return;
 
             const resetAtIso = profileState.profileDoc?.resetHistoryAt || null;
@@ -1021,7 +1506,7 @@
             if ((visibleEvals.length === 0 && visibleRedeems.length === 0 && currentPoints === 0 && totalReports === 0)
                 || (currentPoints === 0 && totalReports === 0 && profileState.profileDoc && typeof profileState.profileDoc.meritPoints === 'number')) {
                 historyContainer.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center text-neutral-400 text-sm sm:text-base font-bold py-16">
+                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
                         目前沒有歷史紀錄
                     </div>
                 `;
@@ -1048,7 +1533,7 @@
                 dayRecord.deducted += (Number(rd.pointsUsed) || 0);
             });
 
-            // 若後台有手動調整公德點數，將差額自動反映於當日紀錄，確保歷史紀錄總計與上方公德點數 100% 一致
+            // 若後台有手動調整點數，將差額反映於當日紀錄，確保「剩餘」與左方總點數一致
             const rawVisibleAdded = visibleEvals.length;
             const rawVisibleDeducted = visibleRedeems.reduce((s, r) => s + (Number(r.pointsUsed) || 0), 0);
             const rawVisibleNet = Math.max(0, rawVisibleAdded - rawVisibleDeducted);
@@ -1066,7 +1551,7 @@
 
             if (dailyMap.size === 0) {
                 historyContainer.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center text-neutral-400 text-sm sm:text-base font-bold py-16">
+                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
                         目前沒有歷史紀錄
                     </div>
                 `;
@@ -1081,30 +1566,24 @@
             });
 
             const sortedDesc = sortedAsc.reverse();
-            const isLocked = profileState.isEditing;
 
-            historyContainer.innerHTML = sortedDesc.map((day, index) => {
-                const isLatest = index === 0;
-                const rowBg = isLocked ? 'bg-[#D6D6D6]/70 opacity-60 cursor-default' : 'bg-white hover:bg-[#FCF6E8]/60';
-                const pillBg = isLocked ? 'bg-[#CFCFD4] text-neutral-600' : (isLatest ? 'bg-[#72D0FF] text-black' : 'bg-[#FCF6E8] hover:bg-[#72D0FF] text-black');
-                const addedColor = isLocked ? 'text-neutral-500' : 'text-emerald-600';
-                const deductedColor = isLocked ? 'text-neutral-500' : (day.deducted > 0 ? 'text-rose-600' : 'text-neutral-400');
-                const totalColor = isLocked ? 'text-neutral-600' : 'text-[#1E2270]';
+            historyContainer.innerHTML = sortedDesc.map((day) => {
+                const shortDate = formatToMonthDay(day.dateKey);
                 return `
-                    <div class="flex items-center justify-between px-3 py-2.5 rounded-2xl border-[1.5px] border-[#1E2270] ${rowBg} transition">
-                        <span class="px-3.5 py-1 rounded-full ${pillBg} border border-[#1E2270] text-xs sm:text-sm font-extrabold tracking-wide transition-colors">
-                            ${escapeHtml(day.dateKey)}
-                        </span>
-                        <div class="flex items-center gap-3 sm:gap-5 text-xs sm:text-sm font-extrabold">
-                            <span class="w-12 text-center ${addedColor}">+${day.added}</span>
-                            <span class="w-12 text-center ${deductedColor}">-${day.deducted}</span>
-                            <span class="w-16 text-right ${totalColor}">共 ${day.totalAtEndOfDay} 點</span>
-                        </div>
+                    <div class="history-dashed-row grid grid-cols-4 items-center text-center py-2 px-2 text-sm sm:text-[16px] font-extrabold tracking-wider shrink-0"
+                         title="${escapeHtml(day.dateKey)}">
+                        <span class="text-[#1E2470] font-bold">${escapeHtml(shortDate)}</span>
+                        <span class="text-[#1E2470]">${day.added}</span>
+                        <span class="text-[#FF5A52]">${day.deducted}</span>
+                        <span class="text-[#1E2470]">${day.totalAtEndOfDay}</span>
                     </div>
                 `;
             }).join('');
         }
 
+        // ===================================================================
+        // 訂閱使用者雲端資料 (user_profiles / evaluations / redemptions)
+        // ===================================================================
         function subscribeUserCloudData(uid) {
             if (!db || !uid) return;
 
@@ -1116,26 +1595,24 @@
             profileState.redeemLoaded = false;
             profileState.profileLoaded = false;
 
-            // 即時監聽 user_profiles/{uid}：支援從 Firebase 後台直接修改 meritPoints 與 totalReports 即時生效
             profileState.profileUnsubscribe = db.collection('user_profiles').doc(uid)
                 .onSnapshot((doc) => {
                     profileState.profileLoaded = true;
                     if (doc.exists) {
                         const data = doc.data() || {};
                         profileState.profileDoc = data;
-                        if (data.avatarType && !profileState.isEditing) {
+                        if (data.displayName && (!profileState.displayName || profileState.displayName === 'OOO')) {
+                            profileState.displayName = data.displayName;
+                        }
+                        if (data.avatarType) {
                             const normalizedCloud = normalizeLoggedInAvatarType(data.avatarType);
                             profileState.avatarType = normalizedCloud;
-                            profileState.savedAvatarType = normalizedCloud;
-                            renderProfileAvatar();
                             try {
                                 localStorage.setItem(`poogle_avatar_${uid}`, normalizedCloud);
                                 localStorage.setItem('poogle_latest_avatar', normalizedCloud);
                             } catch (e) {}
-                            if (normalizedCloud !== data.avatarType) {
-                                db.collection('user_profiles').doc(uid).set({ avatarType: normalizedCloud }, { merge: true }).catch(() => {});
-                            }
                         }
+                        renderProfileHeaderAndAvatar();
                     } else {
                         profileState.profileDoc = null;
                     }
@@ -1174,10 +1651,11 @@
         }
 
         function applyGoogleUser(user) {
-            if (!user) return;
+            if (!user || !user.uid) return;
             profileState.uid = user.uid;
-            profileState.displayName = user.displayName || 'Google 用戶';
+            profileState.displayName = user.displayName || '探險家';
             profileState.email = user.email || '';
+            profileState.photoURL = user.photoURL || '';
 
             let savedAvatar = DEFAULT_LOGGED_IN_PFP;
             try {
@@ -1187,32 +1665,104 @@
                 localStorage.setItem('poogle_latest_avatar', savedAvatar);
             } catch (e) {}
             profileState.avatarType = savedAvatar;
-            profileState.savedAvatarType = savedAvatar;
 
-            renderProfileAvatar();
-            renderGoogleAccountInfo();
+            const avatarPromise = renderProfileHeaderAndAvatar();
+
+            // 若有本機快取的點數與回報數，先在剛載入時立即觸發從 0 快速上升的動畫
+            try {
+                const cachedStats = JSON.parse(localStorage.getItem(`poogle_cached_stats_${user.uid}`) || 'null');
+                if (cachedStats && typeof cachedStats.meritPoints === 'number') {
+                    profileState.currentPoints = cachedStats.meritPoints;
+                    profileState.totalReports = cachedStats.totalReports || 0;
+                    const reportsEl = document.getElementById('totalReportsCount');
+                    if (reportsEl) reportsEl.textContent = String(profileState.totalReports);
+                    renderUserLevelUI(profileState.totalReports);
+                    renderClosestPrizeUI(profileState.currentPoints);
+                    if (!profileState.hasAnimatedInitialLoad && cachedStats.meritPoints > 0) {
+                        profileState.hasAnimatedInitialLoad = true;
+                        animateMeritPointsTo(cachedStats.meritPoints, true);
+                    }
+                }
+            } catch (e) {}
+
             subscribeUserCloudData(user.uid);
+            return avatarPromise;
+        }
+
+        // ===================================================================
+        // 頁面初始化與本機圖片預載完成後顯現
+        // ===================================================================
+        function preloadLocalLogoImage() {
+            if (isSandboxEnv()) return Promise.resolve();
+            const logoImg = document.getElementById('profileLogoImg');
+            if (!logoImg) return Promise.resolve();
+            const rawSrc = logoImg.getAttribute('data-local-src');
+            if (!rawSrc) return Promise.resolve();
+
+            return new Promise((resolve) => {
+                const probe = new Image();
+                probe.onload = () => {
+                    logoImg.src = rawSrc;
+                    if (typeof logoImg.decode === 'function') {
+                        logoImg.decode().catch(() => {}).finally(resolve);
+                    } else {
+                        resolve();
+                    }
+                };
+                probe.onerror = () => resolve();
+                probe.src = rawSrc;
+            });
+        }
+
+        function revealPageWhenReady(promises) {
+            let revealed = false;
+            const doReveal = () => {
+                if (revealed) return;
+                revealed = true;
+                document.body.classList.remove('page-cloak');
+                document.body.classList.add('page-ready');
+            };
+            // 最多等待 220ms，確保即使網路慢也不會卡白畫面
+            const fallbackTimer = setTimeout(doReveal, 220);
+            Promise.allSettled(promises).then(() => {
+                clearTimeout(fallbackTimer);
+                requestAnimationFrame(doReveal);
+            });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            upgradeProfileLocalImages();
-            renderProfileAvatar();
-            renderShopItems();
-            recalculateAndRenderPointsAndHistory();
+            const preloadTasks = [preloadLocalLogoImage(), preloadAllFreeAvatars()];
 
+            // 1. 先檢查 localStorage 是否有已登入的快取帳號
             let cachedUser = null;
             try {
                 cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
             } catch (e) {}
 
             if (cachedUser && cachedUser.uid) {
-                applyGoogleUser(cachedUser);
+                preloadTasks.push(applyGoogleUser(cachedUser));
+            } else {
+                preloadTasks.push(renderProfileHeaderAndAvatar());
+                renderUserLevelUI(0);
+                renderClosestPrizeUI(0);
+                // 若尚未登入，先顯示無歷史紀錄狀態
+                const historyContainer = document.getElementById('historyListContainer');
+                if (historyContainer) {
+                    historyContainer.innerHTML = `
+                        <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                            目前沒有歷史紀錄
+                        </div>
+                    `;
+                }
             }
 
+            // 等 Logo 與頭貼圖片皆解碼完成後，再一次顯示畫面並啟動捲筒與點數動畫
+            revealPageWhenReady(preloadTasks);
+
+            // 2. 監聽 Firebase Auth 登入狀態
             if (auth) {
                 auth.onAuthStateChanged((user) => {
                     if (user) {
-                        document.getElementById('requireLoginModal').classList.add('hidden');
                         let savedAvatar = DEFAULT_LOGGED_IN_PFP;
                         try {
                             const rawSaved = localStorage.getItem(`poogle_avatar_${user.uid}`) || DEFAULT_LOGGED_IN_PFP;
@@ -1220,7 +1770,7 @@
                         } catch (e) {}
                         const cleanUser = {
                             uid: user.uid,
-                            displayName: user.displayName || 'Google 用戶',
+                            displayName: user.displayName || '探險家',
                             email: user.email || '',
                             photoURL: user.photoURL || '',
                             avatarType: savedAvatar
@@ -1229,343 +1779,123 @@
                             localStorage.setItem('poogle_auth_user', JSON.stringify(cleanUser));
                         } catch (e) {}
                         applyGoogleUser(cleanUser);
-                    } else if (!cachedUser || !cachedUser.uid) {
-                        document.getElementById('requireLoginModal').classList.remove('hidden');
                     }
                 });
-            } else if (!cachedUser || !cachedUser.uid) {
-                document.getElementById('requireLoginModal').classList.remove('hidden');
             }
 
-            // 編輯個人檔案模式與頭貼選擇器互動
-            const chooseAvatarModal = document.getElementById('chooseAvatarModal');
-            const discardEditModal = document.getElementById('discardEditModal');
+            // 3. 「變更頭貼」彈窗開關綁定
+            const openChangeAvatarBtn = document.getElementById('openChangeAvatarModalBtn');
+            const changeAvatarModal = document.getElementById('changeAvatarModal');
+            const closeChangeAvatarBtn = document.getElementById('closeChangeAvatarModalBtn');
 
-            document.getElementById('startEditProfileBtn').addEventListener('click', () => {
-                profileState.savedAvatarType = profileState.avatarType;
-                setEditProfileMode(true);
-            });
+            if (openChangeAvatarBtn && changeAvatarModal) {
+                openChangeAvatarBtn.addEventListener('click', () => {
+                    renderChangeAvatarModalOptions();
+                    changeAvatarModal.classList.remove('hidden');
+                });
+            }
+            if (closeChangeAvatarBtn && changeAvatarModal) {
+                closeChangeAvatarBtn.addEventListener('click', () => {
+                    changeAvatarModal.classList.add('hidden');
+                });
+            }
+            if (changeAvatarModal) {
+                changeAvatarModal.addEventListener('click', (e) => {
+                    if (e.target === changeAvatarModal) {
+                        changeAvatarModal.classList.add('hidden');
+                    }
+                });
+            }
 
-            document.getElementById('profileAvatarBtn').addEventListener('click', () => {
-                if (!profileState.isEditing) return;
-                profileState.tempModalAvatarType = profileState.avatarType;
-                renderAvatarModalOptions();
-                chooseAvatarModal.classList.remove('hidden');
-            });
+            // 4. 「獎品窗戶」Hover 粉紅店員探頭動畫 & 點擊開啟「兌換商店 - 獎品專區」Popup
+            const prizeWindowHitBtn = document.getElementById('prizeWindowHitBtn');
+            const prizeLabelBtn = document.getElementById('prizeLabelBtn');
+            const pinkClerkPeekInner = document.getElementById('pinkClerkPeekInner');
+            const prizeShopModal = document.getElementById('prizeShopModal');
+            const closePrizeShopModalBtn = document.getElementById('closePrizeShopModalBtn');
 
-            document.getElementById('closeChooseAvatarModalBtn').addEventListener('click', () => {
-                chooseAvatarModal.classList.add('hidden');
-            });
-
-            document.getElementById('confirmAvatarSelectBtn').addEventListener('click', () => {
-                profileState.avatarType = normalizeLoggedInAvatarType(profileState.tempModalAvatarType);
-                renderProfileAvatar();
-                chooseAvatarModal.classList.add('hidden');
-            });
-
-            document.getElementById('finishEditProfileBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('finishEditProfileBtn');
-                btn.disabled = true;
-                btn.textContent = '儲存中...';
-                try {
-                    profileState.savedAvatarType = normalizeLoggedInAvatarType(profileState.avatarType);
-                    await persistSelectedAvatar(profileState.savedAvatarType);
-                    setEditProfileMode(false);
-                    showProfileToast('✅ 已儲存您的個人頭貼設定！', '#3CE6B0');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = '完成編輯';
-                }
-            });
-
-            document.getElementById('cancelEditProfileBtn').addEventListener('click', () => {
-                profileState.pendingRedirectHome = false;
-                discardEditModal.classList.remove('hidden');
-            });
-
-            // 編輯狀態下點擊「主頁」或左上角「Logo」時，同樣跳出是否放棄編輯的確認彈窗
-            const interceptHomeNavigationInEditMode = (e) => {
-                if (profileState.isEditing) {
-                    e.preventDefault();
-                    profileState.pendingRedirectHome = true;
-                    discardEditModal.classList.remove('hidden');
-                }
+            const showPinkClerk = () => {
+                if (pinkClerkPeekInner) pinkClerkPeekInner.classList.add('is-peeking');
             };
-            document.getElementById('profileHomeBtn').addEventListener('click', interceptHomeNavigationInEditMode);
-            document.getElementById('profileLogoLink').addEventListener('click', interceptHomeNavigationInEditMode);
+            const hidePinkClerk = () => {
+                if (pinkClerkPeekInner) pinkClerkPeekInner.classList.remove('is-peeking');
+            };
+            const openPrizeModal = () => {
+                if (prizeShopModal) prizeShopModal.classList.remove('hidden');
+            };
 
-            document.getElementById('continueEditProfileBtn').addEventListener('click', () => {
-                profileState.pendingRedirectHome = false;
-                discardEditModal.classList.add('hidden');
-            });
-
-            document.getElementById('confirmDiscardEditBtn').addEventListener('click', () => {
-                const shouldGoHome = profileState.pendingRedirectHome;
-                profileState.pendingRedirectHome = false;
-                profileState.avatarType = profileState.savedAvatarType;
-                renderProfileAvatar();
-                discardEditModal.classList.add('hidden');
-                setEditProfileMode(false);
-                if (shouldGoHome) {
-                    window.location.href = './index.html';
-                }
-            });
-
-            discardEditModal.addEventListener('click', (e) => {
-                if (e.target === discardEditModal) {
-                    profileState.pendingRedirectHome = false;
-                    discardEditModal.classList.add('hidden');
-                }
-            });
-
-            // 未登入時彈窗中的 Google 登入按鈕
-            document.getElementById('profileGoogleLoginBtn').addEventListener('click', async () => {
-                if (!auth) {
-                    showProfileToast('目前環境無法連線至認證服務，可先點擊「預覽測試個人空間」', '#FF85D0');
-                    return;
-                }
-                const provider = new firebase.auth.GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-                try {
-                    await auth.signInWithPopup(provider);
-                    document.getElementById('requireLoginModal').classList.add('hidden');
-                } catch (err) {
-                    console.warn('Google login error:', err);
-                    showProfileToast('Google 登入視窗在預覽環境受限，請於 localhost 開啟或點擊「預覽測試個人空間」', '#FF85D0');
-                }
-            });
-
-            // 預覽測試模式按鈕（方便在預覽視窗或尚未設定白名單時直接測試換頭貼與商店）
-            document.getElementById('profilePreviewGuestBtn').addEventListener('click', () => {
-                document.getElementById('requireLoginModal').classList.add('hidden');
-                const demoUser = {
-                    uid: 'preview_demo_user',
-                    displayName: '有所味探險家',
-                    email: 'poogle.explorer@gmail.com',
-                    avatarType: normalizeLoggedInAvatarType(profileState.avatarType)
-                };
-                try {
-                    localStorage.setItem('poogle_auth_user', JSON.stringify(demoUser));
-                } catch (e) {}
-                applyGoogleUser(demoUser);
-            });
-
-            // 頂部登出按鈕
-            document.getElementById('headerLogoutBtn').addEventListener('click', () => {
-                try { localStorage.removeItem('poogle_auth_user'); } catch (e) {}
-                if (auth) {
-                    auth.signOut().finally(() => {
-                        window.location.href = './index.html';
-                    });
-                } else {
-                    window.location.href = './index.html';
-                }
-            });
-
-            // 兌換商店確認彈窗按鈕
-            const redeemModal = document.getElementById('redeemConfirmModal');
-            document.getElementById('cancelRedeemBtn').addEventListener('click', () => {
-                profileState.pendingRedeemItem = null;
-                redeemModal.classList.add('hidden');
-            });
-
-            document.getElementById('confirmRedeemBtn').addEventListener('click', async () => {
-                const item = profileState.pendingRedeemItem;
-                if (!item || !profileState.uid) {
-                    redeemModal.classList.add('hidden');
-                    return;
-                }
-                if (profileState.currentPoints < item.cost) {
-                    redeemModal.classList.add('hidden');
-                    showProfileToast('公德點數不足！', '#FF85D0');
-                    return;
-                }
-
-                const confirmBtn = document.getElementById('confirmRedeemBtn');
-                confirmBtn.disabled = true;
-                confirmBtn.textContent = '兌換中...';
-
-                try {
-                    if (item.type === 'background') {
-                        profileState.unlockedBgIds.add(item.id);
-                        try {
-                            localStorage.setItem('poogle_selected_card_bg', item.id);
-                            localStorage.setItem(`poogle_unlocked_bgs_${profileState.uid}`, JSON.stringify(Array.from(profileState.unlockedBgIds)));
-                            localStorage.setItem('poogle_unlocked_bgs_latest', JSON.stringify(Array.from(profileState.unlockedBgIds)));
-                        } catch (e) {}
+            if (prizeWindowHitBtn) {
+                prizeWindowHitBtn.addEventListener('mouseenter', showPinkClerk);
+                prizeWindowHitBtn.addEventListener('mouseleave', hidePinkClerk);
+                prizeWindowHitBtn.addEventListener('click', openPrizeModal);
+            }
+            if (prizeLabelBtn) {
+                prizeLabelBtn.addEventListener('mouseenter', showPinkClerk);
+                prizeLabelBtn.addEventListener('mouseleave', hidePinkClerk);
+                prizeLabelBtn.addEventListener('click', openPrizeModal);
+            }
+            if (closePrizeShopModalBtn && prizeShopModal) {
+                closePrizeShopModalBtn.addEventListener('click', () => {
+                    prizeShopModal.classList.add('hidden');
+                });
+            }
+            if (prizeShopModal) {
+                prizeShopModal.addEventListener('click', (e) => {
+                    if (e.target === prizeShopModal) {
+                        prizeShopModal.classList.add('hidden');
                     }
-
-                    if (db) {
-                        await db.collection('redemptions').add({
-                            userId: profileState.uid,
-                            itemId: item.id,
-                            itemType: item.type || 'item',
-                            itemName: item.name,
-                            pointsUsed: item.cost,
-                            createdAt: new Date().toISOString(),
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-
-                        if (item.type === 'background') {
-                            await db.collection('user_profiles').doc(profileState.uid).set({
-                                unlockedBackgrounds: Array.from(profileState.unlockedBgIds),
-                                updatedAt: new Date().toISOString()
-                            }, { merge: true });
-                        }
-                    } else {
-                        profileState.redemptions.push({
-                            id: `local_${Date.now()}`,
-                            userId: profileState.uid,
-                            itemId: item.id,
-                            itemType: item.type || 'item',
-                            itemName: item.name,
-                            pointsUsed: item.cost,
-                            createdAt: new Date().toISOString()
-                        });
-                        recalculateAndRenderPointsAndHistory();
-                    }
-
-                    const msg = item.type === 'background'
-                        ? `🎉 成功解鎖「${item.name}」（-${item.cost} 點）！已自動設為您的評鑑背景`
-                        : `🎉 成功兌換「${item.name}」（-${item.cost} 點）！`;
-                    showProfileToast(msg, '#3CE6B0');
-                } catch (err) {
-                    console.warn('Redeem error:', err);
-                    showProfileToast('兌換失敗，請稍後再試', '#FF85D0');
-                } finally {
-                    confirmBtn.disabled = false;
-                    confirmBtn.textContent = '確認兌換';
-                    profileState.pendingRedeemItem = null;
-                    redeemModal.classList.add('hidden');
-                }
-            });
-
-            // 測試階段：快速歸零與自訂點數/回報次數彈窗邏輯
-            const testAdminModal = document.getElementById('testAdminModal');
-            const inputMerit = document.getElementById('testInputMeritPoints');
-            const inputReports = document.getElementById('testInputTotalReports');
-
-            document.getElementById('openTestAdminModalBtn').addEventListener('click', () => {
-                inputMerit.value = profileState.currentPoints;
-                inputReports.value = profileState.totalReports;
-                testAdminModal.classList.remove('hidden');
-            });
-
-            document.getElementById('closeTestAdminModalBtn').addEventListener('click', () => {
-                testAdminModal.classList.add('hidden');
-            });
-
-            testAdminModal.addEventListener('click', (e) => {
-                if (e.target === testAdminModal) testAdminModal.classList.add('hidden');
-            });
-
-            async function updateBackendCounts(newPoints, newReports, resetHistory = false) {
-                const cleanPoints = Math.max(0, parseInt(newPoints, 10) || 0);
-                const cleanReports = Math.max(0, parseInt(newReports, 10) || 0);
-                const rawEvalCount = profileState.evaluations.length;
-                const rawSpentPoints = profileState.redemptions.reduce((sum, r) => sum + (Number(r.pointsUsed) || 0), 0);
-
-                const payload = {
-                    userId: profileState.uid || 'preview_demo_user',
-                    displayName: profileState.displayName || 'Google 用戶',
-                    email: profileState.email || '',
-                    avatarType: normalizeLoggedInAvatarType(profileState.avatarType),
-                    meritPoints: cleanPoints,
-                    totalReports: cleanReports,
-                    _rawEvalCount: rawEvalCount,
-                    _rawSpentPoints: rawSpentPoints,
-                    updatedAt: new Date().toISOString()
-                };
-                if (resetHistory) {
-                    payload.resetHistoryAt = new Date().toISOString();
-                }
-
-                profileState.profileDoc = { ...(profileState.profileDoc || {}), ...payload };
-                recalculateAndRenderPointsAndHistory();
-
-                if (db && profileState.uid) {
-                    await db.collection('user_profiles').doc(profileState.uid).set(payload, { merge: true });
-                }
+                });
             }
 
-            document.getElementById('applyCustomCountsBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('applyCustomCountsBtn');
-                btn.disabled = true;
-                btn.textContent = '同步中...';
-                try {
-                    await updateBackendCounts(inputMerit.value, inputReports.value, false);
-                    testAdminModal.classList.add('hidden');
-                    showProfileToast(`✅ 已同步更新：公德點數 ${profileState.currentPoints} 點、總回報 ${profileState.totalReports} 次`, '#3CE6B0');
-                } catch (err) {
-                    showProfileToast('更新失敗，請稍後再試', '#FF85D0');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = '套用自訂數值（同步至後台）';
+            // 5. 兌換商店店員（藍色店員與粉紅店員）眼珠跟隨游標移動互動
+            const clerkGroup = document.getElementById('shopClerkGroup');
+            const pupilLeft = document.getElementById('clerkPupilLeft');
+            const pupilRight = document.getElementById('clerkPupilRight');
+            const pinkClerkGroup = document.getElementById('pinkClerkGroup');
+            const pinkPupilLeft = document.getElementById('pinkClerkPupilLeft');
+            const pinkPupilRight = document.getElementById('pinkClerkPupilRight');
+
+            const leftBase = { x: 23.8, y: 27.0 };
+            const rightBase = { x: 34.2, y: 27.0 };
+            const maxOffsetX = 2.4;
+            const maxOffsetY = 2.2;
+
+            const updateSingleClerkEyes = (groupEl, pLeft, pRight, clientX, clientY) => {
+                if (!groupEl || !pLeft || !pRight) return;
+                const rect = groupEl.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
+
+                const eyeCenterX = rect.left + rect.width * 0.5;
+                const eyeCenterY = rect.top + rect.height * 0.38;
+
+                const dx = clientX - eyeCenterX;
+                const dy = clientY - eyeCenterY;
+                const angle = Math.atan2(dy, dx);
+                const distRatio = Math.min(Math.hypot(dx, dy) / 180, 1);
+
+                const offsetX = Math.cos(angle) * maxOffsetX * distRatio;
+                const offsetY = Math.sin(angle) * maxOffsetY * distRatio;
+
+                pLeft.setAttribute('cx', (leftBase.x + offsetX).toFixed(2));
+                pLeft.setAttribute('cy', (leftBase.y + offsetY).toFixed(2));
+                pRight.setAttribute('cx', (rightBase.x + offsetX).toFixed(2));
+                pRight.setAttribute('cy', (rightBase.y + offsetY).toFixed(2));
+            };
+
+            const updateAllClerksEyes = (clientX, clientY) => {
+                updateSingleClerkEyes(clerkGroup, pupilLeft, pupilRight, clientX, clientY);
+                updateSingleClerkEyes(pinkClerkGroup, pinkPupilLeft, pinkPupilRight, clientX, clientY);
+            };
+
+            window.addEventListener('mousemove', (e) => {
+                updateAllClerksEyes(e.clientX, e.clientY);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    updateAllClerksEyes(e.touches[0].clientX, e.touches[0].clientY);
                 }
-            });
-
-            document.getElementById('quickZeroCountsOnlyBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('quickZeroCountsOnlyBtn');
-                btn.disabled = true;
-                try {
-                    await updateBackendCounts(0, 0, true);
-                    testAdminModal.classList.add('hidden');
-                    showProfileToast('✅ 已將公德點數與總回報次數歸 0！', '#3CE6B0');
-                } finally {
-                    btn.disabled = false;
-                }
-            });
-
-            document.getElementById('quickZeroAndDeleteHistoryBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('quickZeroAndDeleteHistoryBtn');
-                btn.disabled = true;
-                btn.textContent = '清空雲端紀錄中...';
-                try {
-                    const defaultBgs = ['bg_classic', 'bg_ocean_bubble', 'bg_peach_blossom'];
-                    profileState.unlockedBgIds = new Set(defaultBgs);
-                    try {
-                        if (profileState.uid) {
-                            localStorage.setItem(`poogle_unlocked_bgs_${profileState.uid}`, JSON.stringify(defaultBgs));
-                        }
-                        localStorage.setItem('poogle_unlocked_bgs_latest', JSON.stringify(defaultBgs));
-                        localStorage.setItem('poogle_selected_card_bg', 'bg_classic');
-                    } catch (e) {}
-
-                    if (db && profileState.uid) {
-                        const evalSnap = await db.collection('evaluations').where('userId', '==', profileState.uid).get();
-                        const redeemSnap = await db.collection('redemptions').where('userId', '==', profileState.uid).get();
-                        const batch = db.batch();
-                        evalSnap.forEach((d) => batch.delete(d.ref));
-                        redeemSnap.forEach((d) => batch.delete(d.ref));
-                        await batch.commit();
-
-                        await db.collection('user_profiles').doc(profileState.uid).set({
-                            userId: profileState.uid,
-                            displayName: profileState.displayName || 'Google 用戶',
-                            email: profileState.email || '',
-                            meritPoints: 0,
-                            totalReports: 0,
-                            unlockedBackgrounds: defaultBgs,
-                            _rawEvalCount: 0,
-                            _rawSpentPoints: 0,
-                            resetHistoryAt: new Date().toISOString(),
-                            updatedAt: new Date().toISOString()
-                        }, { merge: true });
-                    } else {
-                        profileState.evaluations = [];
-                        profileState.redemptions = [];
-                        await updateBackendCounts(0, 0, true);
-                    }
-                    testAdminModal.classList.add('hidden');
-                    showProfileToast('🧹 已完整歸 0 並重置購買背景、測試評論與兌換紀錄！', '#3CE6B0');
-                } catch (err) {
-                    console.warn('Reset all error:', err);
-                    showProfileToast('清空失敗，請稍後再試', '#FF85D0');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = '完整歸 0（同時清空此帳號的歷史紀錄與測試評論）';
-                }
-            });
+            }, { passive: true });
         });
     </script>
 </body>
