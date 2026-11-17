@@ -2151,7 +2151,10 @@
                 </g>
             </g>
 
-           <!-- 4. 外圍米白畫框邊緣遮罩 (刪除此區塊，讓下半部地板完整延伸至邊緣) -->
+           <!-- 4. 外圍米白畫框邊緣遮罩 (一般廁間維持顯示，小便斗模式自動隱藏) -->
+            <path id="stallOuterFrameMask"
+                  d="M -2000,-500 L 4000,-500 L 4000,2500 L -2000,2500 Z M -33,28 L -33,760 L 1473,760 L 1473,28 Z"
+                  fill="#FFF9EC" fill-rule="evenodd" class="pointer-events-none" />
         </svg>
     </main>
 
@@ -2850,6 +2853,7 @@
             const stallFgUse = document.getElementById('mainStallForegroundUse');
             const urinalFgUse = document.getElementById('mainUrinalForegroundUse');
             const inlineDownloadRect = document.getElementById('inlineDownloadCardBtnRect');
+            const stallOuterMask = document.getElementById('stallOuterFrameMask');
 
             // 手機版元素
             const mobileStallShoeWrapper = document.getElementById('mobileStallShoeBarWrapper');
@@ -4721,15 +4725,15 @@
             }
 
             if (currentSceneType === 'urinal') {
-                stallBg?.classList.add('hidden');
-                urinalBg?.classList.remove('hidden');
-                stallFg?.classList.add('hidden');
-                urinalFg?.classList.remove('hidden');
+                stallOuterMask?.classList.add('hidden'); // 👈 新增：小便斗模式隱藏米白遮罩，讓下半部地板完整鋪滿
+                mobileStallShoeWrapper?.classList.add('hidden');
+                mobileUrinalShoeWrapper?.classList.remove('hidden');
+                // ... (中間原本的程式碼維持不變) ...
             } else {
-                stallBg?.classList.remove('hidden');
-                urinalBg?.classList.add('hidden');
-                stallFg?.classList.remove('hidden');
-                urinalFg?.classList.add('hidden');
+                stallOuterMask?.classList.remove('hidden'); // 👈 新增：一般廁間模式恢復顯示米白遮罩
+                mobileStallShoeWrapper?.classList.remove('hidden');
+                mobileUrinalShoeWrapper?.classList.add('hidden');
+                // ... (中間原本的程式碼維持不變) ...
             }
 
             const cardNameLine1El = document.getElementById('cardToiletNameLine1');
