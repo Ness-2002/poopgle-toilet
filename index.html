@@ -591,8 +591,7 @@
             transition: all 0.16s ease;
         }
         .poogle-pill-btn:hover:not(:disabled) {
-            transform: translateY(-1.5px);
-            box-shadow: 0 3px 0 #2A348C;
+            box-shadow: none;
         }
 
         .poogle-zone {
@@ -915,6 +914,30 @@
         #trashCanOpenGroup:not(.hidden) .roach-dive-in-group {
             animation: roachDiveIntoCan 0.34s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
+
+        /* ========================================================= */
+        /* 自訂游標設定 (Default: img/mouse / Hover: img/hover)       */
+        /* ========================================================= */
+        :root {
+            --cursor-default: url('./img/mouse.png') 0 0, auto;
+            --cursor-hover: url('./img/hover.png') 0 0, pointer;
+        }
+        html, body, svg {
+            cursor: var(--cursor-default) !important;
+        }
+        a, button, select, [role="button"],
+        .cursor-pointer, [style*="cursor:pointer"], [style*="cursor: pointer"], [style*="cursor:grab"],
+        .poogle-zone, .poogle-zone *,
+        .tp-menu-item, .tp-menu-item *,
+        .bubble-unit, .bubble-unit *,
+        .mobile-bubble-unit, .mobile-bubble-unit *,
+        #pinkLocateDoorBtn, #pinkLocateDoorBtn *,
+        #mobilePinkLocateDoorBtn, #mobilePinkLocateDoorBtn *,
+        .eval-type-card, .eval-type-card *,
+        .nearby-100m-card, .nearby-100m-card * {
+            cursor: var(--cursor-hover) !important;
+        }
+        
     </style>
 </head>
 
@@ -2326,28 +2349,40 @@
     </div>
 
     <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FFF9EC] rounded-[32px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_10px_0_#2A348C] overflow-hidden">
-            <div class="bg-[#80E4FF] border-b-2 border-[#2A348C] px-6 py-4 flex items-center justify-between">
-                <h3 class="font-extrabold text-base text-[#2A348C]">有所味會員登入</h3>
-                <button id="closeLoginModalBtn" type="button" class="poogle-pill-btn w-8 h-8 rounded-full bg-[#FFF9EC] text-[#2A348C] flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <div id="loginModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative bg-white rounded-[36px] max-w-[430px] w-full border-[3px] border-[#2A348C] pt-12 pb-10 px-8 sm:px-12">
+            <!-- 頂部置中深藍膠囊標題 -->
+            <div class="absolute -top-[25px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[50px] px-8 sm:px-10 flex items-center justify-center text-lg sm:text-[22px] font-extrabold tracking-[0.16em] whitespace-nowrap select-none">
+                Google帳號登入
             </div>
-            <div class="p-6 space-y-4 text-center">
-                <p id="loginModalStatusText" class="text-sm text-[#2A348C] font-bold mb-3">登入以記錄您的專屬小怪與評鑑！</p>
+
+            <!-- 右上角深藍圓形關閉按鈕 -->
+            <button id="closeLoginModalBtn"
+                    type="button"
+                    aria-label="關閉登入視窗"
+                    class="absolute -top-3.5 -right-3.5 w-[46px] h-[46px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#2A348C] hover:bg-[#1f276b] text-[#FFF9EC] flex items-center justify-center transition-transform hover:scale-105 cursor-pointer focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFF9EC" stroke-width="3.8" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <div class="w-full max-w-[300px] mx-auto flex flex-col items-center text-center">
+                <!-- 已登入時顯示的標題文字 -->
+                <p id="loginModalStatusText" class="hidden text-sm sm:text-[15px] text-[#2A348C] font-extrabold tracking-[0.18em] mb-4">
+                    您目前已登入:
+                </p>
 
                 <!-- 登入後顯示的使用者資訊卡 -->
-                <div id="loggedInUserCard" class="hidden p-4 rounded-2xl bg-[#FFF9EC] border-2 border-[#2A348C] flex items-center gap-3.5 text-left">
-                    <div id="modalUserAvatarBox" class="w-12 h-12 rounded-full border-2 border-[#2A348C] overflow-hidden shrink-0"></div>
+                <div id="loggedInUserCard" class="hidden w-full min-h-[108px] p-4 rounded-[20px] bg-white border-[1.8px] border-[#2A348C] flex items-center gap-3.5 text-left mb-5">
+                    <div id="modalUserAvatarBox" class="w-12 h-12 rounded-full border-[1.8px] border-[#2A348C] overflow-hidden shrink-0"></div>
                     <div class="min-w-0 flex-1">
-                        <div id="modalUserName" class="font-extrabold text-[#2A348C] text-sm truncate">使用者名稱</div>
-                        <div id="modalUserEmail" class="text-xs text-[#2A348C]/75 truncate">user@gmail.com</div>
+                        <div id="modalUserName" class="font-extrabold text-[#2A348C] text-sm sm:text-base truncate">使用者名稱</div>
+                        <div id="modalUserEmail" class="text-xs text-[#2A348C]/75 truncate mt-0.5">user@gmail.com</div>
                     </div>
                 </div>
 
                 <!-- 錯誤診斷提示框 -->
-                <div id="loginErrorBox" class="hidden p-3.5 rounded-2xl bg-[#F3EF84] border-2 border-[#2A348C] text-left text-xs space-y-2">
+                <div id="loginErrorBox" class="hidden w-full p-3.5 rounded-2xl bg-[#F3EF84] border-[1.8px] border-[#2A348C] text-left text-xs space-y-2 mb-4">
                     <div class="font-extrabold text-[#2A348C] flex items-center gap-1.5">
                         <i class="fa-solid fa-triangle-exclamation text-[#F26559]"></i>
                         <span id="loginErrorTitle">Google 登入視窗被中斷</span>
@@ -2358,17 +2393,20 @@
                     </button>
                 </div>
 
-                <button id="googleLoginBtn" type="button" class="poogle-pill-btn w-full py-3 rounded-full bg-[#FFF9EC] text-[#2A348C] font-extrabold text-sm flex items-center justify-center gap-3 hover:bg-[#F3EF84] transition-colors">
+                <!-- 未登入時顯示的白色膠囊登入按鈕 -->
+                <button id="googleLoginBtn" type="button" class="poogle-pill-btn w-full h-[64px] my-3 rounded-full bg-white text-[#2A348C] font-extrabold text-sm sm:text-base tracking-wider flex items-center justify-center gap-3 hover:bg-[#FFF9EC] transition-colors">
                     <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0" aria-hidden="true">
                         <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
                         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
                         <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
                         <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
                     </svg>
-                    使用 Google 帳號登入
+                    <span>使用 Google 帳號登入</span>
                 </button>
-                <button id="logoutBtn" type="button" class="hidden poogle-pill-btn w-full py-3 rounded-full bg-[#FF99D3] text-[#2A348C] font-extrabold text-sm flex items-center justify-center gap-2 mt-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> 登出帳號
+
+                <!-- 已登入時顯示的粉紅膠囊登出按鈕 -->
+                <button id="logoutBtn" type="button" class="hidden poogle-pill-btn w-full h-[54px] rounded-full bg-[#FF85D0] hover:bg-[#ff70c6] text-[#2A348C] font-extrabold text-sm sm:text-base tracking-widest flex items-center justify-center gap-2 transition-colors">
+                    <span>登出帳號</span>
                 </button>
             </div>
         </div>
@@ -4886,7 +4924,7 @@
                     pendingPersonalSpaceRedirect = true;
                     const statusText = document.getElementById('loginModalStatusText');
                     if (statusText) {
-                        statusText.textContent = '個人空間需要登入 Google 帳號才能使用，請先登入！';
+                        statusText.classList.add('hidden');
                     }
                     setTimeout(() => {
                         document.getElementById('loginModal')?.classList.remove('hidden');
@@ -5074,7 +5112,10 @@
 
                 if (modalName) modalName.textContent = userObj.displayName || '有所味評鑑員';
                 if (modalEmail) modalEmail.textContent = userObj.email || '已透過 Google 驗證登入';
-                if (statusText) statusText.textContent = '您目前已登入 Google 帳號：';
+                if (statusText) {
+                    statusText.textContent = '您目前已登入:';
+                    statusText.classList.remove('hidden');
+                }
                 userCard?.classList.remove('hidden');
                 errorBox?.classList.add('hidden');
                 googleBtn?.classList.add('hidden');
@@ -5207,7 +5248,7 @@
                         try { localStorage.removeItem('poogle_auth_user'); } catch (e) {}
                         if (loginText) loginText.textContent = '登入';
                         if (avatarCircle) avatarCircle.innerHTML = getAnonymousAvatarHtml(true);
-                        if (statusText) statusText.textContent = '登入以記錄您的專屬小怪與評鑑！';
+                        if (statusText) statusText.classList.add('hidden');
                         userCard?.classList.add('hidden');
                         googleBtn?.classList.remove('hidden');
                         logoutBtn?.classList.add('hidden');

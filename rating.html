@@ -230,7 +230,7 @@
         #ratingMainStage.is-completed #mobilePlacedMonstersLayer,
         #ratingMainStage.is-completed #mobilePlacedMonstersLayer * {
             pointer-events: none !important;
-            cursor: default !important;
+            cursor: var(--cursor-default) !important;
         }
 
         .appear-on-complete {
@@ -521,7 +521,35 @@
             margin: 0 28px;
             line-height: 1;
         }
-
+/* ========================================================= */
+        /* 自訂游標設定 (Default: img/mouse / Hover: img/hover)       */
+        /* ========================================================= */
+        :root {
+            --cursor-default: url('./img/mouse.png') 0 0, auto;
+            --cursor-hover: url('./img/hover.png') 0 0, pointer;
+        }
+        html, body, svg {
+            cursor: var(--cursor-default) !important;
+        }
+        a, button, select, [role="button"],
+        .cursor-pointer, .cursor-grab, .cursor-grabbing,
+        [style*="cursor: pointer"], [style*="cursor: grab"], [style*="cursor: nwse-resize"],
+        .star-interactive, .star-interactive *,
+        .svg-action-btn, .svg-action-btn *,
+        .logo-link-group, .logo-link-group *,
+        .shoe-option-btn, .shoe-option-btn *,
+        .mobile-drawer-card:not(.is-placed), .mobile-drawer-card:not(.is-placed) *,
+        .monster-menu-card:not(.is-placed), .monster-menu-card:not(.is-placed) *,
+        .rating-tp-menu-item, .rating-tp-menu-item *,
+        #placedMonstersLayer g, #placedMonstersLayer g *,
+        #mobilePlacedMonstersLayer g, #mobilePlacedMonstersLayer g * {
+            cursor: var(--cursor-hover) !important;
+        }
+        /* 已放置的小怪或完成評鑑鎖定狀態維持預設游標 */
+        .monster-menu-card.is-placed,
+        .mobile-drawer-card.is-placed {
+            cursor: var(--cursor-default) !important;
+        }
     </style>
 </head>
 <body>
@@ -677,7 +705,7 @@
         <!-- =============================================================== -->
         <!-- 1A. MOBILE RATING SVG (< 768px：1:1 還原 手機ui-26.jpg & 28.jpg) -->
         <!-- =============================================================== -->
-        <svg id="mobileRatingMainSvg" viewBox="0 0 430 1122" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none">
+        <svg id="mobileRatingMainSvg" viewBox="0 0 430 1122" preserveAspectRatio="xMidYMin meet" style="touch-action: pan-y;" class="block md:hidden w-full h-auto select-none overflow-visible">
         <defs>                
             <!-- 手機版獨立圓潤五角星路徑 -->
                 <path id="mobilePoogleStarShape"
@@ -695,8 +723,8 @@
 
                 <!-- 手機版小便斗視角裁切遮罩 (讓全寬藍色地板與黃色隔板整齊收合於中央視景區) -->
                 <clipPath id="mobileUrinalViewportClip">
-                    <rect x="0" y="228" width="430" height="382" />
-                </clipPath>
+    <rect x="-500" y="228" width="1500" height="2000" />
+</clipPath>
 
                 <!-- 手機版獨立定義的四大分類圖示 (避免跨隱藏 SVG 引用失效) -->
                 <g id="mobileIconCategoryUrinal">
@@ -863,11 +891,11 @@
                 </g>
             </g>
 
-            <!-- 2B. 手機版場景 B：小便斗視角 (同步製作小便斗、黃色隔板、藍色地板、綠長褲球鞋與中央小雞) -->
-            <g id="mobileSceneUrinalGroup" class="hidden mobile-shift-up-on-complete" clip-path="url(#mobileUrinalViewportClip)">
-                <g transform="translate(215, 238) scale(0.485) translate(-720, 0)">
-                    <!-- 小便斗藍色地板 -->
-                    <rect x="-150" y="492" width="1740" height="270" fill="#59E1FF" />
+            <!-- 2B. 手機版場景 B：小便斗視角 -->
+<g id="mobileSceneUrinalGroup" class="hidden mobile-shift-up-on-complete" clip-path="url(#mobileUrinalViewportClip)">
+    <g transform="translate(215, 238) scale(0.485) translate(-720, 0)">
+        <!-- 小便斗地板 (改為 #E0DCD3 並向下延伸填滿整個下半部) -->
+        <rect x="-1000" y="492" width="3500" height="2000" fill="#E0DCD3" />
 
                     <!-- 左右黃色隔板 -->
                     <path d="M 458,184 C 464,166 482,166 488,184 L 594,492 L 500,746 L 360,694 C 346,688 344,674 348,656 Z"
@@ -1500,7 +1528,7 @@
         <!-- =============================================================== -->
         <!-- 1C. DESKTOP RATING SVG (>= 768px：保留原本 1550x780 完整電腦版)   -->
         <!-- =============================================================== -->
-        <svg id="ratingMainSvg" viewBox="-55 0 1550 780" preserveAspectRatio="xMidYMid meet" class="hidden md:block w-full h-full max-w-full max-h-full">
+        <svg id="ratingMainSvg" viewBox="-55 0 1550 780" preserveAspectRatio="xMidYMid meet" class="hidden md:block w-full h-full max-w-full max-h-full overflow-visible">
             <defs>
                 <!-- 1:1 還原 star-05.svg 圓潤五角星路徑 (中心為 0,0，帶微傾俏皮角度與底部立體厚邊) -->
                 <path id="poogleStarShape"
@@ -1597,9 +1625,9 @@
             <!-- 0. 滿版米白底色 -->
             <rect x="-100" y="0" width="1640" height="780" fill="#FFF9EC" />
 
-            <!-- 小便斗滿版藍色地板底層 -->
+            <!-- 小便斗滿版地板底層 (改為 #E0DCD3 並填滿整個下半部) -->
             <g id="urinalFloorFullBleed" class="hidden pointer-events-none">
-                <rect x="-500" y="492" width="2600" height="288" fill="#59E1FF" />
+                <rect x="-2000" y="492" width="6000" height="2000" fill="#E0DCD3" />
             </g>
 
             <!-- =========================================================== -->
@@ -1704,25 +1732,25 @@
             <!-- 2A. 左欄：公廁標題資訊 + 四排互動星等                       -->
             <!-- =========================================================== -->
             <g id="leftRatingPanelGroup">
-               <g id="leftToiletHeaderGroup" class="fade-on-complete" transform="translate(0, 48)">
-                    <!-- 編輯模式提示徽章 (電腦版：移至公廁名稱上方) -->
-                    <g id="editModeBadgeGroup" class="hidden" transform="translate(46, 40)">
-                        <rect x="0" y="0" width="224" height="28" rx="14" fill="#08F29A" stroke="#2A348C" stroke-width="1.8" />
-                        <text x="112" y="14.5" fill="#2A348C" font-size="12" font-weight="900" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central">
-                            ✓ 已評鑑過・目前為編輯模式
-                        </text>
-                    </g>
+               <g id="leftToiletHeaderGroup" class="fade-on-complete" transform="translate(0, -6)">
+    <!-- 編輯模式提示徽章 (電腦版：移至公廁名稱上方) -->
+    <g id="editModeBadgeGroup" class="hidden" transform="translate(46, 40)">
+        <rect x="0" y="0" width="224" height="28" rx="14" fill="#08F29A" stroke="#2A348C" stroke-width="1.8" />
+        <text x="112" y="14.5" fill="#2A348C" font-size="12" font-weight="900" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central">
+            ✓ 已評鑑過・目前為編輯模式
+        </text>
+    </g>
 
-                    <text id="displayToiletName" x="46" y="114" fill="#2A348C" font-size="40" font-weight="900" letter-spacing="2.5">
-                        公廁一
-                    </text>
-                    <text id="displayToiletManager" x="48" y="152" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2">
-                        管理單位 : 000000
-                    </text>
-                    <text id="displayToiletAddress" x="48" y="180" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2">
-                        地址 : 000000
-                    </text>
-                </g>
+    <text id="displayToiletName" x="46" y="114" fill="#2A348C" font-size="40" font-weight="900" letter-spacing="2.5">
+        公廁一
+    </text>
+    <text id="displayToiletManager" x="48" y="152" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2">
+        管理單位 : 000000
+    </text>
+    <text id="displayToiletAddress" x="48" y="180" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2">
+        地址 : 000000
+    </text>
+</g>
 
                 <!-- 第 1 排：整潔衛生 -->
                 <text x="48" y="256" class="fade-on-complete" fill="#2A348C" font-size="20" font-weight="900" letter-spacing="2">整潔衛生</text>
@@ -2123,9 +2151,7 @@
                 </g>
             </g>
 
-            <!-- 4. 外圍米白畫框邊緣遮罩 -->
-            <path d="M -100,0 L 1540,0 L 1540,780 L -100,780 Z M -33,28 L -33,760 L 1473,760 L 1473,28 Z"
-                  fill="#FFF9EC" fill-rule="evenodd" class="pointer-events-none" />
+           <!-- 4. 外圍米白畫框邊緣遮罩 (刪除此區塊，讓下半部地板完整延伸至邊緣) -->
         </svg>
     </main>
 
@@ -2178,8 +2204,8 @@
                     </g>
 
                     <!-- 圖卡場景 B：小便斗背景 -->
-                    <g id="cardSceneUrinalBg" class="hidden">
-                        <rect x="280" y="492" width="880" height="270" fill="#59E1FF" />
+<g id="cardSceneUrinalBg" class="hidden">
+    <rect x="280" y="492" width="880" height="270" fill="#E0DCD3" />
                         <path d="M 458,184 C 464,166 482,166 488,184 L 594,492 L 500,746 L 360,694 C 346,688 344,674 348,656 Z"
                               fill="#F3EF84" stroke="#2A348C" stroke-width="4" stroke-linejoin="round" />
                         <path d="M 982,184 C 976,166 958,166 952,184 L 846,492 L 940,746 L 1080,694 C 1094,688 1096,674 1092,656 Z"
@@ -2296,121 +2322,125 @@
     </section>
 
     <!-- =================================================================== -->
-    <!-- POPUP 1: 點擊「不是您所在的廁所嗎？」切換附近 100 公尺內廁所視窗     -->
+    <!-- POPUP 1: 點擊「不是您所在的廁所嗎？」變更公廁視窗                   -->
     <!-- =================================================================== -->
-    <div id="switchToiletModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="w-full max-w-[465px] bg-[#FFF9EC] rounded-[24px] border-[2.5px] border-[#2A348C] overflow-hidden shadow-2xl flex flex-col">
-            <!-- 粉紅標題列 -->
-            <div class="bg-[#FF85D6] border-b-[2.5px] border-[#2A348C] px-6 py-4 flex items-center justify-between">
-                <h3 class="text-[#2A348C] text-lg sm:text-[20px] font-black tracking-wider">
-                    切換附近100公尺內的廁所
-                </h3>
-                <button id="closeSwitchToiletModalBtn" type="button" aria-label="關閉"
-                        class="w-9 h-9 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-[2.2px] border-[#2A348C] flex items-center justify-center transition-colors focus:outline-none">
-                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round">
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                    </svg>
-                </button>
+    <div id="switchToiletModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-[540px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] pt-12 pb-8 flex flex-col shadow-2xl">
+            <!-- 頂部置中跨邊框深藍標題 -->
+            <div class="absolute -top-[16px] left-1/2 -translate-x-1/2 w-[160px] sm:w-[180px] h-[32px] bg-[#2A348C] text-white rounded-full flex items-center justify-center text-sm sm:text-[15px] font-black tracking-[0.22em] indent-[0.22em] whitespace-nowrap">
+             變更公廁
             </div>
 
-            <!-- 搜尋框 -->
-            <div class="px-6 py-4 border-b border-[#2A348C]/20">
+            <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
+            <button id="closeSwitchToiletModalBtn" type="button" aria-label="關閉"
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
+                    <line x1="9" y1="9" x2="23" y2="23" />
+                    <line x1="23" y1="9" x2="9" y2="23" />
+                </svg>
+            </button>
+
+            <!-- 搜尋框 (下方帶全寬細分隔線) -->
+            <div class="px-8 sm:px-12 pt-2 pb-5 border-b border-[#2A348C]/25">
                 <input id="switchModalSearchInput" type="text" placeholder="搜尋附近100m內的公廁..."
                        style="user-select: text; -webkit-user-select: text;"
-                       class="w-full px-5 py-2.5 rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] placeholder-[#2A348C]/35 text-sm sm:text-base font-bold tracking-wider focus:outline-none focus:ring-2 focus:ring-[#59E1FF]" />
+                       class="w-full h-[44px] px-6 rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] placeholder-[#2A348C]/30 text-sm sm:text-[16px] font-bold tracking-[0.14em] focus:outline-none focus:ring-2 focus:ring-[#59E1FF]" />
             </div>
 
-            <!-- 一般廁間 / 小便斗 類型切換膠囊按鈕 + 100m 公廁清單 -->
-            <div class="px-6 py-4 space-y-4">
-                <div class="grid grid-cols-2 gap-3.5">
+            <!-- 一般廁間 / 小便斗 切換按鈕 + 100m 公廁清單 -->
+            <div class="px-8 sm:px-12 pt-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4 sm:gap-5">
                     <button id="modalSelectStallBtn" type="button"
-                            class="h-[42px] rounded-full bg-[#F3EF84] border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-wider flex items-center justify-center gap-1 transition-all focus:outline-none">
+                            class="h-[42px] rounded-full bg-[#F3EF84] border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-[0.14em] flex items-center justify-center gap-1 transition-all focus:outline-none">
                         <span>一般廁間</span>
                         <span id="modalStallSelectedTag" class="text-[#F26559] text-xs font-black">(目前選取)</span>
                     </button>
                     <button id="modalSelectUrinalBtn" type="button"
-                            class="h-[42px] rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-wider flex items-center justify-center gap-1 transition-all focus:outline-none">
+                            class="h-[42px] rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-[0.14em] flex items-center justify-center gap-1 transition-all focus:outline-none">
                         <span>小便斗</span>
                         <span id="modalUrinalSelectedTag" class="hidden text-[#F26559] text-xs font-black">(目前選取)</span>
                     </button>
                 </div>
 
-                <div id="switchModalToiletList" class="max-h-[210px] overflow-y-auto poogle-modal-scroll space-y-3 pr-1">
+                <div id="switchModalToiletList" class="max-h-[220px] overflow-y-auto poogle-modal-scroll space-y-3.5 pr-1">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- =================================================================== -->
-    <!-- POPUP 2: 點擊「我要留言」彈出留言板視窗                             -->
+    <!-- POPUP 2: 點擊「我要留言」彈出留言視窗                               -->
     <!-- =================================================================== -->
-    <div id="leaveCommentModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="w-full max-w-[465px] bg-[#FFF9EC] rounded-[24px] border-[2.5px] border-[#2A348C] overflow-hidden shadow-2xl flex flex-col">
-            <!-- 粉紅標題列：留言板 -->
-            <div class="bg-[#FF85D6] border-b-[2.5px] border-[#2A348C] px-6 py-3.5 flex items-center justify-between">
-                <h3 class="text-[#2A348C] text-lg sm:text-[20px] font-black tracking-wider">
-                    留言板
-                </h3>
-                <button id="closeLeaveCommentModalBtn" type="button" aria-label="關閉"
-                        class="w-9 h-9 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-[2.2px] border-[#2A348C] flex items-center justify-center transition-colors focus:outline-none">
-                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round">
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                    </svg>
-                </button>
-            </div>
+    <div id="leaveCommentModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-[520px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] px-7 sm:px-11 pt-14 pb-9 flex flex-col shadow-2xl">
+            <!-- 頂部置中跨邊框深藍標題 -->
+           <!-- 頂部置中跨邊框深藍膠囊標題 (寬度縮小 1/2) -->
+<div class="absolute -top-[16px] left-1/2 -translate-x-1/2 w-[80px] sm:w-[90px] h-[32px] bg-[#2A348C] text-white rounded-full flex items-center justify-center text-sm sm:text-[15px] font-black tracking-[0.22em] indent-[0.22em] whitespace-nowrap">
+    留言
+</div>
+            <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
+            <button id="closeLeaveCommentModalBtn" type="button" aria-label="關閉"
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
+                    <line x1="9" y1="9" x2="23" y2="23" />
+                    <line x1="23" y1="9" x2="9" y2="23" />
+                </svg>
+            </button>
 
-            <!-- 留言輸入區與右下角字數統計 + 藍色紙飛機送出鈕 -->
-            <div class="p-6">
-                <div class="relative w-full h-[210px] rounded-[20px] bg-white border-[2px] border-[#2A348C] p-4 flex flex-col justify-between">
-                    <textarea id="modalCommentTextarea" maxlength="100" placeholder="留下想說的話..."
-                              style="user-select: text; -webkit-user-select: text;"
-                              class="w-full flex-1 resize-none border-none bg-transparent text-[#2A348C] placeholder-[#2A348C]/30 text-base font-bold tracking-wider focus:outline-none"></textarea>
+            <!-- 留言輸入框與右下角字數統計 + 藍色紙飛機送出鈕 -->
+            <div class="relative w-full h-[220px] rounded-[18px] bg-white border-[2px] border-[#2A348C] p-5 flex flex-col justify-between">
+                <textarea id="modalCommentTextarea" maxlength="100" placeholder="留下想說的話..."
+                          style="user-select: text; -webkit-user-select: text;"
+                          class="w-full flex-1 resize-none border-none bg-transparent text-[#2A348C] placeholder-[#2A348C]/25 text-base sm:text-[17px] font-bold tracking-[0.14em] focus:outline-none"></textarea>
 
-                    <div class="flex items-end justify-end gap-3 pt-2">
-                        <span id="modalCommentCharCount" class="text-[#2A348C]/35 text-sm font-black tracking-widest mb-1">
-                            (0/100)
-                        </span>
-                        <button id="submitModalCommentBtn" type="button" aria-label="送出留言"
-                                class="w-11 h-11 rounded-full bg-[#4CE0FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] flex items-center justify-center transition-all focus:outline-none">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="#2A348C">
-                                <path d="M 3,11.5 L 20,4 L 14.5,20.5 L 11,13.5 Z" stroke="#2A348C" stroke-width="1.5" stroke-linejoin="round" />
-                            </svg>
-                        </button>
-                    </div>
+                <div class="flex items-end justify-end gap-3 pt-2">
+                    <span id="modalCommentCharCount" class="text-[#2A348C]/25 text-sm sm:text-[15px] font-black tracking-[0.14em] mb-1">
+                        (0/100)
+                    </span>
+                    <button id="submitModalCommentBtn" type="button" aria-label="送出留言"
+                            class="w-11 h-11 rounded-full bg-[#4CE0FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] flex items-center justify-center transition-all focus:outline-none">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="#2A348C">
+                            <path d="M 3,11.5 L 20,4 L 14.5,20.5 L 11,13.5 Z" stroke="#2A348C" stroke-width="1.5" stroke-linejoin="round" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- =================================================================== -->
-    <!-- POPUP 3: 點擊右上角 Logo 彈出「確定返回?」確認視窗                   -->
+    <!-- POPUP 3: 點擊離開或返回主頁時彈出「確定返回 / 確定離開?」確認視窗 (整體放大 1/3) -->
     <!-- =================================================================== -->
-    <div id="confirmReturnHomeModal" class="hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="w-full max-w-[465px] bg-[#FFF9EC] rounded-[24px] border-[2.5px] border-[#2A348C] px-7 pt-5 pb-9 relative flex flex-col items-center text-center shadow-2xl">
-            <div class="w-full flex justify-end">
-                <button id="closeConfirmReturnModalBtn" type="button" aria-label="關閉"
-                        class="w-10 h-10 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-[2.2px] border-[#2A348C] flex items-center justify-center transition-colors focus:outline-none">
-                    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round">
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                    </svg>
-                </button>
+    <div id="confirmReturnHomeModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-[500px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] px-7 sm:px-10 pt-16 pb-9 flex flex-col items-center text-center shadow-2xl">
+            <!-- 頂部置中跨邊框深藍膠囊標題 (同步放大 1/3) -->
+            <div class="absolute -top-[16px] left-1/2 -translate-x-1/2 w-[80px] sm:w-[90px] h-[32px] bg-[#2A348C] text-white rounded-full flex items-center justify-center text-sm sm:text-[15px] font-black tracking-[0.22em] indent-[0.22em] whitespace-nowrap">
+                留言
             </div>
 
-            <div class="mt-2 mb-8 space-y-2 text-[#2A348C] text-lg sm:text-[21px] font-bold tracking-[0.14em] leading-relaxed">
-                <p id="confirmLeaveTitleText">確定返回?</p>
+            <!-- 右上角跨邊框深藍圓形關閉按鈕 (同步放大 1/3) -->
+            <button id="closeConfirmReturnModalBtn" type="button" aria-label="關閉"
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
+                    <line x1="9" y1="9" x2="23" y2="23" />
+                    <line x1="23" y1="9" x2="9" y2="23" />
+                </svg>
+            </button>
+
+            <!-- 內文提示區 (字體與間距放大 1/3) -->
+            <div class="mt-2 mb-8 space-y-2 text-[#2A348C] text-lg sm:text-[21px] font-black tracking-[0.16em] leading-relaxed">
+                <p id="confirmLeaveTitleText">確定返回？</p>
                 <p>您的操作將<span class="underline underline-offset-[6px] decoration-[2.5px]">不會</span>被儲存</p>
             </div>
 
-            <div class="w-full flex items-center justify-center gap-6 sm:gap-9 px-2">
+            <!-- 底部雙按鈕 (寬高與字體放大 1/3) -->
+            <div class="w-full flex items-center justify-center gap-6 sm:gap-8 px-2">
                 <button id="confirmGoHomeBtn" type="button"
-                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.14em] flex items-center justify-center transition-all focus:outline-none">
+                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-white hover:bg-[#FFF9EC] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
                     回主頁
                 </button>
                 <button id="continueRatingEditBtn" type="button"
-                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-[#08F29A] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.14em] flex items-center justify-center transition-all focus:outline-none">
+                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-[#08F29A] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
                     繼續編輯
                 </button>
             </div>
@@ -3631,7 +3661,7 @@
 
             if (filtered.length === 0) {
                 listEl.innerHTML = `
-                    <div class="rounded-[16px] bg-white border-[2px] border-[#2A348C] p-5 text-center text-[#2A348C] font-bold text-sm">
+                    <div class="rounded-[14px] bg-white border-[2px] border-[#2A348C] p-5 text-center text-[#2A348C] font-bold text-sm">
                         100公尺內找不到符合「${escapeHtml(filterQuery)}」的公廁
                     </div>
                 `;
@@ -3643,37 +3673,40 @@
                     || (idx === 0 && currentSelectedToilet.name === '公廁名');
                 const cleanItemName = String(item.name || '').trim();
                 const alreadyRatedRecord = syncedUserEvaluationsByName.get(cleanItemName) || findLocalExistingEvaluationForToilet(cleanItemName);
-                const cardBg = isSelected ? 'bg-[#F3EF84]' : 'bg-white';
+                const cardBg = isSelected ? 'bg-[#F3EF84]' : 'bg-white hover:bg-[#FFF9EC]';
 
                 const cleanAddr = String(item.address || '').replace(/^地址\s*[:：]?\s*/, '').trim();
-                const addrText = cleanAddr || '000000000000';
+                const addrText = `地址${cleanAddr || '000000000000'}`;
+                const distMeters = Number.isFinite(Number(item.distance)) ? Math.round(Number(item.distance)) : 0;
+                const distLabel = `${String(distMeters).padStart(2, '0')}m`;
 
                 return `
-                    <div class="w-full rounded-[16px] ${cardBg} border-[2px] border-[#2A348C] px-4 py-3 flex items-center justify-between gap-3.5 transition-colors">
-                        <div class="min-w-0 flex-1 space-y-1">
+                    <div data-replace-idx="${idx}"
+                         class="w-full rounded-[14px] ${cardBg} border-[2px] border-[#2A348C] px-5 py-3 flex items-center justify-between gap-3.5 transition-colors cursor-pointer">
+                        <div class="min-w-0 flex-1 space-y-0.5">
                             <div class="flex items-baseline gap-1.5 flex-wrap">
-                                <span class="text-[#2A348C] text-base sm:text-[17px] font-black tracking-wider truncate">
+                                <span class="text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.12em] truncate">
                                     ${escapeHtml(item.name)}
                                 </span>
-                                ${alreadyRatedRecord ? `<span class="text-[#F26559] text-xs font-extrabold tracking-wide shrink-0">(已評鑑)</span>` : ''}
-                                ${isSelected ? `<span class="text-[#2A348C]/70 text-xs font-black tracking-wide shrink-0">(目前選取)</span>` : ''}
+                                ${isSelected ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] shrink-0">(目前選取)</span>` : ''}
+                                ${!isSelected && alreadyRatedRecord ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] shrink-0">(已評鑑)</span>` : ''}
                             </div>
-                            <div class="text-[#2A348C] text-[13px] font-light tracking-widest truncate">
+                            <div class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-[0.14em] truncate">
                                 ${escapeHtml(addrText)}
                             </div>
                         </div>
 
-                        <button type="button" data-replace-idx="${idx}"
-                                class="shrink-0 w-[82px] h-[36px] rounded-full ${alreadyRatedRecord ? 'bg-[#08F29A] hover:bg-[#06d688]' : 'bg-[#4CE0FF] hover:bg-[#35d2f2]'} active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-wider flex items-center justify-center transition-all focus:outline-none">
-                            ${alreadyRatedRecord ? '編輯' : '更換'}
+                        <button type="button"
+                                class="shrink-0 w-[80px] h-[36px] rounded-full bg-[#4CE0FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-[0.12em] flex items-center justify-center transition-all focus:outline-none">
+                            ${escapeHtml(distLabel)}
                         </button>
                     </div>
                 `;
             }).join('');
 
-            listEl.querySelectorAll('[data-replace-idx]').forEach((btn) => {
-                btn.addEventListener('click', async () => {
-                    const idx = parseInt(btn.getAttribute('data-replace-idx'), 10);
+            listEl.querySelectorAll('[data-replace-idx]').forEach((cardEl) => {
+                cardEl.addEventListener('click', async () => {
+                    const idx = parseInt(cardEl.getAttribute('data-replace-idx'), 10);
                     const chosen = filtered[idx];
                     if (chosen) {
                         const isSameSelectedToilet = (

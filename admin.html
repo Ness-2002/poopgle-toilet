@@ -133,6 +133,22 @@
             border: 1.5px solid var(--poogle-ink);
             border-radius: 9999px;
         }
+        /* ========================================================= */
+        /* 自訂游標設定 (Default: img/mouse / Hover: img/hover)       */
+        /* ========================================================= */
+        :root {
+            --cursor-default: url('./img/mouse.png') 0 0, auto;
+            --cursor-hover: url('./img/hover.png') 0 0, pointer;
+        }
+        html, body, svg {
+            cursor: var(--cursor-default) !important;
+        }
+        a, button:not(:disabled), select, [role="button"],
+        .cursor-pointer,
+        .poogle-pill-btn:not(:disabled), .poogle-pill-btn:not(:disabled) *,
+        .poogle-tab-btn:not(:disabled), .poogle-tab-btn:not(:disabled) * {
+            cursor: var(--cursor-hover) !important;
+        }
     </style>
 </head>
 
