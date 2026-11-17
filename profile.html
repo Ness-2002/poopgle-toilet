@@ -173,27 +173,69 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* 手機版右上角下拉式衛生紙捲筒選單展開與收合動畫 */
+        @keyframes profileTpDropdownUnroll {
+            0% { opacity: 0; transform: scaleY(0.18); }
+            70% { opacity: 1; transform: scaleY(1.03); }
+            100% { opacity: 1; transform: scaleY(1); }
+        }
+        @keyframes profileTpDropdownRollUp {
+            0% { opacity: 1; transform: scaleY(1); }
+            30% { opacity: 1; transform: scaleY(1.02); }
+            100% { opacity: 0; transform: scaleY(0.12); }
+        }
+        #profileTpRollDropdownMenu {
+            transform-origin: top center;
+        }
+        #profileTpRollDropdownMenu.is-open {
+            display: block !important;
+            animation: profileTpDropdownUnroll 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        #profileTpRollDropdownMenu.is-closing {
+            display: block !important;
+            pointer-events: none;
+            animation: profileTpDropdownRollUp 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @media (min-width: 768px) {
+            #profileTpRollDropdownMenu,
+            #profileTpRollDropdownMenu.is-open,
+            #profileTpRollDropdownMenu.is-closing {
+                display: none !important;
+            }
+        }
+        .profile-tp-menu-item {
+            cursor: pointer;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+        .profile-tp-menu-item:hover {
+            transform: translateX(3px);
+        }
+        .profile-tp-menu-item:hover text {
+            fill: #EE5A5A;
+        }
     </style>
 </head>
 
 <body class="page-cloak min-h-screen w-full flex flex-col justify-between select-none relative">
 
     <!-- =================================================================== -->
-    <!-- 頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO                              -->
+    <!-- 電腦版頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (手機版隱藏)           -->
     <!-- =================================================================== -->
-    <header class="w-full relative z-35 mb-6 sm:mb-8 lg:mb-10">
-        <!-- 粉紅導覽列：調整高度與上下間距，使高度貼合文字並保留適當間距 -->
-        <nav class="w-full h-[40px] sm:h-[48px] bg-[#FF85D0] flex items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-    <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
-        <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
-        <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
-        <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-        <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
-        <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
-        <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
-    </div>
-</nav>
-        <!-- 左上角 LOGO（允許超出導覽列高度，自然覆蓋於上方） -->
+    <header class="hidden md:block w-full relative z-50 mb-8 lg:mb-10">
+        <!-- 粉紅導覽列 -->
+        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-7 xl:gap-10 text-[#1E2470] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+                <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
+                <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+                <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
+                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
+                <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
+            </div>
+        </nav>
+
+        <!-- 左上角 LOGO（僅電腦版顯示，自然覆蓋於導覽列上方） -->
         <div class="absolute inset-x-0 top-0 pointer-events-none z-40">
             <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
                 <a href="./index.html" class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味主頁">
@@ -208,9 +250,73 @@
     </header>
 
     <!-- =================================================================== -->
+    <!-- 手機版頂部列：左上角「功德點數:__」+ 右上角漢堡選單 (電腦版隱藏)    -->
+    <!-- =================================================================== -->
+    <div class="w-full flex md:hidden items-center justify-between px-[7.4%] pt-[28px] pb-2 relative z-50">
+        <!-- 左上角：功德點數文字 -->
+        <div class="text-[#1E2470] text-[18px] sm:text-[20px] font-extrabold tracking-wider flex items-baseline gap-1">
+            <span>功德點數:</span>
+            <span id="mobileMeritPointsCount" class="font-black">0</span>
+        </div>
+
+        <!-- 右上角：漢堡選單按鈕與衛生紙下拉選單 -->
+        <div id="profileMobileNavContainer" class="relative flex items-center justify-end">
+            <button id="profileMobileHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
+                    class="flex flex-col justify-center gap-[8px] p-1.5 focus:outline-none group transition-transform active:scale-95 cursor-pointer">
+                <span class="w-[38px] h-[7px] bg-[#1E2470] block transition-transform group-hover:scale-x-105"></span>
+                <span class="w-[38px] h-[7px] bg-[#1E2470] block transition-transform group-hover:scale-x-105"></span>
+            </button>
+
+            <div id="profileTpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-34px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(30,36,112,0.18)]">
+                <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+                    <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
+                          fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+
+                    <g id="profileTpMenuHomeBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="34" width="180" height="48" fill="transparent" />
+                        <text x="22" y="65" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">主頁</text>
+                    </g>
+
+                    <g id="profileTpMenuReportSystemBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="98" width="180" height="48" fill="transparent" />
+                        <text x="22" y="129" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
+                    </g>
+
+                    <g id="profileTpMenuMapBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="162" width="180" height="48" fill="transparent" />
+                        <text x="22" y="193" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
+                    </g>
+
+                    <g id="profileTpMenuStatusBoardBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="226" width="180" height="48" fill="transparent" />
+                        <text x="22" y="257" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                    </g>
+
+                    <g id="profileTpMenuMonsterDexBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="290" width="180" height="48" fill="transparent" />
+                        <text x="22" y="321" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
+                    </g>
+
+                    <g id="profileTpMenuPersonalSpaceBtn" class="profile-tp-menu-item" role="button" tabindex="0">
+                        <rect x="8" y="354" width="180" height="48" fill="transparent" />
+                        <text x="22" y="385" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
+                    </g>
+
+                    <path d="M 34,420 L 177,420 A 31,88 0 0,1 177,596 L 34,596 Z"
+                          fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                    <ellipse cx="34" cy="508" rx="31" ry="88"
+                             fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" />
+                    <ellipse cx="31" cy="508" rx="9" ry="26"
+                             fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
     <!-- 上半部：使用者稱號、頭貼、Lv.1 徽章、變更頭貼按鈕、升級提示         -->
     <!-- =================================================================== -->
-    <section class="w-full max-w-[1280px] mx-auto px-4 pt-10 sm:pt-12 lg:pt-4 flex flex-col items-center text-center clear-both">
+    <section class="w-full max-w-[1280px] mx-auto px-4 pt-4 sm:pt-8 lg:pt-4 flex flex-col items-center text-center clear-both">
         <!-- 使用者名稱與稱號 (字距縮小 1/3) -->
         <h1 class="text-2xl sm:text-[33px] font-extrabold text-[#1E2470] tracking-[0.093em] leading-snug">
             <span id="displayUserNameText">OOO</span>，<span id="displayUserTitleText">探廁小白</span>
@@ -526,9 +632,9 @@
             </div>
 
             <!-- =========================================================== -->
-            <!-- 3. 右欄：我的功德點數                                       -->
+            <!-- 3. 右欄：我的功德點數 (手機版隱藏，電腦/平板顯示)            -->
             <!-- =========================================================== -->
-            <div class="relative w-full max-w-[360px] mx-auto flex flex-col items-center">
+            <div class="hidden md:flex md:flex-col items-center w-full max-w-[360px] mx-auto">
                 <!-- 頂部膠囊標題 (純展示不可點擊) -->
                 <div class="section-pill-title relative z-20 -mb-[22px] cursor-default select-none pointer-events-none">
                     我的功德點數
@@ -754,10 +860,13 @@
             </div>
         </div>
     </div>
-    <!-- 施工中彈窗 (點擊「公廁現況版 / 小怪圖鑑」時顯示) -->
+
+    <!-- =================================================================== -->
+    <!-- POPUP 3: 施工中彈窗 (點擊「公廁現況版 / 小怪圖鑑」時顯示)           -->
+    <!-- =================================================================== -->
     <div id="profileUnderConstructionModal"
-        onclick="if(event.target === this) this.classList.add('hidden')"
-        class="hidden fixed inset-0 z-50 bg-[#1E2470]/45 backdrop-blur-sm flex items-center justify-center p-4">
+         onclick="if(event.target === this) this.classList.add('hidden')"
+         class="hidden fixed inset-0 z-50 bg-[#1E2470]/45 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="poogle-modal-card bg-[#FCF5E5] rounded-[28px] max-w-sm w-full border-2 border-[#1E2470] shadow-[0_8px_0_#1E2470] px-6 py-10 relative flex flex-col items-center justify-center text-center">
             <button type="button"
                     aria-label="關閉"
@@ -772,6 +881,7 @@
             </div>
         </div>
     </div>
+
     <script>
         // ===================================================================
         // Firebase 初始化與全域狀態
@@ -931,7 +1041,6 @@
 
         function renderClosestPrizeUI(currentPoints) {
             const pts = Math.max(0, parseInt(currentPoints, 10) || 0);
-            // 找出下一個尚未達標、最接近可兌換的獎品；若已達最高獎品門檻則顯示最高獎品
             let targetPrize = PRIZE_ITEMS.find((item) => item.cost > pts);
             let diffPoints = 0;
 
@@ -1020,35 +1129,22 @@
             if (avatarKey === 'free_squat') {
                 return `
                     <svg viewBox="0 0 200 200" class="w-full h-full block">
-                        <!-- 粉紅磁磚透視背景 -->
                         <rect width="200" height="200" fill="#FF85D0" />
-                        <!-- 後牆格線 -->
                         <path d="M 35 0 L 35 66 M 68 0 L 68 66 M 100 0 L 100 66 M 132 0 L 132 66 M 165 0 L 165 66" stroke="#1E2470" stroke-width="1.2" />
                         <path d="M 0 33 L 200 33 M 0 66 L 200 66" stroke="#1E2470" stroke-width="1.2" />
-                        <!-- 地板放射透視格線 -->
                         <path d="M 35 66 L -15 160 M 68 66 L 25 200 M 100 66 L 100 200 M 132 66 L 175 200 M 165 66 L 215 160" stroke="#1E2470" stroke-width="1.2" />
                         <path d="M 0 96 L 200 96 M 0 130 L 200 130 M 0 168 L 200 168" stroke="#1E2470" stroke-width="1.2" />
-
-                        <!-- 蹲式馬桶本體外罩 -->
                         <path d="M 46 146 C 46 92 72 52 100 52 C 128 52 154 92 154 146 C 154 176 132 192 100 192 C 68 192 46 176 46 146 Z"
                               fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
-                        <!-- 上方淺藍水池凹槽 -->
                         <path d="M 64 114 C 70 74 84 58 100 58 C 116 58 130 74 136 114 Z"
                               fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
-                        <!-- 圓滾滾臉頰主體 -->
                         <ellipse cx="100" cy="146" rx="54" ry="44" fill="#FCF5E5" stroke="#1E2470" stroke-width="2" />
-
-                        <!-- 大眼睛與眼眶線 -->
                         <ellipse cx="87" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
                         <ellipse cx="88" cy="145" rx="7.5" ry="10" fill="#1E2470" />
                         <ellipse cx="113" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
                         <ellipse cx="112" cy="145" rx="7.5" ry="10" fill="#1E2470" />
                         <path d="M 76 156 Q 87 164 98 155 M 102 155 Q 113 164 124 156" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
-
-                        <!-- 微笑嘴巴 -->
                         <path d="M 92 167 C 92 176 108 176 108 167" fill="none" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" />
-
-                        <!-- 托腮雙手 -->
                         <path d="M 48 166 C 48 154 60 154 62 162 C 64 155 72 156 73 164 C 75 158 83 160 82 170 L 82 188 C 65 186 52 178 48 166 Z"
                               fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
                         <path d="M 152 166 C 152 154 140 154 138 162 C 136 155 128 156 127 164 C 125 158 117 160 118 170 L 118 188 C 135 186 148 178 152 166 Z"
@@ -1059,38 +1155,27 @@
             if (avatarKey === 'free_urinal') {
                 return `
                     <svg viewBox="0 0 200 200" class="w-full h-full block">
-                        <!-- 翠綠磁磚透視背景 -->
                         <rect width="200" height="200" fill="#3CE6A8" />
                         <path d="M 42 0 L 10 200 M 78 0 L 62 200 M 122 0 L 138 200 M 158 0 L 190 200" stroke="#1E2470" stroke-width="1.2" />
                         <path d="M 0 38 L 200 38 M 0 76 L 200 76 M 0 114 L 200 114 M 0 152 L 200 152 M 0 184 L 200 184" stroke="#1E2470" stroke-width="1.2" />
-
-                        <!-- 小便斗本體 -->
                         <path d="M 60 40 C 60 22 140 22 140 40 L 132 72 C 146 76 150 84 148 102 L 134 166 C 128 186 114 192 100 192 C 86 192 72 186 66 166 L 52 102 C 50 84 54 76 68 72 Z"
                               fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
-                        <!-- 頂部弧線與感應窗 -->
                         <path d="M 60 40 Q 100 24 140 40" fill="none" stroke="#1E2470" stroke-width="1.8" />
                         <rect x="89" y="37" width="22" height="6" rx="2" fill="#1E2470" />
-
-                        <!-- 眼睛與張嘴紅舌表情 -->
                         <path d="M 82 54 Q 91 50 98 56 M 102 56 Q 109 50 118 54" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
                         <ellipse cx="91" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
                         <ellipse cx="92" cy="64" rx="5" ry="6.5" fill="#1E2470" />
                         <ellipse cx="109" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
                         <ellipse cx="108" cy="64" rx="5" ry="6.5" fill="#1E2470" />
                         <path d="M 93 78 Q 100 76 107 78 Q 105 86 100 86 Q 95 86 93 78 Z" fill="#FF5A52" stroke="#1E2470" stroke-width="1.6" stroke-linejoin="round" />
-
-                        <!-- 中央藍色水池區域 -->
                         <path d="M 68 102 C 68 92 80 92 88 95 Q 100 99 112 95 C 120 92 132 92 132 102 L 124 156 C 120 174 110 180 100 180 C 90 180 80 174 76 156 Z"
                               fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
                         <path d="M 76 150 C 82 166 91 170 100 170 C 109 170 118 166 124 150" fill="none" stroke="#1E2470" stroke-width="1.8" />
-
-                        <!-- 兩側小手扶著邊緣 -->
                         <path d="M 67 120 C 74 119 75 126 68 128 C 75 128 76 135 69 137 C 76 137 76 144 69 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M 133 120 C 126 119 125 126 132 128 C 125 128 124 135 131 137 C 124 137 124 144 131 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 `;
             }
-            // 預設坐式馬桶 (free_toilet)
             return `
                 <svg viewBox="0 0 200 200" class="w-full h-full block">
                     <defs>
@@ -1122,7 +1207,6 @@
             `;
         }
 
-        // 預先解析並快取三款頭貼圖片路徑，避免切換時出現底層備援頭貼閃爍
         function preloadSingleAvatarAsset(key) {
             if (resolvedAvatarUrlMap[key]) return Promise.resolve(resolvedAvatarUrlMap[key]);
             if (isSandboxEnv()) return Promise.resolve(null);
@@ -1204,7 +1288,6 @@
 
             const currentAvatar = normalizeLoggedInAvatarType(profileState.avatarType);
 
-            // 若彈窗內的選項尚未建立，僅在第一次建立 DOM，後續點擊只更新外框與文字狀態，徹底杜絕圖片重新載入閃爍
             if (!grid.dataset.initialized) {
                 grid.dataset.initialized = 'true';
                 grid.innerHTML = FREE_LOGGED_IN_PFP_LIST.map((avatarId) => {
@@ -1249,7 +1332,6 @@
                 });
             }
 
-            // 更新目前選中頭貼的米色外框與「目前頭貼」標籤
             grid.querySelectorAll('[data-select-avatar]').forEach((btn) => {
                 const avatarId = btn.getAttribute('data-select-avatar');
                 const isCurrent = avatarId === currentAvatar;
@@ -1288,7 +1370,6 @@
 
             if (!imgEl) return Promise.resolve();
 
-            // 若在雲端預覽沙盒且無本機檔案，才使用備援 SVG
             if (isSandboxEnv() && !resolvedAvatarUrlMap[cleanKey]) {
                 imgEl.classList.add('hidden');
                 if (svgContainer) {
@@ -1298,7 +1379,6 @@
                 return Promise.resolve();
             }
 
-            // 若已預載完成，直接替換圖片路徑，絕不顯示底層備援 SVG
             if (resolvedAvatarUrlMap[cleanKey]) {
                 if (svgContainer) svgContainer.classList.add('hidden');
                 imgEl.src = resolvedAvatarUrlMap[cleanKey];
@@ -1322,12 +1402,17 @@
         }
 
         // ===================================================================
-        // 功德點數：從 0 快速上升至目標點數的動畫
+        // 功德點數：同步更新電腦版圓圈與手機版左上角點數，並支援 0 快速上升動畫
         // ===================================================================
-        function animateMeritPointsTo(targetValue, forceFromZero = false) {
-            const countEl = document.getElementById('meritPointsCount');
-            if (!countEl) return;
+        function setDisplayedMeritPoints(val) {
+            const strVal = String(val);
+            const desktopEl = document.getElementById('meritPointsCount');
+            const mobileEl = document.getElementById('mobileMeritPointsCount');
+            if (desktopEl) desktopEl.textContent = strVal;
+            if (mobileEl) mobileEl.textContent = strVal;
+        }
 
+        function animateMeritPointsTo(targetValue, forceFromZero = false) {
             const endVal = Math.max(0, parseInt(targetValue, 10) || 0);
             const startVal = forceFromZero ? 0 : profileState.displayedPoints;
 
@@ -1337,35 +1422,34 @@
             }
 
             if (endVal === 0 && startVal === 0) {
-                countEl.textContent = '0';
+                setDisplayedMeritPoints(0);
                 profileState.displayedPoints = 0;
                 return;
             }
 
-            const duration = 750; // 0.75 秒內快速跳動上升至總點數
+            const duration = 750;
             const startTime = performance.now();
 
             function step(now) {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // Ease-out 曲線：前段快速衝刺、末段平滑停在目標數字
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const currentVal = Math.round(startVal + (endVal - startVal) * eased);
 
-                countEl.textContent = String(currentVal);
+                setDisplayedMeritPoints(currentVal);
                 profileState.displayedPoints = currentVal;
 
                 if (progress < 1) {
                     profileState.pointsAnimFrameId = requestAnimationFrame(step);
                 } else {
-                    countEl.textContent = String(endVal);
+                    setDisplayedMeritPoints(endVal);
                     profileState.displayedPoints = endVal;
                     profileState.pointsAnimFrameId = null;
                 }
             }
 
             if (forceFromZero) {
-                countEl.textContent = '0';
+                setDisplayedMeritPoints(0);
                 profileState.displayedPoints = 0;
             }
             profileState.pointsAnimFrameId = requestAnimationFrame(step);
@@ -1387,7 +1471,6 @@
         }
 
         function formatToMonthDay(dateKey) {
-            // 將 YYYY-MM-DD 轉為設計稿的 MM/DD 格式
             const parts = String(dateKey || '').split('-');
             if (parts.length === 3) {
                 return `${parts[1]}/${parts[2]}`;
@@ -1475,7 +1558,6 @@
             const currentPoints = profileState.currentPoints;
             const totalReports = profileState.totalReports;
 
-            // 更新已回報次數與對應等級稱號、升級進度提示
             const reportsEl = document.getElementById('totalReportsCount');
             if (reportsEl) {
                 reportsEl.textContent = String(totalReports);
@@ -1483,7 +1565,6 @@
             renderUserLevelUI(totalReports);
             renderClosestPrizeUI(currentPoints);
 
-            // 更新功德點數（首次載入固定從 0 快速上升至總點數，後續變動則平滑跳動至新點數）
             if (!profileState.hasAnimatedInitialLoad && (currentPoints > 0 || (profileState.evalLoaded && profileState.redeemLoaded && profileState.profileLoaded))) {
                 profileState.hasAnimatedInitialLoad = true;
                 animateMeritPointsTo(currentPoints, true);
@@ -1491,7 +1572,6 @@
                 animateMeritPointsTo(currentPoints, false);
             }
 
-            // 渲染歷史紀錄列表
             const historyContainer = document.getElementById('historyListContainer');
             if (!historyContainer) return;
 
@@ -1533,7 +1613,6 @@
                 dayRecord.deducted += (Number(rd.pointsUsed) || 0);
             });
 
-            // 若後台有手動調整點數，將差額反映於當日紀錄，確保「剩餘」與左方總點數一致
             const rawVisibleAdded = visibleEvals.length;
             const rawVisibleDeducted = visibleRedeems.reduce((s, r) => s + (Number(r.pointsUsed) || 0), 0);
             const rawVisibleNet = Math.max(0, rawVisibleAdded - rawVisibleDeducted);
@@ -1668,7 +1747,6 @@
 
             const avatarPromise = renderProfileHeaderAndAvatar();
 
-            // 若有本機快取的點數與回報數，先在剛載入時立即觸發從 0 快速上升的動畫
             try {
                 const cachedStats = JSON.parse(localStorage.getItem(`poogle_cached_stats_${user.uid}`) || 'null');
                 if (cachedStats && typeof cachedStats.meritPoints === 'number') {
@@ -1722,7 +1800,6 @@
                 document.body.classList.remove('page-cloak');
                 document.body.classList.add('page-ready');
             };
-            // 最多等待 220ms，確保即使網路慢也不會卡白畫面
             const fallbackTimer = setTimeout(doReveal, 220);
             Promise.allSettled(promises).then(() => {
                 clearTimeout(fallbackTimer);
@@ -1732,6 +1809,81 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const preloadTasks = [preloadLocalLogoImage(), preloadAllFreeAvatars()];
+
+            // 手機版右上角漢堡選單與衛生紙捲筒下拉互動
+            const profileMobileHamburgerBtn = document.getElementById('profileMobileHamburgerBtn');
+            const profileTpRollDropdownMenu = document.getElementById('profileTpRollDropdownMenu');
+            const profileUnderConstructionModal = document.getElementById('profileUnderConstructionModal');
+            let profileTpDropdownCloseTimer = null;
+
+            const closeProfileTpDropdownMenu = (immediate = false) => {
+                if (!profileTpRollDropdownMenu) return;
+                if (profileTpDropdownCloseTimer) {
+                    clearTimeout(profileTpDropdownCloseTimer);
+                    profileTpDropdownCloseTimer = null;
+                }
+                profileMobileHamburgerBtn?.setAttribute('aria-expanded', 'false');
+                if (immediate || (!profileTpRollDropdownMenu.classList.contains('is-open') && !profileTpRollDropdownMenu.classList.contains('is-closing'))) {
+                    profileTpRollDropdownMenu.classList.remove('is-open', 'is-closing');
+                    profileTpRollDropdownMenu.classList.add('hidden');
+                    return;
+                }
+                profileTpRollDropdownMenu.classList.remove('is-open');
+                void profileTpRollDropdownMenu.offsetWidth;
+                profileTpRollDropdownMenu.classList.add('is-closing');
+                profileTpDropdownCloseTimer = setTimeout(() => {
+                    profileTpRollDropdownMenu.classList.remove('is-closing');
+                    profileTpRollDropdownMenu.classList.add('hidden');
+                    profileTpDropdownCloseTimer = null;
+                }, 260);
+            };
+
+            const openProfileTpDropdownMenu = () => {
+                if (!profileTpRollDropdownMenu) return;
+                if (profileTpDropdownCloseTimer) {
+                    clearTimeout(profileTpDropdownCloseTimer);
+                    profileTpDropdownCloseTimer = null;
+                }
+                profileTpRollDropdownMenu.classList.remove('hidden', 'is-closing');
+                void profileTpRollDropdownMenu.offsetWidth;
+                profileTpRollDropdownMenu.classList.add('is-open');
+                profileMobileHamburgerBtn?.setAttribute('aria-expanded', 'true');
+            };
+
+            profileMobileHamburgerBtn?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = profileTpRollDropdownMenu?.classList.contains('is-open') && !profileTpRollDropdownMenu?.classList.contains('is-closing');
+                if (isOpen) closeProfileTpDropdownMenu(false);
+                else openProfileTpDropdownMenu();
+            });
+
+            document.getElementById('profileTpMenuHomeBtn')?.addEventListener('click', () => {
+                window.location.href = './index.html';
+            });
+            document.getElementById('profileTpMenuReportSystemBtn')?.addEventListener('click', () => {
+                window.location.href = './index.html?openReport=1';
+            });
+            document.getElementById('profileTpMenuMapBtn')?.addEventListener('click', () => {
+                window.location.href = './map.html';
+            });
+            document.getElementById('profileTpMenuStatusBoardBtn')?.addEventListener('click', () => {
+                closeProfileTpDropdownMenu(false);
+                profileUnderConstructionModal?.classList.remove('hidden');
+            });
+            document.getElementById('profileTpMenuMonsterDexBtn')?.addEventListener('click', () => {
+                closeProfileTpDropdownMenu(false);
+                profileUnderConstructionModal?.classList.remove('hidden');
+            });
+            document.getElementById('profileTpMenuPersonalSpaceBtn')?.addEventListener('click', () => {
+                closeProfileTpDropdownMenu(false);
+            });
+
+            document.addEventListener('pointerdown', (e) => {
+                if (!profileTpRollDropdownMenu || !profileTpRollDropdownMenu.classList.contains('is-open')) return;
+                if (profileTpRollDropdownMenu.contains(e.target)) return;
+                if (profileMobileHamburgerBtn && profileMobileHamburgerBtn.contains(e.target)) return;
+                closeProfileTpDropdownMenu(false);
+            }, true);
 
             // 1. 先檢查 localStorage 是否有已登入的快取帳號
             let cachedUser = null;
@@ -1745,7 +1897,6 @@
                 preloadTasks.push(renderProfileHeaderAndAvatar());
                 renderUserLevelUI(0);
                 renderClosestPrizeUI(0);
-                // 若尚未登入，先顯示無歷史紀錄狀態
                 const historyContainer = document.getElementById('historyListContainer');
                 if (historyContainer) {
                     historyContainer.innerHTML = `
@@ -1756,7 +1907,6 @@
                 }
             }
 
-            // 等 Logo 與頭貼圖片皆解碼完成後，再一次顯示畫面並啟動捲筒與點數動畫
             revealPageWhenReady(preloadTasks);
 
             // 2. 監聽 Firebase Auth 登入狀態
