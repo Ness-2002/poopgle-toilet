@@ -873,6 +873,48 @@
             filter: url(#logoStickerOutline);
             -webkit-filter: url(#logoStickerOutline);
         }
+        /* ========================================================= */
+        /* 垃圾桶小蟑螂：預設探頭偷看、Hover 躲進桶內、離開再次探頭     */
+        /* ========================================================= */
+        @keyframes roachPeekOutFromCan {
+            0% {
+                transform: translate(-26px, 58px);
+            }
+            25% {
+                transform: translate(-20px, 44px);
+            }
+            72% {
+                transform: translate(2.5px, -5px);
+            }
+            100% {
+                transform: translate(0px, 0px);
+            }
+        }
+        @keyframes roachIdleSpyWiggle {
+            0%, 100% {
+                transform: translate(393px, 482px) rotate(18deg) scale(1.04);
+            }
+            50% {
+                transform: translate(396px, 478px) rotate(23deg) scale(1.04);
+            }
+        }
+        @keyframes roachDiveIntoCan {
+            0% {
+                transform: translate(393px, 516px) rotate(18deg) scale(1.04);
+            }
+            100% {
+                transform: translate(366px, 616px) rotate(-12deg) scale(0.83);
+            }
+        }
+        .roach-peek-out-group {
+            animation: roachPeekOutFromCan 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .roach-idle-wiggle {
+            animation: roachIdleSpyWiggle 2.4s ease-in-out infinite;
+        }
+        #trashCanOpenGroup:not(.hidden) .roach-dive-in-group {
+            animation: roachDiveIntoCan 0.34s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
     </style>
 </head>
 
@@ -1341,7 +1383,7 @@
                 <filter id="whiteGlow" x="-25%" y="-25%" width="150%" height="150%">
                     <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#FFF9EC" flood-opacity="0.98" />
                 </filter>
-
+            
                 <!-- 馬桶水箱裁切遮罩 (確保維修封鎖條完美貼齊水箱左右邊界) -->
                 <clipPath id="toiletTankClip">
                     <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z" />
@@ -1422,6 +1464,29 @@
                         <path d="M 88,83 Q 119,88 150,86" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
                     </g>
                 </g>
+
+                <!-- 垃圾桶開口前緣遮罩（讓蟑螂往下躲進桶內時，自然隱沒在紅色桶身前壁後方） -->
+                <clipPath id="trashCanMouthClip">
+                    <path d="M 260,440 L 260,554 L 282,554 A 71,28 0 0,0 424,554 L 446,554 L 446,440 Z" />
+                </clipPath>
+
+                <!-- 1:1 還原 蟑螂-19.svg 元件 -->
+                <g id="poogleCockroachUnit">
+                    <!-- 觸角 -->
+                    <path d="M -4,-15 Q -7,-28 -16,-31" fill="none" stroke="#F3EF84" stroke-width="5.5" stroke-linecap="round" />
+                    <path d="M 4,-15 Q 7,-28 16,-31" fill="none" stroke="#F3EF84" stroke-width="5.5" stroke-linecap="round" />
+                    <!-- 六隻腳 -->
+                    <path d="M -12,-4 L -21,-6 M 12,-4 L 21,-6" fill="none" stroke="#F3EF84" stroke-width="5.5" stroke-linecap="round" />
+                    <path d="M -14,5 L -20,5 M 14,5 L 20,5" fill="none" stroke="#F3EF84" stroke-width="5.5" stroke-linecap="round" />
+                    <path d="M -11,14 L -19,20 M 11,14 L 19,20" fill="none" stroke="#F3EF84" stroke-width="5.5" stroke-linecap="round" />
+                    <!-- 橢圓身體 -->
+                    <ellipse cx="0" cy="3" rx="15" ry="21" fill="#F3EF84" />
+                    <!-- 深藍雙眼與微笑 -->
+                    <circle cx="-6.8" cy="-4.5" r="2.3" fill="#2A348C" />
+                    <circle cx="6.8" cy="-4.5" r="2.3" fill="#2A348C" />
+                    <path d="M -3,-4.2 A 3,3 0 0,0 3,-4.2" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" />
+                </g>
+                
             </defs>
 
             <!-- =============================================================== -->
@@ -1458,7 +1523,7 @@
             </g>
 
             <!-- =============================================================== -->
-            <!-- C. ZONE 2: 公廁地圖 (1:1 還原原圖紅桶綠圈垃圾桶 + 桶身直式文字)   -->
+            <!-- C. ZONE 2: 公廁地圖 (1:1 還原原圖紅桶綠圈垃圾桶 + 探頭小蟑螂)     -->
             <!-- =============================================================== -->
             <g id="zoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
                 <title>點擊進入「公廁地圖」</title>
@@ -1468,6 +1533,13 @@
 
                 <!-- 1. 預設蓋上的珊瑚紅垃圾桶 -->
                 <g id="trashCanClosedGroup" class="pointer-events-none">
+                    <!-- 預設狀態：從垃圾桶蓋右上方探出頭、觸角與前手偷看的蟑螂 -->
+                    <g id="trashCockroachPeekGroup" class="roach-peek-out-group">
+                        <g class="roach-idle-wiggle">
+                            <use href="#poogleCockroachUnit" />
+                        </g>
+                    </g>
+
                     <path d="M 282,524 L 282,718 A 71,28 0 0,0 424,718 L 424,524"
                           fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     <path d="M 282,510 L 282,526 A 71,26 0 0,0 424,526 L 424,510"
@@ -1482,7 +1554,7 @@
                     </g>
                 </g>
 
-                <!-- 2. 游標靠近時：桶蓋向上彈開 -->
+                <!-- 2. 游標靠近時：桶蓋向上彈開 + 蟑螂迅速縮進綠色桶口內部 -->
                 <g id="trashCanOpenGroup" class="hidden pointer-events-none" filter="url(#whiteGlow)">
                     <g id="trashCanOpenBase">
                         <path d="M 282,554 L 282,718 A 71,28 0 0,0 424,718 L 424,554"
@@ -1497,6 +1569,14 @@
                         </g>
                     </g>
 
+                    <!-- Hover 狀態：往下溜進綠色桶口並隱沒在桶身前緣後的蟑螂 -->
+                    <g clip-path="url(#trashCanMouthClip)">
+                        <g class="roach-dive-in-group">
+                            <use href="#poogleCockroachUnit" />
+                        </g>
+                    </g>
+
+                    <!-- 向上掀開的桶蓋 -->
                     <g id="trashCanOpenLid">
                         <path d="M 282,472 L 282,488 A 71,26 0 0,0 424,488 L 424,472"
                               fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
@@ -3292,8 +3372,17 @@
             zonePersonalSpace?.addEventListener('mouseenter', () => activateZone('personal'));
             zonePersonalSpace?.addEventListener('mouseleave', resetAllZonesToIdle);
 
+            const trashCockroachPeekGroup = document.getElementById('trashCockroachPeekGroup');
+
             zoneMapTrashCan?.addEventListener('mouseenter', () => activateZone('map'));
-            zoneMapTrashCan?.addEventListener('mouseleave', resetAllZonesToIdle);
+            zoneMapTrashCan?.addEventListener('mouseleave', () => {
+                resetAllZonesToIdle();
+                if (trashCockroachPeekGroup) {
+                    trashCockroachPeekGroup.style.animation = 'none';
+                    void trashCockroachPeekGroup.getBoundingClientRect();
+                    trashCockroachPeekGroup.style.animation = '';
+                }
+            });
 
             zoneCenterToilet?.addEventListener('mouseenter', () => activateZone('toilet'));
             zoneCenterToilet?.addEventListener('mouseleave', resetAllZonesToIdle);
