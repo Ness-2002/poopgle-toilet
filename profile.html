@@ -230,6 +230,26 @@
         [data-select-avatar], [data-select-avatar] * {
             cursor: var(--cursor-hover) !important;
         }
+        /* 手機版：商店與歷史紀錄整體縮小 1/5 (0.8 倍)，並讓歷史紀錄對齊畫面垂直中線 */
+        @media (max-width: 767px) {
+            .mobile-shop-scale {
+                transform: scale(0.8);
+                transform-origin: top center;
+                margin-bottom: -64px;
+            }
+            .mobile-history-scale {
+                /* 縮小 1/5 並校正衛生紙張偏移，使其與上方商店及頭貼垂直齊中 */
+                transform: translateX(-3.5%) scale(0.85);
+                transform-origin: bottom center;
+                margin-top: -56px;
+            }
+        }
+        /* 手機版隱藏左側櫥窗的粉紅店員，僅保留中間的小藍店員 */
+        @media (max-width: 767px) {
+            #pinkClerkGroup {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -269,10 +289,15 @@
     <!-- 手機版頂部列：左上角「功德點數:__」+ 右上角漢堡選單 (電腦版隱藏)    -->
     <!-- =================================================================== -->
     <div class="w-full flex md:hidden items-center justify-between px-[7.4%] pt-[28px] pb-2 relative z-50">
-        <!-- 左上角：功德點數文字（標籤變細1級、點數數字放大1/3倍） -->
-        <div class="text-[#1E2470] flex items-baseline gap-1.5">
-            <span class="text-[18px] sm:text-[20px] font-medium tracking-wider">功德點數:</span>
-            <span id="mobileMeritPointsCount" class="text-[24px] sm:text-[27px] font-black leading-none">0</span>
+        <!-- 左上角：功德點數 + 已回報次數 -->
+        <div class="text-[#1E2470] flex flex-col items-start leading-tight">
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-[18px] sm:text-[20px] font-medium tracking-wider">功德點數:</span>
+                <span id="mobileMeritPointsCount" class="text-[24px] sm:text-[27px] font-black leading-none">0</span>
+            </div>
+            <div class="mt-1 text-[14px] sm:text-[15px] font-medium tracking-wider">
+                已回報<span id="mobileTotalReportsCount" class="font-extrabold mx-0.5">0</span>次
+            </div>
         </div>
 
         <!-- 右上角：漢堡選單按鈕與衛生紙下拉選單 -->
@@ -378,7 +403,7 @@
             <!-- =========================================================== -->
             <!-- 1. 左欄：兌換商店 (依據 個人空間配件-17.svg & 18.svg)         -->
             <!-- =========================================================== -->
-            <div class="relative w-full max-w-[360px] mx-auto flex flex-col items-center">
+            <div class="mobile-shop-scale relative w-full max-w-[360px] mx-auto flex flex-col items-center">
                 <!-- 頂部膠囊標題 (純展示不可點擊) -->
                 <div class="section-pill-title relative z-20 -mb-[22px] cursor-default select-none pointer-events-none">
                     兌換商店
@@ -514,8 +539,7 @@
             <!-- =========================================================== -->
             <!-- 2. 中欄：歷史紀錄 (依據 個人空間配件-16, 15, 14.svg)          -->
             <!-- =========================================================== -->
-            <div class="relative w-full max-w-[390px] mx-auto flex flex-col items-center">
-                <!-- 頂部膠囊標題 (對齊衛生紙張中心，純展示不可點擊) -->
+            <div class="mobile-history-scale relative w-full max-w-[390px] mx-auto flex flex-col items-center">
                 <div class="w-full pl-[8%] flex justify-center relative z-20 -mb-[24px]">
                     <div class="section-pill-title cursor-default select-none pointer-events-none">
                         歷史紀錄
@@ -584,7 +608,7 @@
                     </div>
 
                     <!-- 收據內容區 (隨衛生紙向下展開同步顯現) -->
-                    <div class="toilet-sheet-unroll relative z-10 pl-[13%] pr-[7%] pt-10 flex flex-col gap-2.5 h-[192px] overflow-hidden">
+                    <div class="toilet-sheet-unroll relative z-10 pl-[13%] pr-[7%] pt-6 md:pt-10 flex flex-col justify-center md:justify-start gap-2.5 h-[192px] overflow-hidden">
                         <!-- 表格標題 -->
                         <div class="grid grid-cols-4 text-center text-[#1E2470] font-extrabold text-sm sm:text-[15px] tracking-widest px-2 shrink-0">
                             <span>日期</span>
@@ -870,8 +894,8 @@
                 你的頭貼
             </h2>
 
-            <!-- 三款頭貼選擇區 -->
-            <div id="avatarModalOptionsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3.5 items-center justify-items-center">
+            <!-- 三款頭貼選擇區（手機版與電腦版皆為橫式 3 欄並排） -->
+            <div id="avatarModalOptionsGrid" class="grid grid-cols-3 gap-2 sm:gap-3.5 items-center justify-items-center">
                 <!-- 由 JS 初始化一次並透過切換狀態更新，避免重繪閃爍 -->
             </div>
         </div>
@@ -1312,8 +1336,8 @@
                     return `
                         <button type="button"
                                 data-select-avatar="${avatarId}"
-                                class="w-[144px] min-h-[172px] rounded-[14px] px-2.5 pt-3.5 pb-2.5 flex flex-col items-center justify-start transition-colors cursor-pointer">
-                            <div class="w-[114px] h-[114px] sm:w-[120px] sm:h-[120px] rounded-full border-[2px] border-[#1E2470] overflow-hidden shrink-0 flex items-center justify-center bg-[#FCF5E5]">
+                                class="w-full max-w-[144px] min-h-[134px] sm:min-h-[172px] rounded-[14px] px-1.5 sm:px-2.5 pt-2.5 sm:pt-3.5 pb-2 sm:pb-2.5 flex flex-col items-center justify-start transition-colors cursor-pointer">
+                            <div class="w-[82px] h-[82px] sm:w-[120px] sm:h-[120px] rounded-full border-[2px] border-[#1E2470] overflow-hidden shrink-0 flex items-center justify-center bg-[#FCF5E5]">
                                 <img data-modal-pfp="${avatarId}"
                                      src="${useFallbackInSandbox ? '' : imgSrc}"
                                      alt="${avatarId}"
@@ -1322,7 +1346,7 @@
                                     ${getAvatarFallbackSvgMarkup(avatarId)}
                                 </div>
                             </div>
-                            <span data-modal-label="${avatarId}" class="mt-2.5 text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-[0.16em]">
+                            <span data-modal-label="${avatarId}" class="mt-2 sm:mt-2.5 text-[#1E2470] text-[11px] sm:text-[13px] font-extrabold tracking-[0.12em] sm:tracking-[0.16em] whitespace-nowrap">
                                 目前頭貼
                             </span>
                         </button>
@@ -1582,8 +1606,17 @@
 
             const currentPoints = profileState.currentPoints;
             const totalReports = profileState.totalReports;
-
+            
+            // 更新已回報次數與對應等級稱號、升級進度提示
             const reportsEl = document.getElementById('totalReportsCount');
+            if (reportsEl) {
+                reportsEl.textContent = String(totalReports);
+            }
+            const mobileReportsEl = document.getElementById('mobileTotalReportsCount');
+            if (mobileReportsEl) {
+                mobileReportsEl.textContent = String(totalReports);
+            }
+            
             if (reportsEl) {
                 reportsEl.textContent = String(totalReports);
             }
@@ -1779,6 +1812,8 @@
                     profileState.totalReports = cachedStats.totalReports || 0;
                     const reportsEl = document.getElementById('totalReportsCount');
                     if (reportsEl) reportsEl.textContent = String(profileState.totalReports);
+                    const mobileReportsEl = document.getElementById('mobileTotalReportsCount');
+                    if (mobileReportsEl) mobileReportsEl.textContent = String(profileState.totalReports);
                     renderUserLevelUI(profileState.totalReports);
                     renderClosestPrizeUI(profileState.currentPoints);
                     if (!profileState.hasAnimatedInitialLoad && cachedStats.meritPoints > 0) {
@@ -1990,6 +2025,7 @@
             const closePrizeShopModalBtn = document.getElementById('closePrizeShopModalBtn');
 
             const showPinkClerk = () => {
+                if (window.innerWidth < 768) return; // 手機版不觸發粉紅店員探頭
                 if (pinkClerkPeekInner) pinkClerkPeekInner.classList.add('is-peeking');
             };
             const hidePinkClerk = () => {
