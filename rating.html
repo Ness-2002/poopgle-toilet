@@ -2537,24 +2537,11 @@
         }
 
         function normalizeUrinalShoeType(shoeKey) {
-            return VALID_URINAL_SHOES.includes(shoeKey) ? shoeKey : 'urinal_sneakers_g';
+            return VALID_URINAL_SHOES.includes(shoeKey) ? shoeKey : 'urinal_flippers';
         }
 
-        let currentStallShoeType = (() => {
-            try {
-                const saved = localStorage.getItem('poogle_selected_stall_shoe');
-                if (saved) return normalizeStallShoeType(saved);
-            } catch (e) {}
-            return 'stall_flippers';
-        })();
-
-        let currentUrinalShoeType = (() => {
-            try {
-                const saved = localStorage.getItem('poogle_selected_urinal_shoe');
-                if (saved) return normalizeUrinalShoeType(saved);
-            } catch (e) {}
-            return 'urinal_sneakers_g';
-        })();
+        let currentStallShoeType = 'stall_flippers';
+        let currentUrinalShoeType = 'urinal_flippers';
 
         // 預覽環境或本機圖檔尚未載入完成前的乾淨向量備援圖 (含完整腳趾與大拇趾藍色圓甲)
         const STALL_SHOE_FALLBACK_SVGS = {
@@ -2594,7 +2581,7 @@
 
         function getUrinalShoeFallbackDataUri(shoeKey) {
             const safeKey = normalizeUrinalShoeType(shoeKey);
-            const svgStr = URINAL_SHOE_FALLBACK_SVGS[safeKey] || URINAL_SHOE_FALLBACK_SVGS.urinal_sneakers_g;
+            const svgStr = URINAL_SHOE_FALLBACK_SVGS[safeKey] || URINAL_SHOE_FALLBACK_SVGS.urinal_flippers;
             return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
         }
 
@@ -2706,7 +2693,7 @@
             `;
         }
 
-        function buildUrinalForegroundSvgMarkup(shoeKey = 'urinal_sneakers_g') {
+        function buildUrinalForegroundSvgMarkup(shoeKey = 'urinal_flippers') {
             const safeKey = normalizeUrinalShoeType(shoeKey);
             const shoeUrl = shoeResolvedUrlCache.get(safeKey) || getUrinalShoeFallbackDataUri(safeKey);
 
@@ -2881,6 +2868,7 @@
             }
 
             if (currentSceneType === 'urinal') {
+                stallOuterMask?.classList.add('hidden');
                 mobileStallShoeWrapper?.classList.add('hidden');
                 mobileUrinalShoeWrapper?.classList.remove('hidden');
                 stallGroup?.classList.add('hidden');
@@ -2905,6 +2893,7 @@
 
                 updateUrinalShoeSelectorUI();
             } else {
+                stallOuterMask?.classList.remove('hidden');
                 mobileStallShoeWrapper?.classList.remove('hidden');
                 mobileUrinalShoeWrapper?.classList.add('hidden');
                 stallGroup?.classList.remove('hidden');
@@ -4138,7 +4127,6 @@
             }
             return null;
         }
-
         function resolveMonsterImageUrl(monsterItem) {
             const key = `${monsterItem.folder}_${monsterItem.id}`;
             if (monsterResolvedUrlCache.has(key)) {
@@ -4174,6 +4162,36 @@
                 };
                 tryNext();
             });
+        }
+        // 直接取得小怪 PNG 路徑（優先使用快取或本機 PNG，不再預設塞入備援向量圖）
+        function getImmediateMonsterImageUrl(monsterItem) {
+            const key = `${monsterItem.folder}_${monsterItem.id}`;
+            if (monsterResolvedUrlCache.has(key)) {
+                return monsterResolvedUrlCache.get(key);
+            }
+            if (IS_RATING_PREVIEW_SANDBOX) {
+                return getMonsterFallbackDataUri(monsterItem.id);
+            }
+            return `./img/${monsterItem.folder}/${encodeURIComponent(monsterItem.id)}.png`;
+        }
+
+        // 在進場 Loading 期間預先載入並解碼所有分類的小怪 PNG
+        function preloadAllMonsterImages() {
+            const allItems = [];
+            Object.values(MONSTER_CATALOG_BY_CATEGORY).forEach((cat) => {
+                if (Array.isArray(cat.xian)) allItems.push(...cat.xian);
+                if (Array.isArray(cat.yao)) allItems.push(...cat.yao);
+            });
+            return Promise.allSettled(
+                allItems.map((item) =>
+                    resolveMonsterImageUrl(item).then((url) => {
+                        if (!url || url.startsWith('data:')) return url;
+                        const img = new Image();
+                        img.src = url;
+                        return typeof img.decode === 'function' ? img.decode().catch(() => {}) : Promise.resolve();
+                    })
+                )
+            );
         }
 
         let currentMonsterCategory = 'stall';
@@ -4300,15 +4318,15 @@
             const categoryObj = MONSTER_CATALOG_BY_CATEGORY[currentMonsterCategory] || MONSTER_CATALOG_BY_CATEGORY.stall;
             const items = categoryObj[currentStallMonsterTab] || [];
 
-            // 1. 電腦版直向選單渲染
+            // 1. 電腦版直向選單渲染（直接使用預載好的 PNG 路徑，不顯示底層向量備援圖）
             if (stallMonsterListContentEl) {
                 stallMonsterListContentEl.innerHTML = items.map((item) => {
-                    const fallbackUri = getMonsterFallbackDataUri(item.id);
+                    const initialImgSrc = getImmediateMonsterImageUrl(item);
                     const placedClass = isMonsterAlreadyPlaced(item.id) ? ' is-placed' : '';
                     return `
                         <div class="monster-menu-card${placedClass}" data-monster-id="${escapeHtml(item.id)}" style="width:100%;">
                             <img id="menuMonsterImg_${escapeHtml(item.id)}"
-                                 src="${fallbackUri}"
+                                 src="${initialImgSrc}"
                                  alt="${escapeHtml(item.name)}"
                                  style="width:136px; height:136px; object-fit:contain; pointer-events:none; display:block;" />
                             <div style="margin-top:6px; color:#2A348C; font-size:18px; font-weight:400; font-family:'Huninn', 'jf-openhuninn', sans-serif; letter-spacing:2.5px; text-align:center; pointer-events:none;">
@@ -4324,56 +4342,36 @@
                 }
             }
 
-             // 2. 手機版底部橫向抽屜選單渲染 (縮小 1/3 倍：94px 小怪圖示 + 11.5px 文字)
-
+            // 2. 手機版底部橫向抽屜選單渲染（直接使用預載好的 PNG 路徑）
             if (mobileMonsterListContentEl) {
-
                 mobileMonsterListContentEl.innerHTML = items.map((item) => {
-
-                    const fallbackUri = getMonsterFallbackDataUri(item.id);
-
+                    const initialImgSrc = getImmediateMonsterImageUrl(item);
                     const placedClass = isMonsterAlreadyPlaced(item.id) ? ' is-placed' : '';
-
                     return `
-
                         <div class="mobile-drawer-card${placedClass}" data-monster-id="${escapeHtml(item.id)}" style="padding: 5px 7px;">
-
                             <img id="mobileMenuMonsterImg_${escapeHtml(item.id)}"
-
-                                 src="${fallbackUri}"
-
+                                 src="${initialImgSrc}"
                                  alt="${escapeHtml(item.name)}"
-
                                  style="width:94px; height:94px; object-fit:contain; pointer-events:none; display:block;" />
-
                             <div style="margin-top:6px; color:#2A348C; font-size:11.5px; font-weight:900; letter-spacing:1.4px; text-align:center; white-space:nowrap; pointer-events:none;">
-
                                 ${escapeHtml(item.name)}
-
                             </div>
-
                         </div>
-
                     `;
-
                 }).join('');
-
-
 
                 if (mobileMonsterScrollViewportEl) {
                     mobileMonsterScrollViewportEl.scrollLeft = 0;
                     setTimeout(syncMobileDrawerScrollbarThumb, 25);
-
                 }
-
             }
 
             items.forEach(async (item) => {
                 const resolvedUrl = await resolveMonsterImageUrl(item);
                 const imgEl = document.getElementById(`menuMonsterImg_${item.id}`);
                 const mobileImgEl = document.getElementById(`mobileMenuMonsterImg_${item.id}`);
-                if (imgEl && resolvedUrl) imgEl.src = resolvedUrl;
-                if (mobileImgEl && resolvedUrl) mobileImgEl.src = resolvedUrl;
+                if (imgEl && resolvedUrl && imgEl.getAttribute('src') !== resolvedUrl) imgEl.src = resolvedUrl;
+                if (mobileImgEl && resolvedUrl && mobileImgEl.getAttribute('src') !== resolvedUrl) mobileImgEl.src = resolvedUrl;
             });
 
             const bindCardClick = (cardEl) => {
@@ -4725,15 +4723,15 @@
             }
 
             if (currentSceneType === 'urinal') {
-                stallOuterMask?.classList.add('hidden'); // 👈 新增：小便斗模式隱藏米白遮罩，讓下半部地板完整鋪滿
-                mobileStallShoeWrapper?.classList.add('hidden');
-                mobileUrinalShoeWrapper?.classList.remove('hidden');
-                // ... (中間原本的程式碼維持不變) ...
+                stallBg?.classList.add('hidden');
+                urinalBg?.classList.remove('hidden');
+                stallFg?.classList.add('hidden');
+                urinalFg?.classList.remove('hidden');
             } else {
-                stallOuterMask?.classList.remove('hidden'); // 👈 新增：一般廁間模式恢復顯示米白遮罩
-                mobileStallShoeWrapper?.classList.remove('hidden');
-                mobileUrinalShoeWrapper?.classList.add('hidden');
-                // ... (中間原本的程式碼維持不變) ...
+                stallBg?.classList.remove('hidden');
+                urinalBg?.classList.add('hidden');
+                stallFg?.classList.remove('hidden');
+                urinalFg?.classList.add('hidden');
             }
 
             const cardNameLine1El = document.getElementById('cardToiletNameLine1');
@@ -4860,12 +4858,15 @@
         async function applyEvaluationRecordToCanvas(record) {
             if (!record) {
                 currentEditingEvalRecord = null;
+                // 👇 新增：第一次評鑑公廁時，固定將廁間與小便斗預設鞋子設為夾腳拖鞋
+                setStallShoeType('stall_flippers', false);
+                setUrinalShoeType('urinal_flippers', false);
+
                 starRatingsState.cleanliness = 3;
                 starRatingsState.lighting = 3;
                 starRatingsState.equipment = 3;
                 starRatingsState.space = 3;
                 renderAllInteractiveStars();
-
                 savedUserCommentText = '';
                 try {
                     sessionStorage.removeItem('poogle_draft_comment');
@@ -5472,6 +5473,7 @@
             try {
                 initStallShoeImages();
                 initUrinalShoeImages();
+                preloadAllMonsterImages();
                 applySceneTypeFromUrl();
                 updateStallShoeSelectorUI();
                 updateUrinalShoeSelectorUI();
