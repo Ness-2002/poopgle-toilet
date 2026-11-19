@@ -754,8 +754,8 @@
 
                 <!-- 手機版小便斗視角裁切遮罩 (讓全寬藍色地板與黃色隔板整齊收合於中央視景區) -->
                 <clipPath id="mobileUrinalViewportClip">
-    <rect x="-500" y="228" width="1500" height="2000" />
-</clipPath>
+                    <rect x="-500" y="228" width="1500" height="384" />
+                </clipPath>
 
                 <!-- 手機版獨立定義的四大分類圖示 (避免跨隱藏 SVG 引用失效) -->
                 <g id="mobileIconCategoryUrinal">
@@ -925,8 +925,8 @@
             <!-- 2B. 手機版場景 B：小便斗視角 -->
 <g id="mobileSceneUrinalGroup" class="hidden mobile-shift-up-on-complete" clip-path="url(#mobileUrinalViewportClip)">
     <g transform="translate(215, 238) scale(0.485) translate(-720, 0)">
-        <!-- 小便斗地板 (改為 #E0DCD3 並向下延伸填滿整個下半部) -->
-        <rect x="-1000" y="492" width="3500" height="2000" fill="#E0DCD3" />
+        <!-- 小便斗地板 (#E0DCD3 僅延伸至選鞋框上方) -->
+        <rect x="-1000" y="492" width="3500" height="276" fill="#E0DCD3" />
 
                     <!-- 左右黃色隔板 -->
                     <path d="M 458,184 C 464,166 482,166 488,184 L 594,492 L 500,746 L 360,694 C 346,688 344,674 348,656 Z"
@@ -1504,8 +1504,7 @@
 
 
             <!-- 右側：縮小 1/3 版粉紅底直立切換欄 (小妖 ⇅ 小仙) -->
-            <div class="w-[44px] shrink-0 bg-[#FF85D6] border-l-[1.8px] border-[#2A348C] rounded-tr-[12px] flex flex-col items-center justify-between py-2.5 px-1">
-
+            <div class="w-[44px] shrink-0 bg-[#FF85D6] border-l-[1.8px] border-[#2A348C] flex flex-col items-center justify-between py-2.5 px-1">
                 <!-- 上方膠囊：小妖 -->
 
                 <button id="mobileTabYaoBtn" type="button"
@@ -3383,6 +3382,60 @@
                 .replace(/'/g, '&#39;');
         }
 
+        // 紀錄手機版公廁名稱因換行所增加的高度，供下方圖示與畫布同步順移
+        let mobileTitleExtraHeight = 0;
+
+        // 自動將手機版標題區 (#mobileHeaderGroup) 以下的所有圖層包進同一個位移群組
+        function ensureMobileBelowHeaderWrapper() {
+            const mobileSvg = document.getElementById('mobileRatingMainSvg');
+            const headerGroup = document.getElementById('mobileHeaderGroup');
+            if (!mobileSvg || !headerGroup) return null;
+
+            let wrapper = document.getElementById('mobileBelowHeaderShiftGroup');
+            if (!wrapper) {
+                const svgNs = 'http://www.w3.org/2000/svg';
+                wrapper = document.createElementNS(svgNs, 'g');
+                wrapper.setAttribute('id', 'mobileBelowHeaderShiftGroup');
+
+                const nodesToMove = [];
+                let nextNode = headerGroup.nextElementSibling;
+                while (nextNode) {
+                    nodesToMove.push(nextNode);
+                    nextNode = nextNode.nextElementSibling;
+                }
+                nodesToMove.forEach((node) => wrapper.appendChild(node));
+                mobileSvg.appendChild(wrapper);
+            }
+            return wrapper;
+        }
+
+        // 依右側安全寬度將過長的公廁名稱切分為多行
+        function splitMobileTitleIntoLines(text, fontSize, letterSpacing, maxWidth) {
+            const chars = Array.from(String(text || '').trim());
+            if (chars.length === 0) return ['公廁名'];
+
+            const lines = [];
+            let currentLine = '';
+            let currentWidth = 0;
+
+            for (let i = 0; i < chars.length; i++) {
+                const ch = chars[i];
+                const isHalfWidth = /^[\x00-\xff]$/.test(ch);
+                const charW = (isHalfWidth ? fontSize * 0.58 : fontSize) + letterSpacing;
+
+                if (currentLine && (currentWidth + charW > maxWidth)) {
+                    lines.push(currentLine);
+                    currentLine = ch;
+                    currentWidth = charW;
+                } else {
+                    currentLine += ch;
+                    currentWidth += charW;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
         function renderToiletTextToUi(toiletName, toiletManager, toiletAddress) {
             const nameEl = document.getElementById('displayToiletName');
             const managerEl = document.getElementById('displayToiletManager');
@@ -3392,6 +3445,7 @@
             const mobileManagerEl = document.getElementById('mobileDisplayToiletManager');
             const mobileAddressEl = document.getElementById('mobileDisplayToiletAddress');
 
+            // 1. 電腦版文字更新
             if (nameEl && toiletName) {
                 nameEl.textContent = toiletName;
                 if (toiletName.length > 12) {
@@ -3409,31 +3463,72 @@
                 addressEl.textContent = `地址 : ${toiletAddress || '000000'}`;
             }
 
+            // 2. 手機版名稱安全距離換行 + 下方圖示維持相同間距順移
             if (mobileNameEl && toiletName) {
+                const svgNs = 'http://www.w3.org/2000/svg';
+                const baseNameX = mobileNameEl.getAttribute('x') || '36';
 
-                mobileNameEl.textContent = toiletName;
-
-                const charLen = Array.from(toiletName).length;
-
-                if (charLen > 14) {
-
-                    mobileNameEl.setAttribute('font-size', '20.5');
-
-                } else if (charLen > 11) {
-
-                    mobileNameEl.setAttribute('font-size', '23.5');
-
-                } else if (charLen > 8) {
-
-                    mobileNameEl.setAttribute('font-size', '26.5');
-
-                } else {
-
-                    mobileNameEl.setAttribute('font-size', '34');
-
+                if (!mobileNameEl.dataset.baseY) {
+                    mobileNameEl.dataset.baseY = mobileNameEl.getAttribute('y') || '74';
+                }
+                if (mobileManagerEl && !mobileManagerEl.dataset.baseY) {
+                    mobileManagerEl.dataset.baseY = mobileManagerEl.getAttribute('y') || '105';
+                }
+                if (mobileAddressEl && !mobileAddressEl.dataset.baseY) {
+                    mobileAddressEl.dataset.baseY = mobileAddressEl.getAttribute('y') || '131';
                 }
 
+                const baseNameY = parseFloat(mobileNameEl.dataset.baseY);
+                const baseManagerY = mobileManagerEl ? parseFloat(mobileManagerEl.dataset.baseY) : 105;
+                const baseAddressY = mobileAddressEl ? parseFloat(mobileAddressEl.dataset.baseY) : 131;
+
+                // 👇 手機版標題最大寬度（數值越小，離右方漢堡選單的安全距離越大；268 約每行 8 個中文字）
+                const MOBILE_NAME_MAX_WIDTH = 268;
+                const charLen = Array.from(toiletName).length;
+                const fontSize = charLen > 7 ? 30 : 34;
+                const letterSpacing = 1.5;
+                const lineHeight = Math.round(fontSize * 1.26);
+
+                mobileNameEl.setAttribute('font-size', String(fontSize));
+                const lines = splitMobileTitleIntoLines(toiletName, fontSize, letterSpacing, MOBILE_NAME_MAX_WIDTH);
+
+                mobileNameEl.innerHTML = '';
+                lines.forEach((lineStr, idx) => {
+                    const tspan = document.createElementNS(svgNs, 'tspan');
+                    tspan.setAttribute('x', baseNameX);
+                    tspan.setAttribute('dy', idx === 0 ? '0' : String(lineHeight));
+                    tspan.textContent = lineStr;
+                    mobileNameEl.appendChild(tspan);
+                });
+
+                // 計算多出來的行高，將管理單位、地址與下方所有圖示同步往下推，維持原本間距
+                mobileTitleExtraHeight = Math.max(0, (lines.length - 1) * lineHeight);
+
+                if (mobileManagerEl) {
+                    mobileManagerEl.setAttribute('y', String(baseManagerY + mobileTitleExtraHeight));
+                }
+                if (mobileAddressEl) {
+                    mobileAddressEl.setAttribute('y', String(baseAddressY + mobileTitleExtraHeight));
+                }
+
+                const shiftWrapper = ensureMobileBelowHeaderWrapper();
+                if (shiftWrapper) {
+                    shiftWrapper.setAttribute('transform', `translate(0, ${mobileTitleExtraHeight})`);
+                }
+
+                const mobileSvg = document.getElementById('mobileRatingMainSvg');
+                if (mobileSvg) {
+                    const bgRect = mobileSvg.querySelector('rect[fill="#FFF9EC"]');
+                    if (bgRect) {
+                        bgRect.setAttribute('height', String(1122 + mobileTitleExtraHeight));
+                    }
+                    const targetVbHeight = isRatingCompletedState
+                        ? (720 + mobileTitleExtraHeight)
+                        : (1122 + mobileTitleExtraHeight);
+                    mobileSvg.setAttribute('viewBox', `0 0 430 ${targetVbHeight}`);
+                }
             }
+
             if (mobileManagerEl) {
                 mobileManagerEl.textContent = `管理單位 : ${toiletManager || '000000'}`;
             }
@@ -3736,13 +3831,9 @@
                 return `
                     <div data-replace-idx="${idx}"
                          class="w-full rounded-[14px] ${cardBg} border-[2px] border-[#2A348C] px-5 py-3 flex items-center justify-between gap-3.5 transition-colors cursor-pointer">
-                        <div class="min-w-0 flex-1 space-y-0.5">
-                            <div class="flex items-baseline gap-1.5 flex-wrap">
-                                <span class="text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.12em] truncate">
-                                    ${escapeHtml(item.name)}
-                                </span>
-                                ${isSelected ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] shrink-0">(目前選取)</span>` : ''}
-                                ${!isSelected && alreadyRatedRecord ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] shrink-0">(已評鑑)</span>` : ''}
+                        <div class="min-w-0 flex-1 space-y-1">
+                            <div class="leading-snug break-words">
+                                <span class="text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.12em]">${escapeHtml(item.name)}</span>${isSelected ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] whitespace-nowrap ml-1.5">(目前選取)</span>` : ''}${!isSelected && alreadyRatedRecord ? `<span class="text-[#F26559] text-xs font-black tracking-[0.12em] whitespace-nowrap ml-1.5">(已評鑑)</span>` : ''}
                             </div>
                             <div class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-[0.14em] truncate">
                                 ${escapeHtml(addrText)}
@@ -5243,7 +5334,7 @@
             // 👇 新增：強制將手機版 SVG 畫布高度從 1046 縮小為 720，徹底消除底部空白
             const mobileSvg = document.getElementById('mobileRatingMainSvg');
             if (mobileSvg) {
-                mobileSvg.setAttribute('viewBox', '0 0 430 720');
+                mobileSvg.setAttribute('viewBox', `0 0 430 ${720 + mobileTitleExtraHeight}`);
             }
 
             if (window.innerWidth < 768) {
@@ -5259,7 +5350,7 @@
             // 👇 新增：點擊「編輯評鑑」時，將手機版 SVG 畫布高度恢復為原本的 1046
             const mobileSvg = document.getElementById('mobileRatingMainSvg');
             if (mobileSvg) {
-                mobileSvg.setAttribute('viewBox', '0 0 430 1122');
+                mobileSvg.setAttribute('viewBox', `0 0 430 ${1122 + mobileTitleExtraHeight}`);
             }
 
             document.getElementById('ratingMainStage')?.classList.remove('is-completed');
@@ -5668,9 +5759,19 @@
             });
 
             // 電腦版右側分類按鈕 & 手機版下方橫排分類按鈕
+            // 電腦版右側分類按鈕 & 手機版下方橫排分類按鈕 (點一下開啟、再點一下收起)
             const bindCatToggle = (id, catKey) => {
-                document.getElementById(id)?.addEventListener('click', (e) => {
+                const btnEl = document.getElementById(id);
+                if (!btnEl) return;
+
+                // 阻止 pointerdown 冒泡到 SVG 畫布，避免先把選單關掉又在 click 時重開
+                btnEl.addEventListener('pointerdown', (e) => {
                     e.stopPropagation();
+                });
+
+                btnEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isRatingCompletedState) return;
                     toggleMonsterMenuByCategory(catKey);
                 });
             };

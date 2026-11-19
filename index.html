@@ -2785,34 +2785,65 @@
 
             if (!halftoneLoopStarted) {
                 halftoneLoopStarted = true;
+                let lastTouchTime = 0;
+
+                const clearHalftoneCursor = () => {
+                    halftoneCursorX = null;
+                    halftoneCursorY = null;
+                };
+
+                // 僅在真實滑鼠移動時更新（忽略手機觸控放開後瀏覽器補發的合成 mousemove）
                 window.addEventListener('mousemove', (e) => {
+                    if (Date.now() - lastTouchTime < 800) return;
                     halftoneCursorX = e.clientX;
                     halftoneCursorY = e.clientY;
-                });
+                }, { passive: true });
+
                 window.addEventListener('pointermove', (e) => {
-                    halftoneCursorX = e.clientX;
-                    halftoneCursorY = e.clientY;
+                    if (e.pointerType === 'mouse') {
+                        if (Date.now() - lastTouchTime < 800) return;
+                        halftoneCursorX = e.clientX;
+                        halftoneCursorY = e.clientY;
+                    }
                 }, { passive: true });
-                window.addEventListener('mouseleave', () => {
-                    halftoneCursorX = null;
-                    halftoneCursorY = null;
-                });
+
+                window.addEventListener('pointerup', (e) => {
+                    if (e.pointerType !== 'mouse') {
+                        lastTouchTime = Date.now();
+                        clearHalftoneCursor();
+                    }
+                }, { passive: true });
+
+                window.addEventListener('pointercancel', clearHalftoneCursor, { passive: true });
+                window.addEventListener('mouseleave', clearHalftoneCursor);
+                window.addEventListener('blur', clearHalftoneCursor);
+
+                // 手機版觸控按下與滑動時跟隨手指，放開或轉為捲動時立即平滑縮回
                 window.addEventListener('touchstart', (e) => {
+                    lastTouchTime = Date.now();
                     if (e.touches && e.touches.length > 0) {
                         halftoneCursorX = e.touches[0].clientX;
                         halftoneCursorY = e.touches[0].clientY;
                     }
                 }, { passive: true });
+
                 window.addEventListener('touchmove', (e) => {
+                    lastTouchTime = Date.now();
                     if (e.touches && e.touches.length > 0) {
                         halftoneCursorX = e.touches[0].clientX;
                         halftoneCursorY = e.touches[0].clientY;
                     }
                 }, { passive: true });
-                window.addEventListener('touchend', () => {
-                    halftoneCursorX = null;
-                    halftoneCursorY = null;
-                }, { passive: true });
+
+                const handleTouchRelease = (e) => {
+                    lastTouchTime = Date.now();
+                    if (!e.touches || e.touches.length === 0) {
+                        clearHalftoneCursor();
+                    }
+                };
+                window.addEventListener('touchend', handleTouchRelease, { passive: true });
+                window.addEventListener('touchcancel', handleTouchRelease, { passive: true });
+
                 requestAnimationFrame(animateHalftoneHoverEffect);
             }
         }
