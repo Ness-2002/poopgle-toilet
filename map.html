@@ -233,6 +233,31 @@
         .poopgle-map-popup .leaflet-popup-tip-container {
             display: none;
         }
+        .poopgle-map-popup,
+        .poopgle-map-popup .leaflet-popup-content-wrapper,
+        .poopgle-map-popup .leaflet-popup-content {
+            pointer-events: none !important;
+        }
+        .poopgle-map-popup .poopgle-popup-card,
+        .poopgle-map-popup .leaflet-popup-content > div > div:first-child {
+            pointer-events: auto !important;
+        }
+        .poopgle-restroom-pin {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 9999px !important;
+            background: rgba(0, 0, 0, 0.001) !important;
+            border: none !important;
+            pointer-events: auto !important;
+        }
+        .poopgle-restroom-pin * {
+            pointer-events: none !important;
+        }
+        .poopgle-user-marker,
+        .poopgle-user-marker * {
+            pointer-events: none !important;
+        }
         /* 上移右下角縮放按鈕與版權列，避開蹲式馬桶圓角裁切 */
         .squat-toilet-map-well .leaflet-bottom.leaflet-right .leaflet-control-zoom {
             margin-bottom: 24px !important;
@@ -322,7 +347,7 @@
 
 <body class="min-h-screen md:h-screen w-full md:overflow-hidden select-none relative flex items-start md:items-center justify-center pt-[112px] pb-10 px-3 sm:px-6 md:pt-[84px] md:pb-4 md:px-0">    <!-- 電腦版頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (手機版隱藏) -->
     <header class="hidden md:block w-full fixed top-0 left-0 z-50">
-        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-native-scrollbar">
             <div class="flex items-center gap-7 xl:gap-10 text-[#1E2470] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
@@ -339,7 +364,7 @@
                 <a href="./index.html" class="group pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味主頁">
                     <img id="mapDesktopLogoImg"
                          data-local-src="./img/logo.png"
-                         src="..."
+                         src="./img/logo.png"
                          alt="有所味 Logo"
                          class="w-[195px] h-auto object-contain transition-transform duration-200 group-hover:scale-105" />
                 </a>
@@ -659,16 +684,16 @@
 
              <!-- 地圖左下角兩顆方形定位控制卡 (手機版與電腦版皆顯示) -->
           <div class="absolute left-2.5 sm:left-3.5 bottom-2.5 sm:bottom-3.5 z-[420] flex items-center gap-2 sm:gap-2.5">
-              <!-- 左卡：定位當前位置 -->
+              <!-- 左卡：定位最近公廁 -->
               <button id="btnLocateCurrentPos" type="button"
                       class="pm-flat-btn w-[68px] h-[72px] sm:w-[72px] sm:h-[76px] bg-[#FF94DA] border-[3px] border-[#4BE0FF] flex flex-col items-center justify-between pt-1.5 pb-1.5 px-1 shadow-md focus:outline-none"
-                      title="重新啟動 GPS 定位您的當前位置">
+                      title="定位距離您最近的公廁">
                   <svg viewBox="0 0 40 42" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0">
                       <path d="M 20,3 C 11.2,3 4,10.2 4,19 C 4,29.5 20,40 20,40 C 20,40 36,29.5 36,19 C 36,10.2 28.8,3 20,3 Z" fill="#FFFFFF" />
                       <circle cx="20" cy="18" r="6" fill="#FF94DA" />
                   </svg>
                   <span class="text-[#2A348C] text-[10px] font-black leading-[1.15] tracking-tight text-center">
-                      定位<br>當前位置
+                      定位<br>最近公廁
                   </span>
               </button>
 
@@ -1441,7 +1466,7 @@
 
              return `
               <div class="${isMobileInline ? 'w-full' : 'w-[296px]'} select-none font-['jf-openhuninn','Varela_Round','Kosugi_Maru','Noto_Sans_TC',sans-serif]" onclick="event.stopPropagation()">
-                  <div class="bg-[#FFF8EA] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
+                  <div class="poopgle-popup-card bg-[#FFF8EA] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
                       <div class="relative px-7 py-2 bg-[#FFF8EA] flex items-center justify-center border-b-[2px]" style="border-bottom-color: ${themeMainHex};">
                           <h3 class="text-[#2A348C] text-[17px] font-black tracking-wider text-center leading-snug truncate m-0">
                               ${escapeHtml(toilet.name)}
@@ -1564,12 +1589,22 @@
             state.isUpdatingPopupInternally = false;
         }
 
+        function updateSelectedCardHighlight() {
+            const container = document.getElementById('toiletListContainer');
+            if (!container) return;
+            container.querySelectorAll('.toilet-list-card').forEach((cardEl) => {
+                const isSelected = cardEl.getAttribute('data-card-key') === state.selectedToiletKey;
+                cardEl.classList.toggle('border-[#2A348C]', isSelected);
+                cardEl.classList.toggle('shadow-sm', isSelected);
+                cardEl.classList.toggle('border-transparent', !isSelected);
+            });
+        }
+
         function openToiletPopupOnMarker(toilet) {
             if (!toilet || !state.map || typeof L === 'undefined') return;
             state.selectedToiletKey = toilet.key;
 
             if (isMobileMapViewport()) {
-                // 手機版：關閉地圖上的氣泡框，改在下方顯示資訊框與「返回公廁列表」按鈕
                 if (state.activeToiletPopup && state.map.hasLayer(state.activeToiletPopup)) {
                     state.isUpdatingPopupInternally = true;
                     state.map.closePopup(state.activeToiletPopup);
@@ -1577,14 +1612,14 @@
                 }
                 showMobileInlineDetailPanel(toilet);
                 renderMapMarkersInViewport();
-                renderToiletList();
+                updateSelectedCardHighlight();
                 return;
             }
 
             hideMobileInlineDetailPanel();
             if (!state.activeToiletPopup) {
                 state.activeToiletPopup = L.popup({
-                    offset: [0, -14],
+                    offset: [0, -20],
                     closeButton: false,
                     autoPan: true,
                     autoPanPaddingTopLeft: [20, 20],
@@ -1603,7 +1638,7 @@
             state.isUpdatingPopupInternally = false;
 
             renderMapMarkersInViewport();
-            renderToiletList();
+            updateSelectedCardHighlight();
         }
 
         window.closeActiveToiletPopup = function(e) {
@@ -2260,7 +2295,7 @@
             const userIcon = L.divIcon({
                 className: 'poopgle-user-marker',
                 html: `
-                    <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:auto;">
+                    <div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;pointer-events:none;">
                         ${innerVisualHtml}
                     </div>
                 `,
@@ -2269,8 +2304,12 @@
             });
 
             if (!state.userMarker) {
-                state.userMarker = L.marker(latLng, { icon: userIcon, zIndexOffset: 1200 }).addTo(state.map);
-                state.userMarker.bindTooltip('目前所在位置', { direction: 'top', offset: [0, -22] });
+                state.userMarker = L.marker(latLng, {
+                    icon: userIcon,
+                    interactive: false,
+                    keyboard: false,
+                    zIndexOffset: 50
+                }).addTo(state.map);
             } else {
                 state.userMarker.setIcon(userIcon);
                 state.userMarker.setLatLng(latLng);
@@ -2279,6 +2318,7 @@
             if (!state.userCircle100m) {
                 state.userCircle100m = L.circle(latLng, {
                     radius: 100,
+                    interactive: false,
                     color: '#2A348C',
                     weight: 1.8,
                     dashArray: '5, 6',
@@ -2309,29 +2349,34 @@
                     if (inView.length >= 450) break;
                 }
             }
+            if (state.selectedToiletKey && !inView.some(item => item.key === state.selectedToiletKey)) {
+                const selectedItem = state.allToilets.find(item => item.key === state.selectedToiletKey);
+                if (selectedItem) inView.push(selectedItem);
+            }
 
             inView.forEach((t) => {
                 const isSelected = t.key === state.selectedToiletKey;
-                const size = isSelected ? 34 : 28;
+                const visualSize = isSelected ? 38 : 32;
+                const hitSize = visualSize + 6; // 完整覆蓋整個圓圈與邊框緩衝
 
-                // 判斷公廁類型：女廁粉色 (#FF94DA)、男廁藍色 (#4BE0FF)、其他黃色 (#F5F078)
+                // 女廁粉色 (#FF94DA)、男廁藍色 (#4BE0FF)、其他黃色 (#F5F078)
                 const toiletType = t.normalizedType || normalizeToiletType(t.type, t.type2, t.name);
-                let pinBgColor = '#F5F078'; // 其他類型：亮黃色
+                let pinBgColor = '#F5F078';
                 if (toiletType === '女廁所') {
-                    pinBgColor = '#FF94DA'; // 女廁：粉紅色
+                    pinBgColor = '#FF94DA';
                 } else if (toiletType === '男廁所') {
-                    pinBgColor = '#4BE0FF'; // 男廁：青藍色
+                    pinBgColor = '#4BE0FF';
                 }
 
                 const ringStyle = isSelected
-                    ? 'border:3px solid #FFFFFF;box-shadow:0 0 0 2.5px #2A348C, 0 4px 10px rgba(0,0,0,0.28);transform:scale(1.12);'
+                    ? 'border:3px solid #FFFFFF;box-shadow:0 0 0 2.5px #2A348C, 0 4px 10px rgba(0,0,0,0.28);'
                     : 'border:2px solid #2A348C;box-shadow:0 2px 5px rgba(42,52,140,0.25);';
 
                 const icon = L.divIcon({
                     className: 'poopgle-restroom-pin',
                     html: `
-                        <div style="width:${size}px;height:${size}px;border-radius:9999px;background:${pinBgColor};${ringStyle}display:flex;align-items:center;justify-content:center;cursor:pointer;">
-                            <svg viewBox="0 0 24 24" width="${size * 0.64}" height="${size * 0.64}" fill="#2A348C">
+                        <div style="width:${visualSize}px;height:${visualSize}px;border-radius:9999px;background:${pinBgColor};${ringStyle}display:flex;align-items:center;justify-content:center;pointer-events:none;flex-shrink:0;">
+                            <svg viewBox="0 0 24 24" width="${visualSize * 0.62}" height="${visualSize * 0.62}" fill="#2A348C" style="pointer-events:none;">
                                 <circle cx="7.5" cy="5.5" r="2" />
                                 <path d="M 5,9 L 10,9 L 10,14.5 L 8.8,14.5 L 8.8,20 L 6.2,20 L 6.2,14.5 L 5,14.5 Z" />
                                 <rect x="11.5" y="4.5" width="1.2" height="15.5" rx="0.6" />
@@ -2340,16 +2385,80 @@
                             </svg>
                         </div>
                     `,
-                    iconSize: [size, size],
-                    iconAnchor: [size / 2, size / 2]
+                    iconSize: [hitSize, hitSize],
+                    iconAnchor: [hitSize / 2, hitSize / 2]
                 });
 
-                const marker = L.marker([t.lat, t.lng], { icon, zIndexOffset: isSelected ? 900 : 100 });
-                marker.on('click', (e) => {
-                    L.DomEvent.stopPropagation(e);
-                    openToiletPopupOnMarker(t);
+                const marker = L.marker([t.lat, t.lng], {
+                    icon,
+                    zIndexOffset: isSelected ? 1000 : 200
                 });
+
+                let lastPinActivateTs = 0;
+                const activatePin = (ev) => {
+                    if (ev) {
+                        if (typeof ev.stopPropagation === 'function') ev.stopPropagation();
+                        if (ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
+                    }
+                    const now = Date.now();
+                    if (now - lastPinActivateTs < 250) return;
+                    lastPinActivateTs = now;
+                    openToiletPopupOnMarker(t);
+                };
+
+                const attachPinDomEvents = () => {
+                    const el = marker.getElement();
+                    if (!el || el._poopglePinBound) return;
+                    el._poopglePinBound = true;
+
+                    let downX = null;
+                    let downY = null;
+
+                    // 記錄按下的起點座標（不攔截事件，讓地圖拖曳狀態正常重置）
+                    el.addEventListener('mousedown', (ev) => {
+                        downX = ev.clientX;
+                        downY = ev.clientY;
+                    }, { passive: true });
+
+                    el.addEventListener('touchstart', (ev) => {
+                        if (ev.touches && ev.touches.length === 1) {
+                            downX = ev.touches[0].clientX;
+                            downY = ev.touches[0].clientY;
+                        } else {
+                            downX = null;
+                            downY = null;
+                        }
+                    }, { passive: true });
+
+                    // 直接在整個圓形容器上觸發點擊（容許 14px 內微幅手震，拖曳超過 14px 則視為移動地圖）
+                    el.addEventListener('click', (ev) => {
+                        if (downX !== null && downY !== null) {
+                            const moved = Math.hypot(ev.clientX - downX, ev.clientY - downY);
+                            downX = null;
+                            downY = null;
+                            if (moved > 14) return;
+                        }
+                        ev.stopPropagation();
+                        activatePin(ev);
+                    });
+
+                    el.addEventListener('touchend', (ev) => {
+                        if (downX === null || downY === null || !ev.changedTouches || ev.changedTouches.length !== 1) return;
+                        const moved = Math.hypot(ev.changedTouches[0].clientX - downX, ev.changedTouches[0].clientY - downY);
+                        downX = null;
+                        downY = null;
+                        if (moved <= 14) {
+                            if (ev.cancelable) ev.preventDefault();
+                            ev.stopPropagation();
+                            activatePin(ev);
+                        }
+                    }, { passive: false });
+                };
+
+                marker.on('click', activatePin);
+                marker.on('add', attachPinDomEvents);
                 state.markerLayerGroup.addLayer(marker);
+                attachPinDomEvents();
             });
         }
 
@@ -2357,6 +2466,7 @@
         // 7. GPS 定位與距離篩選渲染
         // ===================================================================
         let geoWatchId = null;
+        let isWaitingInitialGeo = true;
 
         function hasSharedToiletUrlParam() {
             try {
@@ -2367,10 +2477,17 @@
         }
 
         function setUserPosition(lat, lng, panMap = true) {
+            isWaitingInitialGeo = false;
             state.userLat = lat;
             state.userLng = lng;
             updateUserMapLayer();
-            // 若從分享連結進入且未手動點擊定位按鈕，禁止自動將地圖拉回使用者位置
+
+            if (state._pendingFocusNearest) {
+                state._pendingFocusNearest = false;
+                window.locateNearestToilet();
+                return;
+            }
+
             const allowPan = panMap && (!hasSharedToiletUrlParam() || state._manualLocateTriggered);
             if (allowPan && state.map) {
                 state.map.setView([lat, lng], 16);
@@ -2385,15 +2502,21 @@
         function triggerUserGeolocation(isManualClick = false) {
             if (isManualClick) state._manualLocateTriggered = true;
             if (!navigator.geolocation) {
+                isWaitingInitialGeo = false;
                 if ((IS_IN_IFRAME || IS_STRICT_SANDBOX) && state.userLat === null) {
                     setUserPosition(24.9852, 121.3418, false);
-                } else if (isManualClick) {
-                    showToast('您的瀏覽器不支援 GPS 定位功能', 'error');
+                } else {
+                    if (isManualClick) showToast('您的瀏覽器不支援 GPS 定位功能', 'error');
+                    refreshDistancesAndRender();
                 }
                 return;
             }
             if (isManualClick) {
                 showToast('正在定位您的當前位置...', 'info');
+            }
+            if (state.userLat === null) {
+                isWaitingInitialGeo = true;
+                renderToiletList();
             }
             if (geoWatchId !== null) {
                 navigator.geolocation.clearWatch(geoWatchId);
@@ -2404,29 +2527,51 @@
             const handlePos = (pos) => {
                 const { latitude, longitude } = pos.coords;
                 if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-                const shouldPan = !hasCenteredOnce && (isManualClick || !state.initialSharedToiletParam);
+                isWaitingInitialGeo = false;
+                if (hasCenteredOnce && state.userLat !== null && state.userLng !== null) {
+                    const movedMeters = calculateDistanceMeters(state.userLat, state.userLng, latitude, longitude);
+                    if (movedMeters < 10) return;
+                }
+                const shouldPan = !hasCenteredOnce && (isManualClick || !hasSharedToiletUrlParam());
                 hasCenteredOnce = true;
                 setUserPosition(latitude, longitude, shouldPan);
             };
 
-            const geoOpts = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+            const handleFinalGeoError = () => {
+                isWaitingInitialGeo = false;
+                state._pendingFocusNearest = false;
+                if ((IS_IN_IFRAME || IS_STRICT_SANDBOX) && state.userLat === null) {
+                    setUserPosition(24.9852, 121.3418, false);
+                } else {
+                    if (isManualClick) showToast('無法取得定位訊號，請確認瀏覽器位置權限已開啟', 'error');
+                    refreshDistancesAndRender();
+                }
+            };
+
+            // 先嘗試高精準定位，若桌機逾時失敗則立即改用一般網路定位備援
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     handlePos(pos);
                     if (isManualClick) showToast('已定位至您的當前位置！', 'success');
                 },
                 () => {
-                    if ((IS_IN_IFRAME || IS_STRICT_SANDBOX) && state.userLat === null) {
-                        setUserPosition(24.9852, 121.3418, false);
-                    } else if (isManualClick) {
-                        showToast('無法取得定位訊號，請確認瀏覽器位置權限', 'error');
-                    }
-                    refreshDistancesAndRender();
+                    navigator.geolocation.getCurrentPosition(
+                        (pos2) => {
+                            handlePos(pos2);
+                            if (isManualClick) showToast('已定位至您的當前位置！', 'success');
+                        },
+                        handleFinalGeoError,
+                        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+                    );
                 },
-                geoOpts
+                { enableHighAccuracy: true, timeout: 4500, maximumAge: 30000 }
             );
 
-            geoWatchId = navigator.geolocation.watchPosition(handlePos, () => {}, geoOpts);
+            geoWatchId = navigator.geolocation.watchPosition(handlePos, () => {}, {
+                enableHighAccuracy: false,
+                timeout: 15000,
+                maximumAge: 10000
+            });
         }
 
         function refreshDistancesAndRender() {
@@ -2468,7 +2613,6 @@
             }
 
             results.sort((a, b) => {
-                // 取得目前定位後，一律依照距離「由近到遠」排序
                 if (state.userLat !== null && state.userLng !== null) {
                     const distA = Number.isFinite(a.distance) ? a.distance : Infinity;
                     const distB = Number.isFinite(b.distance) ? b.distance : Infinity;
@@ -2482,7 +2626,7 @@
 
             const badgeEl = document.getElementById('datasetCountBadge');
             if (badgeEl) {
-                badgeEl.textContent = (state.userLat !== null && results.length > 0) ? `${results.length.toLocaleString()} 間` : '';
+                badgeEl.textContent = (!isWaitingInitialGeo && results.length > 0) ? `${results.length.toLocaleString()} 間` : '';
             }
 
             renderToiletList();
@@ -2517,8 +2661,8 @@
             const container = document.getElementById('toiletListContainer');
             if (!container) return;
 
-            // 尚未取得目前位置定位前，維持轉圈圈 Loading 畫面
-            if (state.userLat === null || state.userLng === null) {
+            // 正在定位目前位置時，顯示轉圈圈 Loading 畫面
+            if (state.userLat === null && isWaitingInitialGeo) {
                 container.innerHTML = `
                     <div class="h-full flex flex-col items-center justify-center text-center p-5 text-[#2A348C] font-bold text-xs space-y-2">
                         <i class="fa-solid fa-spinner fa-spin text-lg"></i>
@@ -2539,7 +2683,7 @@
                     container.innerHTML = `
                         <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-2">
                             <div class="font-black text-sm">尚未取得目前位置</div>
-                            <p class="text-xs font-bold opacity-75">請點擊地圖左下角「定位當前位置」，或切回下方「All」瀏覽全部公廁</p>
+                            <p class="text-xs font-bold opacity-75">請點擊地圖左下角「定位最近公廁」，或切回下方「All」瀏覽全部公廁</p>
                         </div>`;
                 } else {
                     container.innerHTML = `
@@ -2574,7 +2718,6 @@
 
                 const rightButtonsHtml = isLoggedIn
                     ? `<div class="grid grid-cols-2 gap-2 shrink-0 items-center justify-items-center">
-                           <!-- 左上：查看評論 -->
                            <button type="button" data-action="reviews" data-key="${escapeHtml(t.key)}"
                                    class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center focus:outline-none"
                                    title="查看評論">
@@ -2586,7 +2729,6 @@
                                </svg>
                            </button>
 
-                           <!-- 右上：存到常用 (登入時取代原本的查看地點按鈕) -->
                            <button type="button" data-action="save" data-key="${escapeHtml(t.key)}"
                                    class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#F5F078] border-2 ${isSavedFav ? 'border-[#FF94DA]' : 'border-transparent'} flex items-center justify-center overflow-hidden focus:outline-none"
                                    title="${isSavedFav ? '從常用移除' : '存到常用'}">
@@ -2595,10 +2737,8 @@
                                </svg>
                            </button>
 
-                           <!-- 左下：空白佔位，讓導航按鈕精準對齊右下角 -->
                            <span class="w-[38px] h-[38px] pointer-events-none"></span>
 
-                           <!-- 右下：開啟 Google Maps 導航 -->
                            <a href="${gmapNavUrl}" target="_blank" rel="noopener noreferrer" data-action="nav"
                               class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center no-underline"
                               title="開啟 Google Maps 導航">
@@ -2609,7 +2749,6 @@
                            </a>
                        </div>`
                     : `<div class="flex flex-col gap-2 shrink-0 items-center justify-center">
-                           <!-- 上：查看評論 -->
                            <button type="button" data-action="reviews" data-key="${escapeHtml(t.key)}"
                                    class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center focus:outline-none"
                                    title="查看評論">
@@ -2621,7 +2760,6 @@
                                </svg>
                            </button>
 
-                           <!-- 下：開啟 Google Maps 導航 -->
                            <a href="${gmapNavUrl}" target="_blank" rel="noopener noreferrer" data-action="nav"
                               class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center no-underline"
                               title="開啟 Google Maps 導航">
@@ -2636,7 +2774,6 @@
                   <div data-card-key="${escapeHtml(t.key)}"
                        class="toilet-list-card relative bg-[#FFF8EA] rounded-[18px] border-2 ${isSelected ? 'border-[#2A348C] shadow-sm' : 'border-transparent'} px-4 py-3 cursor-pointer transition-all hover:brightness-[1.01] flex items-center justify-between gap-2.5">
                       ${favStarBadgeHtml}
-                      <!-- 左側：公廁名稱、類型與地址 -->
                       <div class="min-w-0 flex-1 pr-1">
                           <h4 class="text-[#2A348C] text-[15.5px] font-black tracking-wide leading-snug break-words">
                               ${escapeHtml(t.name)}
@@ -2655,13 +2792,17 @@
               `;
             }).join('');
 
-            container.querySelectorAll('.toilet-list-card').forEach((cardEl) => {
-                cardEl.addEventListener('click', (e) => {
-                    const actionBtn = e.target.closest('[data-action]');
+            if (!container._hasDelegatedClick) {
+                container._hasDelegatedClick = true;
+                container.addEventListener('click', (e) => {
+                    const cardEl = e.target.closest('.toilet-list-card');
+                    if (!cardEl || !container.contains(cardEl)) return;
+
                     const key = cardEl.getAttribute('data-card-key');
                     const toilet = state.allToilets.find(item => item.key === key);
                     if (!toilet) return;
 
+                    const actionBtn = e.target.closest('[data-action]');
                     if (actionBtn) {
                         const act = actionBtn.getAttribute('data-action');
                         if (act === 'reviews') {
@@ -2679,14 +2820,96 @@
                             return;
                         }
                     }
+
                     window.focusToiletOnMap(key);
                 });
-            });
+            }
 
             setTimeout(syncCustomListScrollbar, 20);
         }
 
-       let sharedFocusTimer = null;
+        window.focusToiletOnMap = function(toiletKey) {
+            const toilet = state.allToilets.find(t => t.key === toiletKey);
+            if (!toilet || !state.map) return;
+
+            if (state.activeToiletPopup && state.map.hasLayer(state.activeToiletPopup)) {
+                state.isUpdatingPopupInternally = true;
+                state.map.closePopup(state.activeToiletPopup);
+                state.isUpdatingPopupInternally = false;
+            }
+
+            state.map.invalidateSize();
+            const targetZoom = Math.max(state.map.getZoom(), 17);
+
+            if (isMobileMapViewport()) {
+                state.map.setView([toilet.lat, toilet.lng], targetZoom, { animate: false });
+                openToiletPopupOnMarker(toilet);
+                document.querySelector('.squat-toilet-map-well')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                const mapSize = state.map.getSize();
+                const verticalOffset = Math.min(135, Math.round((mapSize.y || 480) * 0.27));
+                const pt = state.map.project([toilet.lat, toilet.lng], targetZoom);
+                pt.y -= verticalOffset;
+                const offsetCenter = state.map.unproject(pt, targetZoom);
+                state.map.setView(offsetCenter, targetZoom, { animate: false });
+                openToiletPopupOnMarker(toilet);
+            }
+        };
+
+        window.locateNearestToilet = function() {
+            // 1. 若已有選取的公廁，先取消選取並關閉對話框／手機版資訊卡
+            if (state.map && state.activeToiletPopup) {
+                state.isUpdatingPopupInternally = true;
+                state.map.closePopup(state.activeToiletPopup);
+                state.isUpdatingPopupInternally = false;
+            }
+            hideMobileInlineDetailPanel();
+            state.selectedToiletKey = null;
+            renderMapMarkersInViewport();
+            updateSelectedCardHighlight();
+
+            const listContainer = document.getElementById('toiletListContainer');
+            if (listContainer) listContainer.scrollTop = 0;
+
+            // 2. 若尚未取得目前座標，先啟動定位，完成後自動跳轉最近公廁
+            if (state.userLat === null || state.userLng === null) {
+                state._pendingFocusNearest = true;
+                triggerUserGeolocation(true);
+                return;
+            }
+
+            // 3. 重新計算距離並找出最近的公廁
+            refreshDistancesAndRender();
+
+            let nearest = null;
+            if (state.filteredToilets.length > 0 && state.radiusFilter !== '1000plus' && !state.countyFilter && !state.townFilter) {
+                nearest = state.filteredToilets[0];
+            } else if (state.allToilets.length > 0) {
+                let minDist = Infinity;
+                for (let i = 0; i < state.allToilets.length; i++) {
+                    const t = state.allToilets[i];
+                    const d = calculateDistanceMeters(state.userLat, state.userLng, t.lat, t.lng);
+                    t.distance = d;
+                    if (d < minDist) {
+                        minDist = d;
+                        nearest = t;
+                    }
+                }
+            }
+
+            if (!nearest) {
+                showToast('目前找不到可定位的公廁資料', 'error');
+                return;
+            }
+
+            // 4. 定點至該最近公廁並顯示對話框
+            window.focusToiletOnMap(nearest.key);
+            const distLabel = Number.isFinite(nearest.distance)
+                ? (nearest.distance < 1000 ? `（距離約 ${Math.round(nearest.distance)}m）` : `（距離約 ${(nearest.distance / 1000).toFixed(1)}km）`)
+                : '';
+            showToast(`已定位最近公廁：${nearest.name}${distLabel}`, 'success');
+        };
+
         function tryFocusSharedToiletFromUrl() {
             if (state._sharedToiletDone) return;
             let rawParam = '';
@@ -2716,15 +2939,16 @@
                 if (isMobileMapViewport()) {
                     state.map.setView([target.lat, target.lng], targetZoom, { animate: false });
                 } else {
+                    const mapSize = state.map.getSize();
+                    const verticalOffset = Math.min(135, Math.round((mapSize.y || 480) * 0.27));
                     const pt = state.map.project([target.lat, target.lng], targetZoom);
-                    pt.y -= 130;
+                    pt.y -= verticalOffset;
                     const offsetCenter = state.map.unproject(pt, targetZoom);
                     state.map.setView(offsetCenter, targetZoom, { animate: false });
                 }
                 openToiletPopupOnMarker(target);
             }, 350);
         }
-
 
         // ===================================================================
         // 9. DOM 事件綁定與啟動流程
@@ -2895,7 +3119,7 @@
             });
 
             document.getElementById('btnLocateCurrentPos').addEventListener('click', () => {
-                triggerUserGeolocation(true);
+                window.locateNearestToilet();
             });
             document.getElementById('btnPanToCurrentPos').addEventListener('click', () => {
                 if (state.userLat !== null && state.userLng !== null && state.map) {
