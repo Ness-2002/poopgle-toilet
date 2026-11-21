@@ -1392,18 +1392,19 @@
             initLogoImagesWithFallback();
             buildArchStageDOM();
             // ===================================================================
-            // 🚽 上排正中央窗戶：Windows XP 小幫手風格（光滑光影＋低解析預渲染點陣 3D 旋轉馬桶）
+            // 🚽 上排正中央窗戶：極速背景運算 (Web Worker) + 快取版 Windows XP 3D 馬桶
             // ===================================================================
             (function initRetro3dSpinningToilet() {
                 const stageEl = document.getElementById('retro3dToiletStage');
                 if (!stageEl) return;
 
                 // 💡 可自由微調參數：
-                const SPRITE_RES = 84;       // 復古 3D 點陣解析度（越小顆粒感越重，建議 72~96）
+                const SPRITE_RES = 78;       // 點陣解析度（72~84 最有 XP 小幫手質感且極快）
                 const TOILET_SIZE = 166;     // 馬桶在窗戶內的顯示大小
-                const TOILET_Y = -226;       // 馬桶上下位置（負越多越往上，例如 -235 往上、-215 往下）
-                const TOTAL_FRAMES = 36;     // 旋轉一圈的格數
-                const SPIN_FPS = 15;         // 每秒播放格數（12~16 最有 XP 動畫小幫手節奏感）
+                const TOILET_Y = -226;       // 馬桶上下位置（負越多越往上）
+                const TOTAL_FRAMES = 28;     // 旋轉一圈格數
+                const SPIN_FPS = 14;         // 每秒播放格數
+                const CACHE_KEY = `poogle_xp_toilet_v3_${SPRITE_RES}_${TOTAL_FRAMES}`;
 
                 stageEl.innerHTML = '';
                 const svgNs = 'http://www.w3.org/2000/svg';
@@ -1416,290 +1417,311 @@
                 spriteImg.style.imageRendering = 'pixelated';
                 stageEl.appendChild(spriteImg);
 
-                // 3D 圓潤曲面數學函式 (模擬 2000 年代 3ds Max 光滑建模)
-                function smin(a, b, k) {
-                    const h = Math.max(k - Math.abs(a - b), 0) / k;
-                    return Math.min(a, b) - h * h * k * 0.25;
-                }
-                function smax(a, b, k) {
-                    return -smin(-a, -b, k);
-                }
-                function sdEllipsoid(x, y, z, rx, ry, rz) {
-                    const k0 = Math.hypot(x / rx, y / ry, z / rz);
-                    if (k0 < 1e-6) return -Math.min(rx, ry, rz);
-                    const k1 = Math.hypot(x / (rx * rx), y / (ry * ry), z / (rz * rz));
-                    return k0 * (k0 - 1.0) / k1;
-                }
-                function sdRoundBox(x, y, z, bx, by, bz, r) {
-                    const qx = Math.abs(x) - bx;
-                    const qy = Math.abs(y) - by;
-                    const qz = Math.abs(z) - bz;
-                    return Math.hypot(Math.max(qx, 0), Math.max(qy, 0), Math.max(qz, 0)) +
-                           Math.min(Math.max(qx, qy, qz), 0) - r;
-                }
-                function sdOval2D(x, z, rx, rz) {
-                    const k0 = Math.hypot(x / rx, z / rz);
-                    if (k0 < 1e-6) return -Math.min(rx, rz);
-                    const k1 = Math.hypot(x / (rx * rx), z / (rz * rz));
-                    return k0 * (k0 - 1.0) / k1;
-                }
-                function sdVertOvalCyl(x, y, z, rx, rz, h, r) {
-                    const dXZ = sdOval2D(x, z, rx, rz);
-                    const dY = Math.abs(y) - h;
-                    return Math.hypot(Math.max(dXZ, 0), Math.max(dY, 0)) +
-                           Math.min(Math.max(dXZ, dY), 0) - r;
-                }
+                let frames = new Array(TOTAL_FRAMES).fill(null);
+                let readyCount = 0;
 
-                // 坐式馬桶 3D 距離場 (回傳 [最短距離, 材質編號])
-                // 材質：1=陶瓷本體, 2=坐墊圈, 3=藍色水池, 4=金屬沖水把手
-                function mapToilet(x, y, z) {
-                    // 1. 圓潤底座、頸部柱身與飽滿盆體
-                    const dFoot = sdVertOvalCyl(x, y + 0.78, z - 0.04, 0.31, 0.43, 0.032, 0.048);
-                    const dNeck = sdVertOvalCyl(x, y + 0.50, z + 0.01, 0.21, 0.31, 0.24, 0.05);
-                    const dBowlOuter = smax(sdEllipsoid(x, y + 0.02, z - 0.17, 0.45, 0.45, 0.50), y + 0.03, 0.045);
-                    const dBridge = sdRoundBox(x, y + 0.09, z + 0.22, 0.33, 0.06, 0.16, 0.045);
+                // 1. 優先讀取瀏覽器暫存：若這個分頁已經算過，0 毫秒直接秒開！
+                try {
+                    const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+                    if (Array.isArray(cached) && cached.length === TOTAL_FRAMES && cached[0]) {
+                        frames = cached;
+                        readyCount = TOTAL_FRAMES;
+                        setSvgImageHref(spriteImg, frames[0]);
+                    }
+                } catch (e) {}
 
-                    let dBody = smin(dFoot, dNeck, 0.11);
-                    dBody = smin(dBody, dBowlOuter, 0.11);
-                    dBody = smin(dBody, dBridge, 0.08);
+                // 2. 若尚未快取，啟動獨立背景 Worker 運算（完全不佔用主畫面動畫資源）
+                if (readyCount < TOTAL_FRAMES) {
+                    const workerCode = `
+                        const RES = ${SPRITE_RES};
+                        const TOTAL = ${TOTAL_FRAMES};
+                        const UP = 2;
+                        const OUT_RES = RES * UP;
+                        const PITCH = 0.39;
+                        const cosP = Math.cos(PITCH), sinP = Math.sin(PITCH);
+                        const CAM_DIST = 3.8, FOV = 1.06, R_BOUND2 = 1.12 * 1.12;
+                        const BAYER4 = [0,8,2,10, 12,4,14,6, 3,11,1,9, 15,7,13,5];
+                        let lastHitMat = 1;
 
-                    // 挖空馬桶內槽
-                    const dCavity = sdEllipsoid(x, y - 0.02, z - 0.20, 0.29, 0.34, 0.33);
-                    dBody = smax(dBody, -dCavity, 0.032);
+                        function smin(a, b, k) {
+                            const h = Math.max(k - Math.abs(a - b), 0) / k;
+                            return Math.min(a, b) - h * h * k * 0.25;
+                        }
+                        function smax(a, b, k) { return -smin(-a, -b, k); }
 
-                    // 2. 後方圓角水箱與厚實水箱蓋
-                    const taper = 1.0 + (y - 0.34) * 0.06;
-                    const dTank = sdRoundBox(x / taper, y - 0.34, z + 0.37, 0.39, 0.31, 0.135, 0.075);
-                    const dTankLid = sdRoundBox(x, y - 0.72, z + 0.37, 0.435, 0.036, 0.17, 0.046);
-                    dBody = smin(dBody, dTank, 0.04);
-                    dBody = Math.min(dBody, dTankLid);
+                        function sdEllipsoid(x, y, z, rx, ry, rz) {
+                            const x0 = x / rx, y0 = y / ry, z0 = z / rz;
+                            const k0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
+                            if (k0 < 1e-6) return -Math.min(rx, ry, rz);
+                            const x1 = x / (rx * rx), y1 = y / (ry * ry), z1 = z / (rz * rz);
+                            return k0 * (k0 - 1.0) / Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+                        }
+                        function sdRoundBox(x, y, z, bx, by, bz, r) {
+                            const qx = Math.abs(x) - bx, qy = Math.abs(y) - by, qz = Math.abs(z) - bz;
+                            const mx = qx > 0 ? qx : 0, my = qy > 0 ? qy : 0, mz = qz > 0 ? qz : 0;
+                            return Math.sqrt(mx * mx + my * my + mz * mz) + Math.min(Math.max(qx, qy, qz), 0) - r;
+                        }
+                        function sdOval2D(x, z, rx, rz) {
+                            const x0 = x / rx, z0 = z / rz;
+                            const k0 = Math.sqrt(x0 * x0 + z0 * z0);
+                            if (k0 < 1e-6) return -Math.min(rx, rz);
+                            const x1 = x / (rx * rx), z1 = z / (rz * rz);
+                            return k0 * (k0 - 1.0) / Math.sqrt(x1 * x1 + z1 * z1);
+                        }
+                        function sdVertOvalCyl(x, y, z, rx, rz, h, r) {
+                            const dXZ = sdOval2D(x, z, rx, rz), dY = Math.abs(y) - h;
+                            const m1 = dXZ > 0 ? dXZ : 0, m2 = dY > 0 ? dY : 0;
+                            return Math.sqrt(m1 * m1 + m2 * m2) + Math.min(Math.max(dXZ, dY), 0) - r;
+                        }
 
-                    let bestD = dBody;
-                    let bestMat = 1;
+                        // 純數值距離場（零陣列建立、零記憶體垃圾回收）
+                        function sdToilet(x, y, z) {
+                            const dFoot = sdVertOvalCyl(x, y + 0.78, z - 0.04, 0.31, 0.43, 0.032, 0.048);
+                            const dNeck = sdVertOvalCyl(x, y + 0.50, z + 0.01, 0.21, 0.31, 0.24, 0.05);
+                            const dBowl = smax(sdEllipsoid(x, y + 0.02, z - 0.17, 0.45, 0.45, 0.50), y + 0.03, 0.045);
+                            const dBridge = sdRoundBox(x, y + 0.09, z + 0.22, 0.33, 0.06, 0.16, 0.045);
 
-                    // 3. 厚實圓潤坐墊圈
-                    const dRing2D = Math.abs(sdOval2D(x, z - 0.20, 0.345, 0.375)) - 0.054;
-                    const dRingY = Math.abs(y - 0.022) - 0.012;
-                    const dSeat = Math.hypot(Math.max(dRing2D, 0), Math.max(dRingY, 0)) +
-                                  Math.min(Math.max(dRing2D, dRingY), 0) - 0.032;
-                    if (dSeat < bestD) { bestD = dSeat; bestMat = 2; }
+                            let dBody = smin(smin(smin(dFoot, dNeck, 0.11), dBowl, 0.11), dBridge, 0.08);
+                            const dCavity = sdEllipsoid(x, y - 0.02, z - 0.20, 0.29, 0.34, 0.33);
+                            dBody = smax(dBody, -dCavity, 0.032);
 
-                    // 4. 馬桶內水池
-                    const dWater = Math.max(sdEllipsoid(x, y + 0.02, z - 0.20, 0.28, 0.30, 0.32), y + 0.13);
-                    if (dWater < bestD) { bestD = dWater; bestMat = 3; }
+                            const taper = 1.0 + (y - 0.34) * 0.06;
+                            const dTank = sdRoundBox(x / taper, y - 0.34, z + 0.37, 0.39, 0.31, 0.135, 0.075);
+                            const dTankLid = sdRoundBox(x, y - 0.72, z + 0.37, 0.435, 0.036, 0.17, 0.046);
+                            dBody = Math.min(smin(dBody, dTank, 0.04), dTankLid);
 
-                    // 5. 水箱側邊復古沖水把手
-                    const dLeverBase = sdRoundBox(x + 0.28, y - 0.54, z + 0.16, 0.032, 0.032, 0.035, 0.02);
-                    const dLeverArm = sdRoundBox(x + 0.34, y - 0.53, z + 0.145, 0.062, 0.016, 0.016, 0.014);
-                    const dHandle = smin(dLeverBase, dLeverArm, 0.02);
-                    if (dHandle < bestD) { bestD = dHandle; bestMat = 4; }
+                            let bestD = dBody, bestMat = 1;
 
-                    return [bestD, bestMat];
-                }
+                            const dRing2D = Math.abs(sdOval2D(x, z - 0.20, 0.345, 0.375)) - 0.054;
+                            const dRingY = Math.abs(y - 0.022) - 0.012;
+                            const mr1 = dRing2D > 0 ? dRing2D : 0, mr2 = dRingY > 0 ? dRingY : 0;
+                            const dSeat = Math.sqrt(mr1 * mr1 + mr2 * mr2) + Math.min(Math.max(dRing2D, dRingY), 0) - 0.032;
+                            if (dSeat < bestD) { bestD = dSeat; bestMat = 2; }
 
-                function calcNormal(x, y, z) {
-                    const e = 0.003;
-                    const nx = mapToilet(x + e, y, z)[0] - mapToilet(x - e, y, z)[0];
-                    const ny = mapToilet(x, y + e, z)[0] - mapToilet(x, y - e, z)[0];
-                    const nz = mapToilet(x, y, z + e)[0] - mapToilet(x, y, z - e)[0];
-                    const len = Math.hypot(nx, ny, nz) || 1;
-                    return [nx / len, ny / len, nz / len];
-                }
+                            const dWater = Math.max(sdEllipsoid(x, y + 0.02, z - 0.20, 0.28, 0.30, 0.32), y + 0.13);
+                            if (dWater < bestD) { bestD = dWater; bestMat = 3; }
 
-                function calcAO(px, py, pz, nx, ny, nz) {
-                    const d1 = mapToilet(px + nx * 0.06, py + ny * 0.06, pz + nz * 0.06)[0];
-                    const d2 = mapToilet(px + nx * 0.14, py + ny * 0.14, pz + nz * 0.14)[0];
-                    const occ = (0.06 - d1) * 3.2 + (0.14 - d2) * 1.6;
-                    return Math.max(0.32, Math.min(1.0, 1.0 - occ));
-                }
+                            const dLevB = sdRoundBox(x + 0.28, y - 0.54, z + 0.16, 0.032, 0.032, 0.035, 0.02);
+                            const dLevA = sdRoundBox(x + 0.34, y - 0.53, z + 0.145, 0.062, 0.016, 0.016, 0.014);
+                            const dHandle = smin(dLevB, dLevA, 0.02);
+                            if (dHandle < bestD) { bestD = dHandle; bestMat = 4; }
 
-                // 4x4 Bayer 復古 256 色抖色矩陣 (還原 2001 Windows Agent 點陣質感)
-                const BAYER4 = [
-                     0,  8,  2, 10,
-                    12,  4, 14,  6,
-                     3, 11,  1,  9,
-                    15,  7, 13,  5
-                ];
+                            lastHitMat = bestMat;
+                            return bestD;
+                        }
 
-                function lerpColor(cA, cB, t) {
-                    return [
-                        cA[0] + (cB[0] - cA[0]) * t,
-                        cA[1] + (cB[1] - cA[1]) * t,
-                        cA[2] + (cB[2] - cA[2]) * t
-                    ];
-                }
+                        const srcBuf = new Uint8ClampedArray(RES * RES * 4);
+                        const src32 = new Uint32Array(srcBuf.buffer);
+                        const dst32 = new Uint32Array(OUT_RES * OUT_RES);
 
-                const rawCanvas = document.createElement('canvas');
-                rawCanvas.width = SPRITE_RES;
-                rawCanvas.height = SPRITE_RES;
-                const rawCtx = rawCanvas.getContext('2d');
+                        function renderRawPixels(yawAngle) {
+                            src32.fill(0);
+                            const cosY = Math.cos(yawAngle), sinY = Math.sin(yawAngle);
 
-                const upScale = 3;
-                const outCanvas = document.createElement('canvas');
-                outCanvas.width = SPRITE_RES * upScale;
-                outCanvas.height = SPRITE_RES * upScale;
-                const outCtx = outCanvas.getContext('2d');
-                outCtx.imageSmoothingEnabled = false;
+                            const lxC = -0.52, lyC = 0.66, lzC = 0.54;
+                            const lyp = lyC * cosP + lzC * sinP, lzp = -lyC * sinP + lzC * cosP;
+                            const lx = lxC * cosY + lzp * sinY, ly = lyp, lz = -lxC * sinY + lzp * cosY;
 
-                const PITCH = 0.39;
-                const cosP = Math.cos(PITCH), sinP = Math.sin(PITCH);
-                const CAM_DIST = 3.8;
-                const FOV = 1.06;
-                const R_BOUND2 = 1.12 * 1.12;
+                            const roYp = CAM_DIST * sinP, roZp = CAM_DIST * cosP;
+                            const roX = roZp * sinY, roY = roYp, roZ = roZp * cosY;
+                            const roLen2 = roX * roX + roY * roY + roZ * roZ - R_BOUND2;
 
-                // 單格預渲染函式 (光滑 Phong 光影 + 濃郁暗部 + 復古抖色量化)
-                function renderSpriteFrame(yawAngle) {
-                    const imgData = rawCtx.createImageData(SPRITE_RES, SPRITE_RES);
-                    const data = imgData.data;
-                    const cosY = Math.cos(yawAngle), sinY = Math.sin(yawAngle);
+                            for (let py = 0; py < RES; py++) {
+                                const v = 1.0 - ((py + 0.5) / RES) * 2.0;
+                                if (v > 0.92 || v < -0.95) continue;
 
-                    // 固定在鏡頭左前上方的經典 3ds Max 主光源與補光
-                    const lxCam = -0.52, lyCam = 0.66, lzCam = 0.54;
-                    const lxp = lxCam, lyp = lyCam * cosP + lzCam * sinP, lzp = -lyCam * sinP + lzCam * cosP;
-                    const lx = lxp * cosY + lzp * sinY, ly = lyp, lz = -lxp * sinY + lzp * cosY;
+                                for (let px = 0; px < RES; px++) {
+                                    const u = ((px + 0.5) / RES) * 2.0 - 1.0;
+                                    if (u < -0.78 || u > 0.78) continue;
 
-                    const roXp = 0, roYp = CAM_DIST * sinP, roZp = CAM_DIST * cosP;
-                    const roX = roXp * cosY + roZp * sinY;
-                    const roY = roYp;
-                    const roZ = -roXp * sinY + roZp * cosY;
+                                    let rdxC = u * FOV, rdyC = v * FOV, rdzC = -CAM_DIST;
+                                    const invLen = 1.0 / Math.sqrt(rdxC * rdxC + rdyC * rdyC + rdzC * rdzC);
+                                    rdxC *= invLen; rdyC *= invLen; rdzC *= invLen;
 
-                    for (let py = 0; py < SPRITE_RES; py++) {
-                        const v = 1.0 - ((py + 0.5) / SPRITE_RES) * 2.0;
-                        for (let px = 0; px < SPRITE_RES; px++) {
-                            const u = ((px + 0.5) / SPRITE_RES) * 2.0 - 1.0;
-                            const idx = (py * SPRITE_RES + px) * 4;
+                                    const rdyP = rdyC * cosP + rdzC * sinP;
+                                    const rdzP = -rdyC * sinP + rdzC * cosP;
+                                    const rdx = rdxC * cosY + rdzP * sinY;
+                                    const rdy = rdyP;
+                                    const rdz = -rdxC * sinY + rdzP * cosY;
 
-                            let rdxC = u * FOV, rdyC = v * FOV, rdzC = -CAM_DIST;
-                            const rLen = Math.hypot(rdxC, rdyC, rdzC);
-                            rdxC /= rLen; rdyC /= rLen; rdzC /= rLen;
+                                    const b = roX * rdx + roY * rdy + roZ * rdz;
+                                    const disc = b * b - roLen2;
+                                    let hit = false, t = 0, hitMat = 1;
 
-                            const rdxP = rdxC;
-                            const rdyP = rdyC * cosP + rdzC * sinP;
-                            const rdzP = -rdyC * sinP + rdzC * cosP;
-
-                            const rdx = rdxP * cosY + rdzP * sinY;
-                            const rdy = rdyP;
-                            const rdz = -rdxP * sinY + rdzP * cosY;
-
-                            // 包圍球快速篩選
-                            const b = roX * rdx + roY * rdy + roZ * rdz;
-                            const c = (roX * roX + roY * roY + roZ * roZ) - R_BOUND2;
-                            const disc = b * b - c;
-
-                            let hit = false, t = 0, hitMat = 1;
-                            if (disc >= 0) {
-                                const sqrtD = Math.sqrt(disc);
-                                t = Math.max(0.1, -b - sqrtD);
-                                const tMax = -b + sqrtD;
-                                for (let step = 0; step < 40; step++) {
-                                    const hx = roX + rdx * t;
-                                    const hy = roY + rdy * t;
-                                    const hz = roZ + rdz * t;
-                                    const [d, mat] = mapToilet(hx, hy, hz);
-                                    if (d < 0.0028) {
-                                        hit = true;
-                                        hitMat = mat;
-                                        break;
+                                    if (disc >= 0) {
+                                        const sqrtD = Math.sqrt(disc);
+                                        t = -b - sqrtD;
+                                        if (t < 0.1) t = 0.1;
+                                        const tMax = -b + sqrtD;
+                                        for (let s = 0; s < 32; s++) {
+                                            const d = sdToilet(roX + rdx * t, roY + rdy * t, roZ + rdz * t);
+                                            if (d < 0.0032) { hit = true; hitMat = lastHitMat; break; }
+                                            t += d;
+                                            if (t > tMax) break;
+                                        }
                                     }
-                                    t += d;
-                                    if (t > tMax) break;
-                                }
-                            }
 
-                            if (hit) {
-                                const hx = roX + rdx * t;
-                                const hy = roY + rdy * t;
-                                const hz = roZ + rdz * t;
-                                const [nx, ny, nz] = calcNormal(hx, hy, hz);
-                                const ao = calcAO(hx, hy, hz, nx, ny, nz);
+                                    const idx = (py * RES + px) * 4;
+                                    if (hit) {
+                                        const hx = roX + rdx * t, hy = roY + rdy * t, hz = roZ + rdz * t;
+                                        const e = 0.0035;
+                                        // 四面體快速法向量計算（少算 1/3 次數）
+                                        const d0 = sdToilet(hx + e, hy - e, hz - e);
+                                        const d1 = sdToilet(hx - e, hy - e, hz + e);
+                                        const d2 = sdToilet(hx - e, hy + e, hz - e);
+                                        const d3 = sdToilet(hx + e, hy + e, hz + e);
+                                        let nx = d0 - d1 - d2 + d3;
+                                        let ny = -d0 - d1 + d2 + d3;
+                                        let nz = -d0 + d1 - d2 + d3;
+                                        const nInv = 1.0 / (Math.sqrt(nx * nx + ny * ny + nz * nz) || 1);
+                                        nx *= nInv; ny *= nInv; nz *= nInv;
 
-                                const ndotl = Math.max(0, nx * lx + ny * ly + nz * lz);
-                                const ndotv = Math.max(0, -(nx * rdx + ny * rdy + nz * rdz));
-                                const rimDarken = 0.58 + 0.42 * Math.pow(ndotv, 0.45);
-                                const shade = Math.min(1, (0.16 + ndotl * 0.86) * ao * rimDarken);
+                                        const aoD = sdToilet(hx + nx * 0.09, hy + ny * 0.09, hz + nz * 0.09);
+                                        const ao = Math.max(0.36, Math.min(1.0, 1.0 - (0.09 - aoD) * 3.8));
 
-                                // Blinn-Phong 光滑塑膠/陶瓷高光
-                                const hvx = lx - rdx, hvy = ly - rdy, hvz = lz - rdz;
-                                const hvLen = Math.hypot(hvx, hvy, hvz) || 1;
-                                const ndoth = Math.max(0, (nx * hvx + ny * hvy + nz * hvz) / hvLen);
-                                const spec = Math.pow(ndoth, hitMat === 4 ? 28 : 22) * ao;
+                                        const ndotl = Math.max(0, nx * lx + ny * ly + nz * lz);
+                                        const ndotv = Math.max(0, -(nx * rdx + ny * rdy + nz * rdz));
+                                        const shade = Math.min(1, (0.16 + ndotl * 0.86) * ao * (0.58 + 0.42 * Math.sqrt(ndotv)));
 
-                                let rgb;
-                                if (hitMat === 3) {
-                                    // 亮藍色水池
-                                    rgb = shade < 0.5
-                                        ? lerpColor([24, 92, 168], [68, 198, 250], shade * 2)
-                                        : lerpColor([68, 198, 250], [175, 244, 255], (shade - 0.5) * 2);
-                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * 0.9));
-                                } else if (hitMat === 4) {
-                                    // 暖金色復古沖水把手 (呼應 Rover 暖黃色澤)
-                                    rgb = shade < 0.5
-                                        ? lerpColor([118, 68, 12], [238, 176, 28], shade * 2)
-                                        : lerpColor([238, 176, 28], [255, 236, 128], (shade - 0.5) * 2);
-                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * 0.85));
-                                } else {
-                                    // Windows XP 經典陶瓷白光影 (深藍紫暗部 -> 薰衣草灰中調 -> 暖象牙白亮部)
-                                    if (shade < 0.42) {
-                                        rgb = lerpColor([52, 64, 134], [148, 166, 220], shade / 0.42);
-                                    } else {
-                                        rgb = lerpColor([148, 166, 220], hitMat === 2 ? [255, 255, 252] : [250, 246, 238], (shade - 0.42) / 0.58);
-                                    }
-                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * (hitMat === 2 ? 0.82 : 0.62)));
-                                }
+                                        const hvx = lx - rdx, hvy = ly - rdy, hvz = lz - rdz;
+                                        const hvInv = 1.0 / (Math.sqrt(hvx * hvx + hvy * hvy + hvz * hvz) || 1);
+                                        const ndoth = Math.max(0, (nx * hvx + ny * hvy + nz * hvz) * hvInv);
+                                        const spec = Math.pow(ndoth, hitMat === 4 ? 28 : 22) * ao;
 
-                                // 復古 256 色微抖色量化
-                                const dither = (BAYER4[(py & 3) * 4 + (px & 3)] / 15 - 0.5) * 9;
-                                data[idx]     = Math.max(0, Math.min(255, Math.round((rgb[0] + dither) / 10) * 10));
-                                data[idx + 1] = Math.max(0, Math.min(255, Math.round((rgb[1] + dither) / 10) * 10));
-                                data[idx + 2] = Math.max(0, Math.min(255, Math.round((rgb[2] + dither) / 10) * 10));
-                                data[idx + 3] = 255;
-                            } else if (rdy < -0.05) {
-                                // 地板柔和暗影 (與窗戶米白底色 #FFF9EC 自然融合，邊緣呈現點陣抖色)
-                                const tFloor = (-0.86 - roY) / rdy;
-                                if (tFloor > 0) {
-                                    const fx = roX + rdx * tFloor;
-                                    const fz = roZ + rdz * tFloor - 0.04;
-                                    const ellip = Math.hypot(fx / 0.46, fz / 0.58);
-                                    if (ellip < 1.0) {
-                                        const strength = (1.0 - ellip) * 0.36;
-                                        const bayerThreshold = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
-                                        if (strength * 2.1 > bayerThreshold) {
-                                            data[idx]     = 176;
-                                            data[idx + 1] = 180;
-                                            data[idx + 2] = 214;
-                                            data[idx + 3] = 255;
+                                        let r, g, bl;
+                                        if (hitMat === 3) {
+                                            const k = shade < 0.5 ? shade * 2 : (shade - 0.5) * 2;
+                                            r  = shade < 0.5 ? 24 + 44 * k : 68 + 107 * k;
+                                            g  = shade < 0.5 ? 92 + 106 * k : 198 + 46 * k;
+                                            bl = shade < 0.5 ? 168 + 82 * k : 250 + 5 * k;
+                                            const sp = Math.min(1, spec * 0.9);
+                                            r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                                        } else if (hitMat === 4) {
+                                            const k = shade < 0.5 ? shade * 2 : (shade - 0.5) * 2;
+                                            r  = shade < 0.5 ? 118 + 120 * k : 238 + 17 * k;
+                                            g  = shade < 0.5 ? 68 + 108 * k : 176 + 60 * k;
+                                            bl = shade < 0.5 ? 12 + 16 * k : 28 + 100 * k;
+                                            const sp = Math.min(1, spec * 0.85);
+                                            r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                                        } else {
+                                            if (shade < 0.42) {
+                                                const k = shade / 0.42;
+                                                r = 52 + 96 * k; g = 64 + 102 * k; bl = 134 + 86 * k;
+                                            } else {
+                                                const k = (shade - 0.42) / 0.58;
+                                                const tr = hitMat === 2 ? 255 : 250, tg = hitMat === 2 ? 255 : 246, tb = hitMat === 2 ? 252 : 238;
+                                                r = 148 + (tr - 148) * k; g = 166 + (tg - 166) * k; bl = 220 + (tb - 220) * k;
+                                            }
+                                            const sp = Math.min(1, spec * (hitMat === 2 ? 0.82 : 0.62));
+                                            r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                                        }
+
+                                        const dither = (BAYER4[(py & 3) * 4 + (px & 3)] / 15 - 0.5) * 9;
+                                        srcBuf[idx]     = Math.max(0, Math.min(255, Math.round((r + dither) / 10) * 10));
+                                        srcBuf[idx + 1] = Math.max(0, Math.min(255, Math.round((g + dither) / 10) * 10));
+                                        srcBuf[idx + 2] = Math.max(0, Math.min(255, Math.round((bl + dither) / 10) * 10));
+                                        srcBuf[idx + 3] = 255;
+                                    } else if (v < -0.38 && rdy < -0.05) {
+                                        const tFloor = (-0.86 - roY) / rdy;
+                                        if (tFloor > 0) {
+                                            const fx = (roX + rdx * tFloor) / 0.46;
+                                            const fz = (roZ + rdz * tFloor - 0.04) / 0.58;
+                                            const ellip = Math.sqrt(fx * fx + fz * fz);
+                                            if (ellip < 1.0) {
+                                                const bayerT = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
+                                                if ((1.0 - ellip) * 0.75 > bayerT) {
+                                                    srcBuf[idx] = 176; srcBuf[idx + 1] = 180; srcBuf[idx + 2] = 214; srcBuf[idx + 3] = 255;
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                    }
 
-                    rawCtx.putImageData(imgData, 0, 0);
-                    outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
-                    outCtx.drawImage(rawCanvas, 0, 0, outCanvas.width, outCanvas.height);
-                    return outCanvas.toDataURL('image/png');
+                            // 2x 硬邊像素無損放大，確保所有瀏覽器皆維持銳利復古像素感
+                            for (let y = 0; y < RES; y++) {
+                                const row0 = (y * 2) * OUT_RES;
+                                const row1 = row0 + OUT_RES;
+                                const srcRow = y * RES;
+                                for (let x = 0; x < RES; x++) {
+                                    const pxVal = src32[srcRow + x];
+                                    const dx = x * 2;
+                                    dst32[row0 + dx] = pxVal;
+                                    dst32[row0 + dx + 1] = pxVal;
+                                    dst32[row1 + dx] = pxVal;
+                                    dst32[row1 + dx + 1] = pxVal;
+                                }
+                            }
+                        }
+
+                        async function runAll() {
+                            const hasOffscreen = typeof OffscreenCanvas !== 'undefined' && typeof FileReaderSync !== 'undefined';
+                            const offCanvas = hasOffscreen ? new OffscreenCanvas(OUT_RES, OUT_RES) : null;
+                            const offCtx = offCanvas ? offCanvas.getContext('2d') : null;
+                            const reader = hasOffscreen ? new FileReaderSync() : null;
+
+                            for (let i = 0; i < TOTAL; i++) {
+                                renderRawPixels((i / TOTAL) * Math.PI * 2);
+                                if (offCtx && reader) {
+                                    offCtx.putImageData(new ImageData(new Uint8ClampedArray(dst32.buffer.slice(0)), OUT_RES, OUT_RES), 0, 0);
+                                    const blob = await offCanvas.convertToBlob({ type: 'image/png' });
+                                    const dataUrl = reader.readAsDataURL(blob);
+                                    self.postMessage({ idx: i, dataUrl });
+                                } else {
+                                    const copy = new Uint8ClampedArray(dst32.buffer.slice(0));
+                                    self.postMessage({ idx: i, rawBuffer: copy.buffer, size: OUT_RES }, [copy.buffer]);
+                                }
+                            }
+                            self.postMessage({ done: true });
+                        }
+                        runAll();
+                    `;
+
+                    try {
+                        const blobUrl = URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' }));
+                        const worker = new Worker(blobUrl);
+                        let fallbackCanvas = null, fallbackCtx = null;
+
+                        worker.onmessage = (e) => {
+                            const msg = e.data;
+                            if (msg.done) {
+                                URL.revokeObjectURL(blobUrl);
+                                worker.terminate();
+                                try {
+                                    if (frames.every(Boolean)) {
+                                        sessionStorage.setItem(CACHE_KEY, JSON.stringify(frames));
+                                    }
+                                } catch (err) {}
+                                return;
+                            }
+
+                            let url = msg.dataUrl;
+                            if (!url && msg.rawBuffer) {
+                                if (!fallbackCanvas) {
+                                    fallbackCanvas = document.createElement('canvas');
+                                    fallbackCanvas.width = msg.size;
+                                    fallbackCanvas.height = msg.size;
+                                    fallbackCtx = fallbackCanvas.getContext('2d');
+                                }
+                                fallbackCtx.putImageData(new ImageData(new Uint8ClampedArray(msg.rawBuffer), msg.size, msg.size), 0, 0);
+                                url = fallbackCanvas.toDataURL('image/png');
+                            }
+
+                            frames[msg.idx] = url;
+                            readyCount++;
+                            if (msg.idx === 0) setSvgImageHref(spriteImg, url);
+                        };
+                    } catch (err) {}
                 }
 
-                // 先立即渲染第 1 格顯示，其餘格數於背景逐格預渲染快取（完全不卡畫面）
-                const frames = new Array(TOTAL_FRAMES);
-                frames[0] = renderSpriteFrame(0);
-                setSvgImageHref(spriteImg, frames[0]);
-
-                let nextBuildIdx = 1;
+                // 3. 輕量播放迴圈（只負責切換已算好的貼圖，0 運算負擔）
                 let currentPlayIdx = 0;
                 let lastStepTime = performance.now();
                 const frameInterval = 1000 / SPIN_FPS;
                 const mainStageEl = document.querySelector('main');
 
                 function tick(now) {
-                    if (nextBuildIdx < TOTAL_FRAMES) {
-                        const angle = (nextBuildIdx / TOTAL_FRAMES) * Math.PI * 2;
-                        frames[nextBuildIdx] = renderSpriteFrame(angle);
-                        nextBuildIdx++;
-                    }
-
-                    if (!mainStageEl || !mainStageEl.classList.contains('hidden')) {
+                    if (readyCount > 0 && (!mainStageEl || !mainStageEl.classList.contains('hidden'))) {
                         if (now - lastStepTime >= frameInterval) {
                             lastStepTime = now;
                             const nextIdx = (currentPlayIdx + 1) % TOTAL_FRAMES;
@@ -2111,7 +2133,10 @@
             await populateAllArchesRandomly(null);
             lastTickTime = performance.now();
             requestAnimationFrame(tickWindowAnimations);
-            Promise.all(allMonsters.map(m => resolveMonsterPngUrl(m)));
+            // 等開場動畫跑完 (0.8秒後)，再於背景預載剩餘的小怪 PNG
+            setTimeout(() => {
+                Promise.all(allMonsters.map(m => resolveMonsterPngUrl(m)));
+            }, 800);
 
             // ===================================================================
             // 🔊 小怪點擊音效系統 (隨機播放 ./sfx/squeak/*.mp3，最多連續 1~2 次，第 3 次絕不重複)
@@ -2242,7 +2267,7 @@
                 } catch (e) {}
             }
 
-            initSqueakSoundPool();
+            setTimeout(initSqueakSoundPool, 600);
 
             // 觸發小怪原地快速輕跳一下（支援連續點擊重複起跳）
             function triggerMonsterHop(imgEl) {

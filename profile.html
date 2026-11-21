@@ -67,7 +67,12 @@
             }
         }
 
-        button, a {
+        button, a, svg, svg *, [role="button"], [tabindex],
+        button:focus, button:focus-visible,
+        a:focus, a:focus-visible,
+        svg:focus, svg *:focus, svg *:focus-visible,
+        [role="button"]:focus, [role="button"]:focus-visible,
+        [tabindex]:focus, [tabindex]:focus-visible {
             outline: none !important;
             -webkit-tap-highlight-color: transparent;
         }
