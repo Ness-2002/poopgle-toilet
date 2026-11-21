@@ -1250,34 +1250,47 @@
                     <circle cx="451.7" cy="445.9" r="24.7" fill="#FFF9EC" />
 
                     <!-- 中門模糊底圖 -->
+                    <!-- 修改後：中門模糊底圖（與主頁面小雞廁間一致的粉色坐式馬桶標誌） -->
                     <rect x="546" y="223" width="37" height="54" rx="6" fill="#45E5AC" />
                     <rect x="546" y="565" width="37" height="54" rx="6" fill="#45E5AC" />
                     <rect x="564.2" y="101.3" width="330" height="639.8" rx="23.3" fill="#80E4FF" />
-                    <circle cx="729.2" cy="236.8" r="65.5" fill="#45E5AC" />
-                    <path d="M727,242 c0-13-9.4-23.3-21-23.3 s-21,10.4-21,23.3 Z" fill="#FFF9EC" />
-                    <rect x="685" y="241" width="88" height="15" rx="6" fill="#FFF9EC" />
+                    <circle cx="729.2" cy="236.8" r="65.5" fill="#FF99D3" />
+                    <path d="M701.6,254.4c0,0.4,0,0.8,0,1.1c0,16.9,12.4,30.6,27.7,30.6c15.3,0,27.7-13.7,27.7-30.6c0-0.4,0-0.8,0-1.1H701.6z" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="254.4" rx="27.7" ry="15.8" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
+                    <rect x="834.5" y="459.2" width="33.3" height="22.7" rx="6.3" fill="#FFF9EC" />
                     <circle cx="851.2" cy="445.9" r="24.7" fill="#FFF9EC" />
+                    <rect x="842" y="433.8" width="18.3" height="9.5" rx="4.7" fill="#45E5AC" />
+                    <path d="M842,438.5c0-2.6,2.1-4.7,4.7-4.7h4.4v9.5h-4.4C844.1,443.3,842,441.1,842,438.5z" fill="#F26559" />
 
-                    <!-- 右門模糊底圖 -->
+                    <!-- 修改後：右門模糊底圖（維持與主頁面一致的綠色蹲式馬桶標誌） -->
                     <rect x="945" y="223" width="37" height="54" rx="6" fill="#45E5AC" />
                     <rect x="945" y="565" width="37" height="54" rx="6" fill="#45E5AC" />
                     <rect x="963.7" y="101.3" width="330" height="639.8" rx="23.3" fill="#80E4FF" />
-                    <circle cx="1128.7" cy="236.8" r="65.5" fill="#FF99D3" />
-                    <ellipse cx="1128.7" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
-                    <ellipse cx="1128.7" cy="254.4" rx="27.7" ry="26" fill="#FFF9EC" />
-                    <ellipse cx="1128.7" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
+                    <circle cx="1128.7" cy="236.8" r="65.5" fill="#45E5AC" />
+                    <path d="M1126.5,241.9c0-0.3,0-0.6,0-0.9c0-12.9-9.4-23.3-21-23.3c-11.6,0-21,10.4-21,23.3c0,0.3,0,0.6,0,0.9H1126.5z" fill="#FFF9EC" />
+                    <path d="M1167.2,255.7H1092c-4.2,0-7.6-3.4-7.6-7.6v-7h82.8c3.2,0,5.7,2.6,5.7,5.7v3.1C1173,253.2,1170.4,255.7,1167.2,255.7z" fill="#FFF9EC" />
+                    <rect x="1234" y="459.2" width="33.3" height="22.7" rx="6.3" fill="#FFF9EC" />
                     <circle cx="1250.7" cy="445.9" r="24.7" fill="#FFF9EC" />
+                    <rect x="1241.5" y="433.8" width="18.3" height="9.5" rx="4.7" fill="#45E5AC" />
                 </svg>
             </div>
 
-            <!-- 頂部資訊列：左上「變更公廁」按鈕 ＋ 中央公廁名稱與四顆星等 ＋ 右上「LIVE」 -->
+            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊按鈕 ＋ 中央公廁名稱與四顆星等 ＋ 右上「LIVE」 -->
             <div class="relative z-10 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0">
-                <div class="flex items-start justify-between gap-2">
-                    <!-- 左上角：變更公廁膠囊按鈕 -->
-                    <button id="openChangeToiletModalBtn" type="button"
-                            class="shrink-0 h-[34px] sm:h-[38px] px-5 sm:px-7 rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
-                        變更公廁
-                    </button>
+                <div class="flex items-start justify-between gap-2 sm:pointer-events-none">
+                    <!-- 左上角：變更公廁 ＋ 返回鍵（相同膠囊設計上下排列） -->
+                    <div class="flex flex-col items-stretch gap-2 sm:gap-2.5 shrink-0 sm:pointer-events-auto z-20">
+                        <button id="openChangeToiletModalBtn" type="button"
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
+                            變更公廁
+                        </button>
+                        <button id="backFromMessageBoardBtn" type="button"
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
+                            返回
+                        </button>
+                    </div>
 
                     <!-- 右上角：LIVE 膠囊燈號（手機版避開右上漢堡選單微向左移） -->
                     <div class="mr-12 md:mr-0 shrink-0 h-[28px] px-3.5 rounded-full bg-[#F26559] flex items-center gap-2 select-none">
@@ -1286,11 +1299,10 @@
                     </div>
                 </div>
 
-                <!-- 中央：目前公廁標題 ＋ 四項圓潤星星評分 -->
-                <div class="mt-2 sm:-mt-7 flex flex-col items-center text-center px-2">
-                    <h1 id="mbCurrentToiletTitle"
-                        class="text-[#273491] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[680px] break-words">
-                        定位最近公廁中...
+                <!-- 中央：目前公廁標題（後方加上 1/2 字型大小的 |留言板）＋ 四項圓潤星星評分 -->
+                <div class="mt-2.5 sm:-mt-[86px] flex flex-col items-center text-center px-2 sm:px-[165px]">
+                    <h1 class="text-[#273491] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
+                        <span id="mbCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|留言板</span>
                     </h1>
 
                     <!-- 四顆立體五角星（依星等數字動態顯示黃色填滿程度）：整潔衛生 / 環境明亮 / 設備完善 / 空間寬敞 -->
@@ -3528,6 +3540,12 @@
             doorMessageBoardGroup?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 enterLeftDoorMessageBoard();
+            });
+
+            // 點擊左上角「返回」膠囊按鈕 -> 回到三扇門公廁現況板畫面
+            document.getElementById('backFromMessageBoardBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exitMessageBoardToThreeDoors();
             });
 
             document.querySelectorAll('a[href="./board.html"]').forEach((linkEl) => {
