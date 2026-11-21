@@ -2895,52 +2895,56 @@
             }
 
             // 完整保留雲端每一筆評鑑文件並合併本機最新留言（避免欄位覆蓋或同 evalId 互相吃掉）
+            // 與 map.html / admin.html 完全同步：雲端載入後以雲端為準，自動剔除並清理已被管理員刪除的本機舊快取
             function rebuildBoardReviewIndex() {
                 const mergedById = new Map();
-                const seenCloudEvalIds = new Set();
+                const cloudIds = new Set();
 
                 mbState.cloudEvaluations.forEach((ev, idx) => {
                     if (!ev) return;
                     const docKey = ev._docId || ev.id || ev.evalId || `cloud_${idx}`;
                     mergedById.set(docKey, ev);
-                    if (ev.evalId) seenCloudEvalIds.add(String(ev.evalId));
-                    if (ev.id) seenCloudEvalIds.add(String(ev.id));
+                    if (ev._docId) cloudIds.add(String(ev._docId));
+                    if (ev.id) cloudIds.add(String(ev.id));
+                    if (ev.evalId) cloudIds.add(String(ev.evalId));
                 });
 
                 try {
                     const rawLocal = localStorage.getItem('poogle_local_evaluations_v2');
                     const localList = rawLocal ? JSON.parse(rawLocal) : [];
                     if (Array.isArray(localList)) {
+                        const validLocalToKeep = [];
+                        let needCleanStorage = false;
+
                         localList.forEach((item, idx) => {
                             if (!item) return;
-                            const localEvalId = String(item.evalId || item.id || '');
-                            // 若雲端已有同筆評鑑，比對時間保留較新者；若雲端尚未同步則直接納入
-                            if (localEvalId && seenCloudEvalIds.has(localEvalId)) {
-                                for (const [k, cloudItem] of mergedById.entries()) {
-                                    if (String(cloudItem.evalId || cloudItem.id || '') === localEvalId) {
-                                        if (getRecordTimeMs(item) > getRecordTimeMs(cloudItem)) {
-                                            mergedById.set(k, { ...cloudItem, ...item, _docId: k });
-                                        }
-                                        break;
+                            const id = String(item.evalId || item.id || '');
+
+                            if (mbState.hasLoadedCloudOnce) {
+                                // 雲端已連線：若此筆曾同步過 (cloudSynced !== false) 卻已不在雲端，代表已被管理員刪除，直接剔除並清理快取
+                                if (item.cloudSynced !== false) {
+                                    if (id && cloudIds.has(id)) {
+                                        validLocalToKeep.push(item);
+                                    } else {
+                                        needCleanStorage = true;
                                     }
+                                    return;
                                 }
-                            } else {
-                                const uniqueLocalKey = `local_${idx}_${localEvalId || item.createdAt || ''}`;
+                            }
+
+                            // 僅在「尚未連上雲端前」或「離線尚未上傳 (cloudSynced === false)」時納入，與 map.html 邏輯完全一致
+                            validLocalToKeep.push(item);
+                            if (id && !cloudIds.has(id)) {
+                                const uniqueLocalKey = `local_${idx}_${id}`;
                                 mergedById.set(uniqueLocalKey, { ...item, _docId: uniqueLocalKey });
                             }
                         });
+
+                        if (needCleanStorage) {
+                            localStorage.setItem('poogle_local_evaluations_v2', JSON.stringify(validLocalToKeep));
+                        }
                     }
                 } catch (e) {}
-
-                if (isPreviewSandbox && mergedById.size === 0) {
-                    const demoName = '銘傳大學設計大樓女廁';
-                    [
-                        { _docId: 'sb_1', id: 'sb_1', name: demoName, ratings: { cleanliness: 3, lighting: 4, equipment: 2, space: 4 }, comment: '我再也不會來這裡了。', createdAt: '2026-11-21T05:20:00.000Z' },
-                        { _docId: 'sb_2', id: 'sb_2', name: demoName, ratings: { cleanliness: 4, lighting: 5, equipment: 3, space: 4 }, comment: '洗手乳有高級的味道！', createdAt: '2026-11-21T07:43:00.000Z' },
-                        { _docId: 'sb_3', id: 'sb_3', name: demoName, ratings: { cleanliness: 2, lighting: 4, equipment: 2, space: 4 }, comment: '地板濕濕的太可怕了...', createdAt: '2026-11-21T10:22:00.000Z' },
-                        { _docId: 'sb_4', id: 'sb_4', name: demoName, ratings: { cleanliness: 4, lighting: 5, equipment: 3, space: 4 }, comment: '非常乾淨的一間廁所～', createdAt: '2026-11-21T10:57:00.000Z' }
-                    ].forEach(d => mergedById.set(d._docId, d));
-                }
 
                 mbState.reviewsByToiletName.clear();
                 mergedById.forEach((rev) => {
@@ -2952,10 +2956,20 @@
                     mbState.reviewsByToiletName.get(tName).push(rev);
                 });
 
-                // 依時間由舊到新排序，確保第 1 則留言先出現於左側、後續留言依序往上推移
+                // 依時間由舊到新排序
                 mbState.reviewsByToiletName.forEach((arr) => {
                     arr.sort((a, b) => getRecordTimeMs(a) - getRecordTimeMs(b));
                 });
+
+                // 移除先前動態補入、但評鑑已被管理員全數刪除的臨時公廁項目
+                if (mbState.hasLoadedCloudOnce && mbState.allToilets.length > 0) {
+                    mbState.allToilets = mbState.allToilets.filter(t => {
+                        if (String(t.key || '').startsWith('EVAL_')) {
+                            return mbState.reviewsByToiletName.has(t.name);
+                        }
+                        return true;
+                    });
+                }
 
                 syncEvaluatedToiletsIntoDataset();
             }
@@ -3000,10 +3014,9 @@
 
                     const msg = String(r.comment ?? r.commentText ?? r.content ?? '').trim();
                     if (msg.length > 0) {
-                        // 確保每一則留言都有唯一識別碼，即使兩則留言文字相同也會全部顯示
                         const uniqueDocKey = r._docId || r.id || r.evalId || `${cleanName}_${idx}`;
                         textComments.push({
-                            id: `${uniqueDocKey}__#${idx}__${msg}`,
+                            id: `${uniqueDocKey}__${msg}`,
                             text: msg,
                             timestamp: formatChatTimeHHMM(r.updatedAt || r.createdAt || r.timestamp)
                         });
@@ -3024,6 +3037,25 @@
                 };
             }
 
+            // 比對目前畫面氣泡與最新資料：若有留言被管理員刪除或修改，立即重繪清空；若是新增留言則由下方推入
+            function syncChatStreamWithCurrentStats() {
+                if (!mbState.isOpen || !mbState.selectedToilet) return;
+                const tName = mbState.selectedToilet.name || '';
+                const stats = getBoardToiletStats(tName);
+                const latestComments = stats?.textComments || [];
+                const latestIdSet = new Set(latestComments.map(c => c.id));
+
+                const hasRemovedOrEdited =
+                    mbState.activeChatNodes.some(node => !latestIdSet.has(node.id)) ||
+                    Array.from(mbState.renderedCommentIds).some(id => !latestIdSet.has(id));
+
+                if (hasRemovedOrEdited || (latestComments.length === 0 && mbState.activeChatNodes.length > 0)) {
+                    resetAndPlayChatCommentsForSelectedToilet();
+                } else {
+                    appendIncomingRealtimeComments();
+                }
+            }
+
             function attachFirestoreEvaluationsListener() {
                 if (!boardDb) return;
                 if (mbState.unsubscribeEvaluations) {
@@ -3038,7 +3070,6 @@
                             const cloudList = [];
                             snap.forEach((doc) => {
                                 const d = doc.data() || {};
-                                // 將 doc.id 放在展開運算子之後，防止被文件內空欄位覆蓋
                                 cloudList.push({
                                     ...d,
                                     _docId: doc.id,
@@ -3058,7 +3089,7 @@
                                 if (!wasLoadedBefore || prevSelectedKey !== mbState.selectedToilet.key) {
                                     resetAndPlayChatCommentsForSelectedToilet();
                                 } else {
-                                    appendIncomingRealtimeComments();
+                                    syncChatStreamWithCurrentStats();
                                 }
                             }
                             if (mbState.dropdownOpen) {
@@ -3106,7 +3137,7 @@
                     recomputeDistancesAndPickNearestIfNeeded();
                     if (mbState.isOpen && mbState.selectedToilet) {
                         renderCurrentToiletHeaderAndStars();
-                        appendIncomingRealtimeComments();
+                        syncChatStreamWithCurrentStats();
                     }
                     if (mbState.dropdownOpen) {
                         renderBoardToiletDropdownItems();
