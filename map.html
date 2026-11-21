@@ -619,8 +619,8 @@
                     </div>
 
                     <!-- 卡片容器 -->
-                    <div id="toiletListBodyWrapper" class="flex-1 min-h-0 bg-[#FF94DA] relative flex overflow-hidden pt-2 pb-2 px-3.5 md:pt-1.5 md:pb-1.5 md:pl-1.5 md:pr-5 transition-colors duration-200">
-                        <div id="toiletListContainer" class="w-full h-full overflow-y-auto no-native-scrollbar space-y-2.5 py-1 md:pl-1 md:pr-1.5">
+                    <div id="toiletListBodyWrapper" class="flex-1 min-h-0 bg-[#FF94DA] relative flex flex-col overflow-hidden pt-2 pb-2 px-3.5 md:pt-1.5 md:pb-1.5 md:pl-1.5 md:pr-5 transition-colors duration-200">
+                        <div id="toiletListContainer" class="w-full flex-1 min-h-0 overflow-y-auto no-native-scrollbar space-y-2.5 py-1 md:pl-1 md:pr-1.5">
                             <div class="h-full flex flex-col items-center justify-center text-center p-5 text-[#2A348C] font-bold text-xs space-y-2">
                                 <i class="fa-solid fa-spinner fa-spin text-lg"></i>
                                 <span>正在載入全國公廁資料...</span>
@@ -1902,16 +1902,35 @@
         // ===================================================================
         function openDatabase() {
             return new Promise((resolve, reject) => {
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (!settled) { settled = true; reject(new Error('IDB timeout')); }
+                }, 1500);
                 try {
-                    if (typeof indexedDB === 'undefined') { reject(new Error('No IDB')); return; }
+                    if (typeof indexedDB === 'undefined') {
+                        clearTimeout(timer); settled = true; reject(new Error('No IDB')); return;
+                    }
                     const req = indexedDB.open(IDB_NAME, 1);
                     req.onupgradeneeded = (e) => {
                         const idb = e.target.result;
                         if (!idb.objectStoreNames.contains(IDB_STORE_DATA)) idb.createObjectStore(IDB_STORE_DATA);
                     };
-                    req.onsuccess = () => resolve(req.result);
-                    req.onerror = () => reject(req.error);
-                } catch (err) { reject(err); }
+                    req.onsuccess = () => {
+                        clearTimeout(timer);
+                        if (!settled) { settled = true; resolve(req.result); }
+                    };
+                    req.onerror = () => {
+                        clearTimeout(timer);
+                        if (!settled) { settled = true; reject(req.error || new Error('IDB error')); }
+                    };
+                    req.onblocked = () => {
+                        clearTimeout(timer);
+                        if (!settled) { settled = true; reject(new Error('IDB blocked')); }
+                    };
+                } catch (err) {
+                    clearTimeout(timer);
+                    if (!settled) { settled = true; reject(err); }
+                }
             });
         }
 
@@ -1919,10 +1938,19 @@
             try {
                 const idb = await openDatabase();
                 return new Promise((resolve) => {
-                    const tx = idb.transaction(IDB_STORE_DATA, 'readwrite');
-                    tx.objectStore(IDB_STORE_DATA).put({ records, fileName, savedAt: new Date().toISOString() }, 'main_csv_dataset');
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => resolve(false);
+                    let done = false;
+                    const finish = (val) => { if (!done) { done = true; resolve(val); } };
+                    const timer = setTimeout(() => finish(false), 3000);
+                    try {
+                        const tx = idb.transaction(IDB_STORE_DATA, 'readwrite');
+                        tx.objectStore(IDB_STORE_DATA).put({ records, fileName, savedAt: new Date().toISOString() }, 'main_csv_dataset');
+                        tx.oncomplete = () => { clearTimeout(timer); finish(true); };
+                        tx.onerror = () => { clearTimeout(timer); finish(false); };
+                        tx.onabort = () => { clearTimeout(timer); finish(false); };
+                    } catch (e) {
+                        clearTimeout(timer);
+                        finish(false);
+                    }
                 });
             } catch (err) { return false; }
         }
@@ -1931,10 +1959,19 @@
             try {
                 const idb = await openDatabase();
                 return new Promise((resolve) => {
-                    const tx = idb.transaction(IDB_STORE_DATA, 'readonly');
-                    const req = tx.objectStore(IDB_STORE_DATA).get('main_csv_dataset');
-                    req.onsuccess = () => resolve(req.result || null);
-                    req.onerror = () => resolve(null);
+                    let done = false;
+                    const finish = (val) => { if (!done) { done = true; resolve(val); } };
+                    const timer = setTimeout(() => finish(null), 1800);
+                    try {
+                        const tx = idb.transaction(IDB_STORE_DATA, 'readonly');
+                        const req = tx.objectStore(IDB_STORE_DATA).get('main_csv_dataset');
+                        req.onsuccess = () => { clearTimeout(timer); finish(req.result || null); };
+                        req.onerror = () => { clearTimeout(timer); finish(null); };
+                        tx.onabort = () => { clearTimeout(timer); finish(null); };
+                    } catch (e) {
+                        clearTimeout(timer);
+                        finish(null);
+                    }
                 });
             } catch (err) { return null; }
         }
@@ -2076,13 +2113,13 @@
             return records;
         }
 
-        const CANDIDATE_CSV_FILES = [
+        const CANDIDATE_CSV_FILES = Array.from(new Set([
+            encodeURI('./全國公廁建檔資料.csv'),
             './全國公廁建檔資料.csv',
             '全國公廁建檔資料.csv',
-            encodeURI('./全國公廁建檔資料.csv'),
             './toilets.csv',
             'toilets.csv'
-        ];
+        ]));
 
         async function autoFetchSameFolderCSV() {
             if (IS_STRICT_SANDBOX) return false;
@@ -2094,9 +2131,10 @@
                     const records = parseCSV(decodeCsvArrayBuffer(buffer));
                     if (records && records.length > 0) {
                         state.allToilets = records;
+                        state.datasetLoadFinished = true;
                         buildIndexesAndDropdowns(state.allToilets);
-                        await saveDatasetToIDB(records, '全國公廁建檔資料.csv');
                         refreshDistancesAndRender();
+                        saveDatasetToIDB(records, '全國公廁建檔資料.csv').catch(() => {});
                         return true;
                     }
                 } catch (e) {}
@@ -2467,6 +2505,7 @@
         // ===================================================================
         let geoWatchId = null;
         let isWaitingInitialGeo = true;
+        let geoFallbackTimer = null;
 
         function hasSharedToiletUrlParam() {
             try {
@@ -2478,6 +2517,10 @@
 
         function setUserPosition(lat, lng, panMap = true) {
             isWaitingInitialGeo = false;
+            if (geoFallbackTimer) {
+                clearTimeout(geoFallbackTimer);
+                geoFallbackTimer = null;
+            }
             state.userLat = lat;
             state.userLng = lng;
             updateUserMapLayer();
@@ -2501,8 +2544,14 @@
 
         function triggerUserGeolocation(isManualClick = false) {
             if (isManualClick) state._manualLocateTriggered = true;
+            if (geoFallbackTimer) {
+                clearTimeout(geoFallbackTimer);
+                geoFallbackTimer = null;
+            }
+
             if (!navigator.geolocation) {
                 isWaitingInitialGeo = false;
+                state._pendingFocusNearest = false;
                 if ((IS_IN_IFRAME || IS_STRICT_SANDBOX) && state.userLat === null) {
                     setUserPosition(24.9852, 121.3418, false);
                 } else {
@@ -2511,13 +2560,27 @@
                 }
                 return;
             }
+
             if (isManualClick) {
                 showToast('正在定位您的當前位置...', 'info');
-            }
-            if (state.userLat === null) {
+            } else if (state.userLat === null && state.allToilets.length === 0) {
                 isWaitingInitialGeo = true;
                 renderToiletList();
             }
+
+            // 保底機制：超過 3 秒沒收到定位結果（例如未按允許、或 LINE/IG 擋定位），自動先解鎖顯示公廁列表
+            geoFallbackTimer = setTimeout(() => {
+                geoFallbackTimer = null;
+                if (isWaitingInitialGeo) {
+                    isWaitingInitialGeo = false;
+                    refreshDistancesAndRender();
+                }
+                if (isManualClick && state.userLat === null) {
+                    state._pendingFocusNearest = false;
+                    showToast('定位逾時，請確認位置權限或改用 Safari / Chrome 開啟', 'error');
+                }
+            }, isManualClick ? 8500 : 3000);
+
             if (geoWatchId !== null) {
                 navigator.geolocation.clearWatch(geoWatchId);
                 geoWatchId = null;
@@ -2528,6 +2591,10 @@
                 const { latitude, longitude } = pos.coords;
                 if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
                 isWaitingInitialGeo = false;
+                if (geoFallbackTimer) {
+                    clearTimeout(geoFallbackTimer);
+                    geoFallbackTimer = null;
+                }
                 if (hasCenteredOnce && state.userLat !== null && state.userLng !== null) {
                     const movedMeters = calculateDistanceMeters(state.userLat, state.userLng, latitude, longitude);
                     if (movedMeters < 10) return;
@@ -2539,6 +2606,10 @@
 
             const handleFinalGeoError = () => {
                 isWaitingInitialGeo = false;
+                if (geoFallbackTimer) {
+                    clearTimeout(geoFallbackTimer);
+                    geoFallbackTimer = null;
+                }
                 state._pendingFocusNearest = false;
                 if ((IS_IN_IFRAME || IS_STRICT_SANDBOX) && state.userLat === null) {
                     setUserPosition(24.9852, 121.3418, false);
@@ -2561,10 +2632,10 @@
                             if (isManualClick) showToast('已定位至您的當前位置！', 'success');
                         },
                         handleFinalGeoError,
-                        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+                        { enableHighAccuracy: false, timeout: 4500, maximumAge: 60000 }
                     );
                 },
-                { enableHighAccuracy: true, timeout: 4500, maximumAge: 30000 }
+                { enableHighAccuracy: true, timeout: 3500, maximumAge: 30000 }
             );
 
             geoWatchId = navigator.geolocation.watchPosition(handlePos, () => {}, {
@@ -2661,7 +2732,30 @@
             const container = document.getElementById('toiletListContainer');
             if (!container) return;
 
-            // 正在定位目前位置時，顯示轉圈圈 Loading 畫面
+            // 1. 全國公廁 CSV 尚未下載完畢時，持續顯示載入畫面（避免先按拒絕定位就誤閃「找不到公廁」）
+            if (state.allToilets.length === 0 && !state.datasetLoadFinished) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center p-5 text-[#2A348C] font-bold text-xs space-y-2">
+                        <i class="fa-solid fa-spinner fa-spin text-lg"></i>
+                        <span>正在載入全國公廁資料...</span>
+                    </div>`;
+                setTimeout(syncCustomListScrollbar, 20);
+                return;
+            }
+
+            // 2. 若手機網路瞬斷導致 CSV 下載失敗，提供一鍵重新載入按鈕
+            if (state.allToilets.length === 0 && state.datasetLoadFinished) {
+                container.innerHTML = `
+                    <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-2.5">
+                        <div class="font-black text-sm">公廁資料載入未完成</div>
+                        <p class="text-xs font-bold opacity-75">可能因行動網路不穩導致中斷，請點擊下方重新載入</p>
+                        <button type="button" onclick="window.location.reload()" class="pm-flat-btn px-4 py-1.5 rounded-full bg-[#F5F078] border-2 border-[#2A348C] text-xs font-black">重新載入</button>
+                    </div>`;
+                setTimeout(syncCustomListScrollbar, 20);
+                return;
+            }
+
+            // 3. 資料已就緒、等待初始定位排序中（最多等 3 秒即自動顯示）
             if (state.userLat === null && isWaitingInitialGeo) {
                 container.innerHTML = `
                     <div class="h-full flex flex-col items-center justify-center text-center p-5 text-[#2A348C] font-bold text-xs space-y-2">
@@ -3262,19 +3356,25 @@
             }, true);
 
 
-            // 1. 優先讀取 IndexedDB 快取公廁資料
+            window.addEventListener('resize', () => {
+                if (!isMobileMapViewport()) hideMobileInlineDetailPanel();
+            });
+
+            // 1. 啟動 GPS 定位（與資料讀取同步進行，不互相卡住）
+            triggerUserGeolocation(false);
+
+            // 2. 優先讀取 IndexedDB 快取公廁資料
             const cached = await loadDatasetFromIDB();
             if (cached && cached.records && cached.records.length > 0) {
                 state.allToilets = cached.records;
+                state.datasetLoadFinished = true;
                 buildIndexesAndDropdowns(state.allToilets);
                 refreshDistancesAndRender();
             }
 
-            // 2. 啟動 GPS 定位
-            triggerUserGeolocation(false);
-
             // 3. 自動讀取同資料夾 ./全國公廁建檔資料.csv (預覽視窗若無本機 CSV 則載入示範公廁展示完整介面)
             const autoLoaded = await autoFetchSameFolderCSV();
+            state.datasetLoadFinished = true;
             if (!autoLoaded && state.allToilets.length === 0) {
                 if (IS_IN_IFRAME || IS_STRICT_SANDBOX) {
                     state.allToilets = SANDBOX_DEMO_TOILETS.map(item => ({ ...item }));
