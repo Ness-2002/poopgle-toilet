@@ -976,17 +976,68 @@
          animation-delay: 0.34s;
      }
 
-     /* 畫面與首屏圖片解碼就緒前先隱藏主舞台並暫停進場動畫，就緒後同步以滿幀啟動 */
-     body:not(.stage-ready) main {
-         opacity: 0;
+     /* 新增：有所味 Logo 與個人空間進場彈出動畫 */
+     @keyframes stageLogoPopIn {
+         0% {
+             transform: translate3d(0, -28px, 0) scale(0.55);
+             opacity: 0;
+         }
+         70% {
+             transform: translate3d(0, 4px, 0) scale(1.05);
+             opacity: 1;
+         }
+         100% {
+             transform: translate3d(0, 0, 0) scale(1);
+             opacity: 1;
+         }
      }
-     body.stage-ready main {
-         opacity: 1;
-         transition: opacity 0.18s ease-out;
+     .logo-entrance-wrapper {
+         transform-box: view-box;
+         transform-origin: 720px 153px;
+         will-change: transform, opacity;
+         animation: stageLogoPopIn 0.56s cubic-bezier(0.34, 1.56, 0.64, 1) 0.02s both;
+     }
+     .logo-entrance-wrapper.mobile-logo-origin {
+         transform-origin: 0px 0px;
+     }
+
+     @keyframes personalSpacePopIn {
+         0% {
+             transform: scale(0.45);
+             opacity: 0;
+         }
+         70% {
+             transform: scale(1.06);
+             opacity: 1;
+         }
+         100% {
+             transform: scale(1);
+             opacity: 1;
+         }
+     }
+     .personal-entrance-wrapper {
+         transform-box: view-box;
+         transform-origin: 382px 378px;
+         will-change: transform, opacity;
+         animation: personalSpacePopIn 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) 0.16s both;
+     }
+     .personal-entrance-wrapper.mobile-personal-origin {
+         transform-origin: 215px 710px;
+     }
+
+     /* 馬桶載入時立即顯示在正中間；其他週邊元素先隱藏並暫停，待停頓後同步啟動動畫 */
+     body:not(.stage-ready) .poogle-zone,
+     body:not(.stage-ready) #bubblesGroup {
+         pointer-events: none !important;
      }
      body:not(.stage-ready) .bubble-travel-wrapper.bubble-rise-in,
      body:not(.stage-ready) .trash-slide-in-wrapper,
      body:not(.stage-ready) .tp-drop-in,
+     body:not(.stage-ready) .logo-entrance-wrapper,
+     body:not(.stage-ready) .personal-entrance-wrapper {
+         opacity: 0 !important;
+         animation-play-state: paused !important;
+     }
      body:not(.stage-ready) .roach-peek-out-group {
          animation-play-state: paused !important;
      }
@@ -1217,8 +1268,10 @@
 
             <!-- 0. 頂端水平置中：「有所味」Logo (精準對齊畫布中心 x=215 並保留輕柔上下飄動) -->
             <g class="pointer-events-none" transform="translate(215, 160)">
-                <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
-                    <image x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                <g class="logo-entrance-wrapper mobile-logo-origin">
+                    <g style="animation: toiletLogoIdleFloat 3s ease-in-out infinite;">
+                        <image x="-126" y="-54" width="252" height="108" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
+                    </g>
                 </g>
             </g>
 
@@ -1320,20 +1373,22 @@
             <g id="mobileZoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
                 <rect x="24" y="438" width="112" height="214" rx="18" fill="transparent" />
 
-                <!-- 下方珊瑚紅圓柱桶身 -->
-                <path d="M 29,518 L 29,624 A 51,19.5 0 0,0 131,624 L 131,518"
-                      fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                <!-- 薄荷綠桶口內圈 + 橫向「公廁地圖」文字 -->
-                <ellipse cx="80" cy="518" rx="51" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="80" y="519" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
-                    公廁地圖
-                </text>
+                <g class="trash-slide-in-wrapper">
+                    <!-- 下方珊瑚紅圓柱桶身 -->
+                    <path d="M 29,518 L 29,624 A 51,19.5 0 0,0 131,624 L 131,518"
+                          fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <!-- 薄荷綠桶口內圈 + 橫向「公廁地圖」文字 -->
+                    <ellipse cx="80" cy="518" rx="51" ry="20" fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" />
+                    <text x="80" y="519" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                        公廁地圖
+                    </text>
 
-               <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈，持續微幅上下飄動不擋文字) -->
-                <g id="mobileTrashCanLidFloat">
-                    <path d="M 29,462 L 29,475 A 51,19 0 0,0 131,475 L 131,462"
-                          fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                    <ellipse cx="80" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                    <!-- 上方掀開的桶蓋 (珊瑚紅頂 + 薄荷綠邊圈，持續微幅上下飄動不擋文字) -->
+                    <g id="mobileTrashCanLidFloat">
+                        <path d="M 29,462 L 29,475 A 51,19 0 0,0 131,475 L 131,462"
+                              fill="#45E5AC" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <ellipse cx="80" cy="462" rx="51" ry="19" fill="#F26559" stroke="#2A348C" stroke-width="1.6" />
+                    </g>
                 </g>
             </g>
 
@@ -1347,7 +1402,7 @@
                     <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
 
                     <!-- 中下偏右直立衛生紙捲 -->
-                    <g>
+                    <g class="tp-drop-in tp-drop-1">
                         <path d="M 1058,576 L 1058,690 A 55,20 0 0,0 1168,690 L 1168,576"
                               fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
                         <ellipse cx="1113" cy="576" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
@@ -1355,15 +1410,17 @@
                     </g>
 
                     <!-- 左下水平橫放衛生紙捲 -->
-                    <g id="mobileLyingTpRollAnim">
-                        <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
-                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
-                        <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+                    <g class="tp-drop-in tp-drop-2">
+                        <g id="mobileLyingTpRollAnim">
+                            <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
+                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                            <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+                        </g>
                     </g>
 
                     <!-- 最上方直立衛生紙捲 + 「小怪 / 圖鑑」文字 -->
-                    <g>
+                    <g class="tp-drop-in tp-drop-3">
                         <path d="M 1041,474 L 1041,580 A 55,20 0 0,0 1151,580 L 1151,474"
                               fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
                         <ellipse cx="1096" cy="474" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
@@ -1380,15 +1437,17 @@
             <g id="mobileZonePersonalSpace" class="poogle-zone" role="button" aria-label="個人空間">
                 <rect x="130" y="676" width="170" height="68" rx="14" fill="transparent" />
 
-                <!-- 左方「個人空間」圓角貼紙 -->
-                <rect x="136.5" y="684" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <text x="190.5" y="710" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
-                    個人空間
-                </text>
+                <g class="personal-entrance-wrapper mobile-personal-origin">
+                    <!-- 左方「個人空間」圓角貼紙 -->
+                    <rect x="136.5" y="684" width="108" height="52" rx="12" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                    <text x="190.5" y="710" fill="#2A348C" font-size="16" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                        個人空間
+                    </text>
 
-                <!-- 右方牆上緊急按鈕 -->
-                <rect x="253.5" y="682" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
-                <rect x="267" y="699" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
+                    <!-- 右方牆上緊急按鈕 -->
+                    <rect x="253.5" y="682" width="40" height="56" rx="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.6" />
+                    <rect x="267" y="699" width="13" height="22" rx="6.5" fill="#F26559" stroke="#2A348C" stroke-width="1.5" />
+                </g>
             </g>
 
             <!-- 5. 手機版小怪泡泡圖層 (依 有所味網頁設計-11.jpg 隱藏，保留 DOM 供腳本安全同步) -->
@@ -1617,26 +1676,28 @@
                 <!-- 固定不縮放的精準感應層 -->
                 <rect x="304" y="344" width="158" height="72" rx="16" fill="transparent" />
 
-                <!-- 游標靠近時：左上方彈出三道「等距整齊、縮小 1/2、圓潤胖胖」的亮黃色閃電 (#F3EF84) -->
-                <g id="optionPersonalSpace" class="hidden pointer-events-none" filter="url(#whiteGlow)">
-                    <use href="#chubbyLightningBoltUnit" transform="translate(352, 344) rotate(-66) scale(0.92)" />
-                    <use href="#chubbyLightningBoltUnit" transform="translate(376, 332) rotate(-32) scale(1.06)" />
-                    <use href="#chubbyLightningBoltUnit" transform="translate(404, 328) rotate(2) scale(0.92)" />
-                </g>
+                <g class="personal-entrance-wrapper">
+                    <!-- 游標靠近時：左上方彈出三道「等距整齊、縮小 1/2、圓潤胖胖」的亮黃色閃電 (#F3EF84) -->
+                    <g id="optionPersonalSpace" class="hidden pointer-events-none" filter="url(#whiteGlow)">
+                        <use href="#chubbyLightningBoltUnit" transform="translate(352, 344) rotate(-66) scale(0.92)" />
+                        <use href="#chubbyLightningBoltUnit" transform="translate(376, 332) rotate(-32) scale(1.06)" />
+                        <use href="#chubbyLightningBoltUnit" transform="translate(404, 328) rotate(2) scale(0.92)" />
+                    </g>
 
-                <!-- 緊急按鈕左方的「個人空間」文字貼紙 -->
-                <g id="idleLabelPersonalSpace" class="pointer-events-none">
-                    <rect x="304" y="358" width="90" height="40" rx="10" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                    <text id="personalSpaceStickerText" x="349" y="378" fill="#2A348C" font-size="16.5" font-weight="700" letter-spacing="1.5" text-anchor="middle" dominant-baseline="central">
-                        個人空間
-                    </text>
-                </g>
+                    <!-- 緊急按鈕左方的「個人空間」文字貼紙 -->
+                    <g id="idleLabelPersonalSpace" class="pointer-events-none">
+                        <rect x="304" y="358" width="90" height="40" rx="10" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                        <text id="personalSpaceStickerText" x="349" y="378" fill="#2A348C" font-size="16.5" font-weight="700" letter-spacing="1.5" text-anchor="middle" dominant-baseline="central">
+                            個人空間
+                        </text>
+                    </g>
 
-                <!-- 牆上緊急按鈕本體 -->
-                <g id="switchPlateBody" class="pointer-events-none">
-                    <rect x="404" y="344" width="56" height="68" rx="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                    <g id="switchRedButton">
-                        <rect x="421" y="361" width="22" height="34" rx="11" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
+                    <!-- 牆上緊急按鈕本體 -->
+                    <g id="switchPlateBody" class="pointer-events-none">
+                        <rect x="404" y="344" width="56" height="68" rx="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                        <g id="switchRedButton">
+                            <rect x="421" y="361" width="22" height="34" rx="11" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
+                        </g>
                     </g>
                 </g>
             </g>
@@ -1872,8 +1933,10 @@
             </g>
 
          <!-- 4. 「有所味」Logo（獨立於馬桶白光濾鏡外，呈現 2000 年 Windows 復古 3D 白邊漂浮效果） -->
-         <g id="toiletMainLogoGroup" class="pointer-events-none">
-             <image x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" href="./img/logo.png" class="poogle-logo-img" />
+         <g class="logo-entrance-wrapper">
+             <g id="toiletMainLogoGroup" class="pointer-events-none">
+                 <image x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" href="./img/logo.png" class="poogle-logo-img" />
+             </g>
          </g>
             <!-- =============================================================== -->
             <!-- E. ZONE 4: 小怪圖鑑 (三捲衛生紙由上方一個個落下到定點)            -->
@@ -3375,30 +3438,42 @@
             let activeHoverZone = null;
             let toiletCloseTimer = null;
 
-            let hasRevealedStage = false;
+            const stageInitTime = performance.now();
+         const MIN_TOILET_SOLO_MS = 380; // 讓馬桶先單獨呈現在正中間 0.38 秒，再觸發其他元素動畫
+         let hasRevealedStage = false;
          window.__revealHomeStage = () => {
              if (hasRevealedStage) return;
              hasRevealedStage = true;
-             requestAnimationFrame(() => {
+             const elapsed = performance.now() - stageInitTime;
+             const waitMs = Math.max(0, MIN_TOILET_SOLO_MS - elapsed);
+             setTimeout(() => {
                  requestAnimationFrame(() => {
-                     document.body.classList.add('stage-ready');
-                     setTimeout(() => {
-                         document.querySelectorAll('.bubble-travel-wrapper').forEach((el) => {
-                             el.classList.remove('bubble-rise-in');
-                         });
-                         document.querySelectorAll('.tp-drop-in').forEach((el) => {
-                             el.classList.remove('tp-drop-in', 'tp-drop-1', 'tp-drop-2', 'tp-drop-3');
-                         });
-                         document.querySelectorAll('.trash-slide-in-wrapper').forEach((el) => {
-                             el.classList.remove('trash-slide-in-wrapper');
-                         });
-                         document.getElementById('trashCockroachPeekGroup')?.classList.remove('roach-initial-delay');
-                     }, 1600);
+                     requestAnimationFrame(() => {
+                         document.body.classList.add('stage-ready');
+                         setTimeout(() => {
+                             document.querySelectorAll('.bubble-travel-wrapper').forEach((el) => {
+                                 el.classList.remove('bubble-rise-in');
+                             });
+                             document.querySelectorAll('.tp-drop-in').forEach((el) => {
+                                 el.classList.remove('tp-drop-in', 'tp-drop-1', 'tp-drop-2', 'tp-drop-3');
+                             });
+                             document.querySelectorAll('.trash-slide-in-wrapper').forEach((el) => {
+                                 el.classList.remove('trash-slide-in-wrapper');
+                             });
+                             document.querySelectorAll('.logo-entrance-wrapper').forEach((el) => {
+                                 el.classList.remove('logo-entrance-wrapper', 'mobile-logo-origin');
+                             });
+                             document.querySelectorAll('.personal-entrance-wrapper').forEach((el) => {
+                                 el.classList.remove('personal-entrance-wrapper', 'mobile-personal-origin');
+                             });
+                             document.getElementById('trashCockroachPeekGroup')?.classList.remove('roach-initial-delay');
+                         }, 1600);
+                     });
                  });
-             });
+             }, waitMs);
          };
-         // 安全保底：最多等待 240ms 即強制啟動畫面與動畫，避免網路較慢時久候
-         setTimeout(() => window.__revealHomeStage(), 240);
+         // 安全保底：最多等待 520ms 即強制啟動週邊元素進場動畫，避免網路較慢時久候
+         setTimeout(() => window.__revealHomeStage(), 520);
 
             // ===================================================================
          // 2000 年 Windows 復古「3D 文字」白邊厚實擠出 + 微幅傾斜漂浮引擎

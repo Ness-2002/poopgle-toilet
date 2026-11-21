@@ -43,6 +43,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- 預先載入本機 Logo，避免畫面閃爍 -->
+    <link rel="preload" as="image" href="./img/logo.png">
     <!-- Firebase SDK (用於個人空間登入狀態檢查與同步) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -493,23 +495,40 @@
 
     <!-- 1. TOP NAVBAR + MARQUEE BAR (與 index.html 一致的上方導覽列與 POOPGLE 跑馬燈) -->
     <header class="sticky top-0 w-full shrink-0 z-40 flex flex-col">
-    <!-- 底色改為 #F3EF84，並已移除下方跑馬燈 -->
-    <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#F3EF84] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-        <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
-            <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
-            <a href="./index.html?openReport=1" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
-            <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-            <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況板</a>
-            <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
-            <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
+        <!-- 底色改為 #F3EF84，並已移除下方跑馬燈 -->
+        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#F3EF84] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+                <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
+                <a href="./index.html?openReport=1" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+                <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+                <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況板</a>
+                <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+                <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
+            </div>
+        </nav>
+
+        <!-- 電腦版左上角 LOGO -->
+        <div class="hidden md:block absolute inset-x-0 top-0 pointer-events-none z-40">
+            <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
+                <a href="./index.html" class="group pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味首頁">
+                    <img src="./img/logo.png"
+                         alt="有所味 Logo"
+                         fetchpriority="high"
+                         decoding="sync"
+                         class="poogle-logo-img w-[150px] sm:w-[195px] h-auto object-contain transition-transform duration-200 ease-out group-hover:scale-105 block" />
+                </a>
+            </div>
         </div>
-    </nav>
-</header>
+    </header>
 
     <!-- 2. MOBILE TOP BAR (手機版左上角回首頁 Logo + 右上角衛生紙下拉選單) -->
     <div class="flex md:hidden items-center justify-between px-5 pt-3 pb-1 relative z-30">
         <a href="./index.html" class="inline-block focus:outline-none transition-transform active:scale-95" title="回到有所味首頁">
-            <img alt="有所味 Logo" class="poogle-logo-img report-logo-sticker w-[126px] h-auto object-contain block" />
+            <img src="./img/logo.png"
+                 alt="有所味 Logo"
+                 fetchpriority="high"
+                 decoding="sync"
+                 class="poogle-logo-img report-logo-sticker w-[126px] h-auto object-contain block" />
         </a>
 
         <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
@@ -1351,18 +1370,8 @@
         }
 
         // Logo 載入與向量備援
+        // Logo 載入（優先直接顯示 ./img/logo.png，正式環境絕不閃現向量備援圖）
         function initLogoImagesWithFallback() {
-            const symbolEl = document.getElementById('youSuoWeiLogoVector');
-            const applyUrl = (url) => {
-                document.querySelectorAll('.poogle-logo-img').forEach((el) => {
-                    if (el.tagName && el.tagName.toLowerCase() === 'img') el.src = url;
-                    else el.setAttribute('href', url);
-                });
-            };
-            if (symbolEl) {
-                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
-                applyUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
-            }
             const isSandbox = (
                 window.location.protocol === 'about:' ||
                 window.location.protocol === 'blob:' ||
@@ -1370,18 +1379,33 @@
                 (window.location.hostname || '').includes('usercontent.goog') ||
                 (window.location.hostname || '').includes('googleusercontent.com')
             );
-            if (isSandbox) return;
-            const candidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png'];
-            let idx = 0;
-            const tryNext = () => {
-                if (idx >= candidates.length) return;
-                const url = candidates[idx++];
-                const probe = new Image();
-                probe.onload = () => applyUrl(url);
-                probe.onerror = () => tryNext();
-                probe.src = url;
-            };
-            tryNext();
+
+            // 僅在無本機圖檔的線上預覽沙盒才啟用向量圖，Live Server 與 GitHub Pages 完全不觸發
+            if (isSandbox) {
+                const symbolEl = document.getElementById('youSuoWeiLogoVector');
+                if (!symbolEl) return;
+                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+                const fallbackUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
+                document.querySelectorAll('.poogle-logo-img').forEach((el) => {
+                    if (el.tagName && el.tagName.toLowerCase() === 'img') el.src = fallbackUri;
+                    else el.setAttribute('href', fallbackUri);
+                });
+                return;
+            }
+
+            // 正式環境：維持直接顯示 ./img/logo.png，僅在遇到大寫副檔名時自動切換 .PNG
+            document.querySelectorAll('img.poogle-logo-img').forEach((imgEl) => {
+                const tryUppercaseFallback = () => {
+                    if (imgEl.dataset.triedFallback) return;
+                    imgEl.dataset.triedFallback = '1';
+                    imgEl.src = './img/logo.PNG';
+                };
+                if (imgEl.complete && imgEl.naturalWidth === 0) {
+                    tryUppercaseFallback();
+                } else {
+                    imgEl.addEventListener('error', tryUppercaseFallback, { once: true });
+                }
+            });
         }
 
         // ===================================================================
@@ -1391,6 +1415,365 @@
             renderIllustratorHalftoneGrid();
             initLogoImagesWithFallback();
             buildArchStageDOM();
+
+            // ===================================================================
+            // ⚡ 零延遲 Web Audio 音效預解碼引擎（預載進記憶體 + 自動跳過開頭空白靜音）
+            // ===================================================================
+            const poogleAudioEngine = (() => {
+                // 💡 若有特殊自訂檔名也可填在這裡（留空即可自動偵測 GitHub Pages 與 Live Server）
+                const CUSTOM_BOOM_FILES = [];
+                const CUSTOM_SQUEAK_FILES = [];
+
+                let sharedCtx = null;
+                let hwUnlocked = false;
+                const boomPool = [];
+                const squeakPool = [];
+                const seenUrls = new Set();
+                let lastSqueakUrl = '';
+                let squeakStreakCount = 0;
+
+                const isSandboxEnv = (
+                    window.location.protocol === 'about:' ||
+                    window.location.protocol === 'blob:' ||
+                    window.location.protocol === 'data:' ||
+                    (window.location.hostname || '').includes('usercontent.goog') ||
+                    (window.location.hostname || '').includes('googleusercontent.com')
+                );
+
+                function getCtx() {
+                    if (!sharedCtx) {
+                        const Ctx = window.AudioContext || window.webkitAudioContext;
+                        if (Ctx) sharedCtx = new Ctx();
+                    }
+                    return sharedCtx;
+                }
+
+                // 偵測音檔開頭是否有空白靜音，若有超過 0.035 秒無聲區段則自動跳過
+                function computeTrimOffset(audioBuffer) {
+                    if (!audioBuffer || !audioBuffer.length || !audioBuffer.sampleRate) return 0;
+                    const sr = audioBuffer.sampleRate;
+                    const chCount = audioBuffer.numberOfChannels;
+                    const len = audioBuffer.length;
+                    const threshold = 0.012;
+                    const win = 64;
+
+                    for (let w = 0; w < len; w += win) {
+                        const end = Math.min(len, w + win);
+                        for (let ch = 0; ch < chCount; ch++) {
+                            const data = audioBuffer.getChannelData(ch);
+                            let hits = 0;
+                            for (let i = w; i < end; i++) {
+                                if (Math.abs(data[i]) >= threshold && ++hits >= 6) {
+                                    const firstSec = w / sr;
+                                    if (firstSec <= 0.035) return 0;
+                                    const offset = Math.max(0, firstSec - 0.008);
+                                    return offset < (audioBuffer.duration - 0.04) ? offset : 0;
+                                }
+                            }
+                        }
+                    }
+                    return 0;
+                }
+
+                async function decodeEntryBuffer(entry) {
+                    if (entry.buffer || !entry.rawBuf) return;
+                    const ctx = getCtx();
+                    if (!ctx) return;
+                    try {
+                        const decoded = await ctx.decodeAudioData(entry.rawBuf.slice(0));
+                        entry.buffer = decoded;
+                        entry.trimOffset = computeTrimOffset(decoded);
+                        entry.rawBuf = null;
+                    } catch (e) {}
+                }
+
+                // 手指／滑鼠按下的瞬間提前喚醒音訊硬體，不等 click 放開才啟動
+                function unlockHardware() {
+                    const ctx = getCtx();
+                    if (!ctx) return;
+                    if (ctx.state === 'suspended') {
+                        ctx.resume().catch(() => {});
+                    }
+                    if (!hwUnlocked) {
+                        hwUnlocked = true;
+                        try {
+                            const silent = ctx.createBuffer(1, 1, 22050);
+                            const src = ctx.createBufferSource();
+                            src.buffer = silent;
+                            src.connect(ctx.destination);
+                            src.start(0);
+                        } catch (e) {}
+                        [...boomPool, ...squeakPool].forEach((entry) => {
+                            if (!entry.buffer && entry.rawBuf) decodeEntryBuffer(entry);
+                        });
+                    }
+                }
+                window.addEventListener('pointerdown', unlockHardware, { capture: true, passive: true });
+                window.addEventListener('touchstart', unlockHardware, { capture: true, passive: true });
+                window.addEventListener('keydown', unlockHardware, { capture: true, passive: true });
+
+                async function fetchAndDecodeIntoPool(url, pool) {
+                    if (!url || seenUrls.has(url)) return false;
+                    seenUrls.add(url);
+                    try {
+                        const res = await fetch(url);
+                        if (!res.ok) return false;
+                        const cType = (res.headers.get('content-type') || '').toLowerCase();
+                        if (cType.includes('text/html')) return false;
+                        const rawBuf = await res.arrayBuffer();
+                        if (!rawBuf || rawBuf.byteLength < 128) return false;
+
+                        const entry = { url, rawBuf, buffer: null, trimOffset: 0 };
+                        pool.push(entry);
+                        await decodeEntryBuffer(entry);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+
+                function fireBufferSource(ctx, buffer, offset, volume) {
+                    const src = ctx.createBufferSource();
+                    src.buffer = buffer;
+                    const gain = ctx.createGain();
+                    gain.gain.value = volume;
+                    src.connect(gain);
+                    gain.connect(ctx.destination);
+                    src.start(0, offset || 0);
+                }
+
+                function playEntryNow(entry, volume = 0.85) {
+                    if (!entry) return false;
+                    const ctx = getCtx();
+                    if (!ctx) return false;
+
+                    if (entry.buffer) {
+                        if (ctx.state === 'running') {
+                            fireBufferSource(ctx, entry.buffer, entry.trimOffset, volume);
+                        } else {
+                            ctx.resume().then(() => {
+                                fireBufferSource(ctx, entry.buffer, entry.trimOffset, volume);
+                            }).catch(() => {});
+                        }
+                        return true;
+                    }
+                    if (entry.rawBuf) {
+                        ctx.resume().catch(() => {});
+                        decodeEntryBuffer(entry).then(() => {
+                            if (entry.buffer) fireBufferSource(ctx, entry.buffer, entry.trimOffset, volume);
+                        });
+                        return true;
+                    }
+                    return false;
+                }
+
+                function playPop() {
+                    try {
+                        const ctx = getCtx();
+                        if (!ctx) return;
+                        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+                        const now = ctx.currentTime;
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(380, now);
+                        osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+                        gain.gain.setValueAtTime(0.14, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.095);
+                    } catch (e) {}
+                }
+
+                function playFallbackRetroBoom() {
+                    try {
+                        const ctx = getCtx();
+                        if (!ctx) return;
+                        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+                        const now = ctx.currentTime;
+                        const dur = 0.55;
+                        const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+                        const ch = buf.getChannelData(0);
+                        let hold = 0;
+                        for (let i = 0; i < ch.length; i++) {
+                            if (i % 4 === 0) hold = Math.random() * 2 - 1;
+                            ch[i] = hold * Math.pow(1 - i / ch.length, 1.5);
+                        }
+                        const noise = ctx.createBufferSource();
+                        noise.buffer = buf;
+                        const filter = ctx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(920, now);
+                        filter.frequency.exponentialRampToValueAtTime(95, now + dur);
+                        const gain = ctx.createGain();
+                        gain.gain.setValueAtTime(0.45, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + dur);
+                        noise.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(ctx.destination);
+                        noise.start(now);
+                    } catch (e) {}
+                }
+
+                async function scanLiveServerDir(dirPath) {
+                    try {
+                        const res = await fetch(dirPath);
+                        if (!res.ok) return [];
+                        const cType = (res.headers.get('content-type') || '').toLowerCase();
+                        if (!cType.includes('text/html')) return [];
+                        const html = await res.text();
+                        const dirBase = new URL(dirPath, window.location.href).href;
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        const urls = [];
+                        doc.querySelectorAll('a[href]').forEach((a) => {
+                            const rawHref = a.getAttribute('href') || '';
+                            const clean = rawHref.split('?')[0].split('#')[0];
+                            if (!/\.(mp3|wav|ogg|m4a)$/i.test(clean)) return;
+                            const cleanDir = dirPath.replace(/^\.\//, '');
+                            const fullUrl = (!rawHref.startsWith('/') && !rawHref.startsWith('http') && rawHref.includes(cleanDir))
+                                ? new URL(rawHref, window.location.href).href
+                                : new URL(rawHref, dirBase).href;
+                            urls.push(fullUrl);
+                        });
+                        return urls;
+                    } catch (e) {
+                        return [];
+                    }
+                }
+
+                async function preloadAllAudio() {
+                    if (isSandboxEnv || !window.location.protocol.startsWith('http')) return;
+
+                    // 1. 手動指定清單（若有填寫）
+                    CUSTOM_BOOM_FILES.forEach((n) => fetchAndDecodeIntoPool('./sfx/' + n.replace(/^\.?\/?(sfx\/)?/i, ''), boomPool));
+                    CUSTOM_SQUEAK_FILES.forEach((n) => fetchAndDecodeIntoPool('./sfx/squeak/' + n.replace(/^\.?\/?(sfx\/squeak\/)?/i, ''), squeakPool));
+
+                    // 2. GitHub Pages 環境：透過 GitHub API 一次取得真實音檔清單（零 404 盲測）
+                    const host = window.location.hostname || '';
+                    if (host.endsWith('.github.io')) {
+                        const owner = host.replace(/\.github\.io$/i, '');
+                        const parts = window.location.pathname.split('/').filter(Boolean);
+                        if (owner && parts.length >= 1) {
+                            const repo = parts[0];
+                            const subDir = parts.slice(1, -1).join('/');
+                            const sfxApiBase = `https://api.github.com/repos/${owner}/${repo}/contents/${subDir ? subDir + '/' : ''}sfx`;
+                            try {
+                                const res = await fetch(sfxApiBase);
+                                if (res.ok) {
+                                    const items = await res.json();
+                                    if (Array.isArray(items)) {
+                                        const subTasks = [];
+                                        items.forEach((it) => {
+                                            if (!it || !it.name) return;
+                                            if (it.type === 'file' && /\.(mp3|wav|ogg|m4a)$/i.test(it.name)) {
+                                                if (/^boom/i.test(it.name)) {
+                                                    subTasks.push(fetchAndDecodeIntoPool(`./sfx/${encodeURIComponent(it.name)}`, boomPool));
+                                                } else if (/^squeak/i.test(it.name)) {
+                                                    subTasks.push(fetchAndDecodeIntoPool(`./sfx/${encodeURIComponent(it.name)}`, squeakPool));
+                                                }
+                                            } else if (it.type === 'dir' && (it.name === 'boom' || it.name === 'squeak')) {
+                                                const targetPool = it.name === 'boom' ? boomPool : squeakPool;
+                                                const folderName = it.name;
+                                                subTasks.push(
+                                                    fetch(`${sfxApiBase}/${encodeURIComponent(folderName)}`)
+                                                        .then(r => r.ok ? r.json() : [])
+                                                        .then(subItems => {
+                                                            if (!Array.isArray(subItems)) return;
+                                                            return Promise.all(subItems.map((sub) => {
+                                                                if (sub && sub.type === 'file' && /\.(mp3|wav|ogg|m4a)$/i.test(sub.name)) {
+                                                                    return fetchAndDecodeIntoPool(`./sfx/${folderName}/${encodeURIComponent(sub.name)}`, targetPool);
+                                                                }
+                                                            }));
+                                                        }).catch(() => {})
+                                                );
+                                            }
+                                        });
+                                        await Promise.all(subTasks);
+                                        if (boomPool.length > 0 && squeakPool.length > 0) return;
+                                    }
+                                }
+                            } catch (e) {}
+                        }
+                    } else {
+                        // 3. 本機 VS Code Live Server 環境：直接掃描資料夾目錄
+                        const [, boomDirUrls, squeakDirUrls] = await Promise.all([
+                            fetchAndDecodeIntoPool('./sfx/boom.mp3', boomPool),
+                            scanLiveServerDir('./sfx/boom/'),
+                            scanLiveServerDir('./sfx/squeak/')
+                        ]);
+                        await Promise.all([
+                            ...boomDirUrls.map(u => fetchAndDecodeIntoPool(u, boomPool)),
+                            ...squeakDirUrls.map(u => fetchAndDecodeIntoPool(u, squeakPool))
+                        ]);
+                        if (boomPool.length > 0 && squeakPool.length > 0) return;
+                    }
+
+                    // 4. 輕量備援探測（僅在上述方法皆未找到時執行，不建立 Audio 物件）
+                    if (boomPool.length === 0) {
+                        const boomGuesses = ['./sfx/boom.mp3', './sfx/boom/boom.mp3', './sfx/boom/1.mp3', './sfx/boom/boom1.mp3'];
+                        for (const u of boomGuesses) {
+                            if (await fetchAndDecodeIntoPool(u, boomPool)) break;
+                        }
+                    }
+                    if (squeakPool.length === 0) {
+                        const squeakGuesses = ['./sfx/squeak.mp3', './sfx/squeak/squeak.mp3'];
+                        for (let i = 1; i <= 10; i++) {
+                            const pad = String(i).padStart(2, '0');
+                            squeakGuesses.push(
+                                `./sfx/squeak/${i}.mp3`,
+                                `./sfx/squeak/${pad}.mp3`,
+                                `./sfx/squeak/squeak${i}.mp3`,
+                                `./sfx/squeak/squeak_${i}.mp3`
+                            );
+                        }
+                        const BATCH = 6;
+                        for (let i = 0; i < squeakGuesses.length; i += BATCH) {
+                            await Promise.all(squeakGuesses.slice(i, i + BATCH).map(u => fetchAndDecodeIntoPool(u, squeakPool)));
+                        }
+                    }
+                }
+
+                // 一進頁面立即在背景預載並解碼所有音效
+                preloadAllAudio();
+
+                return {
+                    playPop,
+                    playBoom() {
+                        const ready = boomPool.filter(e => e.buffer || e.rawBuf);
+                        if (ready.length > 0) {
+                            const chosen = ready[Math.floor(Math.random() * ready.length)];
+                            if (playEntryNow(chosen, 0.4)) return;
+                        }
+                        playFallbackRetroBoom();
+                    },
+                    playRandomSqueak() {
+                        const ready = squeakPool.filter(e => e.buffer || e.rawBuf);
+                        if (ready.length === 0) {
+                            playPop();
+                            return;
+                        }
+                        let chosen = ready[0];
+                        if (ready.length > 1) {
+                            const candidates = squeakStreakCount >= 2
+                                ? ready.filter(e => e.url !== lastSqueakUrl)
+                                : ready;
+                            const list = candidates.length > 0 ? candidates : ready;
+                            chosen = list[Math.floor(Math.random() * list.length)];
+                        }
+                        if (chosen.url === lastSqueakUrl) {
+                            squeakStreakCount++;
+                        } else {
+                            lastSqueakUrl = chosen.url;
+                            squeakStreakCount = 1;
+                        }
+                        if (!playEntryNow(chosen, 0.85)) {
+                            playPop();
+                        }
+                    }
+                };
+            })();
             // ===================================================================
             // 🚽 上排正中央窗戶：Windows XP 3D 旋轉馬桶 + 點擊同風格 3D 爆炸與 sfx/boom 音效
             // ===================================================================
@@ -1445,137 +1828,8 @@
                 hitboxEl.setAttribute('aria-label', '點擊引爆馬桶');
                 stageEl.appendChild(hitboxEl);
 
-                // ===============================================================
-                // 🔊 爆炸音效載入器（自動支援 ./sfx/boom.mp3 或 ./sfx/boom/ 資料夾）
-                // ===============================================================
-                const boomUrls = [];
-                const boomPreloadMap = new Map();
-
-                function registerBoomUrl(url) {
-                    if (!url || boomPreloadMap.has(url)) return;
-                    const a = new Audio(url);
-                    a.preload = 'auto';
-                    boomPreloadMap.set(url, a);
-                    boomUrls.push(url);
-                }
-
-                function probeBoomUrl(url) {
-                    return new Promise((resolve) => {
-                        let settled = false;
-                        const finish = (ok) => {
-                            if (settled) return;
-                            settled = true;
-                            resolve(ok ? url : null);
-                        };
-                        const probe = new Audio();
-                        probe.preload = 'metadata';
-                        probe.onloadedmetadata = () => finish(true);
-                        probe.oncanplaythrough = () => finish(true);
-                        probe.onerror = () => finish(false);
-                        setTimeout(() => finish(false), 1600);
-                        probe.src = url;
-                    });
-                }
-
-                async function initBoomSoundPool() {
-                    if (BOOM_MP3_FILES.length > 0) {
-                        const resList = await Promise.all(
-                            BOOM_MP3_FILES.map((n) => probeBoomUrl('./sfx/' + n.replace(/^\.?\/?(sfx\/)?/i, '')))
-                        );
-                        resList.filter(Boolean).forEach(registerBoomUrl);
-                        if (boomUrls.length > 0) return;
-                    }
-
-                    // 1. 優先檢查單一音效檔 ./sfx/boom.mp3 / .wav / .ogg
-                    const directFiles = ['./sfx/boom.mp3', './sfx/boom.MP3', './sfx/boom.wav', './sfx/boom.ogg'];
-                    for (let i = 0; i < directFiles.length; i++) {
-                        const hit = await probeBoomUrl(directFiles[i]);
-                        if (hit) {
-                            registerBoomUrl(hit);
-                            return;
-                        }
-                    }
-
-                    // 2. 若 sfx/boom 是資料夾（如 Live Server 環境），自動掃描內部所有 mp3
-                    if (window.location.protocol.startsWith('http')) {
-                        try {
-                            const res = await fetch('./sfx/boom/');
-                            if (res.ok) {
-                                const html = await res.text();
-                                const dirBase = new URL('./sfx/boom/', window.location.href).href;
-                                const doc = new DOMParser().parseFromString(html, 'text/html');
-                                doc.querySelectorAll('a[href]').forEach((a) => {
-                                    const rawHref = a.getAttribute('href') || '';
-                                    const clean = rawHref.split('?')[0].split('#')[0].toLowerCase();
-                                    if (!clean.endsWith('.mp3') && !clean.endsWith('.wav')) return;
-                                    const fullUrl = (!rawHref.startsWith('/') && !rawHref.startsWith('http') && rawHref.includes('sfx/boom/'))
-                                        ? new URL(rawHref, window.location.href).href
-                                        : new URL(rawHref, dirBase).href;
-                                    registerBoomUrl(fullUrl);
-                                });
-                            }
-                        } catch (e) {}
-                    }
-
-                    // 3. 常見命名備援探測 (sfx/boom/boom.mp3, 1.mp3, boom1.mp3...)
-                    if (boomUrls.length === 0) {
-                        const folderGuesses = ['boom.mp3', '1.mp3', '01.mp3', 'boom1.mp3', 'boom_1.mp3'];
-                        const found = await Promise.all(folderGuesses.map((f) => probeBoomUrl('./sfx/boom/' + f)));
-                        found.filter(Boolean).forEach(registerBoomUrl);
-                    }
-                }
-                setTimeout(initBoomSoundPool, 450);
-
-                // 復古 16-bit 合成爆炸音（僅在尚未放入 sfx/boom 檔案時作為備援）
-                let synthCtx = null;
-                function playFallbackRetroBoom() {
-                    try {
-                        const Ctx = window.AudioContext || window.webkitAudioContext;
-                        if (!Ctx) return;
-                        if (!synthCtx) synthCtx = new Ctx();
-                        if (synthCtx.state === 'suspended') synthCtx.resume();
-                        const now = synthCtx.currentTime;
-                        const dur = 0.55;
-                        const buf = synthCtx.createBuffer(1, Math.floor(synthCtx.sampleRate * dur), synthCtx.sampleRate);
-                        const ch = buf.getChannelData(0);
-                        let hold = 0;
-                        for (let i = 0; i < ch.length; i++) {
-                            if (i % 4 === 0) hold = Math.random() * 2 - 1;
-                            ch[i] = hold * Math.pow(1 - i / ch.length, 1.5);
-                        }
-                        const noise = synthCtx.createBufferSource();
-                        noise.buffer = buf;
-                        const filter = synthCtx.createBiquadFilter();
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(920, now);
-                        filter.frequency.exponentialRampToValueAtTime(95, now + dur);
-                        const gain = synthCtx.createGain();
-                        gain.gain.setValueAtTime(0.45, now);
-                        gain.gain.exponentialRampToValueAtTime(0.01, now + dur);
-                        noise.connect(filter);
-                        filter.connect(gain);
-                        gain.connect(synthCtx.destination);
-                        noise.start(now);
-                    } catch (e) {}
-                }
-
                 function playBoomSfx() {
-                    if (boomUrls.length > 0) {
-                        const chosen = boomUrls[Math.floor(Math.random() * boomUrls.length)];
-                        try {
-                            const player = new Audio(chosen);
-                            player.volume = 0.9;
-                            player.play().catch(() => {});
-                            return;
-                        } catch (e) {}
-                    }
-                    try {
-                        const direct = new Audio('./sfx/boom.mp3');
-                        direct.volume = 0.9;
-                        direct.play().catch(() => playFallbackRetroBoom());
-                    } catch (e) {
-                        playFallbackRetroBoom();
-                    }
+                    poogleAudioEngine.playBoom();
                 }
 
                 // ===============================================================
@@ -2737,145 +2991,21 @@
                 requestAnimationFrame(tickWindowAnimations);
             }
 
-            // 啟動初次載入與連續動畫，並在背景預載全部 32 張小怪 PNG
-            await populateAllArchesRandomly(null);
-            lastTickTime = performance.now();
-            requestAnimationFrame(tickWindowAnimations);
-            // 等開場動畫跑完 (0.8秒後)，再於背景預載剩餘的小怪 PNG
-            setTimeout(() => {
-                Promise.all(allMonsters.map(m => resolveMonsterPngUrl(m)));
-            }, 800);
-
-            // ===================================================================
-            // 🔊 小怪點擊音效系統 (隨機播放 ./sfx/squeak/*.mp3，最多連續 1~2 次，第 3 次絕不重複)
-            // ===================================================================
-            // 💡 若直接雙擊 HTML 開啟或上傳至 GitHub Pages，可將 sfx/squeak 資料夾內的 mp3 檔名填寫於下方
-            //    例如：const SQUEAK_MP3_FILES = ['squeak1.mp3', 'squeak2.mp3', 'squeak3.mp3'];
-            //    (若使用 VS Code Live Server 預覽，留空也會自動掃描 sfx/squeak 內所有 mp3！)
-            const SQUEAK_MP3_FILES = [];
-
-            const squeakAudioUrls = [];
-            const squeakPreloadMap = new Map();
-            let lastSqueakIdx = -1;
-            let squeakStreakCount = 0;
-
-            function registerSqueakUrl(url) {
-                if (!url || squeakPreloadMap.has(url)) return;
-                const audio = new Audio(url);
-                audio.preload = 'auto';
-                squeakPreloadMap.set(url, audio);
-                squeakAudioUrls.push(url);
-            }
-
-            function probeAudioFile(url) {
-                return new Promise((resolve) => {
-                    let done = false;
-                    const finish = (ok) => {
-                        if (done) return;
-                        done = true;
-                        resolve(ok ? url : null);
-                    };
-                    const probe = new Audio();
-                    probe.preload = 'metadata';
-                    probe.onloadedmetadata = () => finish(true);
-                    probe.oncanplaythrough = () => finish(true);
-                    probe.onerror = () => finish(false);
-                    setTimeout(() => finish(false), 1800);
-                    probe.src = url;
-                });
-            }
-
-            async function initSqueakSoundPool() {
-                // 1. 優先讀取上方 SQUEAK_MP3_FILES 手動指定的檔名
-                if (SQUEAK_MP3_FILES.length > 0) {
-                    const manualResults = await Promise.all(
-                        SQUEAK_MP3_FILES.map((name) => {
-                            const clean = name.replace(/^\.?\/?(sfx\/squeak\/)?/i, '');
-                            const encoded = clean.split('/').map(encodeURIComponent).join('/');
-                            return probeAudioFile(`./sfx/squeak/${encoded}`);
-                        })
-                    );
-                    manualResults.filter(Boolean).forEach(registerSqueakUrl);
-                }
-
-                // 2. 本地伺服器環境 (如 VS Code Live Server) 自動掃描 ./sfx/squeak/ 內所有 .mp3
-                if (squeakAudioUrls.length === 0 && window.location.protocol.startsWith('http')) {
-                    try {
-                        const res = await fetch('./sfx/squeak/');
-                        if (res.ok) {
-                            const html = await res.text();
-                            const dirBase = new URL('./sfx/squeak/', window.location.href).href;
-                            const doc = new DOMParser().parseFromString(html, 'text/html');
-                            doc.querySelectorAll('a[href]').forEach((a) => {
-                                const rawHref = a.getAttribute('href') || '';
-                                const cleanPath = rawHref.split('?')[0].split('#')[0];
-                                if (!cleanPath.toLowerCase().endsWith('.mp3')) return;
-                                const fullUrl = (!rawHref.startsWith('/') && !rawHref.startsWith('http') && rawHref.includes('sfx/squeak/'))
-                                    ? new URL(rawHref, window.location.href).href
-                                    : new URL(rawHref, dirBase).href;
-                                registerSqueakUrl(fullUrl);
-                            });
-                        }
-                    } catch (e) {}
-                }
-
-                // 3. 備援自動探測常見檔名 (1.mp3~10.mp3, 01.mp3~10.mp3, squeak1.mp3~10.mp3, squeak_1.mp3~10.mp3)
-                if (squeakAudioUrls.length === 0) {
-                    const commonNames = ['squeak.mp3'];
-                    for (let i = 1; i <= 10; i++) {
-                        const pad = String(i).padStart(2, '0');
-                        commonNames.push(
-                            `${i}.mp3`,
-                            `${pad}.mp3`,
-                            `squeak${i}.mp3`,
-                            `squeak${pad}.mp3`,
-                            `squeak_${i}.mp3`,
-                            `squeak_${pad}.mp3`,
-                            `squeak-${i}.mp3`
-                        );
+            // 啟動初次載入與連續動畫（不卡住下方點擊事件綁定，並分批溫和預載剩餘小怪 PNG）
+            populateAllArchesRandomly(null).then(() => {
+                lastTickTime = performance.now();
+                requestAnimationFrame(tickWindowAnimations);
+                setTimeout(async () => {
+                    const BATCH = 6;
+                    for (let i = 0; i < allMonsters.length; i += BATCH) {
+                        await Promise.all(allMonsters.slice(i, i + BATCH).map(m => resolveMonsterPngUrl(m)));
                     }
-                    const probed = await Promise.all(
-                        commonNames.map((n) => probeAudioFile(`./sfx/squeak/${n}`))
-                    );
-                    probed.filter(Boolean).forEach(registerSqueakUrl);
-                }
-            }
+                }, 1000);
+            });
 
-            // 隨機播放一首小怪音效（同一種聲音最多連續 1~2 次，第 3 次強制換別首）
             function playRandomSqueakSfx() {
-                if (squeakAudioUrls.length === 0) {
-                    playPopSfx();
-                    return;
-                }
-
-                let nextIdx = 0;
-                if (squeakAudioUrls.length === 1) {
-                    nextIdx = 0;
-                } else {
-                    const candidates = [];
-                    for (let i = 0; i < squeakAudioUrls.length; i++) {
-                        // 若同一個聲音已經連續播放滿 2 次，第 3 次一定排除它
-                        if (squeakStreakCount >= 2 && i === lastSqueakIdx) continue;
-                        candidates.push(i);
-                    }
-                    nextIdx = candidates[Math.floor(Math.random() * candidates.length)];
-                }
-
-                if (nextIdx === lastSqueakIdx) {
-                    squeakStreakCount++;
-                } else {
-                    lastSqueakIdx = nextIdx;
-                    squeakStreakCount = 1;
-                }
-
-                try {
-                    const player = new Audio(squeakAudioUrls[nextIdx]);
-                    player.volume = 0.85;
-                    player.play().catch(() => {});
-                } catch (e) {}
+                poogleAudioEngine.playRandomSqueak();
             }
-
-            setTimeout(initSqueakSoundPool, 600);
 
             // 觸發小怪原地快速輕跳一下（支援連續點擊重複起跳）
             function triggerMonsterHop(imgEl) {

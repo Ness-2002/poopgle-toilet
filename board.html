@@ -19,8 +19,8 @@
         }, true);
     </script>
     <!-- 優先預載遊戲機對戰畫面小怪 PNG，消除載入時間差 -->
-    <link rel="preload" as="image" href="./img/hardware/mirror_dirty.png">
-    <link rel="preload" as="image" href="./img/hardware/sink_trash.png">
+    <link rel="preload" as="image" href="./img/hardware/mirror_dirty.png" fetchpriority="high">
+    <link rel="preload" as="image" href="./img/hardware/sink_trash.png" fetchpriority="high">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
@@ -1285,8 +1285,8 @@
                                         <g id="leftFighterPortraitFallback" transform="translate(317.5, 526) scale(0.45)">
                                             <use href="#fallbackMirrorDirty" />
                                         </g>
-                                        <image id="leftFighterPortraitImg" x="291" y="485" width="53" height="56"
-                                               preserveAspectRatio="xMidYMin meet" class="hidden" />
+                                        <image id="leftFighterPortraitImg" href="./img/hardware/mirror_dirty.png" x="291" y="485" width="53" height="56"
+                                               preserveAspectRatio="xMidYMin meet" />
                                     </g>
                                     <rect x="296" y="484" width="43" height="43" fill="none" stroke="#2A348C" stroke-width="1.8" />
 
@@ -1313,8 +1313,8 @@
                                         <g id="rightFighterPortraitFallback" transform="translate(628.2, 526) scale(0.41)">
                                             <use href="#fallbackSinkTrash" />
                                         </g>
-                                        <image id="rightFighterPortraitImg" x="601.7" y="484" width="53" height="56"
-                                               preserveAspectRatio="xMidYMin meet" class="hidden" />
+                                        <image id="rightFighterPortraitImg" href="./img/hardware/sink_trash.png" x="601.7" y="484" width="53" height="56"
+                                               preserveAspectRatio="xMidYMin meet" />
                                     </g>
                                     <rect x="606.7" y="484" width="43" height="43" fill="none" stroke="#2A348C" stroke-width="1.8" />
                                 </g>
@@ -1323,16 +1323,16 @@
                                     <g id="leftFighterStageFallback" transform="translate(358, 646) scale(0.94)">
                                         <use href="#fallbackMirrorDirty" />
                                     </g>
-                                    <image id="leftFighterStageImg" x="291" y="567" width="138" height="158"
-                                           preserveAspectRatio="xMidYMid meet" class="hidden" />
+                                    <image id="leftFighterStageImg" href="./img/hardware/mirror_dirty.png" x="291" y="567" width="138" height="158"
+                                           preserveAspectRatio="xMidYMid meet" />
                                 </g>
 
                                 <g id="rightFighterStageGroup">
                                     <g id="rightFighterStageFallback" transform="translate(584, 650) scale(0.94)">
                                         <use href="#fallbackSinkTrash" />
                                     </g>
-                                    <image id="rightFighterStageImg" x="515" y="561" width="142" height="168"
-                                           preserveAspectRatio="xMidYMid meet" class="hidden" />
+                                    <image id="rightFighterStageImg" href="./img/hardware/sink_trash.png" x="515" y="561" width="142" height="168"
+                                           preserveAspectRatio="xMidYMid meet" />
                                 </g>
 
                                 <!-- 步驟 3：START 彈出文字 -->
@@ -2017,7 +2017,9 @@
                 (window.location.hostname || '').includes('googleusercontent.com')
             );
 
-            // 預載並完成點陣圖解碼 (decode) 後寫入 SVG，確保畫面出現瞬間即為完整清晰 PNG
+            const introFighterKeepAlive = [];
+
+            // 預載並完成點陣圖解碼 (decode) 與 SVG 繪製幀確認後，才讓開場遊戲機彈出
             function preloadFighterPng(candidates, stageImgId, portraitImgId) {
                 if (isPreviewSandbox) return Promise.resolve();
 
@@ -2031,22 +2033,27 @@
                         const url = candidates[idx++];
                         const probe = new Image();
                         probe.decoding = 'async';
+                        if ('fetchPriority' in probe) probe.fetchPriority = 'high';
+
                         probe.onload = () => {
+                            introFighterKeepAlive.push(probe);
                             const applyToSvg = () => {
                                 const stageImg = document.getElementById(stageImgId);
                                 const portraitImg = document.getElementById(portraitImgId);
 
-                                if (stageImg) {
-                                    stageImg.setAttribute('href', url);
-                                    stageImg.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
-                                    stageImg.classList.remove('hidden');
-                                }
-                                if (portraitImg) {
-                                    portraitImg.setAttribute('href', url);
-                                    portraitImg.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
-                                    portraitImg.classList.remove('hidden');
-                                }
-                                resolve();
+                                [stageImg, portraitImg].forEach((imgEl) => {
+                                    if (!imgEl) return;
+                                    if (imgEl.getAttribute('href') !== url) {
+                                        imgEl.setAttribute('href', url);
+                                        imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+                                    }
+                                    imgEl.classList.remove('hidden');
+                                });
+
+                                // 等待兩個動畫幀，確保貼圖已完整繪入 SVG 圖層才開始彈出遊戲機
+                                requestAnimationFrame(() => {
+                                    requestAnimationFrame(resolve);
+                                });
                             };
 
                             if (typeof probe.decode === 'function') {
@@ -2128,8 +2135,8 @@
                 });
             }
 
-            // 同步預載兩隻對戰小怪 PNG（附 800ms 安全逾時保底，防止缺檔卡住畫面）
-            Promise.race([
+            // 同步優先預載兩隻對戰小怪 PNG，載入完成後才啟動開場動畫與後續背景資源載入
+            const introAssetsReadyPromise = Promise.race([
                 Promise.all([
                     preloadFighterPng(
                         ['./img/hardware/mirror_dirty.png', './img/hardware/mirror_dirty.PNG', 'img/hardware/mirror_dirty.png'],
@@ -2140,8 +2147,9 @@
                         'rightFighterStageImg', 'rightFighterPortraitImg'
                     )
                 ]),
-                new Promise((res) => setTimeout(res, 800))
-            ]).then(startConsoleIntroSequence);
+                new Promise((res) => setTimeout(res, 6000))
+            ]);
+            introAssetsReadyPromise.then(startConsoleIntroSequence);
 
             function startConsoleFlipAndShrinkToBird() {
                 const durationMs = 1260;
@@ -2310,7 +2318,8 @@
             const preloadedPeekMonsters = [];
             let lastPickedMonsterUrl = null;
 
-            if (!isPreviewSandbox) {
+            introAssetsReadyPromise.then(() => {
+                if (isPreviewSandbox) return;
                 Object.entries(MONSTER_FOLDER_CONFIG).forEach(([folder, files]) => {
                     files.forEach((file) => {
                         const base = file.replace(/\.png$/i, '');
@@ -2334,7 +2343,7 @@
                         probeNext();
                     });
                 });
-            }
+            });
 
             // 計算帶外開微透視與圓角的立體門板 SVG 路徑
             function buildPerspectiveDoorPath(x0, width, yTopL, yBotL, yTopR, yBotR, r = 23.3) {
@@ -2734,28 +2743,38 @@
 
             if (!isPreviewSandbox) {
                 birdGameLoopAudio = new Audio('./sfx/game.mp3');
-                birdGameLoopAudio.preload = 'auto';
+                birdGameLoopAudio.preload = 'none';
                 birdGameLoopAudio.loop = true;
                 birdGameLoopAudio.volume = clampVolume(BIRD_GAME_LOOP_VOLUME);
                 birdGameLoopAudio.addEventListener('error', () => { birdGameLoopAudio = null; });
 
                 birdGuitarLoopAudio = new Audio('./sfx/guitar.mp3');
-                birdGuitarLoopAudio.preload = 'auto';
+                birdGuitarLoopAudio.preload = 'none';
                 birdGuitarLoopAudio.loop = true;
                 birdGuitarLoopAudio.volume = clampVolume(BIRD_GUITAR_LOOP_VOLUME);
                 birdGuitarLoopAudio.addEventListener('error', () => { birdGuitarLoopAudio = null; });
 
                 birdAngryAudio = new Audio('./sfx/bird_angry.mp3');
-                birdAngryAudio.preload = 'auto';
+                birdAngryAudio.preload = 'none';
                 birdAngryAudio.addEventListener('error', () => { birdAngryAudio = null; });
 
                 stringBrokeAudio = new Audio('./sfx/string_broke.mp3');
-                stringBrokeAudio.preload = 'auto';
+                stringBrokeAudio.preload = 'none';
                 stringBrokeAudio.addEventListener('error', () => { stringBrokeAudio = null; });
 
                 doorSlamAudio = new Audio('./sfx/door_slam.mp3');
-                doorSlamAudio.preload = 'auto';
+                doorSlamAudio.preload = 'none';
                 doorSlamAudio.addEventListener('error', () => { doorSlamAudio = null; });
+
+                introAssetsReadyPromise.then(() => {
+                    [birdGameLoopAudio, birdGuitarLoopAudio, birdAngryAudio, stringBrokeAudio, doorSlamAudio].forEach((aud) => {
+                        if (!aud) return;
+                        aud.preload = 'auto';
+                        if (aud.readyState === 0 && aud.paused) {
+                            try { aud.load(); } catch (e) {}
+                        }
+                    });
+                });
             }
 
             function playBoardSfx(audioInstance, volumeLevel) {
@@ -2890,15 +2909,15 @@
                 guitarLayer.innerHTML = `
                     <g id="pinkBirdGuitarAlignGroup">
                         <g id="guitarBirdGrooveMover">
-                            <!-- 雙腳（固定於身體下方） -->
+                            <!-- 粉紅小鳥身體主輪廓（對齊基準） -->
+                            <path id="guitarBirdRefBodyPath" fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                  d="M227.3,140.3c2.6-7.7,4-15.8,4-24.3c0-15.9-5-31.5-14.1-44.4c-4.6-6.5-10.2-12.2-16.5-17c-6.2-4.7-12.3-9.1-20.1-10.8c-0.9-0.2-2.7-0.3-2.6-1.6c0.1-1.1,0.9-2.2,1-3.4c0.1-1.2,0-2.4-0.4-3.6c-0.6-1.7-1.9-3.2-3.4-4.1c-1.8-1-3.4,0-5.2,0.1c-0.5-2-1.1-3.7-2.6-5.2c-1.4-1.4-3.5-2.2-5.4-1.9c-2,0.3-3.8,1.7-4.3,3.6c-1.2-1.8-1.8-3.9-3-5.7c-1.1-1.8-2.5-3.4-4-4.9c-3.4-3.3-7.2-4.4-11.8-4.7c-2.9-0.2-5.9-0.1-8.7,1c-5,1.9-8.7,6.6-9.3,11.9c-0.6,5.3,2,10.8,6.4,13.7c0.8,0.6,1.7,1,2.4,1.8c0.7,0.8,1,1.9,0.6,2.8c-3,0.5-6.1,1.7-8.8,3c-6.3,3-12.1,6.8-17.3,11.4c-16.7,14.5-26.4,35.9-26.4,58c0,8.5,1.4,16.7,4,24.3c-29.7,6.8-52,33.5-52,65.1c0,36.7,30.1,66.8,66.8,66.8h116.3c36.8,0,66.8-30.1,66.8-66.8C279.4,173.7,257,147,227.3,140.3z"/>
+
+                            <!-- 雙腳（移至身體前方） -->
                             <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
                                   d="M131,320.9L131,320.9c-7.2-1.3-12-8.1-10.7-15.3l7.1-40.2c1.3-7.2,8.1-12,15.3-10.7l0,0c7.2,1.3,12,8.1,10.7,15.3l-7.1,40.2C145,317.3,138.1,322.1,131,320.9z"/>
                             <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
                                   d="M177.8,320.9L177.8,320.9c-7.2,1.3-14-3.6-15.3-10.7l-7.1-40.2c-1.3-7.2,3.6-14,10.7-15.3h0c7.2-1.3,14,3.6,15.3,10.7l7.1,40.2C189.8,312.7,185,319.6,177.8,320.9z"/>
-
-                            <!-- 粉紅小鳥身體主輪廓（對齊基準） -->
-                            <path id="guitarBirdRefBodyPath" fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
-                                  d="M227.3,140.3c2.6-7.7,4-15.8,4-24.3c0-15.9-5-31.5-14.1-44.4c-4.6-6.5-10.2-12.2-16.5-17c-6.2-4.7-12.3-9.1-20.1-10.8c-0.9-0.2-2.7-0.3-2.6-1.6c0.1-1.1,0.9-2.2,1-3.4c0.1-1.2,0-2.4-0.4-3.6c-0.6-1.7-1.9-3.2-3.4-4.1c-1.8-1-3.4,0-5.2,0.1c-0.5-2-1.1-3.7-2.6-5.2c-1.4-1.4-3.5-2.2-5.4-1.9c-2,0.3-3.8,1.7-4.3,3.6c-1.2-1.8-1.8-3.9-3-5.7c-1.1-1.8-2.5-3.4-4-4.9c-3.4-3.3-7.2-4.4-11.8-4.7c-2.9-0.2-5.9-0.1-8.7,1c-5,1.9-8.7,6.6-9.3,11.9c-0.6,5.3,2,10.8,6.4,13.7c0.8,0.6,1.7,1,2.4,1.8c0.7,0.8,1,1.9,0.6,2.8c-3,0.5-6.1,1.7-8.8,3c-6.3,3-12.1,6.8-17.3,11.4c-16.7,14.5-26.4,35.9-26.4,58c0,8.5,1.4,16.7,4,24.3c-29.7,6.8-52,33.5-52,65.1c0,36.7,30.1,66.8,66.8,66.8h116.3c36.8,0,66.8-30.1,66.8-66.8C279.4,173.7,257,147,227.3,140.3z"/>
 
                             <!-- 眼白 -->
                             <ellipse transform="matrix(0.1562 -0.9877 0.9877 0.1562 -0.0839 233.5289)" fill="#FFF9EC" cx="136.6" cy="116.8" rx="23.7" ry="19.4"/>
@@ -4560,10 +4579,12 @@
                 setBoardDropdownOpen(true);
             });
 
-            // 啟動同步載入
-            startBoardRealtimeReviews();
-            ensureBoardToiletsDataset();
-            initBoardUserLocation();
+            // 等開場遊戲機小怪 PNG 就緒後，再利用 4 秒過場動畫時間於背景同步載入資料庫與 CSV
+            introAssetsReadyPromise.then(() => {
+                startBoardRealtimeReviews();
+                ensureBoardToiletsDataset();
+                initBoardUserLocation();
+            });
             // ===============================================================
             // 7. 小怪板：24 小時內小怪即時統計、15 人 1.5x 縮放與防碰撞散步系統
             // ===============================================================
