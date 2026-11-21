@@ -1392,22 +1392,36 @@
             initLogoImagesWithFallback();
             buildArchStageDOM();
             // ===================================================================
-            // 🚽 上排正中央窗戶：極速背景運算 (Web Worker) + 快取版 Windows XP 3D 馬桶
+            // 🚽 上排正中央窗戶：Windows XP 3D 旋轉馬桶 + 點擊同風格 3D 爆炸與 sfx/boom 音效
             // ===================================================================
             (function initRetro3dSpinningToilet() {
                 const stageEl = document.getElementById('retro3dToiletStage');
                 if (!stageEl) return;
 
                 // 💡 可自由微調參數：
-                const SPRITE_RES = 78;       // 點陣解析度（72~84 最有 XP 小幫手質感且極快）
-                const TOILET_SIZE = 166;     // 馬桶在窗戶內的顯示大小
-                const TOILET_Y = -226;       // 馬桶上下位置（負越多越往上）
-                const TOTAL_FRAMES = 28;     // 旋轉一圈格數
-                const SPIN_FPS = 14;         // 每秒播放格數
-                const CACHE_KEY = `poogle_xp_toilet_v3_${SPRITE_RES}_${TOTAL_FRAMES}`;
+                const SPRITE_RES = 78;       // 點陣解析度（72~84 最有 XP 小幫手質感）
+                const TOILET_SIZE = 166;     // 馬桶與爆炸在窗戶內的顯示大小
+                const TOILET_Y = -226;       // 上下位置（負越多越往上）
+                const TOTAL_FRAMES = 28;     // 馬桶旋轉一圈格數
+                const EXPLODE_FRAMES = 16;   // 3D 爆炸動畫總格數
+                const SPIN_FPS = 14;         // 馬桶旋轉每秒格數
+                const EXPLODE_FPS = 18;      // 爆炸播放每秒格數
+                // 💡 若部署至 GitHub Pages 且 sfx/boom 為資料夾，也可直接把檔名填進下方陣列
+                const BOOM_MP3_FILES = [];
 
+                const CACHE_KEY = 'poogle_xp_toilet_boom_v1_' + SPRITE_RES + '_' + TOTAL_FRAMES;
+                try {
+                    sessionStorage.removeItem('poogle_xp_toilet_v3_' + SPRITE_RES + '_' + TOTAL_FRAMES);
+                } catch (e) {}
+
+                // 開啟點擊互動並建立貼合馬桶輪廓的專屬感應區
+                stageEl.classList.remove('pointer-events-none');
                 stageEl.innerHTML = '';
+
                 const svgNs = 'http://www.w3.org/2000/svg';
+                const shakeWrap = document.createElementNS(svgNs, 'g');
+                stageEl.appendChild(shakeWrap);
+
                 const spriteImg = document.createElementNS(svgNs, 'image');
                 spriteImg.setAttribute('x', String(-TOILET_SIZE / 2));
                 spriteImg.setAttribute('y', String(TOILET_Y));
@@ -1415,26 +1429,181 @@
                 spriteImg.setAttribute('height', String(TOILET_SIZE));
                 spriteImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
                 spriteImg.style.imageRendering = 'pixelated';
-                stageEl.appendChild(spriteImg);
+                spriteImg.style.pointerEvents = 'none';
+                spriteImg.style.transformBox = 'fill-box';
+                spriteImg.style.transformOrigin = '50% 58%';
+                spriteImg.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+                shakeWrap.appendChild(spriteImg);
 
-                let frames = new Array(TOTAL_FRAMES).fill(null);
-                let readyCount = 0;
+                const hitboxEl = document.createElementNS(svgNs, 'ellipse');
+                hitboxEl.setAttribute('cx', '0');
+                hitboxEl.setAttribute('cy', String(TOILET_Y + TOILET_SIZE * 0.52));
+                hitboxEl.setAttribute('rx', '50');
+                hitboxEl.setAttribute('ry', '65');
+                hitboxEl.setAttribute('fill', 'transparent');
+                hitboxEl.setAttribute('role', 'button');
+                hitboxEl.setAttribute('aria-label', '點擊引爆馬桶');
+                stageEl.appendChild(hitboxEl);
 
-                // 1. 優先讀取瀏覽器暫存：若這個分頁已經算過，0 毫秒直接秒開！
+                // ===============================================================
+                // 🔊 爆炸音效載入器（自動支援 ./sfx/boom.mp3 或 ./sfx/boom/ 資料夾）
+                // ===============================================================
+                const boomUrls = [];
+                const boomPreloadMap = new Map();
+
+                function registerBoomUrl(url) {
+                    if (!url || boomPreloadMap.has(url)) return;
+                    const a = new Audio(url);
+                    a.preload = 'auto';
+                    boomPreloadMap.set(url, a);
+                    boomUrls.push(url);
+                }
+
+                function probeBoomUrl(url) {
+                    return new Promise((resolve) => {
+                        let settled = false;
+                        const finish = (ok) => {
+                            if (settled) return;
+                            settled = true;
+                            resolve(ok ? url : null);
+                        };
+                        const probe = new Audio();
+                        probe.preload = 'metadata';
+                        probe.onloadedmetadata = () => finish(true);
+                        probe.oncanplaythrough = () => finish(true);
+                        probe.onerror = () => finish(false);
+                        setTimeout(() => finish(false), 1600);
+                        probe.src = url;
+                    });
+                }
+
+                async function initBoomSoundPool() {
+                    if (BOOM_MP3_FILES.length > 0) {
+                        const resList = await Promise.all(
+                            BOOM_MP3_FILES.map((n) => probeBoomUrl('./sfx/' + n.replace(/^\.?\/?(sfx\/)?/i, '')))
+                        );
+                        resList.filter(Boolean).forEach(registerBoomUrl);
+                        if (boomUrls.length > 0) return;
+                    }
+
+                    // 1. 優先檢查單一音效檔 ./sfx/boom.mp3 / .wav / .ogg
+                    const directFiles = ['./sfx/boom.mp3', './sfx/boom.MP3', './sfx/boom.wav', './sfx/boom.ogg'];
+                    for (let i = 0; i < directFiles.length; i++) {
+                        const hit = await probeBoomUrl(directFiles[i]);
+                        if (hit) {
+                            registerBoomUrl(hit);
+                            return;
+                        }
+                    }
+
+                    // 2. 若 sfx/boom 是資料夾（如 Live Server 環境），自動掃描內部所有 mp3
+                    if (window.location.protocol.startsWith('http')) {
+                        try {
+                            const res = await fetch('./sfx/boom/');
+                            if (res.ok) {
+                                const html = await res.text();
+                                const dirBase = new URL('./sfx/boom/', window.location.href).href;
+                                const doc = new DOMParser().parseFromString(html, 'text/html');
+                                doc.querySelectorAll('a[href]').forEach((a) => {
+                                    const rawHref = a.getAttribute('href') || '';
+                                    const clean = rawHref.split('?')[0].split('#')[0].toLowerCase();
+                                    if (!clean.endsWith('.mp3') && !clean.endsWith('.wav')) return;
+                                    const fullUrl = (!rawHref.startsWith('/') && !rawHref.startsWith('http') && rawHref.includes('sfx/boom/'))
+                                        ? new URL(rawHref, window.location.href).href
+                                        : new URL(rawHref, dirBase).href;
+                                    registerBoomUrl(fullUrl);
+                                });
+                            }
+                        } catch (e) {}
+                    }
+
+                    // 3. 常見命名備援探測 (sfx/boom/boom.mp3, 1.mp3, boom1.mp3...)
+                    if (boomUrls.length === 0) {
+                        const folderGuesses = ['boom.mp3', '1.mp3', '01.mp3', 'boom1.mp3', 'boom_1.mp3'];
+                        const found = await Promise.all(folderGuesses.map((f) => probeBoomUrl('./sfx/boom/' + f)));
+                        found.filter(Boolean).forEach(registerBoomUrl);
+                    }
+                }
+                setTimeout(initBoomSoundPool, 450);
+
+                // 復古 16-bit 合成爆炸音（僅在尚未放入 sfx/boom 檔案時作為備援）
+                let synthCtx = null;
+                function playFallbackRetroBoom() {
+                    try {
+                        const Ctx = window.AudioContext || window.webkitAudioContext;
+                        if (!Ctx) return;
+                        if (!synthCtx) synthCtx = new Ctx();
+                        if (synthCtx.state === 'suspended') synthCtx.resume();
+                        const now = synthCtx.currentTime;
+                        const dur = 0.55;
+                        const buf = synthCtx.createBuffer(1, Math.floor(synthCtx.sampleRate * dur), synthCtx.sampleRate);
+                        const ch = buf.getChannelData(0);
+                        let hold = 0;
+                        for (let i = 0; i < ch.length; i++) {
+                            if (i % 4 === 0) hold = Math.random() * 2 - 1;
+                            ch[i] = hold * Math.pow(1 - i / ch.length, 1.5);
+                        }
+                        const noise = synthCtx.createBufferSource();
+                        noise.buffer = buf;
+                        const filter = synthCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(920, now);
+                        filter.frequency.exponentialRampToValueAtTime(95, now + dur);
+                        const gain = synthCtx.createGain();
+                        gain.gain.setValueAtTime(0.45, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + dur);
+                        noise.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(synthCtx.destination);
+                        noise.start(now);
+                    } catch (e) {}
+                }
+
+                function playBoomSfx() {
+                    if (boomUrls.length > 0) {
+                        const chosen = boomUrls[Math.floor(Math.random() * boomUrls.length)];
+                        try {
+                            const player = new Audio(chosen);
+                            player.volume = 0.9;
+                            player.play().catch(() => {});
+                            return;
+                        } catch (e) {}
+                    }
+                    try {
+                        const direct = new Audio('./sfx/boom.mp3');
+                        direct.volume = 0.9;
+                        direct.play().catch(() => playFallbackRetroBoom());
+                    } catch (e) {
+                        playFallbackRetroBoom();
+                    }
+                }
+
+                // ===============================================================
+                // 🎨 讀取快取或啟動背景 Web Worker 預渲染（旋轉馬桶 + 3D 點陣爆炸）
+                // ===============================================================
+                let spinFrames = new Array(TOTAL_FRAMES).fill(null);
+                let boomFrames = new Array(EXPLODE_FRAMES).fill(null);
+                let spinReadyCount = 0;
+                let boomReadyCount = 0;
+
                 try {
                     const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
-                    if (Array.isArray(cached) && cached.length === TOTAL_FRAMES && cached[0]) {
-                        frames = cached;
-                        readyCount = TOTAL_FRAMES;
-                        setSvgImageHref(spriteImg, frames[0]);
+                    if (cached &&
+                        Array.isArray(cached.spin) && cached.spin.length === TOTAL_FRAMES && cached.spin[0] &&
+                        Array.isArray(cached.boom) && cached.boom.length === EXPLODE_FRAMES && cached.boom[0]) {
+                        spinFrames = cached.spin;
+                        boomFrames = cached.boom;
+                        spinReadyCount = TOTAL_FRAMES;
+                        boomReadyCount = EXPLODE_FRAMES;
+                        setSvgImageHref(spriteImg, spinFrames[0]);
                     }
                 } catch (e) {}
 
-                // 2. 若尚未快取，啟動獨立背景 Worker 運算（完全不佔用主畫面動畫資源）
-                if (readyCount < TOTAL_FRAMES) {
+                if (spinReadyCount < TOTAL_FRAMES || boomReadyCount < EXPLODE_FRAMES) {
                     const workerCode = `
                         const RES = ${SPRITE_RES};
                         const TOTAL = ${TOTAL_FRAMES};
+                        const BOOM_TOTAL = ${EXPLODE_FRAMES};
                         const UP = 2;
                         const OUT_RES = RES * UP;
                         const PITCH = 0.39;
@@ -1474,7 +1643,6 @@
                             return Math.sqrt(m1 * m1 + m2 * m2) + Math.min(Math.max(dXZ, dY), 0) - r;
                         }
 
-                        // 純數值距離場（零陣列建立、零記憶體垃圾回收）
                         function sdToilet(x, y, z) {
                             const dFoot = sdVertOvalCyl(x, y + 0.78, z - 0.04, 0.31, 0.43, 0.032, 0.048);
                             const dNeck = sdVertOvalCyl(x, y + 0.50, z + 0.01, 0.21, 0.31, 0.24, 0.05);
@@ -1513,6 +1681,32 @@
                         const srcBuf = new Uint8ClampedArray(RES * RES * 4);
                         const src32 = new Uint32Array(srcBuf.buffer);
                         const dst32 = new Uint32Array(OUT_RES * OUT_RES);
+                        const zBuf = new Float32Array(RES * RES);
+
+                        function quantizeWritePixel(px, py, r, g, bl) {
+                            const idx = (py * RES + px) * 4;
+                            const dither = (BAYER4[(py & 3) * 4 + (px & 3)] / 15 - 0.5) * 9;
+                            srcBuf[idx]     = Math.max(0, Math.min(255, Math.round((r + dither) / 10) * 10));
+                            srcBuf[idx + 1] = Math.max(0, Math.min(255, Math.round((g + dither) / 10) * 10));
+                            srcBuf[idx + 2] = Math.max(0, Math.min(255, Math.round((bl + dither) / 10) * 10));
+                            srcBuf[idx + 3] = 255;
+                        }
+
+                        function upscale2xToDst() {
+                            for (let y = 0; y < RES; y++) {
+                                const row0 = (y * 2) * OUT_RES;
+                                const row1 = row0 + OUT_RES;
+                                const srcRow = y * RES;
+                                for (let x = 0; x < RES; x++) {
+                                    const pxVal = src32[srcRow + x];
+                                    const dx = x * 2;
+                                    dst32[row0 + dx] = pxVal;
+                                    dst32[row0 + dx + 1] = pxVal;
+                                    dst32[row1 + dx] = pxVal;
+                                    dst32[row1 + dx + 1] = pxVal;
+                                }
+                            }
+                        }
 
                         function renderRawPixels(yawAngle) {
                             src32.fill(0);
@@ -1561,11 +1755,9 @@
                                         }
                                     }
 
-                                    const idx = (py * RES + px) * 4;
                                     if (hit) {
                                         const hx = roX + rdx * t, hy = roY + rdy * t, hz = roZ + rdz * t;
                                         const e = 0.0035;
-                                        // 四面體快速法向量計算（少算 1/3 次數）
                                         const d0 = sdToilet(hx + e, hy - e, hz - e);
                                         const d1 = sdToilet(hx - e, hy - e, hz + e);
                                         const d2 = sdToilet(hx - e, hy + e, hz - e);
@@ -1615,12 +1807,7 @@
                                             const sp = Math.min(1, spec * (hitMat === 2 ? 0.82 : 0.62));
                                             r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
                                         }
-
-                                        const dither = (BAYER4[(py & 3) * 4 + (px & 3)] / 15 - 0.5) * 9;
-                                        srcBuf[idx]     = Math.max(0, Math.min(255, Math.round((r + dither) / 10) * 10));
-                                        srcBuf[idx + 1] = Math.max(0, Math.min(255, Math.round((g + dither) / 10) * 10));
-                                        srcBuf[idx + 2] = Math.max(0, Math.min(255, Math.round((bl + dither) / 10) * 10));
-                                        srcBuf[idx + 3] = 255;
+                                        quantizeWritePixel(px, py, r, g, bl);
                                     } else if (v < -0.38 && rdy < -0.05) {
                                         const tFloor = (-0.86 - roY) / rdy;
                                         if (tFloor > 0) {
@@ -1630,6 +1817,7 @@
                                             if (ellip < 1.0) {
                                                 const bayerT = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
                                                 if ((1.0 - ellip) * 0.75 > bayerT) {
+                                                    const idx = (py * RES + px) * 4;
                                                     srcBuf[idx] = 176; srcBuf[idx + 1] = 180; srcBuf[idx + 2] = 214; srcBuf[idx + 3] = 255;
                                                 }
                                             }
@@ -1637,40 +1825,379 @@
                                     }
                                 }
                             }
+                            upscale2xToDst();
+                        }
 
-                            // 2x 硬邊像素無損放大，確保所有瀏覽器皆維持銳利復古像素感
-                            for (let y = 0; y < RES; y++) {
-                                const row0 = (y * 2) * OUT_RES;
-                                const row1 = row0 + OUT_RES;
-                                const srcRow = y * RES;
-                                for (let x = 0; x < RES; x++) {
-                                    const pxVal = src32[srcRow + x];
-                                    const dx = x * 2;
-                                    dst32[row0 + dx] = pxVal;
-                                    dst32[row0 + dx + 1] = pxVal;
-                                    dst32[row1 + dx] = pxVal;
-                                    dst32[row1 + dx + 1] = pxVal;
+                        // ===========================================================
+                        // 💥 同風格 3D 爆炸粒子配置（3ds Max 火球濃煙 + 3D 陶瓷碎片 + 馬桶水珠）
+                        // ===========================================================
+                        const PUFFS = [
+                            { x0: 0.00, y0:-0.02, z0: 0.08, vx: 0.00, vy: 0.22, vz: 0.14, r0: 0.36, r1: 0.60, heat: 0.28, f0: 0.46, f1: 0.90, ph: 0.3 },
+                            { x0:-0.14, y0: 0.16, z0: 0.12, vx:-0.58, vy: 0.48, vz: 0.28, r0: 0.22, r1: 0.46, heat: 0.14, f0: 0.48, f1: 0.96, ph: 1.1 },
+                            { x0: 0.15, y0: 0.12, z0: 0.14, vx: 0.60, vy: 0.42, vz: 0.24, r0: 0.23, r1: 0.45, heat: 0.15, f0: 0.46, f1: 0.94, ph: 2.0 },
+                            { x0: 0.02, y0: 0.28, z0:-0.12, vx: 0.08, vy: 0.72, vz:-0.26, r0: 0.24, r1: 0.48, heat: 0.12, f0: 0.52, f1: 1.00, ph: 2.9 },
+                            { x0:-0.16, y0:-0.18, z0: 0.18, vx:-0.62, vy:-0.12, vz: 0.36, r0: 0.20, r1: 0.42, heat: 0.08, f0: 0.42, f1: 0.88, ph: 3.7 },
+                            { x0: 0.17, y0:-0.16, z0: 0.16, vx: 0.64, vy:-0.08, vz: 0.32, r0: 0.20, r1: 0.42, heat: 0.08, f0: 0.42, f1: 0.88, ph: 4.5 },
+                            { x0: 0.00, y0:-0.26, z0:-0.08, vx:-0.06, vy:-0.32, vz:-0.30, r0: 0.21, r1: 0.40, heat: 0.04, f0: 0.40, f1: 0.84, ph: 5.2 },
+                            { x0:-0.10, y0: 0.04, z0: 0.24, vx:-0.34, vy: 0.20, vz: 0.56, r0: 0.19, r1: 0.38, heat: 0.20, f0: 0.44, f1: 0.90, ph: 0.8 },
+                            { x0: 0.11, y0:-0.02, z0:-0.22, vx: 0.38, vy: 0.16, vz:-0.48, r0: 0.21, r1: 0.42, heat: 0.05, f0: 0.45, f1: 0.92, ph: 1.7 },
+                            { x0:-0.22, y0: 0.26, z0:-0.04, vx:-0.74, vy: 0.68, vz:-0.10, r0: 0.14, r1: 0.31, heat:-0.02, f0: 0.50, f1: 0.98, ph: 2.4 },
+                            { x0: 0.22, y0: 0.28, z0:-0.02, vx: 0.72, vy: 0.70, vz: 0.06, r0: 0.14, r1: 0.31, heat:-0.02, f0: 0.50, f1: 0.98, ph: 3.3 },
+                            { x0:-0.06, y0: 0.40, z0: 0.06, vx:-0.18, vy: 0.90, vz: 0.12, r0: 0.15, r1: 0.34, heat: 0.02, f0: 0.55, f1: 1.00, ph: 4.1 },
+                            { x0: 0.24, y0:-0.02, z0: 0.04, vx: 0.84, vy: 0.14, vz: 0.12, r0: 0.13, r1: 0.28, heat: 0.00, f0: 0.38, f1: 0.82, ph: 4.9 },
+                            { x0:-0.24, y0: 0.00, z0: 0.06, vx:-0.82, vy: 0.18, vz: 0.16, r0: 0.13, r1: 0.28, heat: 0.00, f0: 0.38, f1: 0.82, ph: 5.8 }
+                        ];
+
+                        // 飛散的 3D 馬桶陶瓷碎片 (mat:1/2) + 金色沖水把手 (mat:4)
+                        const SHARDS = [
+                            { x0: 0.00, y0: 0.56, z0:-0.28, vx: 0.18, vy: 1.25, vz:-0.25, r: 0.15, ax: 1.35, ay: 0.72, rot0: 0.2, rv: 7.5, mat: 2 },
+                            { x0:-0.20, y0: 0.36, z0:-0.26, vx:-1.18, vy: 0.95, vz: 0.20, r: 0.13, ax: 1.20, ay: 0.82, rot0: 1.1, rv:-8.2, mat: 1 },
+                            { x0: 0.22, y0: 0.34, z0:-0.24, vx: 1.22, vy: 0.88, vz: 0.28, r: 0.13, ax: 0.80, ay: 1.25, rot0: 2.3, rv: 9.0, mat: 1 },
+                            { x0:-0.30, y0: 0.48, z0:-0.12, vx:-1.32, vy: 1.08, vz: 0.55, r: 0.09, ax: 1.45, ay: 0.65, rot0: 0.6, rv:11.0, mat: 4 },
+                            { x0:-0.24, y0: 0.02, z0: 0.22, vx:-1.25, vy: 0.48, vz: 0.65, r: 0.14, ax: 1.30, ay: 0.78, rot0: 0.9, rv:-7.8, mat: 2 },
+                            { x0: 0.25, y0: 0.02, z0: 0.20, vx: 1.28, vy: 0.52, vz: 0.58, r: 0.14, ax: 0.78, ay: 1.28, rot0: 1.8, rv: 8.4, mat: 2 },
+                            { x0: 0.02, y0:-0.05, z0: 0.36, vx: 0.15, vy: 0.36, vz: 1.05, r: 0.12, ax: 1.25, ay: 0.85, rot0: 2.7, rv:-9.5, mat: 1 },
+                            { x0:-0.16, y0:-0.48, z0: 0.06, vx:-0.96, vy:-0.15, vz: 0.42, r: 0.12, ax: 1.15, ay: 0.88, rot0: 0.4, rv: 6.8, mat: 1 },
+                            { x0: 0.16, y0:-0.48, z0: 0.06, vx: 0.98, vy:-0.12, vz: 0.38, r: 0.12, ax: 0.88, ay: 1.18, rot0: 1.5, rv:-7.2, mat: 1 }
+                        ];
+
+                        // 噴濺的 3D 亮藍馬桶水珠 (mat:3)
+                        const DROPS = [
+                            { vx:-0.82, vy: 1.42, vz: 0.42, r: 0.075 },
+                            { vx: 0.86, vy: 1.38, vz: 0.36, r: 0.075 },
+                            { vx:-0.36, vy: 1.62, vz: 0.68, r: 0.068 },
+                            { vx: 0.42, vy: 1.56, vz: 0.62, r: 0.068 },
+                            { vx:-1.12, vy: 0.88, vz: 0.52, r: 0.065 },
+                            { vx: 1.15, vy: 0.92, vz: 0.48, r: 0.065 },
+                            { vx: 0.04, vy: 1.70, vz:-0.28, r: 0.070 },
+                            { vx:-0.58, vy: 1.12, vz:-0.44, r: 0.062 }
+                        ];
+
+                        function projectPoint(wx, wy, wz, radius) {
+                            const roY = CAM_DIST * sinP, roZ = CAM_DIST * cosP;
+                            const dx = wx, dy = wy - roY, dz = wz - roZ;
+                            const cy = dy * cosP - dz * sinP;
+                            const cz = dy * sinP + dz * cosP;
+                            const depth = -cz;
+                            if (depth <= 0.4) return null;
+                            const sc = CAM_DIST / (FOV * depth);
+                            return {
+                                sx: (dx * sc + 1.0) * 0.5 * RES,
+                                sy: (1.0 - cy * sc) * 0.5 * RES,
+                                rPx: radius * sc * 0.5 * RES,
+                                depth: depth
+                            };
+                        }
+
+                        function shadeSolidMat(nxC, nyC, nzC, mat) {
+                            const lxC = -0.52, lyC = 0.66, lzC = 0.54;
+                            const ndotl = Math.max(0, nxC * lxC + nyC * lyC + nzC * lzC);
+                            const shade = Math.min(1, 0.22 + ndotl * 0.82);
+                            const hvx = lxC, hvy = lyC, hvz = lzC + 1.0;
+                            const hvInv = 1.0 / Math.sqrt(hvx * hvx + hvy * hvy + hvz * hvz);
+                            const ndoth = Math.max(0, (nxC * hvx + nyC * hvy + nzC * hvz) * hvInv);
+                            const spec = Math.pow(ndoth, mat === 4 ? 24 : 18);
+
+                            let r, g, bl;
+                            if (mat === 3) {
+                                const k = shade < 0.5 ? shade * 2 : (shade - 0.5) * 2;
+                                r  = shade < 0.5 ? 24 + 44 * k : 68 + 107 * k;
+                                g  = shade < 0.5 ? 92 + 106 * k : 198 + 46 * k;
+                                bl = shade < 0.5 ? 168 + 82 * k : 250 + 5 * k;
+                                const sp = Math.min(1, spec * 0.92);
+                                r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                            } else if (mat === 4) {
+                                const k = shade < 0.5 ? shade * 2 : (shade - 0.5) * 2;
+                                r  = shade < 0.5 ? 118 + 120 * k : 238 + 17 * k;
+                                g  = shade < 0.5 ? 68 + 108 * k : 176 + 60 * k;
+                                bl = shade < 0.5 ? 12 + 16 * k : 28 + 100 * k;
+                                const sp = Math.min(1, spec * 0.88);
+                                r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                            } else {
+                                if (shade < 0.42) {
+                                    const k = shade / 0.42;
+                                    r = 52 + 96 * k; g = 64 + 102 * k; bl = 134 + 86 * k;
+                                } else {
+                                    const k = (shade - 0.42) / 0.58;
+                                    const tr = mat === 2 ? 255 : 250, tg = mat === 2 ? 255 : 246, tb = mat === 2 ? 252 : 238;
+                                    r = 148 + (tr - 148) * k; g = 166 + (tg - 166) * k; bl = 220 + (tb - 220) * k;
                                 }
+                                const sp = Math.min(1, spec * 0.78);
+                                r += (255 - r) * sp; g += (255 - g) * sp; bl += (255 - bl) * sp;
+                            }
+                            return [r, g, bl];
+                        }
+
+                        function renderBoomPixels(fIdx) {
+                            src32.fill(0);
+                            zBuf.fill(1e9);
+
+                            const p = fIdx / (BOOM_TOTAL - 1);
+                            const burstMove = 1.0 - Math.pow(1.0 - p, 2.35);
+                            const lxC = -0.52, lyC = 0.66, lzC = 0.54;
+
+                            // 1. 繪製翻騰的 3D 火球與濃煙團（含 Bayer 點陣消散）
+                            for (let i = 0; i < PUFFS.length; i++) {
+                                const pf = PUFFS[i];
+                                let alpha = 1.0;
+                                if (p > pf.f0) {
+                                    alpha = 1.0 - (p - pf.f0) / Math.max(0.01, pf.f1 - pf.f0);
+                                }
+                                if (alpha <= 0.02) continue;
+
+                                const wx = pf.x0 + pf.vx * burstMove;
+                                const wy = pf.y0 + pf.vy * burstMove + 0.34 * p * p;
+                                const wz = pf.z0 + pf.vz * burstMove;
+                                const rad = pf.r0 + (pf.r1 - pf.r0) * Math.pow(p, 0.62);
+
+                                const proj = projectPoint(wx, wy, wz, rad * 1.18);
+                                if (!proj) continue;
+                                const baseR = proj.rPx / 1.18;
+                                const x0 = Math.max(0, Math.floor(proj.sx - proj.rPx));
+                                const x1 = Math.min(RES - 1, Math.ceil(proj.sx + proj.rPx));
+                                const y0 = Math.max(0, Math.floor(proj.sy - proj.rPx));
+                                const y1 = Math.min(RES - 1, Math.ceil(proj.sy + proj.rPx));
+                                const distCenter = Math.sqrt(wx * wx + wy * wy + wz * wz);
+
+                                for (let py = y0; py <= y1; py++) {
+                                    const dy = (proj.sy - (py + 0.5)) / baseR;
+                                    for (let px = x0; px <= x1; px++) {
+                                        const bayerVal = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
+                                        if (alpha < bayerVal) continue;
+
+                                        const dx = (px + 0.5 - proj.sx) / baseR;
+                                        const ang = Math.atan2(dy, dx);
+                                        const wobble = 1.0 + 0.11 * Math.sin(ang * 3 + pf.ph + p * 3.2) + 0.06 * Math.cos(ang * 5 - pf.ph);
+                                        const r2 = (dx * dx + dy * dy) / (wobble * wobble);
+                                        if (r2 > 1.0) continue;
+
+                                        const nz = Math.sqrt(1.0 - r2);
+                                        const zVal = proj.depth - nz * rad;
+                                        const zIdx = py * RES + px;
+                                        if (zVal >= zBuf[zIdx]) continue;
+                                        zBuf[zIdx] = zVal;
+
+                                        // 微凹凸法向量 + 光照與溫度計算
+                                        let nx = dx / wobble + 0.14 * Math.sin(dx * 4.2 + pf.ph);
+                                        let ny = dy / wobble + 0.14 * Math.cos(dy * 4.2 - pf.ph);
+                                        const nInv = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+                                        nx *= nInv; ny *= nInv; const nzz = nz * nInv;
+
+                                        const ndotl = Math.max(0, nx * lxC + ny * lyC + nzz * lzC);
+                                        const smokeShade = Math.min(1, 0.18 + ndotl * 0.82);
+
+                                        // 煙霧底色 (深靛藍暗部 -> 薰衣草灰中調 -> 暖米白亮邊)
+                                        let sr, sg, sb;
+                                        if (smokeShade < 0.48) {
+                                            const k = smokeShade / 0.48;
+                                            sr = 48 + 86 * k; sg = 58 + 86 * k; sb = 124 + 68 * k;
+                                        } else {
+                                            const k = (smokeShade - 0.48) / 0.52;
+                                            sr = 134 + 98 * k; sg = 144 + 84 * k; sb = 192 + 44 * k;
+                                        }
+
+                                        // 火焰核心溫度漸層 (亮白黃 -> 亮橘黃 -> 珊瑚紅 -> 轉為濃煙)
+                                        let temp = (fIdx === 0 ? 1.05 : (1.02 - p * 1.62)) + pf.heat + nz * 0.24 - distCenter * 0.22;
+                                        if (temp > 0.06) {
+                                            const fireMix = Math.min(1, (temp - 0.06) / 0.26);
+                                            let fr, fg, fb;
+                                            if (temp > 0.78) {
+                                                const k = Math.min(1, (temp - 0.78) / 0.30);
+                                                fr = 255; fg = 224 + 31 * k; fb = 92 + 150 * k;
+                                            } else if (temp > 0.44) {
+                                                const k = (temp - 0.44) / 0.34;
+                                                fr = 244 + 11 * k; fg = 104 + 120 * k; fb = 68 + 24 * k;
+                                            } else {
+                                                const k = Math.max(0, (temp - 0.06) / 0.38);
+                                                fr = 88 + 156 * k; fg = 58 + 46 * k; fb = 126 - 58 * k;
+                                            }
+                                            sr = sr + (fr - sr) * fireMix;
+                                            sg = sg + (fg - sg) * fireMix;
+                                            sb = sb + (fb - sb) * fireMix;
+                                        }
+                                        quantizeWritePixel(px, py, sr, sg, sb);
+                                    }
+                                }
+                            }
+
+                            // 2. 繪製飛散旋轉的 3D 陶瓷馬桶碎片與金色把手
+                            if (p < 0.88) {
+                                const shardAlpha = p < 0.66 ? 1.0 : (0.88 - p) / 0.22;
+                                for (let i = 0; i < SHARDS.length; i++) {
+                                    const sh = SHARDS[i];
+                                    const tFly = p * 1.08;
+                                    const wx = sh.x0 + sh.vx * tFly;
+                                    const wy = sh.y0 + sh.vy * tFly - 1.85 * tFly * tFly;
+                                    const wz = sh.z0 + sh.vz * tFly;
+                                    const proj = projectPoint(wx, wy, wz, sh.r * 1.35);
+                                    if (!proj) continue;
+
+                                    const baseR = proj.rPx / 1.35;
+                                    const rot = sh.rot0 + sh.rv * p;
+                                    const cR = Math.cos(rot), sR = Math.sin(rot);
+                                    const tiltX = Math.sin(rot * 1.3) * 0.45;
+                                    const tiltY = Math.cos(rot * 1.1) * 0.45;
+
+                                    const x0 = Math.max(0, Math.floor(proj.sx - proj.rPx));
+                                    const x1 = Math.min(RES - 1, Math.ceil(proj.sx + proj.rPx));
+                                    const y0 = Math.max(0, Math.floor(proj.sy - proj.rPx));
+                                    const y1 = Math.min(RES - 1, Math.ceil(proj.sy + proj.rPx));
+
+                                    for (let py = y0; py <= y1; py++) {
+                                        const dy = (proj.sy - (py + 0.5)) / baseR;
+                                        for (let px = x0; px <= x1; px++) {
+                                            if (shardAlpha < (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16) continue;
+                                            const dx = (px + 0.5 - proj.sx) / baseR;
+                                            const rx = (dx * cR - dy * sR) * sh.ax;
+                                            const ry = (dx * sR + dy * cR) * sh.ay;
+                                            const boxMetric = Math.max(Math.abs(rx), Math.abs(ry)) * 0.58 + Math.sqrt(rx * rx + ry * ry) * 0.42;
+                                            if (boxMetric > 1.0) continue;
+
+                                            const nz = Math.sqrt(Math.max(0.05, 1.0 - boxMetric * boxMetric));
+                                            const zVal = proj.depth - nz * sh.r;
+                                            const zIdx = py * RES + px;
+                                            if (zVal >= zBuf[zIdx]) continue;
+                                            zBuf[zIdx] = zVal;
+
+                                            let nx = rx * 0.65 + tiltX, ny = ry * 0.65 + tiltY;
+                                            const nInv = 1.0 / Math.sqrt(nx * nx + ny * ny + nz * nz);
+                                            const rgb = shadeSolidMat(nx * nInv, ny * nInv, nz * nInv, sh.mat);
+                                            quantizeWritePixel(px, py, rgb[0], rgb[1], rgb[2]);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 3. 繪製噴濺的 3D 馬桶水珠
+                            if (p < 0.80) {
+                                const dropAlpha = p < 0.56 ? 1.0 : (0.80 - p) / 0.24;
+                                for (let i = 0; i < DROPS.length; i++) {
+                                    const dr = DROPS[i];
+                                    const tFly = p * 1.12;
+                                    const wx = dr.vx * tFly;
+                                    const wy = 0.04 + dr.vy * tFly - 2.35 * tFly * tFly;
+                                    const wz = 0.18 + dr.vz * tFly;
+                                    const proj = projectPoint(wx, wy, wz, dr.r);
+                                    if (!proj || proj.rPx < 0.8) continue;
+
+                                    const x0 = Math.max(0, Math.floor(proj.sx - proj.rPx));
+                                    const x1 = Math.min(RES - 1, Math.ceil(proj.sx + proj.rPx));
+                                    const y0 = Math.max(0, Math.floor(proj.sy - proj.rPx));
+                                    const y1 = Math.min(RES - 1, Math.ceil(proj.sy + proj.rPx));
+
+                                    for (let py = y0; py <= y1; py++) {
+                                        const dy = (proj.sy - (py + 0.5)) / proj.rPx;
+                                        for (let px = x0; px <= x1; px++) {
+                                            if (dropAlpha < (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16) continue;
+                                            const dx = (px + 0.5 - proj.sx) / proj.rPx;
+                                            const r2 = dx * dx + dy * dy;
+                                            if (r2 > 1.0) continue;
+                                            const nz = Math.sqrt(1.0 - r2);
+                                            const zVal = proj.depth - nz * dr.r;
+                                            const zIdx = py * RES + px;
+                                            if (zVal >= zBuf[zIdx]) continue;
+                                            zBuf[zIdx] = zVal;
+
+                                            const rgb = shadeSolidMat(dx, dy, nz, 3);
+                                            quantizeWritePixel(px, py, rgb[0], rgb[1], rgb[2]);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 4. 繪製 3D 透視震波環 (前後真實深度遮擋) 與地面漸散暗影
+                            const roY = CAM_DIST * sinP, roZ = CAM_DIST * cosP;
+                            const showWave = p < 0.38;
+                            const waveR = 0.24 + (p / 0.38) * 0.92;
+                            const waveThick = 0.11 * (1.0 - p / 0.42);
+                            const waveAlpha = showWave ? (1.0 - p / 0.38) : 0;
+                            const shadowScale = 1.0 + Math.sin(Math.min(1, p * 1.4) * Math.PI) * 0.45;
+                            const shadowFade = Math.max(0, 1.0 - p * 1.18);
+
+                            for (let py = 0; py < RES; py++) {
+                                const v = 1.0 - ((py + 0.5) / RES) * 2.0;
+                                for (let px = 0; px < RES; px++) {
+                                    const u = ((px + 0.5) / RES) * 2.0 - 1.0;
+                                    let rdxC = u * FOV, rdyC = v * FOV, rdzC = -CAM_DIST;
+                                    const invL = 1.0 / Math.sqrt(rdxC * rdxC + rdyC * rdyC + rdzC * rdzC);
+                                    rdxC *= invL; rdyC *= invL; rdzC *= invL;
+
+                                    const rdx = rdxC;
+                                    const rdy = rdyC * cosP + rdzC * sinP;
+                                    const rdz = -rdyC * sinP + rdzC * cosP;
+                                    if (rdy >= -0.03) continue;
+
+                                    const zIdx = py * RES + px;
+                                    const bayerT = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
+
+                                    // 3D 水平震波環 (y = -0.04)
+                                    if (showWave) {
+                                        const tWave = (-0.04 - roY) / rdy;
+                                        if (tWave > 0 && tWave < zBuf[zIdx]) {
+                                            const wx = rdx * tWave;
+                                            const wz = roZ + rdz * tWave - 0.06;
+                                            const dist = Math.sqrt(wx * wx + wz * wz);
+                                            const diff = Math.abs(dist - waveR);
+                                            if (diff < waveThick) {
+                                                const ringStr = (1.0 - diff / waveThick) * waveAlpha;
+                                                if (ringStr > bayerT * 0.85) {
+                                                    zBuf[zIdx] = tWave;
+                                                    quantizeWritePixel(px, py, 255, 245, 158);
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // 地面點陣陰影 (當該像素尚未被火球或碎片遮擋時繪製)
+                                    if (shadowFade > 0.05 && zBuf[zIdx] > 1e8) {
+                                        const tFloor = (-0.86 - roY) / rdy;
+                                        if (tFloor > 0) {
+                                            const fx = (rdx * tFloor) / (0.48 * shadowScale);
+                                            const fz = (roZ + rdz * tFloor - 0.04) / (0.60 * shadowScale);
+                                            const ellip = Math.sqrt(fx * fx + fz * fz);
+                                            if (ellip < 1.0 && (1.0 - ellip) * 0.72 * shadowFade > bayerT) {
+                                                const idx = zIdx * 4;
+                                                srcBuf[idx] = 176; srcBuf[idx + 1] = 180; srcBuf[idx + 2] = 214; srcBuf[idx + 3] = 255;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            upscale2xToDst();
+                        }
+
+                        async function emitFrame(kind, idx, offCanvas, offCtx, reader) {
+                            if (offCtx && reader) {
+                                offCtx.putImageData(new ImageData(new Uint8ClampedArray(dst32.buffer.slice(0)), OUT_RES, OUT_RES), 0, 0);
+                                const blob = await offCanvas.convertToBlob({ type: 'image/png' });
+                                self.postMessage({ kind, idx, dataUrl: reader.readAsDataURL(blob) });
+                            } else {
+                                const copy = new Uint8ClampedArray(dst32.buffer.slice(0));
+                                self.postMessage({ kind, idx, rawBuffer: copy.buffer, size: OUT_RES }, [copy.buffer]);
                             }
                         }
 
                         async function runAll() {
-                            const hasOffscreen = typeof OffscreenCanvas !== 'undefined' && typeof FileReaderSync !== 'undefined';
-                            const offCanvas = hasOffscreen ? new OffscreenCanvas(OUT_RES, OUT_RES) : null;
+                            const hasOff = typeof OffscreenCanvas !== 'undefined' && typeof FileReaderSync !== 'undefined';
+                            const offCanvas = hasOff ? new OffscreenCanvas(OUT_RES, OUT_RES) : null;
                             const offCtx = offCanvas ? offCanvas.getContext('2d') : null;
-                            const reader = hasOffscreen ? new FileReaderSync() : null;
+                            const reader = hasOff ? new FileReaderSync() : null;
 
-                            for (let i = 0; i < TOTAL; i++) {
+                            // 1. 第一時間送出第 0 格馬桶畫面
+                            renderRawPixels(0);
+                            await emitFrame('spin', 0, offCanvas, offCtx, reader);
+
+                            // 2. 接著預渲染 16 格 3D 爆炸畫面（僅需數毫秒，確保隨時點擊都能瞬間引爆）
+                            for (let b = 0; b < BOOM_TOTAL; b++) {
+                                renderBoomPixels(b);
+                                await emitFrame('boom', b, offCanvas, offCtx, reader);
+                            }
+
+                            // 3. 完成剩餘旋轉馬桶格數
+                            for (let i = 1; i < TOTAL; i++) {
                                 renderRawPixels((i / TOTAL) * Math.PI * 2);
-                                if (offCtx && reader) {
-                                    offCtx.putImageData(new ImageData(new Uint8ClampedArray(dst32.buffer.slice(0)), OUT_RES, OUT_RES), 0, 0);
-                                    const blob = await offCanvas.convertToBlob({ type: 'image/png' });
-                                    const dataUrl = reader.readAsDataURL(blob);
-                                    self.postMessage({ idx: i, dataUrl });
-                                } else {
-                                    const copy = new Uint8ClampedArray(dst32.buffer.slice(0));
-                                    self.postMessage({ idx: i, rawBuffer: copy.buffer, size: OUT_RES }, [copy.buffer]);
-                                }
+                                await emitFrame('spin', i, offCanvas, offCtx, reader);
                             }
                             self.postMessage({ done: true });
                         }
@@ -1688,8 +2215,8 @@
                                 URL.revokeObjectURL(blobUrl);
                                 worker.terminate();
                                 try {
-                                    if (frames.every(Boolean)) {
-                                        sessionStorage.setItem(CACHE_KEY, JSON.stringify(frames));
+                                    if (spinFrames.every(Boolean) && boomFrames.every(Boolean)) {
+                                        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ spin: spinFrames, boom: boomFrames }));
                                     }
                                 } catch (err) {}
                                 return;
@@ -1707,27 +2234,108 @@
                                 url = fallbackCanvas.toDataURL('image/png');
                             }
 
-                            frames[msg.idx] = url;
-                            readyCount++;
-                            if (msg.idx === 0) setSvgImageHref(spriteImg, url);
+                            if (msg.kind === 'boom') {
+                                boomFrames[msg.idx] = url;
+                                boomReadyCount++;
+                            } else {
+                                spinFrames[msg.idx] = url;
+                                spinReadyCount++;
+                                if (msg.idx === 0 && mode === 'spin') {
+                                    setSvgImageHref(spriteImg, url);
+                                }
+                            }
                         };
                     } catch (err) {}
                 }
 
-                // 3. 輕量播放迴圈（只負責切換已算好的貼圖，0 運算負擔）
-                let currentPlayIdx = 0;
+                // ===============================================================
+                // 🎮 互動狀態機：旋轉 (spin) -> 點擊爆炸 (explode) -> 冷卻 -> 彈跳重生
+                // ===============================================================
+                let mode = 'spin'; // 'spin' | 'explode' | 'cooldown' | 'respawn'
+                let currentSpinIdx = 0;
+                let currentBoomIdx = 0;
+                let respawnStep = 0;
                 let lastStepTime = performance.now();
-                const frameInterval = 1000 / SPIN_FPS;
+                let isHovering = false;
+
+                const RESPAWN_SCALES = [0.32, 1.12, 0.95, 1.0];
+                const SHAKE_OFFSETS = [[-3.5, 2], [3.5, -2.5], [-2.5, -1.5], [2.5, 1.5], [0, 0]];
+
+                hitboxEl.addEventListener('mouseenter', () => {
+                    isHovering = true;
+                    if (mode === 'spin') spriteImg.style.transform = 'scale(1.07)';
+                });
+                hitboxEl.addEventListener('mouseleave', () => {
+                    isHovering = false;
+                    if (mode === 'spin') spriteImg.style.transform = 'scale(1)';
+                });
+
+                hitboxEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (mode !== 'spin') return;
+
+                    playBoomSfx();
+                    mode = 'explode';
+                    currentBoomIdx = 0;
+                    lastStepTime = performance.now() - 1000;
+                    hitboxEl.style.pointerEvents = 'none';
+                    spriteImg.style.transition = 'none';
+                    spriteImg.style.transform = 'scale(1)';
+                });
+
                 const mainStageEl = document.querySelector('main');
 
                 function tick(now) {
-                    if (readyCount > 0 && (!mainStageEl || !mainStageEl.classList.contains('hidden'))) {
-                        if (now - lastStepTime >= frameInterval) {
-                            lastStepTime = now;
-                            const nextIdx = (currentPlayIdx + 1) % TOTAL_FRAMES;
-                            if (frames[nextIdx]) {
-                                currentPlayIdx = nextIdx;
-                                setSvgImageHref(spriteImg, frames[currentPlayIdx]);
+                    if (!mainStageEl || !mainStageEl.classList.contains('hidden')) {
+                        if (mode === 'spin') {
+                            if (spinReadyCount > 0 && now - lastStepTime >= (1000 / SPIN_FPS)) {
+                                lastStepTime = now;
+                                const nextIdx = (currentSpinIdx + 1) % TOTAL_FRAMES;
+                                if (spinFrames[nextIdx]) {
+                                    currentSpinIdx = nextIdx;
+                                    setSvgImageHref(spriteImg, spinFrames[currentSpinIdx]);
+                                }
+                            }
+                        } else if (mode === 'explode') {
+                            if (now - lastStepTime >= (1000 / EXPLODE_FPS)) {
+                                if (currentBoomIdx < EXPLODE_FRAMES) {
+                                    const bUrl = boomFrames[currentBoomIdx];
+                                    if (bUrl) {
+                                        lastStepTime = now;
+                                        setSvgImageHref(spriteImg, bUrl);
+                                        const shk = SHAKE_OFFSETS[currentBoomIdx] || [0, 0];
+                                        shakeWrap.setAttribute('transform', `translate(${shk[0]}, ${shk[1]})`);
+                                        currentBoomIdx++;
+                                    }
+                                } else {
+                                    shakeWrap.setAttribute('transform', 'translate(0, 0)');
+                                    spriteImg.style.opacity = '0';
+                                    mode = 'cooldown';
+                                    lastStepTime = now;
+                                }
+                            }
+                        } else if (mode === 'cooldown') {
+                            if (now - lastStepTime >= 360) {
+                                mode = 'respawn';
+                                respawnStep = 0;
+                                lastStepTime = now - 1000;
+                                if (spinFrames[currentSpinIdx]) {
+                                    setSvgImageHref(spriteImg, spinFrames[currentSpinIdx]);
+                                }
+                                spriteImg.style.opacity = '1';
+                            }
+                        } else if (mode === 'respawn') {
+                            if (now - lastStepTime >= 48) {
+                                lastStepTime = now;
+                                if (respawnStep < RESPAWN_SCALES.length) {
+                                    spriteImg.style.transform = `scale(${RESPAWN_SCALES[respawnStep]})`;
+                                    respawnStep++;
+                                } else {
+                                    mode = 'spin';
+                                    hitboxEl.style.pointerEvents = 'auto';
+                                    spriteImg.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+                                    spriteImg.style.transform = isHovering ? 'scale(1.07)' : 'scale(1)';
+                                }
                             }
                         }
                     }

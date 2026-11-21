@@ -15,10 +15,7 @@
     <link rel="preload" as="image" href="./img/pfp/free_toilet.png">
     <link rel="preload" as="image" href="./img/pfp/free_squat.png">
     <link rel="preload" as="image" href="./img/pfp/free_urinal.png">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    
 
     <style>
         :root {
@@ -41,29 +38,65 @@
             font-display: swap;
         }
 
+        html {
+            background-color: #D2F7EC;
+        }
+
         body {
             font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
-            /* 薄荷綠磁磚底色 + 米色直線與橫線磚縫 */
-            background-color: #D2F7EC;
-            background-image:
-                linear-gradient(to right, #FCF5E5 9px, transparent 9px),
-                linear-gradient(to bottom, #FCF5E5 9px, transparent 9px);
-            background-size: 156px 156px;
-            background-position: center -18px;
+            background-color: transparent;
             color: var(--poogle-navy);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
 
-        /* 手機版磁磚格縮小，維持畫面比例協調 */
+        /* 電玩 Menu 風：緩緩向斜方平行移動的薄荷綠磁磚網格背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -156px;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #D2F7EC;
+            background-image:
+                linear-gradient(to right, #FCF5E5 9px, transparent 9px),
+                linear-gradient(to bottom, #FCF5E5 9px, transparent 9px);
+            background-size: 156px 156px;
+            will-change: transform;
+            /* 10s 控制移動速度（秒數調大更慢、調小更快） */
+            animation: menuGridDriftDesktop 10s linear infinite;
+        }
+
+        @keyframes menuGridDriftDesktop {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+            100% {
+                /* 往右下方斜向平行移動（若想改往左上方移動，改為 -156px, -156px 即可） */
+                transform: translate3d(156px, 156px, 0);
+            }
+        }
+
+        /* 手機版磁磚格等比例縮小並同步斜移 */
         @media (max-width: 767px) {
-            body {
+            body::before {
+                inset: -104px;
                 background-image:
                     linear-gradient(to right, #FCF5E5 6px, transparent 6px),
                     linear-gradient(to bottom, #FCF5E5 6px, transparent 6px);
                 background-size: 104px 104px;
-                background-position: center top;
+                animation-name: menuGridDriftMobile;
+            }
+        }
+
+        @keyframes menuGridDriftMobile {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+            100% {
+                /* 若電腦版改為負數往左上移動，這裡也同步改為 -104px, -104px */
+                transform: translate3d(104px, 104px, 0);
             }
         }
 
@@ -141,25 +174,21 @@
 
         .toilet-sheet-unroll {
             animation: unrollSheetClip 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-play-state: paused;
         }
 
         .toilet-roll-unroll {
             animation: unrollCylinderDown 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-play-state: paused;
         }
 
-        /* 畫面就緒前先保持奶油底色隱藏，圖片就緒後瞬間平滑顯現並啟動動畫 */
-        body.page-cloak {
-            opacity: 0;
+        /* 確保 Tailwind 尚未載入完成前，隱藏中的彈窗與選單不會閃現 */
+        .hidden:not(.md\:block):not(.md\:flex) {
+            display: none !important;
         }
-        body.page-ready {
-            opacity: 1;
-            transition: opacity 0.22s ease-out;
-        }
-        body.page-ready .toilet-sheet-unroll,
-        body.page-ready .toilet-roll-unroll {
-            animation-play-state: running;
+        @media (max-width: 767px) {
+            .hidden.md\:block,
+            .hidden.md\:flex {
+                display: none !important;
+            }
         }
 
         /* 獎品櫥窗粉紅店員探頭動畫 */
@@ -456,11 +485,37 @@
         .wa-style-8::after {
             color: #FFFFFF;
         }
+        /* 使用者名稱載入時的彈性 Pop 彈出效果（使用獨立 scale 避免覆蓋 WordArt 傾斜變形） */
+        .wordart-user {
+            opacity: 0;
+            scale: 0.2;
+        }
+        .wordart-user.user-pop-in {
+            animation: userNamePopIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+        }
+
+        @keyframes userNamePopIn {
+            0% {
+                opacity: 0;
+                scale: 0.2;
+            }
+            62% {
+                opacity: 1;
+                scale: 1.18;
+            }
+            82% {
+                opacity: 1;
+                scale: 0.95;
+            }
+            100% {
+                opacity: 1;
+                scale: 1;
+            }
+        }
     </style>
 </head>
 
-<body class="page-cloak min-h-screen w-full flex flex-col justify-between select-none relative">
-
+<body class="min-h-screen w-full flex flex-col justify-between select-none relative">
     <!-- =================================================================== -->
     <!-- 電腦版頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (手機版隱藏)           -->
     <!-- =================================================================== -->
@@ -1312,7 +1367,10 @@
             </div>
         </div>
     </div>
-
+<!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script>
         // ===================================================================
         // Firebase 初始化與全域狀態
@@ -1854,6 +1912,8 @@
 
         const SESSION_WORDART_CLASS = pickNonRepeatingWordArtClass();
 
+        let lastPoppedUserName = '';
+
         function renderProfileHeaderAndAvatar() {
             const nameEl = document.getElementById('displayUserNameText');
             if (nameEl) {
@@ -1862,7 +1922,17 @@
                 nameEl.setAttribute('data-text', finalName);
                 WORDART_STYLE_CLASSES.forEach((cls) => nameEl.classList.remove(cls));
                 nameEl.classList.add('wordart-user', SESSION_WORDART_CLASS);
+
+                // 載入頁面（或從預設 OOO 更新為真實用戶名稱）時觸發 Pop 彈出
+                if (finalName !== lastPoppedUserName) {
+                    lastPoppedUserName = finalName;
+                    nameEl.classList.remove('user-pop-in');
+                    void nameEl.offsetWidth; // 重新觸發動畫
+                    nameEl.classList.add('user-pop-in');
+                }
             }
+
+            // ...（下方原有的 normalizedKey 與頭貼渲染程式碼維持不變）...
 
             const normalizedKey = normalizeLoggedInAvatarType(profileState.avatarType);
             profileState.avatarType = normalizedKey;
