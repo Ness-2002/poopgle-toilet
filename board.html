@@ -18,6 +18,9 @@
             }
         }, true);
     </script>
+    <!-- 優先預載遊戲機對戰畫面小怪 PNG，消除載入時間差 -->
+    <link rel="preload" as="image" href="./img/hardware/mirror_dirty.png">
+    <link rel="preload" as="image" href="./img/hardware/sink_trash.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts 圓體備援 + jf open 粉圓體 (jf-openhuninn) -->
@@ -218,8 +221,19 @@
             50% { opacity: 0.45; }
         }
 
+        #leftFighterPortraitFallback,
+        #rightFighterPortraitFallback,
+        #leftFighterStageFallback,
+        #rightFighterStageFallback,
+        #rightDoorPeekMonsterFallback {
+            display: none !important;
+        }
+
         #consoleEntranceMover {
+            opacity: 0;
             transform-origin: 720px 390px;
+        }
+        #consoleEntranceMover.is-ready {
             animation: consoleStageAppear 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
@@ -1828,56 +1842,57 @@
                 (window.location.hostname || '').includes('googleusercontent.com')
             );
 
-            function upgradeFighterPng(candidates, stageImgId, stageFallbackId, portraitImgId, portraitFallbackId) {
-                if (isPreviewSandbox) return;
-                let idx = 0;
-                const tryNext = () => {
-                    if (idx >= candidates.length) return;
-                    const url = candidates[idx++];
-                    const probe = new Image();
-                    probe.onload = () => {
-                        const stageImg = document.getElementById(stageImgId);
-                        const stageFallback = document.getElementById(stageFallbackId);
-                        const portraitImg = document.getElementById(portraitImgId);
-                        const portraitFallback = document.getElementById(portraitFallbackId);
+            // 預載並完成點陣圖解碼 (decode) 後寫入 SVG，確保畫面出現瞬間即為完整清晰 PNG
+            function preloadFighterPng(candidates, stageImgId, portraitImgId) {
+                if (isPreviewSandbox) return Promise.resolve();
 
-                        if (stageImg) {
-                            stageImg.setAttribute('href', url);
-                            stageImg.classList.remove('hidden');
+                return new Promise((resolve) => {
+                    let idx = 0;
+                    const tryNext = () => {
+                        if (idx >= candidates.length) {
+                            resolve();
+                            return;
                         }
-                        stageFallback?.classList.add('hidden');
+                        const url = candidates[idx++];
+                        const probe = new Image();
+                        probe.decoding = 'async';
+                        probe.onload = () => {
+                            const applyToSvg = () => {
+                                const stageImg = document.getElementById(stageImgId);
+                                const portraitImg = document.getElementById(portraitImgId);
 
-                        if (portraitImg) {
-                            portraitImg.setAttribute('href', url);
-                            portraitImg.classList.remove('hidden');
-                        }
-                        portraitFallback?.classList.add('hidden');
+                                if (stageImg) {
+                                    stageImg.setAttribute('href', url);
+                                    stageImg.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+                                    stageImg.classList.remove('hidden');
+                                }
+                                if (portraitImg) {
+                                    portraitImg.setAttribute('href', url);
+                                    portraitImg.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+                                    portraitImg.classList.remove('hidden');
+                                }
+                                resolve();
+                            };
+
+                            if (typeof probe.decode === 'function') {
+                                probe.decode().catch(() => {}).finally(applyToSvg);
+                            } else {
+                                applyToSvg();
+                            }
+                        };
+                        probe.onerror = tryNext;
+                        probe.src = url;
                     };
-                    probe.onerror = tryNext;
-                    probe.src = url;
-                };
-                tryNext();
+                    tryNext();
+                });
             }
 
-            upgradeFighterPng(
-                ['./img/hardware/mirror_dirty.png', './img/hardware/mirror_dirty.PNG', 'img/hardware/mirror_dirty.png'],
-                'leftFighterStageImg', 'leftFighterStageFallback',
-                'leftFighterPortraitImg', 'leftFighterPortraitFallback'
-            );
-
-            upgradeFighterPng(
-                ['./img/hardware/sink_trash.png', './img/hardware/sink_trash.PNG', 'img/hardware/sink_trash.png'],
-                'rightFighterStageImg', 'rightFighterStageFallback',
-                'rightFighterPortraitImg', 'rightFighterPortraitFallback'
-            );
-
             // ===============================================================
-            // 3. 開場過場動畫時間軸：
-            //    遊戲機登場 ➔ 雲朵 Pop ➔ 公廁現況板依序 Pop ➔ START Pop
-            //    ➔ 遊戲機 3D 轉向翻至背面 Nintenpoo 並縮小飛入粉紅小鳥手中
+            // 3. 開場過場動畫時間軸（等待小怪 PNG 預載解碼完成後才正式登場）
             // ===============================================================
             const boardFinalSceneSvg = document.getElementById('boardFinalSceneSvg');
             const consoleTitleStage = document.getElementById('consoleTitleStage');
+            const consoleEntranceMover = document.getElementById('consoleEntranceMover');
             const cloudPopTarget = document.getElementById('cloudPopTarget');
             const startPopTarget = document.getElementById('startPopTarget');
 
@@ -1894,28 +1909,50 @@
             const birdHandsStatic = document.getElementById('birdHandsStatic');
             const pinkBirdCatchBounceGroup = document.getElementById('pinkBirdCatchBounceGroup');
 
-            // 步驟 1：遊戲機登場後，雲朵先 Pop 出來 (520ms)
-            setTimeout(() => {
-                cloudPopTarget?.classList.add('is-popped');
-            }, 520);
+            function startConsoleIntroSequence() {
+                // 等待一個繪製幀確保 SVG 材質已貼上，再讓遊戲機彈出登場
+                requestAnimationFrame(() => {
+                    consoleEntranceMover?.classList.add('is-ready');
 
-            // 步驟 2：「公、廁、現、況、板」五個字依序 Pop 出現 (960ms ~ 1600ms)
-            const charTimings = [960, 1120, 1280, 1440, 1600];
-            charTimings.forEach((delayMs, idx) => {
-                setTimeout(() => {
-                    document.getElementById(`titleChar_${idx}`)?.classList.add('is-popped');
-                }, delayMs);
-            });
+                    // 步驟 1：遊戲機登場後，雲朵先 Pop 出來 (520ms)
+                    setTimeout(() => {
+                        cloudPopTarget?.classList.add('is-popped');
+                    }, 520);
 
-            // 步驟 3：下螢幕出現 START 文字 (2020ms)
-            setTimeout(() => {
-                startPopTarget?.classList.add('is-popped');
-            }, 2020);
+                    // 步驟 2：「公、廁、現、況、板」五個字依序 Pop 出現 (960ms ~ 1600ms)
+                    const charTimings = [960, 1120, 1280, 1440, 1600];
+                    charTimings.forEach((delayMs, idx) => {
+                        setTimeout(() => {
+                            document.getElementById(`titleChar_${idx}`)?.classList.add('is-popped');
+                        }, delayMs);
+                    });
 
-            // 步驟 4：遊戲機轉向（180° 翻面露背）並縮小到粉紅小鳥手中 (2720ms 啟動)
-            setTimeout(() => {
-                startConsoleFlipAndShrinkToBird();
-            }, 2720);
+                    // 步驟 3：下螢幕出現 START 文字 (2020ms)
+                    setTimeout(() => {
+                        startPopTarget?.classList.add('is-popped');
+                    }, 2020);
+
+                    // 步驟 4：遊戲機轉向（180° 翻面露背）並縮小到粉紅小鳥手中 (2720ms 啟動)
+                    setTimeout(() => {
+                        startConsoleFlipAndShrinkToBird();
+                    }, 2720);
+                });
+            }
+
+            // 同步預載兩隻對戰小怪 PNG（附 800ms 安全逾時保底，防止缺檔卡住畫面）
+            Promise.race([
+                Promise.all([
+                    preloadFighterPng(
+                        ['./img/hardware/mirror_dirty.png', './img/hardware/mirror_dirty.PNG', 'img/hardware/mirror_dirty.png'],
+                        'leftFighterStageImg', 'leftFighterPortraitImg'
+                    ),
+                    preloadFighterPng(
+                        ['./img/hardware/sink_trash.png', './img/hardware/sink_trash.PNG', 'img/hardware/sink_trash.png'],
+                        'rightFighterStageImg', 'rightFighterPortraitImg'
+                    )
+                ]),
+                new Promise((res) => setTimeout(res, 800))
+            ]).then(startConsoleIntroSequence);
 
             function startConsoleFlipAndShrinkToBird() {
                 const durationMs = 1260;
