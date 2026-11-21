@@ -499,7 +499,7 @@
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-                <a href="./board.html" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+                <a href="./board.html" class="hover:opacity-70 transition-opacity">公廁現況板</a>
                 <a href="./handbook.html" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
@@ -598,7 +598,7 @@
 
                 <a href="./board.html" class="tp-menu-item">
                     <rect x="8" y="226" width="180" height="48" fill="transparent" />
-                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況板</text>
                 </a>
 
                 <a href="./handbook.html" class="tp-menu-item">
@@ -852,7 +852,7 @@
                         <ellipse cx="329.7" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
                         <ellipse cx="329.7" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
                         <text x="329.7" y="344.6" text-anchor="middle" fill="#2A348C" font-size="23.8" font-weight="900">
-                            <tspan>留</tspan><tspan dx="4">言</tspan><tspan dx="4">版</tspan>
+                            <tspan>留</tspan><tspan dx="4">言</tspan><tspan dx="4">板</tspan>
                         </text>
                     </g>
 
@@ -960,7 +960,7 @@
                         <path d="M1126.5,241.9c0-0.3,0-0.6,0-0.9c0-12.9-9.4-23.3-21-23.3c-11.6,0-21,10.4-21,23.3c0,0.3,0,0.6,0,0.9H1126.5z" fill="#FFF9EC" />
                         <path d="M1167.2,255.7H1092c-4.2,0-7.6-3.4-7.6-7.6v-7h82.8c3.2,0,5.7,2.6,5.7,5.7v3.1C1173,253.2,1170.4,255.7,1167.2,255.7z" fill="#FFF9EC" />
                         <text x="1128.7" y="344.6" text-anchor="middle" fill="#2A348C" font-size="23.8" font-weight="900">
-                            <tspan>小</tspan><tspan dx="4">怪</tspan><tspan dx="4">現</tspan><tspan dx="4">況</tspan><tspan dx="4">版</tspan>
+                            <tspan>小</tspan><tspan dx="4">怪</tspan><tspan dx="4">現</tspan><tspan dx="4">況</tspan><tspan dx="4">板</tspan>
                         </text>
                     </g>
 
@@ -4223,13 +4223,18 @@
                 return Array.from(mapById.values()).sort((a, b) => b.count - a.count);
             }
 
+            const MONSTER_RED_WITHIN_MINS = 10;   // 10 分鐘內呈現紅字
+            const MONSTER_RED_INCLUDE_NAME = true; // true = 名字與時間皆紅字；false = 僅時間紅字
+
             function formatMonsterRelativeTime(latestTimeMs, nowMs = Date.now()) {
                 const diffMins = Math.max(1, Math.floor(Math.max(0, nowMs - latestTimeMs) / 60000));
+                const isWithin10Mins = diffMins <= MONSTER_RED_WITHIN_MINS;
+
                 if (diffMins < 60) {
-                    return { label: `${diffMins}分鐘前`, isRecentMinutes: true };
+                    return { label: `${diffMins}分鐘前`, isWithin10Mins };
                 }
                 const diffHours = Math.min(23, Math.floor(diffMins / 60));
-                return { label: `${diffHours}小時前`, isRecentMinutes: false };
+                return { label: `${diffHours}小時前`, isWithin10Mins: false };
             }
 
             function renderMonsterBoardHeaderAndStars() {
@@ -4380,15 +4385,17 @@
                 el.dataset.monsterId = mItem.id;
 
                 const relTime = formatMonsterRelativeTime(mItem.latestTimeMs);
-                const timeColorClass = relTime.isRecentMinutes ? 'text-[#F26559]' : 'text-[#273491]';
+                const isRed = relTime.isWithin10Mins;
+                const nameColorClass = (isRed && MONSTER_RED_INCLUDE_NAME) ? 'text-[#F26559]' : 'text-[#273491]';
+                const timeColorClass = isRed ? 'text-[#F26559]' : 'text-[#273491]';
 
                 el.innerHTML = `
                     <div class="mk-walker-inner flex flex-col items-center">
                         <div class="mb-1.5 flex flex-col items-center text-center whitespace-nowrap">
-                            <span class="mk-walker-name text-[#273491] text-[16px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">
+                            <span class="mk-walker-name ${nameColorClass} text-[16px] sm:text-[21px] font-black tracking-[0.1em] leading-snug transition-colors duration-300">
                                 ${escapeHtmlBoard(mItem.name)}
                             </span>
-                            <span class="mk-walker-time ${timeColorClass} text-[11.5px] sm:text-[14px] font-extrabold tracking-[0.08em] leading-tight mt-0.5">
+                            <span class="mk-walker-time ${timeColorClass} text-[11.5px] sm:text-[14px] font-extrabold tracking-[0.08em] leading-tight mt-0.5 transition-colors duration-300">
                                 ${escapeHtmlBoard(relTime.label)}
                             </span>
                         </div>
@@ -4509,11 +4516,23 @@
             }
 
             function refreshSingleWalkerTimeText(walker, nowMs = Date.now()) {
-                if (!walker || !walker.timeEl) return;
+                if (!walker || !walker.el) return;
                 const rel = formatMonsterRelativeTime(walker.latestTimeMs, nowMs);
-                walker.timeEl.textContent = rel.label;
-                walker.timeEl.classList.toggle('text-[#F26559]', rel.isRecentMinutes);
-                walker.timeEl.classList.toggle('text-[#273491]', !rel.isRecentMinutes);
+                const isRed = rel.isWithin10Mins;
+                const nameIsRed = isRed && MONSTER_RED_INCLUDE_NAME;
+
+                const nameEl = walker.el.querySelector('.mk-walker-name');
+                const timeEl = walker.timeEl || walker.el.querySelector('.mk-walker-time');
+
+                if (nameEl) {
+                    nameEl.classList.toggle('text-[#F26559]', nameIsRed);
+                    nameEl.classList.toggle('text-[#273491]', !nameIsRed);
+                }
+                if (timeEl) {
+                    timeEl.textContent = rel.label;
+                    timeEl.classList.toggle('text-[#F26559]', isRed);
+                    timeEl.classList.toggle('text-[#273491]', !isRed);
+                }
             }
 
             function computeCurrentMonsterDataSignature() {
@@ -4789,7 +4808,7 @@
                 exitMonsterBoardToThreeDoors();
             });
 
-            // 在小怪板內點擊導覽列「公廁現況版」同樣可直接返回三扇門畫面
+            // 在小怪板內點擊導覽列「公廁現況板」同樣可直接返回三扇門畫面
             document.querySelectorAll('a[href="./board.html"]').forEach((linkEl) => {
                 linkEl.addEventListener('click', (e) => {
                     if (mkState.isOpen) {

@@ -716,7 +716,7 @@
             <a href="./index.html" data-rating-nav="home" class="hover:opacity-70 transition-opacity">首頁</a>
             <a href="./index.html?openReport=1" data-rating-nav="report" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
             <a href="./map.html" data-rating-nav="map" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-            <a href="./board.html" data-rating-nav="board" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+            <a href="./board.html" data-rating-nav="board" class="hover:opacity-70 transition-opacity">公廁現況板</a>
 <a href="./handbook.html" data-rating-nav="handbook" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
             <a href="./profile.html" data-rating-nav="profile" class="hover:opacity-70 transition-opacity">個人空間</a>
         </div>
@@ -771,10 +771,10 @@
                         <text x="22" y="193" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
                     </g>
 
-                    <!-- 選單項目 3：公廁現況版 -->
+                    <!-- 選單項目 3：公廁現況板 -->
                     <g id="ratingTpMenuStatusBoardBtn" class="rating-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="226" width="180" height="48" fill="transparent" />
-                        <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                        <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況板</text>
                     </g>
 
                     <!-- 選單項目 4：小怪圖鑑 -->
@@ -2598,7 +2598,7 @@
             </button>
         </div>
     </div>
-    <!-- 施工中彈窗 (供手機版漢堡選單點擊「公廁現況版 / 小怪圖鑑」使用) -->
+    <!-- 施工中彈窗 (供手機版漢堡選單點擊「公廁現況板 / 小怪圖鑑」使用) -->
     <div id="ratingUnderConstructionModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
             <button id="closeRatingUnderConstructionBtn" type="button" aria-label="關閉"
@@ -6432,7 +6432,7 @@ function clearLegacyDeviceReporterId() {
             document.getElementById('ratingTpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     closeRatingTpDropdownMenu(false);
-    requestLeaveRatingPage('./board.html', false); // 👈 改為連結到公廁現況版
+    requestLeaveRatingPage('./board.html', false); // 👈 改為連結到公廁現況板
 });
 document.getElementById('ratingTpMenuMonsterDexBtn')?.addEventListener('click', (e) => {
     e.stopPropagation();

@@ -337,7 +337,7 @@
             animation: waterSplashRise 0.46s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
         }
 
-        /* 3. 粉紅便便「公廁現況版」從水花中彈跳出來 */
+        /* 3. 粉紅便便「公廁現況板」從水花中彈跳出來 */
         @keyframes pinkPoopPopOut {
             0% {
                 transform: translateY(95px) scale(0.35) rotate(-10deg);
@@ -360,7 +360,7 @@
             animation: pinkPoopPopOut 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) 0.11s both;
         }
 
-        /* 馬桶打開後：「公廁回報系統」與「公廁現況版」個別區塊 Hover 微微放大回饋 */
+        /* 馬桶打開後：「公廁回報系統」與「公廁現況板」個別區塊 Hover 微微放大回饋 */
         #openReportSystemBtn .toilet-suboption-hover {
             transform-origin: 720px 520px;
             transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1003,7 +1003,7 @@
                 <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="#" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-                <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+                <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況板</a>
                 <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
@@ -1132,10 +1132,10 @@
                     <text x="22" y="193" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
                 </g>
 
-                <!-- 選單項目 3：公廁現況版 -->
+                <!-- 選單項目 3：公廁現況板 -->
                 <g id="tpMenuStatusBoardBtn" class="tp-menu-item" role="button" tabindex="0">
                     <rect x="8" y="226" width="180" height="48" fill="transparent" />
-                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況板</text>
                 </g>
 
                 <!-- 選單項目 4：小怪圖鑑 -->
@@ -1222,7 +1222,7 @@
                 </g>
             </g>
 
-            <!-- 1. 中央：直接打開的馬桶 (精準置中於 x=215：公廁現況版 + 公廁回報系統) -->
+            <!-- 1. 中央：直接打開的馬桶 (精準置中於 x=215：公廁現況板 + 公廁回報系統) -->
             <g id="mobileCenterToiletGroup" transform="translate(215, 441) scale(0.573) translate(-720, -445)">
                 <!-- 掀開的直立橢圓馬桶蓋 -->
                 <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
@@ -1275,8 +1275,8 @@
                     </text>
                 </g>
 
-                <!-- 手機版選項 2：公廁現況版 (左上歪頭粉紅便便 + #FFF383 大聲公旗幟) -->
-                <g id="mobileOpenStatusBoardBtn" class="poogle-zone" role="button" aria-label="公廁現況版">
+                <!-- 手機版選項 2：公廁現況板 (左上歪頭粉紅便便 + #FFF383 大聲公旗幟) -->
+                <g id="mobileOpenStatusBoardBtn" class="poogle-zone" role="button" aria-label="公廁現況板">
                     <!-- 新增：固定不隨動畫晃動的透明點擊感應框 -->
                     <rect x="572" y="236" width="332" height="148" rx="22" fill="transparent" />
 
@@ -1309,7 +1309,7 @@
                                  fill="#FFF383" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <g transform="rotate(1.5, 792, 327)">
                             <text x="792" y="334" fill="#2A348C" font-size="23" font-weight="900" letter-spacing="2" text-anchor="middle">
-                                公廁現況版
+                                公廁現況板
                             </text>
                         </g>
                     </g>
@@ -1786,7 +1786,7 @@
                  <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="none" stroke="#2A348C" stroke-width="1.8" />
              </g>
 
-                <!-- 3B. 游標靠近馬桶時：打開的坐墊圈 + 湖水藍水花(公廁回報系統) + 粉紅便便旗幟(公廁現況版) -->
+                <!-- 3B. 游標靠近馬桶時：打開的坐墊圈 + 湖水藍水花(公廁回報系統) + 粉紅便便旗幟(公廁現況板) -->
                 <g id="toiletOpenOptionsGroup" class="hidden">
                     <ellipse cx="720" cy="539" rx="220" ry="63" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" class="pointer-events-none" />
                     <ellipse cx="720" cy="539" rx="144.5" ry="40.5" fill="#80E4FF" stroke="none" class="pointer-events-none" />
@@ -1823,9 +1823,9 @@
                         </g>
                     </g>
 
-                    <!-- 選項 2：公廁現況版 -->
-                    <g id="openStatusBoardBtn" class="cursor-pointer" role="button" aria-label="公廁現況版">
-                        <title>點擊查看「公廁現況版」</title>
+                    <!-- 選項 2：公廁現況板 -->
+                    <g id="openStatusBoardBtn" class="cursor-pointer" role="button" aria-label="公廁現況板">
+                        <title>點擊查看「公廁現況板」</title>
                         <g class="toilet-suboption-hover">
                             <g transform="rotate(-7, 650, 318)">
                                 <path d="M 646,238
@@ -1854,7 +1854,7 @@
                                      fill="#FFF383" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                             <g transform="rotate(1.5, 792, 327)">
                                 <text x="792" y="334" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2" text-anchor="middle">
-                                    公廁現況版
+                                    公廁現況板
                                 </text>
                             </g>
                         </g>
@@ -2432,7 +2432,7 @@
     <!-- MODALS (施工中、會員登入、網路定位、管理員驗證)                        -->
     <!-- =================================================================== -->
 
-    <!-- Under Construction Popup Modal (For 小怪圖鑑 & 公廁現況版) -->
+    <!-- Under Construction Popup Modal (For 小怪圖鑑 & 公廁現況板) -->
     <div id="underConstructionModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
             <button id="closeUnderConstructionBtn" type="button" class="poogle-pill-btn absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFF9EC] text-[#2A348C] flex items-center justify-center focus:outline-none" aria-label="關閉">
@@ -3350,7 +3350,7 @@
             const trashCanOpenLid = document.getElementById('trashCanOpenLid');
             const trashCanOpenBase = document.getElementById('trashCanOpenBase');
 
-            // 3. 中央馬桶 (公廁回報系統 & 公廁現況版)
+            // 3. 中央馬桶 (公廁回報系統 & 公廁現況板)
             const zoneCenterToilet = document.getElementById('zoneCenterToilet');
             const toiletClosedUpperGroup = document.getElementById('toiletClosedUpperGroup');
             const toiletOpenUpperGroup = document.getElementById('toiletOpenUpperGroup');
@@ -5423,10 +5423,10 @@
                 }
             });
 
-            // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 播放音效與發光特效並跳轉頁面
+            // 3. 點擊「公廁現況板」或「小怪圖鑑」 -> 播放音效與發光特效並跳轉頁面
             const underConstructionModal = document.getElementById('underConstructionModal');
 
-            // 跳轉至公廁現況版 ./board.html（保留 stopPropagation 避免觸發馬桶本體的定位門盤）
+            // 跳轉至公廁現況板 ./board.html（保留 stopPropagation 避免觸發馬桶本體的定位門盤）
             const handleGoBoard = (e) => {
                 if (e) e.stopPropagation();
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
@@ -5444,7 +5444,7 @@
                 });
             };
 
-            // 主頁馬桶內「公廁現況版」(電腦版與手機版) 跳轉 ./board.html
+            // 主頁馬桶內「公廁現況板」(電腦版與手機版) 跳轉 ./board.html
             document.getElementById('openStatusBoardBtn')?.addEventListener('click', handleGoBoard);
             document.getElementById('mobileOpenStatusBoardBtn')?.addEventListener('click', handleGoBoard);
 
@@ -5562,7 +5562,7 @@
                 closeTpDropdownMenu(false);
                 handleGoMap();
             });
-            // 手機版下拉衛生紙選單：公廁現況版
+            // 手機版下拉衛生紙選單：公廁現況板
             document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 closeTpDropdownMenu(false);
@@ -5596,7 +5596,7 @@
                 e.preventDefault();
                 handleGoMap(e);
             });
-            // 電腦版頂部粉紅導覽列：公廁現況版
+            // 電腦版頂部粉紅導覽列：公廁現況板
             document.getElementById('desktopNavStatusBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();
                 handleGoBoard(e);
