@@ -1075,21 +1075,29 @@
                     const clippedContainer = document.createElementNS(svgNs, 'g');
                     clippedContainer.setAttribute('clip-path', cfg.row === 0 ? 'url(#archClipTop)' : 'url(#archClipBottom)');
 
-                    // 小怪動態移動與探頭演員層 (預設先藏在窗外 x=-220)
-                    const actorWrap = document.createElementNS(svgNs, 'g');
-                    actorWrap.setAttribute('id', `desktopArchActor_${cfg.slot}`);
-                    actorWrap.setAttribute('transform', 'translate(-220, 0)');
+                    if (cfg.slot === 2) {
+                        // 上排正中央窗戶：不出現小怪，改放 2000 年 Windows 復古風旋轉立體坐式馬桶
+                        const toiletStage = document.createElementNS(svgNs, 'g');
+                        toiletStage.setAttribute('id', 'retro3dToiletStage');
+                        toiletStage.setAttribute('class', 'pointer-events-none select-none');
+                        clippedContainer.appendChild(toiletStage);
+                    } else {
+                        // 其他窗戶：維持小怪動態移動與探頭演員層
+                        const actorWrap = document.createElementNS(svgNs, 'g');
+                        actorWrap.setAttribute('id', `desktopArchActor_${cfg.slot}`);
+                        actorWrap.setAttribute('transform', 'translate(-220, 0)');
 
-                    const imgEl = document.createElementNS(svgNs, 'image');
-                    imgEl.setAttribute('id', `desktopArchImg_${cfg.slot}`);
-                    imgEl.setAttribute('x', '-82');
-                    imgEl.setAttribute('y', cfg.row === 0 ? '-178' : '-162');
-                    imgEl.setAttribute('width', '164');
-                    imgEl.setAttribute('height', '164');
-                    imgEl.setAttribute('preserveAspectRatio', 'xMidYMax meet');
+                        const imgEl = document.createElementNS(svgNs, 'image');
+                        imgEl.setAttribute('id', `desktopArchImg_${cfg.slot}`);
+                        imgEl.setAttribute('x', '-82');
+                        imgEl.setAttribute('y', cfg.row === 0 ? '-178' : '-162');
+                        imgEl.setAttribute('width', '164');
+                        imgEl.setAttribute('height', '164');
+                        imgEl.setAttribute('preserveAspectRatio', 'xMidYMax meet');
 
-                    actorWrap.appendChild(imgEl);
-                    clippedContainer.appendChild(actorWrap);
+                        actorWrap.appendChild(imgEl);
+                        clippedContainer.appendChild(actorWrap);
+                    }
                     entranceWrap.appendChild(clippedContainer);
 
                     // 3. 深靛藍圓點虛線外框 (#2A348C)
@@ -1383,6 +1391,328 @@
             renderIllustratorHalftoneGrid();
             initLogoImagesWithFallback();
             buildArchStageDOM();
+            // ===================================================================
+            // 🚽 上排正中央窗戶：Windows XP 小幫手風格（光滑光影＋低解析預渲染點陣 3D 旋轉馬桶）
+            // ===================================================================
+            (function initRetro3dSpinningToilet() {
+                const stageEl = document.getElementById('retro3dToiletStage');
+                if (!stageEl) return;
+
+                // 💡 可自由微調參數：
+                const SPRITE_RES = 84;       // 復古 3D 點陣解析度（越小顆粒感越重，建議 72~96）
+                const TOILET_SIZE = 166;     // 馬桶在窗戶內的顯示大小
+                const TOILET_Y = -226;       // 馬桶上下位置（負越多越往上，例如 -235 往上、-215 往下）
+                const TOTAL_FRAMES = 36;     // 旋轉一圈的格數
+                const SPIN_FPS = 15;         // 每秒播放格數（12~16 最有 XP 動畫小幫手節奏感）
+
+                stageEl.innerHTML = '';
+                const svgNs = 'http://www.w3.org/2000/svg';
+                const spriteImg = document.createElementNS(svgNs, 'image');
+                spriteImg.setAttribute('x', String(-TOILET_SIZE / 2));
+                spriteImg.setAttribute('y', String(TOILET_Y));
+                spriteImg.setAttribute('width', String(TOILET_SIZE));
+                spriteImg.setAttribute('height', String(TOILET_SIZE));
+                spriteImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                spriteImg.style.imageRendering = 'pixelated';
+                stageEl.appendChild(spriteImg);
+
+                // 3D 圓潤曲面數學函式 (模擬 2000 年代 3ds Max 光滑建模)
+                function smin(a, b, k) {
+                    const h = Math.max(k - Math.abs(a - b), 0) / k;
+                    return Math.min(a, b) - h * h * k * 0.25;
+                }
+                function smax(a, b, k) {
+                    return -smin(-a, -b, k);
+                }
+                function sdEllipsoid(x, y, z, rx, ry, rz) {
+                    const k0 = Math.hypot(x / rx, y / ry, z / rz);
+                    if (k0 < 1e-6) return -Math.min(rx, ry, rz);
+                    const k1 = Math.hypot(x / (rx * rx), y / (ry * ry), z / (rz * rz));
+                    return k0 * (k0 - 1.0) / k1;
+                }
+                function sdRoundBox(x, y, z, bx, by, bz, r) {
+                    const qx = Math.abs(x) - bx;
+                    const qy = Math.abs(y) - by;
+                    const qz = Math.abs(z) - bz;
+                    return Math.hypot(Math.max(qx, 0), Math.max(qy, 0), Math.max(qz, 0)) +
+                           Math.min(Math.max(qx, qy, qz), 0) - r;
+                }
+                function sdOval2D(x, z, rx, rz) {
+                    const k0 = Math.hypot(x / rx, z / rz);
+                    if (k0 < 1e-6) return -Math.min(rx, rz);
+                    const k1 = Math.hypot(x / (rx * rx), z / (rz * rz));
+                    return k0 * (k0 - 1.0) / k1;
+                }
+                function sdVertOvalCyl(x, y, z, rx, rz, h, r) {
+                    const dXZ = sdOval2D(x, z, rx, rz);
+                    const dY = Math.abs(y) - h;
+                    return Math.hypot(Math.max(dXZ, 0), Math.max(dY, 0)) +
+                           Math.min(Math.max(dXZ, dY), 0) - r;
+                }
+
+                // 坐式馬桶 3D 距離場 (回傳 [最短距離, 材質編號])
+                // 材質：1=陶瓷本體, 2=坐墊圈, 3=藍色水池, 4=金屬沖水把手
+                function mapToilet(x, y, z) {
+                    // 1. 圓潤底座、頸部柱身與飽滿盆體
+                    const dFoot = sdVertOvalCyl(x, y + 0.78, z - 0.04, 0.31, 0.43, 0.032, 0.048);
+                    const dNeck = sdVertOvalCyl(x, y + 0.50, z + 0.01, 0.21, 0.31, 0.24, 0.05);
+                    const dBowlOuter = smax(sdEllipsoid(x, y + 0.02, z - 0.17, 0.45, 0.45, 0.50), y + 0.03, 0.045);
+                    const dBridge = sdRoundBox(x, y + 0.09, z + 0.22, 0.33, 0.06, 0.16, 0.045);
+
+                    let dBody = smin(dFoot, dNeck, 0.11);
+                    dBody = smin(dBody, dBowlOuter, 0.11);
+                    dBody = smin(dBody, dBridge, 0.08);
+
+                    // 挖空馬桶內槽
+                    const dCavity = sdEllipsoid(x, y - 0.02, z - 0.20, 0.29, 0.34, 0.33);
+                    dBody = smax(dBody, -dCavity, 0.032);
+
+                    // 2. 後方圓角水箱與厚實水箱蓋
+                    const taper = 1.0 + (y - 0.34) * 0.06;
+                    const dTank = sdRoundBox(x / taper, y - 0.34, z + 0.37, 0.39, 0.31, 0.135, 0.075);
+                    const dTankLid = sdRoundBox(x, y - 0.72, z + 0.37, 0.435, 0.036, 0.17, 0.046);
+                    dBody = smin(dBody, dTank, 0.04);
+                    dBody = Math.min(dBody, dTankLid);
+
+                    let bestD = dBody;
+                    let bestMat = 1;
+
+                    // 3. 厚實圓潤坐墊圈
+                    const dRing2D = Math.abs(sdOval2D(x, z - 0.20, 0.345, 0.375)) - 0.054;
+                    const dRingY = Math.abs(y - 0.022) - 0.012;
+                    const dSeat = Math.hypot(Math.max(dRing2D, 0), Math.max(dRingY, 0)) +
+                                  Math.min(Math.max(dRing2D, dRingY), 0) - 0.032;
+                    if (dSeat < bestD) { bestD = dSeat; bestMat = 2; }
+
+                    // 4. 馬桶內水池
+                    const dWater = Math.max(sdEllipsoid(x, y + 0.02, z - 0.20, 0.28, 0.30, 0.32), y + 0.13);
+                    if (dWater < bestD) { bestD = dWater; bestMat = 3; }
+
+                    // 5. 水箱側邊復古沖水把手
+                    const dLeverBase = sdRoundBox(x + 0.28, y - 0.54, z + 0.16, 0.032, 0.032, 0.035, 0.02);
+                    const dLeverArm = sdRoundBox(x + 0.34, y - 0.53, z + 0.145, 0.062, 0.016, 0.016, 0.014);
+                    const dHandle = smin(dLeverBase, dLeverArm, 0.02);
+                    if (dHandle < bestD) { bestD = dHandle; bestMat = 4; }
+
+                    return [bestD, bestMat];
+                }
+
+                function calcNormal(x, y, z) {
+                    const e = 0.003;
+                    const nx = mapToilet(x + e, y, z)[0] - mapToilet(x - e, y, z)[0];
+                    const ny = mapToilet(x, y + e, z)[0] - mapToilet(x, y - e, z)[0];
+                    const nz = mapToilet(x, y, z + e)[0] - mapToilet(x, y, z - e)[0];
+                    const len = Math.hypot(nx, ny, nz) || 1;
+                    return [nx / len, ny / len, nz / len];
+                }
+
+                function calcAO(px, py, pz, nx, ny, nz) {
+                    const d1 = mapToilet(px + nx * 0.06, py + ny * 0.06, pz + nz * 0.06)[0];
+                    const d2 = mapToilet(px + nx * 0.14, py + ny * 0.14, pz + nz * 0.14)[0];
+                    const occ = (0.06 - d1) * 3.2 + (0.14 - d2) * 1.6;
+                    return Math.max(0.32, Math.min(1.0, 1.0 - occ));
+                }
+
+                // 4x4 Bayer 復古 256 色抖色矩陣 (還原 2001 Windows Agent 點陣質感)
+                const BAYER4 = [
+                     0,  8,  2, 10,
+                    12,  4, 14,  6,
+                     3, 11,  1,  9,
+                    15,  7, 13,  5
+                ];
+
+                function lerpColor(cA, cB, t) {
+                    return [
+                        cA[0] + (cB[0] - cA[0]) * t,
+                        cA[1] + (cB[1] - cA[1]) * t,
+                        cA[2] + (cB[2] - cA[2]) * t
+                    ];
+                }
+
+                const rawCanvas = document.createElement('canvas');
+                rawCanvas.width = SPRITE_RES;
+                rawCanvas.height = SPRITE_RES;
+                const rawCtx = rawCanvas.getContext('2d');
+
+                const upScale = 3;
+                const outCanvas = document.createElement('canvas');
+                outCanvas.width = SPRITE_RES * upScale;
+                outCanvas.height = SPRITE_RES * upScale;
+                const outCtx = outCanvas.getContext('2d');
+                outCtx.imageSmoothingEnabled = false;
+
+                const PITCH = 0.39;
+                const cosP = Math.cos(PITCH), sinP = Math.sin(PITCH);
+                const CAM_DIST = 3.8;
+                const FOV = 1.06;
+                const R_BOUND2 = 1.12 * 1.12;
+
+                // 單格預渲染函式 (光滑 Phong 光影 + 濃郁暗部 + 復古抖色量化)
+                function renderSpriteFrame(yawAngle) {
+                    const imgData = rawCtx.createImageData(SPRITE_RES, SPRITE_RES);
+                    const data = imgData.data;
+                    const cosY = Math.cos(yawAngle), sinY = Math.sin(yawAngle);
+
+                    // 固定在鏡頭左前上方的經典 3ds Max 主光源與補光
+                    const lxCam = -0.52, lyCam = 0.66, lzCam = 0.54;
+                    const lxp = lxCam, lyp = lyCam * cosP + lzCam * sinP, lzp = -lyCam * sinP + lzCam * cosP;
+                    const lx = lxp * cosY + lzp * sinY, ly = lyp, lz = -lxp * sinY + lzp * cosY;
+
+                    const roXp = 0, roYp = CAM_DIST * sinP, roZp = CAM_DIST * cosP;
+                    const roX = roXp * cosY + roZp * sinY;
+                    const roY = roYp;
+                    const roZ = -roXp * sinY + roZp * cosY;
+
+                    for (let py = 0; py < SPRITE_RES; py++) {
+                        const v = 1.0 - ((py + 0.5) / SPRITE_RES) * 2.0;
+                        for (let px = 0; px < SPRITE_RES; px++) {
+                            const u = ((px + 0.5) / SPRITE_RES) * 2.0 - 1.0;
+                            const idx = (py * SPRITE_RES + px) * 4;
+
+                            let rdxC = u * FOV, rdyC = v * FOV, rdzC = -CAM_DIST;
+                            const rLen = Math.hypot(rdxC, rdyC, rdzC);
+                            rdxC /= rLen; rdyC /= rLen; rdzC /= rLen;
+
+                            const rdxP = rdxC;
+                            const rdyP = rdyC * cosP + rdzC * sinP;
+                            const rdzP = -rdyC * sinP + rdzC * cosP;
+
+                            const rdx = rdxP * cosY + rdzP * sinY;
+                            const rdy = rdyP;
+                            const rdz = -rdxP * sinY + rdzP * cosY;
+
+                            // 包圍球快速篩選
+                            const b = roX * rdx + roY * rdy + roZ * rdz;
+                            const c = (roX * roX + roY * roY + roZ * roZ) - R_BOUND2;
+                            const disc = b * b - c;
+
+                            let hit = false, t = 0, hitMat = 1;
+                            if (disc >= 0) {
+                                const sqrtD = Math.sqrt(disc);
+                                t = Math.max(0.1, -b - sqrtD);
+                                const tMax = -b + sqrtD;
+                                for (let step = 0; step < 40; step++) {
+                                    const hx = roX + rdx * t;
+                                    const hy = roY + rdy * t;
+                                    const hz = roZ + rdz * t;
+                                    const [d, mat] = mapToilet(hx, hy, hz);
+                                    if (d < 0.0028) {
+                                        hit = true;
+                                        hitMat = mat;
+                                        break;
+                                    }
+                                    t += d;
+                                    if (t > tMax) break;
+                                }
+                            }
+
+                            if (hit) {
+                                const hx = roX + rdx * t;
+                                const hy = roY + rdy * t;
+                                const hz = roZ + rdz * t;
+                                const [nx, ny, nz] = calcNormal(hx, hy, hz);
+                                const ao = calcAO(hx, hy, hz, nx, ny, nz);
+
+                                const ndotl = Math.max(0, nx * lx + ny * ly + nz * lz);
+                                const ndotv = Math.max(0, -(nx * rdx + ny * rdy + nz * rdz));
+                                const rimDarken = 0.58 + 0.42 * Math.pow(ndotv, 0.45);
+                                const shade = Math.min(1, (0.16 + ndotl * 0.86) * ao * rimDarken);
+
+                                // Blinn-Phong 光滑塑膠/陶瓷高光
+                                const hvx = lx - rdx, hvy = ly - rdy, hvz = lz - rdz;
+                                const hvLen = Math.hypot(hvx, hvy, hvz) || 1;
+                                const ndoth = Math.max(0, (nx * hvx + ny * hvy + nz * hvz) / hvLen);
+                                const spec = Math.pow(ndoth, hitMat === 4 ? 28 : 22) * ao;
+
+                                let rgb;
+                                if (hitMat === 3) {
+                                    // 亮藍色水池
+                                    rgb = shade < 0.5
+                                        ? lerpColor([24, 92, 168], [68, 198, 250], shade * 2)
+                                        : lerpColor([68, 198, 250], [175, 244, 255], (shade - 0.5) * 2);
+                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * 0.9));
+                                } else if (hitMat === 4) {
+                                    // 暖金色復古沖水把手 (呼應 Rover 暖黃色澤)
+                                    rgb = shade < 0.5
+                                        ? lerpColor([118, 68, 12], [238, 176, 28], shade * 2)
+                                        : lerpColor([238, 176, 28], [255, 236, 128], (shade - 0.5) * 2);
+                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * 0.85));
+                                } else {
+                                    // Windows XP 經典陶瓷白光影 (深藍紫暗部 -> 薰衣草灰中調 -> 暖象牙白亮部)
+                                    if (shade < 0.42) {
+                                        rgb = lerpColor([52, 64, 134], [148, 166, 220], shade / 0.42);
+                                    } else {
+                                        rgb = lerpColor([148, 166, 220], hitMat === 2 ? [255, 255, 252] : [250, 246, 238], (shade - 0.42) / 0.58);
+                                    }
+                                    rgb = lerpColor(rgb, [255, 255, 255], Math.min(1, spec * (hitMat === 2 ? 0.82 : 0.62)));
+                                }
+
+                                // 復古 256 色微抖色量化
+                                const dither = (BAYER4[(py & 3) * 4 + (px & 3)] / 15 - 0.5) * 9;
+                                data[idx]     = Math.max(0, Math.min(255, Math.round((rgb[0] + dither) / 10) * 10));
+                                data[idx + 1] = Math.max(0, Math.min(255, Math.round((rgb[1] + dither) / 10) * 10));
+                                data[idx + 2] = Math.max(0, Math.min(255, Math.round((rgb[2] + dither) / 10) * 10));
+                                data[idx + 3] = 255;
+                            } else if (rdy < -0.05) {
+                                // 地板柔和暗影 (與窗戶米白底色 #FFF9EC 自然融合，邊緣呈現點陣抖色)
+                                const tFloor = (-0.86 - roY) / rdy;
+                                if (tFloor > 0) {
+                                    const fx = roX + rdx * tFloor;
+                                    const fz = roZ + rdz * tFloor - 0.04;
+                                    const ellip = Math.hypot(fx / 0.46, fz / 0.58);
+                                    if (ellip < 1.0) {
+                                        const strength = (1.0 - ellip) * 0.36;
+                                        const bayerThreshold = (BAYER4[(py & 3) * 4 + (px & 3)] + 0.5) / 16;
+                                        if (strength * 2.1 > bayerThreshold) {
+                                            data[idx]     = 176;
+                                            data[idx + 1] = 180;
+                                            data[idx + 2] = 214;
+                                            data[idx + 3] = 255;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    rawCtx.putImageData(imgData, 0, 0);
+                    outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
+                    outCtx.drawImage(rawCanvas, 0, 0, outCanvas.width, outCanvas.height);
+                    return outCanvas.toDataURL('image/png');
+                }
+
+                // 先立即渲染第 1 格顯示，其餘格數於背景逐格預渲染快取（完全不卡畫面）
+                const frames = new Array(TOTAL_FRAMES);
+                frames[0] = renderSpriteFrame(0);
+                setSvgImageHref(spriteImg, frames[0]);
+
+                let nextBuildIdx = 1;
+                let currentPlayIdx = 0;
+                let lastStepTime = performance.now();
+                const frameInterval = 1000 / SPIN_FPS;
+                const mainStageEl = document.querySelector('main');
+
+                function tick(now) {
+                    if (nextBuildIdx < TOTAL_FRAMES) {
+                        const angle = (nextBuildIdx / TOTAL_FRAMES) * Math.PI * 2;
+                        frames[nextBuildIdx] = renderSpriteFrame(angle);
+                        nextBuildIdx++;
+                    }
+
+                    if (!mainStageEl || !mainStageEl.classList.contains('hidden')) {
+                        if (now - lastStepTime >= frameInterval) {
+                            lastStepTime = now;
+                            const nextIdx = (currentPlayIdx + 1) % TOTAL_FRAMES;
+                            if (frames[nextIdx]) {
+                                currentPlayIdx = nextIdx;
+                                setSvgImageHref(spriteImg, frames[currentPlayIdx]);
+                            }
+                        }
+                    }
+                    requestAnimationFrame(tick);
+                }
+                requestAnimationFrame(tick);
+            })();
             window.addEventListener('resize', renderIllustratorHalftoneGrid);
 
             // 輕巧點擊音效支援

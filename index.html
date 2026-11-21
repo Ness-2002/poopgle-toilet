@@ -4329,68 +4329,26 @@
             let pendingPersonalSpaceRedirect = false;
             let profileUnsubscribe = null;
 
-            let homeClickAudio = null;
-            const isStrictPreviewEnv = (
-                window.location.protocol === 'about:' ||
-                window.location.protocol === 'blob:' ||
-                window.location.protocol === 'data:' ||
-                (window.location.hostname || '').includes('usercontent.goog') ||
-                (window.location.hostname || '').includes('googleusercontent.com')
-            );
-            if (!isStrictPreviewEnv) {
-                fetch('./sfx/home_click.mp3', { method: 'HEAD' }).then((res) => {
-                    if (res && res.ok) {
-                        homeClickAudio = new Audio('./sfx/home_click.mp3');
-                        homeClickAudio.preload = 'auto';
-                    }
-                }).catch(() => {});
-            }
-
             const resolveMobileGlowTarget = (el) => {
-                if (!el) return null;
-                if (el.id === 'mobileOpenReportSystemBtn' || el.id === 'mobileOpenStatusBoardBtn') {
-                    return document.getElementById('mobileCenterToiletGroup');
-                }
-                return el;
-            };
+             if (!el) return null;
+             if (el.id === 'mobileOpenReportSystemBtn' || el.id === 'mobileOpenStatusBoardBtn') {
+                 return document.getElementById('mobileCenterToiletGroup');
+             }
+             return el;
+         };
 
-            const triggerPressGlow = (el) => {
-                const target = resolveMobileGlowTarget(el);
-                if (!target) return;
-                target.classList.add('is-pressed-glow');
-                setTimeout(() => {
-                    target.classList.remove('is-pressed-glow');
-                }, 420);
-            };
+         const triggerPressGlow = (el) => {
+             const target = resolveMobileGlowTarget(el);
+             if (!target) return;
+             target.classList.add('is-pressed-glow');
+             setTimeout(() => {
+                 target.classList.remove('is-pressed-glow');
+             }, 420);
+         };
 
-            function playHomeClickSfx(onComplete) {
-                let called = false;
-                const done = () => {
-                    if (!called) {
-                        called = true;
-                        if (typeof onComplete === 'function') onComplete();
-                    }
-                };
-                if (!homeClickAudio) {
-                    done();
-                    return;
-                }
-                try {
-                    homeClickAudio.currentTime = 0;
-                    const playPromise = homeClickAudio.play();
-                    if (playPromise && typeof playPromise.then === 'function') {
-                        playPromise.then(() => {
-                            setTimeout(done, 190);
-                        }).catch(() => {
-                            done();
-                        });
-                    } else {
-                        setTimeout(done, 190);
-                    }
-                } catch (err) {
-                    done();
-                }
-            }
+         function playHomeClickSfx(onComplete) {
+             if (typeof onComplete === 'function') onComplete();
+         }
 
             // 1. 點擊「公廁地圖」 -> 發光並跳轉至 ./map.html
             const handleGoMap = (e) => {

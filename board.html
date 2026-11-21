@@ -422,6 +422,57 @@
         #middleDoorSlamShakeGroup.is-slam-shaking {
             animation: middleDoorSlamImpact 0.24s ease-out both;
         }
+        /* ========================================================= */
+        /* 小怪板（24hr 即時散步小怪、貼紙白邊外框與輕微搖擺步伐動畫） */
+        /* ========================================================= */
+        @keyframes monsterBoardFadeIn {
+            0% { opacity: 0; transform: scale(0.985); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        #monsterBoardView.is-entering {
+            animation: monsterBoardFadeIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes mkWalkerPopIn {
+            0% { opacity: 0; transform: scale(0.55); }
+            70% { opacity: 1; transform: scale(1.06); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes mkStrollWaddle {
+            0%, 100% { transform: translateY(0px) rotate(-1.8deg); }
+            25%      { transform: translateY(-3.5px) rotate(0deg); }
+            50%      { transform: translateY(0px) rotate(1.8deg); }
+            75%      { transform: translateY(-3.5px) rotate(0deg); }
+        }
+        @keyframes mkIdleBreathe {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%      { transform: translateY(-2px) scale(1.018); }
+        }
+
+        .mk-walker-node {
+            position: absolute;
+            left: 0;
+            top: 0;
+            will-change: transform;
+            pointer-events: none;
+            user-select: none;
+        }
+        .mk-walker-inner {
+            animation: mkWalkerPopIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        .mk-walker-bob.is-walking {
+            animation: mkStrollWaddle 1.55s ease-in-out infinite;
+            transform-origin: 50% 85%;
+        }
+        .mk-walker-bob.is-pausing {
+            animation: mkIdleBreathe 2.5s ease-in-out infinite;
+            transform-origin: 50% 85%;
+        }
+        .mk-sticker-img {
+            filter: url(#monsterStickerFilter);
+            -webkit-filter: url(#monsterStickerFilter);
+            transition: width 0.35s ease, height 0.35s ease;
+        }
     </style>
 </head>
 
@@ -1410,6 +1461,183 @@
             <!-- 下方聊天室動態留言區：新留言出現時，較早留言會慢慢往上移動覆蓋並降低透明度 -->
             <div id="mbChatStreamStage" class="relative z-10 w-full max-w-[1440px] mx-auto flex-1 min-h-0 overflow-hidden">
                 <!-- 由 JS 動態渲染與推移對話框 -->
+            </div>
+
+        </section>
+
+    <!-- =============================================================== -->
+        <!-- 圖層 D：點擊右門進入的「小怪板」畫面（24 小時內出現小怪悠哉散步） -->
+        <!-- =============================================================== -->
+        <section id="monsterBoardView" class="hidden absolute inset-0 z-20 w-full h-full flex flex-col overflow-hidden bg-[#FFF9EC]">
+
+            <!-- 小怪專屬「白邊貼紙＋深藍細線」SVG 濾鏡 -->
+            <svg class="fixed top-0 left-0 w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                <defs>
+                    <filter id="monsterStickerFilter" x="-22%" y="-22%" width="144%" height="144%" color-interpolation-filters="sRGB">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2.6" result="mWhiteBlur" />
+                        <feComponentTransfer in="mWhiteBlur" result="mWhiteMask">
+                            <feFuncA type="linear" slope="22" intercept="-1.2" />
+                        </feComponentTransfer>
+                        <feFlood flood-color="#FFFFFF" flood-opacity="1" result="mWhiteColor" />
+                        <feComposite in="mWhiteColor" in2="mWhiteMask" operator="in" result="mWhiteOutline" />
+
+                        <feGaussianBlur in="mWhiteMask" stdDeviation="0.95" result="mNavyBlur" />
+                        <feComponentTransfer in="mNavyBlur" result="mNavyMask">
+                            <feFuncA type="linear" slope="12" intercept="-0.4" />
+                        </feComponentTransfer>
+                        <feFlood flood-color="#273491" flood-opacity="1" result="mNavyColor" />
+                        <feComposite in="mNavyColor" in2="mNavyMask" operator="in" result="mNavyOutline" />
+
+                        <feMerge>
+                            <feMergeNode in="mNavyOutline" />
+                            <feMergeNode in="mWhiteOutline" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+            </svg>
+
+            <!-- 背景模糊三扇門插畫層（與留言版完全一致：左粉紅坐式、中粉紅坐式、右綠色蹲式） -->
+            <div class="absolute inset-0 pointer-events-none select-none overflow-hidden" style="filter: blur(11px); -webkit-filter: blur(11px); opacity: 0.48;">
+                <svg viewBox="0 0 1440 780" preserveAspectRatio="xMidYMid meet" class="w-full h-full">
+                    <!-- 左門模糊底圖 -->
+                    <rect x="146" y="223" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="146" y="565" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="164.7" y="101.3" width="330" height="639.8" rx="23.3" fill="#80E4FF" />
+                    <circle cx="329.7" cy="236.8" r="65.5" fill="#FF99D3" />
+                    <path d="M302.1,254.4c0,0.4,0,0.8,0,1.1c0,16.9,12.4,30.6,27.7,30.6c15.3,0,27.7-13.7,27.7-30.6c0-0.4,0-0.8,0-1.1H302.1z" fill="#FFF9EC" />
+                    <ellipse cx="329.7" cy="254.4" rx="27.7" ry="15.8" fill="#FFF9EC" />
+                    <ellipse cx="329.7" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
+                    <ellipse cx="329.7" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
+                    <circle cx="451.7" cy="445.9" r="24.7" fill="#FFF9EC" />
+
+                    <!-- 中門模糊底圖（粉色坐式馬桶） -->
+                    <rect x="546" y="223" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="546" y="565" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="564.2" y="101.3" width="330" height="639.8" rx="23.3" fill="#80E4FF" />
+                    <circle cx="729.2" cy="236.8" r="65.5" fill="#FF99D3" />
+                    <path d="M701.6,254.4c0,0.4,0,0.8,0,1.1c0,16.9,12.4,30.6,27.7,30.6c15.3,0,27.7-13.7,27.7-30.6c0-0.4,0-0.8,0-1.1H701.6z" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="254.4" rx="27.7" ry="15.8" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
+                    <ellipse cx="729.2" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
+                    <rect x="834.5" y="459.2" width="33.3" height="22.7" rx="6.3" fill="#FFF9EC" />
+                    <circle cx="851.2" cy="445.9" r="24.7" fill="#FFF9EC" />
+                    <rect x="842" y="433.8" width="18.3" height="9.5" rx="4.7" fill="#45E5AC" />
+                    <path d="M842,438.5c0-2.6,2.1-4.7,4.7-4.7h4.4v9.5h-4.4C844.1,443.3,842,441.1,842,438.5z" fill="#F26559" />
+
+                    <!-- 右門模糊底圖（綠色蹲式馬桶） -->
+                    <rect x="945" y="223" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="945" y="565" width="37" height="54" rx="6" fill="#45E5AC" />
+                    <rect x="963.7" y="101.3" width="330" height="639.8" rx="23.3" fill="#80E4FF" />
+                    <circle cx="1128.7" cy="236.8" r="65.5" fill="#45E5AC" />
+                    <path d="M1126.5,241.9c0-0.3,0-0.6,0-0.9c0-12.9-9.4-23.3-21-23.3c-11.6,0-21,10.4-21,23.3c0,0.3,0,0.6,0,0.9H1126.5z" fill="#FFF9EC" />
+                    <path d="M1167.2,255.7H1092c-4.2,0-7.6-3.4-7.6-7.6v-7h82.8c3.2,0,5.7,2.6,5.7,5.7v3.1C1173,253.2,1170.4,255.7,1167.2,255.7z" fill="#FFF9EC" />
+                    <rect x="1234" y="459.2" width="33.3" height="22.7" rx="6.3" fill="#FFF9EC" />
+                    <circle cx="1250.7" cy="445.9" r="24.7" fill="#FFF9EC" />
+                    <rect x="1241.5" y="433.8" width="18.3" height="9.5" rx="4.7" fill="#45E5AC" />
+                </svg>
+            </div>
+
+            <!-- 小怪悠哉散步舞台（全畫面延伸，自動避開上方按鈕與標題星星區） -->
+            <div id="mkStrollStage" class="absolute inset-0 z-10 w-full max-w-[1440px] mx-auto overflow-hidden pointer-events-none">
+                <!-- 由 JS 動態生成 24 小時內出現的散步小怪 -->
+            </div>
+
+            <!-- 頂部資訊列：左上「變更公廁＋返回」＋ 中央「公廁名稱|小怪板」與四顆星等 ＋ 右上「LIVE」 -->
+            <div class="relative z-20 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0 pointer-events-none">
+                <div class="flex items-start justify-between gap-2">
+                    <div id="mkTopLeftBtnsBox" class="flex flex-col items-stretch gap-2 sm:gap-2.5 shrink-0 pointer-events-auto">
+                        <button id="openChangeToiletFromMonsterBtn" type="button"
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
+                            變更公廁
+                        </button>
+                        <button id="backFromMonsterBoardBtn" type="button"
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
+                            返回
+                        </button>
+                    </div>
+
+                    <div id="mkTopRightLiveBox" class="mr-12 md:mr-0 shrink-0 h-[28px] px-3.5 rounded-full bg-[#F26559] flex items-center gap-2 select-none">
+                        <span class="w-[8px] h-[8px] rounded-full bg-[#80E4FF] border-[2px] border-white animate-pulse"></span>
+                        <span class="text-white text-[14px] sm:text-[15px] font-black tracking-wider leading-none">LIVE</span>
+                    </div>
+                </div>
+
+                <div class="mt-2.5 sm:-mt-[86px] flex flex-col items-center text-center px-2 sm:px-[165px]">
+                    <div id="mkTopCenterHeaderBox" class="inline-flex flex-col items-center">
+                        <h1 class="text-[#273491] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
+                            <span id="mkCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|小怪板</span>
+                        </h1>
+
+                        <!-- 四顆動態黃色填滿五角星 -->
+                        <div class="mt-2.5 sm:mt-3 flex items-center justify-center gap-[13px] sm:gap-[22px]">
+                            <!-- 1. 整潔衛生 -->
+                            <div class="flex flex-col items-center">
+                                <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
+                                    <defs>
+                                        <clipPath id="mkStarInteriorClip" clipPathUnits="userSpaceOnUse">
+                                            <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" />
+                                        </clipPath>
+                                    </defs>
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
+                                    <g clip-path="url(#mkStarInteriorClip)">
+                                        <rect id="mkStarFill_clean" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    </g>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>整</tspan><tspan dx="0.8">潔</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>衛</tspan><tspan dx="0.8">生</tspan></text>
+                                </svg>
+                                <span id="mkScoreClean" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            </div>
+
+                            <!-- 2. 環境明亮 -->
+                            <div class="flex flex-col items-center">
+                                <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
+                                    <g clip-path="url(#mkStarInteriorClip)">
+                                        <rect id="mkStarFill_light" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    </g>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>環</tspan><tspan dx="0.8">境</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>明</tspan><tspan dx="0.8">亮</tspan></text>
+                                </svg>
+                                <span id="mkScoreLight" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            </div>
+
+                            <!-- 3. 設備完善 -->
+                            <div class="flex flex-col items-center">
+                                <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
+                                    <g clip-path="url(#mkStarInteriorClip)">
+                                        <rect id="mkStarFill_equip" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    </g>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>設</tspan><tspan dx="0.8">備</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>完</tspan><tspan dx="0.8">善</tspan></text>
+                                </svg>
+                                <span id="mkScoreEquip" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            </div>
+
+                            <!-- 4. 空間寬敞 -->
+                            <div class="flex flex-col items-center">
+                                <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
+                                    <g clip-path="url(#mkStarInteriorClip)">
+                                        <rect id="mkStarFill_space" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    </g>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>空</tspan><tspan dx="0.8">間</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>寬</tspan><tspan dx="0.8">敞</tspan></text>
+                                </svg>
+                                <span id="mkScoreSpace" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </section>
@@ -3825,6 +4053,723 @@
             startBoardRealtimeReviews();
             ensureBoardToiletsDataset();
             initBoardUserLocation();
+            // ===============================================================
+            // 7. 小怪板：24 小時內小怪即時統計、15 人 1.5x 縮放與防碰撞散步系統
+            // ===============================================================
+            // 👾 小怪目錄設定區（目前顯示「狀況名稱」，之後可在此直接換成「角色名」）
+            const BOARD_MONSTER_INFO = {
+                // 廁間 (stall)
+                air_clean:           { folder: 'stall',      name: '空氣流通' },
+                floor_clean:         { folder: 'stall',      name: '地板乾爽' },
+                placing_ok:          { folder: 'stall',      name: '置物方便' },
+                privacy_ok:          { folder: 'stall',      name: '隱私完善' },
+                smell_nice:          { folder: 'stall',      name: '香香的' },
+                flush_broke:         { folder: 'stall',      name: '沖水壞掉' },
+                handle_wet:          { folder: 'stall',      name: '門把濕濕' },
+                lock_broke:          { folder: 'stall',      name: '無法上鎖' },
+                poopee:              { folder: 'stall',      name: '便便尿尿沒沖' },
+                toilet_clogged:      { folder: 'stall',      name: '馬桶堵塞' },
+
+                // 消耗品 (consumable)
+                pad_yes:             { folder: 'consumable', name: '有提供衛生棉' },
+                paper_yes:           { folder: 'consumable', name: '衛生紙充足' },
+                sanitizer_yes:       { folder: 'consumable', name: '消毒液充足' },
+                soap_yes:            { folder: 'consumable', name: '洗手乳充足' },
+                pad_no:              { folder: 'consumable', name: '衛生棉販賣機售完' },
+                paper_no:            { folder: 'consumable', name: '衛生紙用完' },
+                sanitizer_no:        { folder: 'consumable', name: '消毒液不足' },
+                soap_no:             { folder: 'consumable', name: '洗手乳不足' },
+
+                // 硬體 (hardware)
+                dryer_strong:        { folder: 'hardware',   name: '烘手機風力足夠' },
+                sink_clean:          { folder: 'hardware',   name: '洗手台潔淨' },
+                tools_tidy:          { folder: 'hardware',   name: '掃具整齊' },
+                walls_ceiling_tidy:  { folder: 'hardware',   name: '牆壁天花板完善乾淨' },
+                dryer_broke:         { folder: 'hardware',   name: '烘手機損壞' },
+                mirror_dirty:        { folder: 'hardware',   name: '鏡子髒髒' },
+                trash_too_much:      { folder: 'hardware',   name: '垃圾滿出來' },
+                sink_trash:          { folder: 'hardware',   name: '洗手台有垃圾' },
+
+                // 小便斗 (urinal)
+                panel_ok:            { folder: 'urinal',     name: '擋好擋滿' },
+                urinal_clean:        { folder: 'urinal',     name: '小便斗乾淨' },
+                panel_not_ok:        { folder: 'urinal',     name: '擋板太低' },
+                pee_floor:           { folder: 'urinal',     name: '地板有尿' },
+                stinky:              { folder: 'urinal',     name: '臭臭的' },
+                urinal_sensor_broke: { folder: 'urinal',     name: '小便斗感應不良' }
+            };
+
+            const MONSTER_24H_WINDOW_MS = 24 * 60 * 60 * 1000;
+            const MONSTER_MAX_SCALE_PEOPLE = 15; // 15 人回報達到最大 1.5 倍
+            const MONSTER_MAX_SCALE = 1.5;
+
+            const monsterBoardView = document.getElementById('monsterBoardView');
+            const mkStrollStage = document.getElementById('mkStrollStage');
+
+            const mkState = {
+                isOpen: false,
+                walkers: [],
+                rafId: null,
+                lastFrameTime: 0,
+                lastDataCheckMs: 0,
+                lastTimeRefreshMs: 0,
+                lastDataSig: '',
+                lastToiletKey: '',
+                obstacles: []
+            };
+
+            // 1 人 = 1.0 倍，線性放大至 15 人 = 1.5 倍（超過 15 人維持 1.5 倍上限）
+            function calcMonsterScale(reportCount) {
+                const n = Math.max(1, Number(reportCount) || 1);
+                if (n >= MONSTER_MAX_SCALE_PEOPLE) return MONSTER_MAX_SCALE;
+                return 1 + (MONSTER_MAX_SCALE - 1) * ((n - 1) / (MONSTER_MAX_SCALE_PEOPLE - 1));
+            }
+
+            function getBaseMonsterSizePx(totalCount) {
+                const vw = window.innerWidth || 1440;
+                const rawBase = vw < 640 ? 92 : (vw < 1024 ? 120 : 146);
+                const crowdFactor = totalCount > 8 ? Math.max(0.72, Math.sqrt(8 / totalCount)) : 1;
+                return Math.round(rawBase * crowdFactor);
+            }
+
+            function extractMonsterIdsFromEval(rev) {
+                if (!rev) return [];
+                const result = [];
+                const seen = new Set();
+                const pushClean = (raw) => {
+                    if (!raw) return;
+                    const rawStr = typeof raw === 'string' ? raw : (raw.id || raw.monsterId || raw.key || '');
+                    const cleanId = String(rawStr).split('/').pop().replace(/\.(png|svg|webp|jpg)$/i, '').trim();
+                    if (cleanId && BOARD_MONSTER_INFO[cleanId] && !seen.has(cleanId)) {
+                        seen.add(cleanId);
+                        result.push(cleanId);
+                    }
+                };
+                if (Array.isArray(rev.monsters)) rev.monsters.forEach(pushClean);
+                if (Array.isArray(rev.monsterIds)) rev.monsterIds.forEach(pushClean);
+                return result;
+            }
+
+            // 彙整目前公廁在過去 24 小時內出現的所有小怪、回報人數與最近出現時間
+            function getActive24hMonstersForToilet(toiletName) {
+                const cleanName = String(toiletName || '').trim();
+                if (!cleanName) return [];
+                const list = mbState.reviewsByToiletName.get(cleanName) || [];
+                const nowMs = Date.now();
+                const mapById = new Map();
+
+                list.forEach((r) => {
+                    const tMs = getRecordTimeMs(r);
+                    if (!tMs) return;
+                    const ageMs = nowMs - tMs;
+                    // 僅納入過去 24 小時內的回報（容許 5 分鐘跨裝置時鐘微差）
+                    if (ageMs > MONSTER_24H_WINDOW_MS || ageMs < -300000) return;
+
+                    const mIds = extractMonsterIdsFromEval(r);
+                    mIds.forEach((mId) => {
+                        const prev = mapById.get(mId);
+                        if (!prev) {
+                            mapById.set(mId, {
+                                id: mId,
+                                folder: BOARD_MONSTER_INFO[mId].folder,
+                                name: BOARD_MONSTER_INFO[mId].name,
+                                count: 1,
+                                latestTimeMs: tMs
+                            });
+                        } else {
+                            prev.count += 1;
+                            if (tMs > prev.latestTimeMs) prev.latestTimeMs = tMs;
+                        }
+                    });
+                });
+
+                return Array.from(mapById.values()).sort((a, b) => b.count - a.count);
+            }
+
+            function formatMonsterRelativeTime(latestTimeMs, nowMs = Date.now()) {
+                const diffMins = Math.max(1, Math.floor(Math.max(0, nowMs - latestTimeMs) / 60000));
+                if (diffMins < 60) {
+                    return { label: `${diffMins}分鐘前`, isRecentMinutes: true };
+                }
+                const diffHours = Math.min(23, Math.floor(diffMins / 60));
+                return { label: `${diffHours}小時前`, isRecentMinutes: false };
+            }
+
+            function renderMonsterBoardHeaderAndStars() {
+                const titleEl = document.getElementById('mkCurrentToiletTitle');
+                const cleanEl = document.getElementById('mkScoreClean');
+                const lightEl = document.getElementById('mkScoreLight');
+                const equipEl = document.getElementById('mkScoreEquip');
+                const spaceEl = document.getElementById('mkScoreSpace');
+
+                if (!mbState.selectedToilet) {
+                    if (titleEl) titleEl.textContent = '定位最近公廁中...';
+                    animateSingleStarFill('mkStarFill_clean', 0);
+                    animateSingleStarFill('mkStarFill_light', 0);
+                    animateSingleStarFill('mkStarFill_equip', 0);
+                    animateSingleStarFill('mkStarFill_space', 0);
+                    return;
+                }
+
+                if (titleEl) titleEl.textContent = mbState.selectedToilet.name;
+                const stats = getBoardToiletStats(mbState.selectedToilet.name);
+
+                if (stats) {
+                    if (cleanEl) cleanEl.textContent = stats.avgCleanliness;
+                    if (lightEl) lightEl.textContent = stats.avgLighting;
+                    if (equipEl) equipEl.textContent = stats.avgEquipment;
+                    if (spaceEl) spaceEl.textContent = stats.avgSpace;
+
+                    animateSingleStarFill('mkStarFill_clean', stats.avgCleanliness);
+                    animateSingleStarFill('mkStarFill_light', stats.avgLighting);
+                    animateSingleStarFill('mkStarFill_equip', stats.avgEquipment);
+                    animateSingleStarFill('mkStarFill_space', stats.avgSpace);
+                } else {
+                    if (cleanEl) cleanEl.textContent = '--';
+                    if (lightEl) lightEl.textContent = '--';
+                    if (equipEl) equipEl.textContent = '--';
+                    if (spaceEl) spaceEl.textContent = '--';
+
+                    animateSingleStarFill('mkStarFill_clean', 0);
+                    animateSingleStarFill('mkStarFill_light', 0);
+                    animateSingleStarFill('mkStarFill_equip', 0);
+                    animateSingleStarFill('mkStarFill_space', 0);
+                }
+            }
+
+            // 量測上方按鈕、標題星等與 LIVE 區塊邊界，讓小怪散步時自然繞開不遮擋介面
+            function updateMonsterStageObstacles() {
+                if (!mkStrollStage) return;
+                const stageRect = mkStrollStage.getBoundingClientRect();
+                if (stageRect.width <= 0 || stageRect.height <= 0) return;
+
+                const obs = [];
+                ['mkTopLeftBtnsBox', 'mkTopCenterHeaderBox', 'mkTopRightLiveBox'].forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const r = el.getBoundingClientRect();
+                    if (r.width > 0 && r.height > 0) {
+                        obs.push({
+                            x0: r.left - stageRect.left - 10,
+                            y0: r.top - stageRect.top - 8,
+                            x1: r.right - stageRect.left + 10,
+                            y1: r.bottom - stageRect.top + 12
+                        });
+                    }
+                });
+                mkState.obstacles = obs;
+            }
+
+            function getMonsterFallbackSvgUri() {
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><circle cx="60" cy="64" r="44" fill="#FF99D3" stroke="#273491" stroke-width="4"/><ellipse cx="47" cy="58" rx="7" ry="9" fill="#FFFFFF" stroke="#273491" stroke-width="3"/><ellipse cx="73" cy="58" rx="7" ry="9" fill="#FFFFFF" stroke="#273491" stroke-width="3"/><circle cx="48" cy="59" r="4" fill="#273491"/><circle cx="72" cy="59" r="4" fill="#273491"/><path d="M 48,78 Q 60,86 72,78" fill="none" stroke="#273491" stroke-width="3.5" stroke-linecap="round"/></svg>`;
+                return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+            }
+
+            function probeAndSetMonsterImg(imgEl, folder, id) {
+                const fallback = getMonsterFallbackSvgUri();
+                imgEl.src = fallback;
+                if (isPreviewSandbox) return;
+
+                const candidates = [
+                    `./img/${folder}/${id}.png`,
+                    `./img/${folder}/${id}.PNG`,
+                    `img/${folder}/${id}.png`
+                ];
+                let idx = 0;
+                const tryNext = () => {
+                    if (idx >= candidates.length) return;
+                    const url = candidates[idx++];
+                    const probe = new Image();
+                    probe.onload = () => { imgEl.src = url; };
+                    probe.onerror = tryNext;
+                    probe.src = url;
+                };
+                tryNext();
+            }
+
+            function pickRandomStrollVelocity() {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 18 + Math.random() * 11; // 每秒 18~29px 悠哉散步速度
+                return {
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed * 0.78
+                };
+            }
+
+            function findBestNonOverlappingSpot(rx, ry, existingWalkers) {
+                const W = mkStrollStage?.clientWidth || 1280;
+                const H = mkStrollStage?.clientHeight || 680;
+                const minX = rx + 18, maxX = Math.max(minX + 10, W - rx - 18);
+                const minY = ry + 14, maxY = Math.max(minY + 10, H - ry - 18);
+
+                let bestPt = { x: W * 0.5, y: H * 0.65 };
+                let bestClearance = -1e9;
+
+                for (let attempt = 0; attempt < 85; attempt++) {
+                    const tx = minX + Math.random() * (maxX - minX);
+                    const ty = minY + Math.random() * (maxY - minY);
+
+                    let hitUi = false;
+                    for (let k = 0; k < mkState.obstacles.length; k++) {
+                        const ob = mkState.obstacles[k];
+                        if (tx > ob.x0 - rx && tx < ob.x1 + rx && ty > ob.y0 - ry && ty < ob.y1 + ry) {
+                            hitUi = true;
+                            break;
+                        }
+                    }
+                    if (hitUi && attempt < 70) continue;
+
+                    let minNormDist = 999;
+                    for (let i = 0; i < existingWalkers.length; i++) {
+                        const other = existingWalkers[i];
+                        const nx = (tx - other.x) / (rx + other.rx + 10);
+                        const ny = (ty - other.y) / (ry + other.ry + 8);
+                        const d = Math.hypot(nx, ny);
+                        if (d < minNormDist) minNormDist = d;
+                    }
+
+                    const score = (hitUi ? -5 : 0) + minNormDist;
+                    if (score > bestClearance) {
+                        bestClearance = score;
+                        bestPt = { x: tx, y: ty };
+                    }
+                }
+                return bestPt;
+            }
+
+            function createMonsterWalkerDom(mItem, imgPx) {
+                const el = document.createElement('div');
+                el.className = 'mk-walker-node';
+                el.dataset.monsterId = mItem.id;
+
+                const relTime = formatMonsterRelativeTime(mItem.latestTimeMs);
+                const timeColorClass = relTime.isRecentMinutes ? 'text-[#F26559]' : 'text-[#273491]';
+
+                el.innerHTML = `
+                    <div class="mk-walker-inner flex flex-col items-center">
+                        <div class="mb-1.5 flex flex-col items-center text-center whitespace-nowrap">
+                            <span class="mk-walker-name text-[#273491] text-[16px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">
+                                ${escapeHtmlBoard(mItem.name)}
+                            </span>
+                            <span class="mk-walker-time ${timeColorClass} text-[11.5px] sm:text-[14px] font-extrabold tracking-[0.08em] leading-tight mt-0.5">
+                                ${escapeHtmlBoard(relTime.label)}
+                            </span>
+                        </div>
+                        <div class="mk-walker-bob is-walking flex items-center justify-center">
+                            <img alt="${escapeHtmlBoard(mItem.name)}"
+                                 style="width:${imgPx}px; height:${imgPx}px;"
+                                 class="mk-sticker-img object-contain block select-none" />
+                        </div>
+                    </div>
+                `;
+
+                const imgEl = el.querySelector('img');
+                if (imgEl) probeAndSetMonsterImg(imgEl, mItem.folder, mItem.id);
+                return el;
+            }
+
+            function computeWalkerRadii(imgPx, nameStr) {
+                const labelHalfW = Math.max(46, String(nameStr || '').length * 11.5);
+                const rx = Math.max(imgPx * 0.48, labelHalfW) + 8;
+                const ry = (imgPx + 48) * 0.50 + 6;
+                return { rx, ry };
+            }
+
+            // 同步場上散步小怪（切換公廁時重排；同一公廁有即時新增／人數增加／刪除時原地平滑更新大小與數量）
+            function syncMonsterBoardWalkers(forceFullReset = false) {
+                if (!mkStrollStage) return;
+                updateMonsterStageObstacles();
+
+                const tName = mbState.selectedToilet?.name || '';
+                const activeList = getActive24hMonstersForToilet(tName);
+
+                if (forceFullReset) {
+                    mkState.walkers.forEach(w => w.el.remove());
+                    mkState.walkers = [];
+                }
+
+                if (activeList.length === 0) {
+                    mkState.walkers.forEach(w => w.el.remove());
+                    mkState.walkers = [];
+                    if (!mkStrollStage.querySelector('.mk-empty-hint')) {
+                        mkStrollStage.innerHTML = `
+                            <div class="mk-empty-hint w-full h-full flex items-center justify-center px-6 pt-28">
+                                <div class="bg-white/85 border-[2px] border-[#273491]/55 rounded-full px-8 py-4 text-[#273491]/75 text-sm sm:text-base font-extrabold tracking-[0.14em] text-center">
+                                    過去 24 小時內這間公廁還沒有出現小怪～
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                mkStrollStage.querySelector('.mk-empty-hint')?.remove();
+
+                const basePx = getBaseMonsterSizePx(activeList.length);
+                const activeIdMap = new Map(activeList.map(m => [m.id, m]));
+
+                // 1. 移除已過期或被管理員刪除的小怪
+                mkState.walkers = mkState.walkers.filter((w) => {
+                    if (!activeIdMap.has(w.id)) {
+                        w.el.remove();
+                        return false;
+                    }
+                    return true;
+                });
+
+                const existingById = new Map(mkState.walkers.map(w => [w.id, w]));
+
+                // 2. 更新既有小怪的大小與時間，或新增剛出現的小怪
+                activeList.forEach((mItem) => {
+                    const scale = calcMonsterScale(mItem.count);
+                    const imgPx = Math.round(basePx * scale);
+                    const { rx, ry } = computeWalkerRadii(imgPx, mItem.name);
+
+                    const existing = existingById.get(mItem.id);
+                    if (existing) {
+                        existing.count = mItem.count;
+                        existing.latestTimeMs = mItem.latestTimeMs;
+                        existing.imgPx = imgPx;
+                        existing.rx = rx;
+                        existing.ry = ry;
+
+                        const imgEl = existing.el.querySelector('.mk-sticker-img');
+                        if (imgEl) {
+                            imgEl.style.width = `${imgPx}px`;
+                            imgEl.style.height = `${imgPx}px`;
+                        }
+                        refreshSingleWalkerTimeText(existing);
+                    } else {
+                        const el = createMonsterWalkerDom(mItem, imgPx);
+                        mkStrollStage.appendChild(el);
+
+                        const spot = findBestNonOverlappingSpot(rx, ry, mkState.walkers);
+                        const vel = pickRandomStrollVelocity();
+                        const walker = {
+                            id: mItem.id,
+                            name: mItem.name,
+                            count: mItem.count,
+                            latestTimeMs: mItem.latestTimeMs,
+                            el,
+                            bobEl: el.querySelector('.mk-walker-bob'),
+                            timeEl: el.querySelector('.mk-walker-time'),
+                            x: spot.x,
+                            y: spot.y,
+                            vx: vel.vx,
+                            vy: vel.vy,
+                            targetVx: vel.vx,
+                            targetVy: vel.vy,
+                            isPaused: false,
+                            phaseTimerMs: 2200 + Math.random() * 3800,
+                            imgPx,
+                            rx,
+                            ry
+                        };
+                        el.style.transform = `translate3d(${(walker.x - rx).toFixed(1)}px, ${(walker.y - ry).toFixed(1)}px, 0)`;
+                        mkState.walkers.push(walker);
+                    }
+                });
+            }
+
+            function refreshSingleWalkerTimeText(walker, nowMs = Date.now()) {
+                if (!walker || !walker.timeEl) return;
+                const rel = formatMonsterRelativeTime(walker.latestTimeMs, nowMs);
+                walker.timeEl.textContent = rel.label;
+                walker.timeEl.classList.toggle('text-[#F26559]', rel.isRecentMinutes);
+                walker.timeEl.classList.toggle('text-[#273491]', !rel.isRecentMinutes);
+            }
+
+            function computeCurrentMonsterDataSignature() {
+                const tKey = mbState.selectedToilet?.key || '';
+                const tName = mbState.selectedToilet?.name || '';
+                const revs = mbState.reviewsByToiletName.get(tName) || [];
+                const revSig = revs.map(r => {
+                    const mLen = (Array.isArray(r.monsters) ? r.monsters.length : 0) + (Array.isArray(r.monsterIds) ? r.monsterIds.length : 0);
+                    return `${r._docId || r.id || ''}_${r.updatedAt || r.createdAt || ''}_${r.stars || ''}_${mLen}`;
+                }).join('|');
+                return `${tKey}::${revs.length}::${revSig}`;
+            }
+
+            // 60fps 悠哉散步與柔和防碰撞轉向引擎
+            function tickMonsterStrollLoop(now) {
+                if (!mkState.isOpen) {
+                    mkState.rafId = null;
+                    return;
+                }
+
+                const dt = Math.min(0.05, Math.max(0.001, (now - (mkState.lastFrameTime || now)) / 1000));
+                mkState.lastFrameTime = now;
+
+                // 即時偵測公廁切換或 Firebase 新增／刪除評鑑
+                if (now - mkState.lastDataCheckMs > 280) {
+                    mkState.lastDataCheckMs = now;
+                    const sig = computeCurrentMonsterDataSignature();
+                    if (sig !== mkState.lastDataSig) {
+                        const curKey = mbState.selectedToilet?.key || '';
+                        const toiletChanged = (curKey !== mkState.lastToiletKey);
+                        mkState.lastToiletKey = curKey;
+                        mkState.lastDataSig = sig;
+                        renderMonsterBoardHeaderAndStars();
+                        syncMonsterBoardWalkers(toiletChanged);
+                    }
+                }
+
+                // 每 20 秒自動刷新相對時間文字（「1分鐘前」->「2分鐘前」）並淘汰超過 24 小時的小怪
+                if (now - mkState.lastTimeRefreshMs > 20000) {
+                    mkState.lastTimeRefreshMs = now;
+                    mkState.walkers.forEach(w => refreshSingleWalkerTimeText(w, Date.now()));
+                    syncMonsterBoardWalkers(false);
+                }
+
+                const W = mkStrollStage?.clientWidth || 1280;
+                const H = mkStrollStage?.clientHeight || 680;
+                const walkers = mkState.walkers;
+                const n = walkers.length;
+
+                // 1. 散步／停頓節奏切換
+                for (let i = 0; i < n; i++) {
+                    const w = walkers[i];
+                    w.phaseTimerMs -= dt * 1000;
+                    if (w.phaseTimerMs <= 0) {
+                        if (!w.isPaused && Math.random() < 0.35) {
+                            w.isPaused = true;
+                            w.targetVx = 0;
+                            w.targetVy = 0;
+                            w.phaseTimerMs = 1300 + Math.random() * 1500;
+                            w.bobEl?.classList.remove('is-walking');
+                            w.bobEl?.classList.add('is-pausing');
+                        } else {
+                            w.isPaused = false;
+                            const vel = pickRandomStrollVelocity();
+                            w.targetVx = vel.vx;
+                            w.targetVy = vel.vy;
+                            w.phaseTimerMs = 3400 + Math.random() * 3400;
+                            w.bobEl?.classList.remove('is-pausing');
+                            w.bobEl?.classList.add('is-walking');
+                        }
+                    }
+                }
+
+                // 2. 小怪彼此之間的柔和防重疊排斥力與轉向避讓
+                for (let i = 0; i < n; i++) {
+                    for (let j = i + 1; j < n; j++) {
+                        const a = walkers[i];
+                        const b = walkers[j];
+                        const sumRx = a.rx + b.rx + 8;
+                        const sumRy = a.ry + b.ry + 6;
+                        const dx = b.x - a.x;
+                        const dy = b.y - a.y;
+
+                        const nx = dx / sumRx;
+                        const ny = dy / sumRy;
+                        const normDist = Math.hypot(nx, ny);
+
+                        if (normDist < 1.08) {
+                            const safeDist = Math.max(0.01, normDist);
+                            const ux = nx / safeDist;
+                            const uy = ny / safeDist;
+                            const overlap = 1.08 - safeDist;
+                            const pushStrength = overlap * 68;
+
+                            a.vx -= ux * pushStrength * dt * 2.4;
+                            a.vy -= uy * pushStrength * dt * 2.4;
+                            b.vx += ux * pushStrength * dt * 2.4;
+                            b.vy += uy * pushStrength * dt * 2.4;
+
+                            // 順勢將散步目標方向微調錯開，避免面對面互頂
+                            if (!a.isPaused) {
+                                a.targetVx -= ux * 16 * dt * 3;
+                                a.targetVy -= uy * 14 * dt * 3;
+                            }
+                            if (!b.isPaused) {
+                                b.targetVx += ux * 16 * dt * 3;
+                                b.targetVy += uy * 14 * dt * 3;
+                            }
+
+                            // 若距離過近直接微幅推開防止視覺重疊
+                            if (normDist < 0.94) {
+                                const directSep = (0.94 - normDist) * 0.35;
+                                a.x -= ux * sumRx * directSep * 0.5;
+                                a.y -= uy * sumRy * directSep * 0.5;
+                                b.x += ux * sumRx * directSep * 0.5;
+                                b.y += uy * sumRy * directSep * 0.5;
+                            }
+                        }
+                    }
+                }
+
+                // 3. 邊界與上方標題／按鈕避讓 ＋ 更新位置與前後景深
+                for (let i = 0; i < n; i++) {
+                    const w = walkers[i];
+
+                    // 平滑趨近目標散步速度
+                    const blend = Math.min(1, dt * 2.8);
+                    w.vx += (w.targetVx - w.vx) * blend;
+                    w.vy += (w.targetVy - w.vy) * blend;
+
+                    // 避開上方 UI 區塊（按鈕、標題星等、LIVE）
+                    for (let k = 0; k < mkState.obstacles.length; k++) {
+                        const ob = mkState.obstacles[k];
+                        const ex0 = ob.x0 - w.rx, ex1 = ob.x1 + w.rx;
+                        const ey0 = ob.y0 - w.ry, ey1 = ob.y1 + w.ry;
+                        if (w.x > ex0 && w.x < ex1 && w.y > ey0 && w.y < ey1) {
+                            const dLeft  = (ob.x0 > 60) ? (w.x - ex0) : 9999;
+                            const dRight = (ob.x1 < W - 60) ? (ex1 - w.x) : 9999;
+                            const dDown  = ey1 - w.y;
+                            const minExit = Math.min(dLeft, dRight, dDown);
+
+                            if (minExit === dDown) {
+                                w.y += Math.min(dDown, 95 * dt);
+                                if (w.vy < 12) w.vy = 16;
+                                if (w.targetVy < 8) w.targetVy = Math.abs(w.targetVy) + 12;
+                            } else if (minExit === dLeft) {
+                                w.x -= Math.min(dLeft, 95 * dt);
+                                w.vx = -Math.abs(w.vx) - 10;
+                                w.targetVx = -Math.abs(w.targetVx) - 12;
+                            } else {
+                                w.x += Math.min(dRight, 95 * dt);
+                                w.vx = Math.abs(w.vx) + 10;
+                                w.targetVx = Math.abs(w.targetVx) + 12;
+                            }
+                        }
+                    }
+
+                    w.x += w.vx * dt;
+                    w.y += w.vy * dt;
+
+                    // 畫面四周邊界柔和折返
+                    const minX = w.rx + 14, maxX = Math.max(minX, W - w.rx - 14);
+                    const minY = w.ry + 12, maxY = Math.max(minY, H - w.ry - 14);
+
+                    if (w.x < minX) {
+                        w.x = minX;
+                        w.vx = Math.abs(w.vx) * 0.8 + 8;
+                        w.targetVx = Math.abs(w.targetVx) + 10;
+                    } else if (w.x > maxX) {
+                        w.x = maxX;
+                        w.vx = -Math.abs(w.vx) * 0.8 - 8;
+                        w.targetVx = -Math.abs(w.targetVx) - 10;
+                    }
+
+                    if (w.y < minY) {
+                        w.y = minY;
+                        w.vy = Math.abs(w.vy) * 0.8 + 8;
+                        w.targetVy = Math.abs(w.targetVy) + 10;
+                    } else if (w.y > maxY) {
+                        w.y = maxY;
+                        w.vy = -Math.abs(w.vy) * 0.8 - 8;
+                        w.targetVy = -Math.abs(w.targetVy) - 10;
+                    }
+
+                    // 限制最高速度維持「悠哉散步」感
+                    const spd = Math.hypot(w.vx, w.vy);
+                    if (spd > 38) {
+                        w.vx = (w.vx / spd) * 38;
+                        w.vy = (w.vy / spd) * 38;
+                    }
+
+                    const drawX = w.x - w.el.offsetWidth * 0.5;
+                    const drawY = w.y - w.el.offsetHeight * 0.5;
+                    w.el.style.zIndex = String(Math.max(1, Math.round(w.y + w.ry * 0.5)));
+                    w.el.style.transform = `translate3d(${drawX.toFixed(1)}px, ${drawY.toFixed(1)}px, 0)`;
+                }
+
+                mkState.rafId = requestAnimationFrame(tickMonsterStrollLoop);
+            }
+
+            // 進入右門「小怪板」與返回三扇門主畫面
+            function enterRightDoorMonsterBoard() {
+                if (!isBoardInteractive || mkState.isOpen) return;
+                mkState.isOpen = true;
+                mbState.isOpen = false;
+
+                rebuildBoardReviewIndex();
+                recomputeDistancesAndPickNearestIfNeeded();
+
+                boardStageTopBarEl?.classList.add('hidden');
+                boardStageTopBarEl?.classList.remove('is-fading-in');
+                stopBirdGameLoop();
+                closeRightDoorAndRetractMonster();
+
+                messageBoardView?.classList.add('hidden');
+                boardFinalSceneSvg?.classList.add('hidden');
+
+                if (monsterBoardView) {
+                    monsterBoardView.classList.remove('hidden', 'is-entering');
+                    void monsterBoardView.offsetWidth;
+                    monsterBoardView.classList.add('is-entering');
+                }
+
+                mkState.lastToiletKey = mbState.selectedToilet?.key || '';
+                mkState.lastDataSig = computeCurrentMonsterDataSignature();
+                mkState.lastDataCheckMs = performance.now();
+                mkState.lastTimeRefreshMs = performance.now();
+                mkState.lastFrameTime = performance.now();
+
+                renderMonsterBoardHeaderAndStars();
+                requestAnimationFrame(() => {
+                    syncMonsterBoardWalkers(true);
+                    if (mkState.rafId) cancelAnimationFrame(mkState.rafId);
+                    mkState.rafId = requestAnimationFrame(tickMonsterStrollLoop);
+                });
+            }
+
+            function exitMonsterBoardToThreeDoors() {
+                if (!mkState.isOpen) return;
+                mkState.isOpen = false;
+                if (mkState.rafId) {
+                    cancelAnimationFrame(mkState.rafId);
+                    mkState.rafId = null;
+                }
+                closeChangeToiletModal();
+
+                monsterBoardView?.classList.add('hidden');
+                boardFinalSceneSvg?.classList.remove('hidden');
+
+                if (boardStageTopBarEl) {
+                    boardStageTopBarEl.classList.remove('hidden', 'is-fading-in');
+                    void boardStageTopBarEl.offsetWidth;
+                    boardStageTopBarEl.classList.add('is-fading-in');
+                }
+                if (!isBirdSequencePlaying) {
+                    startBirdGameLoop(false);
+                }
+            }
+
+            // 綁定右門點擊進入小怪板、左上變更公廁與返回按鈕
+            doorMonsterStatusGroup?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                enterRightDoorMonsterBoard();
+            });
+
+            document.getElementById('openChangeToiletFromMonsterBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openChangeToiletModal();
+            });
+
+            document.getElementById('backFromMonsterBoardBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exitMonsterBoardToThreeDoors();
+            });
+
+            // 在小怪板內點擊導覽列「公廁現況版」同樣可直接返回三扇門畫面
+            document.querySelectorAll('a[href="./board.html"]').forEach((linkEl) => {
+                linkEl.addEventListener('click', (e) => {
+                    if (mkState.isOpen) {
+                        e.preventDefault();
+                        closeTpDropdownMenu();
+                        exitMonsterBoardToThreeDoors();
+                    }
+                });
+            });
+
+            // 視窗尺寸變動時更新 UI 避讓範圍與小怪基準比例
+            window.addEventListener('resize', () => {
+                if (mkState.isOpen) {
+                    updateMonsterStageObstacles();
+                    syncMonsterBoardWalkers(false);
+                }
+            });
         });
     </script>
 </body>

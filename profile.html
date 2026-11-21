@@ -302,6 +302,155 @@
             letter-spacing: 0.04em;
             line-height: 1.1;
         }
+        /* =========================================================
+           復古 Windows WordArt 用戶名稱隨機樣式庫
+           ========================================================= */
+        .wordart-user {
+            position: relative;
+            display: inline-block;
+            isolation: isolate;
+            color: transparent !important;
+            font-family: 'Impact', 'Arial Black', 'Noto Sans TC', 'jf-openhuninn', sans-serif;
+            font-weight: 900;
+            white-space: nowrap;
+            text-align: left;
+            margin: 0 6px;
+            line-height: 1.25;
+            vertical-align: baseline;
+        }
+        .wordart-user::before,
+        .wordart-user::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            text-align: left;
+        }
+        .wordart-user::before {
+            z-index: 1; /* 底層：3D 立體厚度、外框或投射陰影 */
+        }
+        .wordart-user::after {
+            z-index: 2; /* 表層：漸層或實心字面 */
+        }
+
+        /* 1. 烈焰紅黃 3D 上揚字 */
+        .wa-style-1 {
+            transform: perspective(300px) rotateY(-10deg) skewY(-7deg);
+        }
+        .wa-style-1::before {
+            color: #7F1100;
+            -webkit-text-stroke: 2px #5A0B00;
+            text-shadow: -1px 1px 0 #8F1500, -2px 2px 0 #7A1000, -3px 3px 0 #660C00, -4px 4px 0 #520800, -5px 5px 0 #3D0500;
+        }
+        .wa-style-1::after {
+            background: linear-gradient(180deg, #FFF720 0%, #FFB800 38%, #FF5100 72%, #D90404 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 2. 經典七彩彩虹斜體字 */
+        .wa-style-2 {
+            transform: skewX(-9deg);
+        }
+        .wa-style-2::before {
+            color: #9DA6B5;
+            transform: translate(4px, 3px);
+        }
+        .wa-style-2::after {
+            background: linear-gradient(90deg, #8E2DE2 0%, #E91E63 22%, #FF6D00 44%, #FFD600 62%, #00C853 80%, #1E88E5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 3. 冰晶水藍 3D 塊狀字 */
+        .wa-style-3 {
+            transform: perspective(260px) rotateY(12deg) skewY(4deg);
+        }
+        .wa-style-3::before {
+            color: #091E5A;
+            -webkit-text-stroke: 2.2px #091E5A;
+            text-shadow: 1px -1px 0 #091E5A, 2px -2px 0 #091E5A, 3px -3px 0 #061540, 4px -4px 0 #061540, 5px -5px 0 #040D29;
+        }
+        .wa-style-3::after {
+            background: linear-gradient(180deg, #B8F8FF 0%, #29C5FF 48%, #0062E6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 4. 皇家流金金屬梯形字 */
+        .wa-style-4 {
+            transform: perspective(200px) rotateX(16deg);
+        }
+        .wa-style-4::before {
+            color: #6B3F00;
+            -webkit-text-stroke: 2px #593300;
+            text-shadow: 0 1px 0 #7A4900, 0 2px 0 #663C00, 0 3px 0 #522F00, 0 4px 0 #3D2200, 2px 6px 3px rgba(30, 36, 112, 0.22);
+        }
+        .wa-style-4::after {
+            background: linear-gradient(180deg, #FFFDE7 0%, #FBC02D 28%, #FFF59D 48%, #B26A00 72%, #FFE082 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 5. 紫羅蘭上揚硬陰影字 */
+        .wa-style-5 {
+            transform: skewY(-8deg);
+        }
+        .wa-style-5::before {
+            color: #9FA8B8;
+            transform: translate(5px, 4px);
+        }
+        .wa-style-5::after {
+            background: linear-gradient(180deg, #E040FB 0%, #8E24AA 55%, #5E1688 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 6. 復古深綠地板投射長倒影字 */
+        .wa-style-6::before {
+            color: rgba(110, 125, 142, 0.52);
+            transform: translate(-6px, -6px) scaleY(0.62) skewX(32deg);
+            transform-origin: bottom center;
+        }
+        .wa-style-6::after {
+            color: #0E6B50;
+        }
+
+        /* 7. 千禧銀藍地平線金屬字 */
+        .wa-style-7 {
+            transform: skewX(-6deg);
+        }
+        .wa-style-7::before {
+            color: #1E2470;
+            -webkit-text-stroke: 2.2px #1E2470;
+            text-shadow: 4px 4px 0 #9AA5B8;
+        }
+        .wa-style-7::after {
+            background: linear-gradient(180deg, #1B3B88 0%, #E3EEFF 46%, #3A4660 50%, #7FA1E8 78%, #FFFFFF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 8. 經典白底雙線空心立體字 */
+        .wa-style-8 {
+            transform: skewX(-10deg);
+        }
+        .wa-style-8::before {
+            color: #1E2470;
+            -webkit-text-stroke: 3.2px #1E2470;
+            text-shadow: 3px 3px 0 #9DA7B8, 4px 4px 0 #1E2470;
+        }
+        .wa-style-8::after {
+            color: #FFFFFF;
+        }
     </style>
 </head>
 
@@ -410,9 +559,9 @@
     <!-- 上半部：使用者稱號、頭貼、Lv.1 徽章、變更頭貼按鈕、升級提示         -->
     <!-- =================================================================== -->
     <section class="w-full max-w-[1280px] mx-auto px-4 pt-4 sm:pt-8 lg:pt-4 flex flex-col items-center text-center clear-both">
-        <!-- 使用者名稱與稱號 (字距縮小 1/3) -->
+        <!-- 使用者名稱與稱號 (用戶名稱套用隨機復古 WordArt) -->
         <h1 class="text-2xl sm:text-[33px] font-extrabold text-[#1E2470] tracking-[0.093em] leading-snug">
-            <span id="displayUserNameText">OOO</span>，<span id="displayUserTitleText">探廁小白</span>
+            <span id="displayUserNameText" class="wordart-user" data-text="OOO">OOO</span>，<span id="displayUserTitleText">探廁小白</span>
         </h1>
 
         <!-- 圓形馬桶頭貼 + 右下角 Lv.1 徽章 -->
@@ -1651,10 +1800,63 @@
             });
         }
 
+        // 每次重新整理皆不重複：8 款全部輪播完一輪才重新洗牌，且換輪交界不與上一次重複
+        const WORDART_STYLE_CLASSES = [
+            'wa-style-1', 'wa-style-2', 'wa-style-3', 'wa-style-4',
+            'wa-style-5', 'wa-style-6', 'wa-style-7', 'wa-style-8'
+        ];
+
+        function pickNonRepeatingWordArtClass() {
+            const BAG_KEY = 'poogle_wordart_bag';
+            const LAST_KEY = 'poogle_wordart_last';
+            try {
+                let bag = JSON.parse(localStorage.getItem(BAG_KEY) || '[]');
+                const lastPicked = localStorage.getItem(LAST_KEY) || '';
+
+                // 過濾確保籤筒內皆為有效樣式
+                bag = Array.isArray(bag)
+                    ? bag.filter((cls) => WORDART_STYLE_CLASSES.includes(cls))
+                    : [];
+
+                // 若一輪 8 款已抽完，重新洗牌放入籤筒
+                if (bag.length === 0) {
+                    bag = [...WORDART_STYLE_CLASSES];
+                    for (let i = bag.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [bag[i], bag[j]] = [bag[j], bag[i]];
+                    }
+                    // 我們會從陣列尾端 pop() 抽出；若尾端剛好與上一次相同，就跟第一個交換，避免跨輪重複
+                    if (bag.length > 1 && bag[bag.length - 1] === lastPicked) {
+                        [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+                    }
+                }
+
+                // 保險檢查：若抽出的剛好等於上一次且還有其他籤，改抽另一支
+                let picked = bag.pop();
+                if (picked === lastPicked && bag.length > 0) {
+                    const alt = bag.pop();
+                    bag.unshift(picked);
+                    picked = alt;
+                }
+
+                localStorage.setItem(BAG_KEY, JSON.stringify(bag));
+                localStorage.setItem(LAST_KEY, picked);
+                return picked;
+            } catch (e) {
+                return WORDART_STYLE_CLASSES[Math.floor(Math.random() * WORDART_STYLE_CLASSES.length)];
+            }
+        }
+
+        const SESSION_WORDART_CLASS = pickNonRepeatingWordArtClass();
+
         function renderProfileHeaderAndAvatar() {
             const nameEl = document.getElementById('displayUserNameText');
             if (nameEl) {
-                nameEl.textContent = profileState.displayName || 'OOO';
+                const finalName = profileState.displayName || 'OOO';
+                nameEl.textContent = finalName;
+                nameEl.setAttribute('data-text', finalName);
+                WORDART_STYLE_CLASSES.forEach((cls) => nameEl.classList.remove(cls));
+                nameEl.classList.add('wordart-user', SESSION_WORDART_CLASS);
             }
 
             const normalizedKey = normalizeLoggedInAvatarType(profileState.avatarType);

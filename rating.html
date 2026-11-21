@@ -156,6 +156,73 @@
         .svg-action-btn:active .svg-action-inner {
             transform: translateY(0px) scale(0.98);
         }
+        /* 完成／更新回報 與 完成畫面三顆按鈕：移除 hover 位移與陰影，改為底色變淡 */
+        :is(
+            #finishRatingBtn,
+            #mobileFinishRatingBtn,
+            #inlineDownloadCardBtn,
+            #inlineReturnHomeBtn,
+            #inlineEditRatingBtn,
+            #mobileInlineDownloadCardBtn,
+            #mobileInlineReturnHomeBtn,
+            #mobileInlineEditRatingBtn,
+            #downloadToiletCardBtn,
+            #resultReturnHomeBtn,
+            #resultEditReportBtn
+        ):hover .svg-action-inner {
+            transform: none !important;
+            filter: none !important;
+        }
+
+        :is(
+            #finishRatingBtn,
+            #mobileFinishRatingBtn,
+            #inlineDownloadCardBtn,
+            #inlineReturnHomeBtn,
+            #inlineEditRatingBtn,
+            #mobileInlineDownloadCardBtn,
+            #mobileInlineReturnHomeBtn,
+            #mobileInlineEditRatingBtn,
+            #downloadToiletCardBtn,
+            #resultReturnHomeBtn,
+            #resultEditReportBtn
+        ) .svg-action-inner :is(rect, ellipse) {
+            transition: fill 0.18s ease, fill-opacity 0.18s ease;
+        }
+
+        /* 亮黃底按鈕 (完成 / 更新回報、返回主頁)：#F3EF84 -> #FAF8BE */
+        :is(#finishRatingBtn, #mobileFinishRatingBtn, #inlineReturnHomeBtn, #mobileInlineReturnHomeBtn, #resultReturnHomeBtn) .svg-action-inner [fill="#F3EF84"] {
+            fill: #F3EF84;
+        }
+        :is(#finishRatingBtn, #mobileFinishRatingBtn, #inlineReturnHomeBtn, #mobileInlineReturnHomeBtn, #resultReturnHomeBtn):hover .svg-action-inner [fill="#F3EF84"] {
+            fill: #FAF8BE;
+        }
+
+        /* 天藍底按鈕 (下載圖卡)：#59E1FF -> #A3EEFF */
+        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn) .svg-action-inner [fill="#59E1FF"] {
+            fill: #59E1FF;
+        }
+        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn):hover .svg-action-inner [fill="#59E1FF"] {
+            fill: #A3EEFF;
+        }
+
+        /* 米白底按鈕 (小便斗模式電腦版下載圖卡)：#FFF9EC 柔和淡化 */
+        #inlineDownloadCardBtn .svg-action-inner [fill="#FFF9EC"] {
+            fill: #FFF9EC;
+            fill-opacity: 1;
+        }
+        #inlineDownloadCardBtn:hover .svg-action-inner [fill="#FFF9EC"] {
+            fill: #FFFFFF;
+            fill-opacity: 0.72;
+        }
+
+        /* 珊瑚紅底按鈕 (編輯評鑑)：#FF5A4E -> #FF948C */
+        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn) .svg-action-inner [fill="#FF5A4E"] {
+            fill: #FF5A4E;
+        }
+        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn):hover .svg-action-inner [fill="#FF5A4E"] {
+            fill: #FF948C;
+        }
         .logo-link-group:hover .logo-visual-inner {
             transform: scale(1.04);
         }
@@ -649,8 +716,8 @@
             <a href="./index.html" data-rating-nav="home" class="hover:opacity-70 transition-opacity">首頁</a>
             <a href="./index.html?openReport=1" data-rating-nav="report" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
             <a href="./map.html" data-rating-nav="map" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-            <a href="#" data-rating-nav="construction" class="hover:opacity-70 transition-opacity">公廁現況版</a>
-            <a href="#" data-rating-nav="construction" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+            <a href="./board.html" data-rating-nav="board" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+<a href="./handbook.html" data-rating-nav="handbook" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
             <a href="./profile.html" data-rating-nav="profile" class="hover:opacity-70 transition-opacity">個人空間</a>
         </div>
     </nav>
@@ -2505,7 +2572,32 @@
             </div>
         </div>
     </div>
+<!-- =================================================================== -->
+    <!-- POPUP 4: 超過小怪數量上限時彈出「最多選擇8隻小怪」提示視窗          -->
+    <!-- =================================================================== -->
+    <div id="monsterLimitModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative w-full max-w-[460px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] px-7 sm:px-10 pt-12 pb-9 flex flex-col items-center text-center shadow-2xl">
+            <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
+            <button id="closeMonsterLimitModalBtn" type="button" aria-label="關閉"
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
+                    <line x1="9" y1="9" x2="23" y2="23" />
+                    <line x1="23" y1="9" x2="9" y2="23" />
+                </svg>
+            </button>
 
+            <!-- 內文提示區 -->
+            <div class="mt-2 mb-7 text-[#2A348C] text-lg sm:text-[22px] font-black tracking-[0.16em] leading-relaxed">
+                <p>最多選擇8隻小怪</p>
+            </div>
+
+            <!-- 底部確認按鈕 -->
+            <button id="confirmMonsterLimitBtn" type="button"
+                    class="w-full max-w-[162px] h-[46px] rounded-full bg-[#08F29A] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
+                知道了
+            </button>
+        </div>
+    </div>
     <!-- 施工中彈窗 (供手機版漢堡選單點擊「公廁現況版 / 小怪圖鑑」使用) -->
     <div id="ratingUnderConstructionModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
@@ -4536,13 +4628,25 @@ function clearLegacyDeviceReporterId() {
             const bindCardClick = (cardEl) => {
                 cardEl.addEventListener('click', async (e) => {
                     e.stopPropagation();
+                    if (window._isDraggingMobileMonsterList) return;
+
                     const monsterId = cardEl.getAttribute('data-monster-id');
                     if (isMonsterAlreadyPlaced(monsterId)) return;
+
+                    // 超過 8 隻上限時彈出「最多選擇8隻小怪」視窗
+                    if (placedMonstersState.length >= MAX_PLACED_MONSTERS) {
+                        openMonsterLimitModal();
+                        return;
+                    }
 
                     const itemObj = items.find(m => m.id === monsterId);
                     if (!itemObj) return;
                     const resolvedUrl = await resolveMonsterImageUrl(itemObj);
                     if (isMonsterAlreadyPlaced(monsterId)) return;
+                    if (placedMonstersState.length >= MAX_PLACED_MONSTERS) {
+                        openMonsterLimitModal();
+                        return;
+                    }
 
                     spawnPlacedMonsterOnCanvas(itemObj, resolvedUrl);
                     syncStallMonsterMenuPlacedState();
@@ -4611,9 +4715,32 @@ function clearLegacyDeviceReporterId() {
             const maxX = MONSTER_X_MAX_BOUND - halfSpan;
             return Math.min(maxX, Math.max(minX, x));
         }
+        
+        const MAX_PLACED_MONSTERS = 8;
+
+        function closeMonsterLimitModal() {
+            document.getElementById('monsterLimitModal')?.classList.add('hidden');
+        }
+
+        function openMonsterLimitModal() {
+            const modalEl = document.getElementById('monsterLimitModal');
+            if (!modalEl) return;
+            if (!modalEl.dataset.boundClose) {
+                modalEl.dataset.boundClose = '1';
+                document.getElementById('closeMonsterLimitModalBtn')?.addEventListener('click', closeMonsterLimitModal);
+                document.getElementById('confirmMonsterLimitBtn')?.addEventListener('click', closeMonsterLimitModal);
+                modalEl.addEventListener('click', (e) => {
+                    if (e.target === modalEl) closeMonsterLimitModal();
+                });
+            }
+            modalEl.classList.remove('hidden');
+        }
 
         function spawnPlacedMonsterOnCanvas(monsterItem, imgUrl) {
-
+            if (placedMonstersState.length >= MAX_PLACED_MONSTERS) {
+                openMonsterLimitModal();
+                return;
+            }
             hasCanvasUnsavedChanges = true;
 
             const offsetSeed = (placedMonstersState.length % 5) * 18 - 36;
@@ -4655,6 +4782,7 @@ function clearLegacyDeviceReporterId() {
         function renderMonstersIntoLayer(layerEl) {
             if (!layerEl) return;
             const svgNs = 'http://www.w3.org/2000/svg';
+            const isMobileLayer = (layerEl.id === 'mobilePlacedMonstersLayer');
             layerEl.innerHTML = '';
 
             placedMonstersState.forEach((m) => {
@@ -4665,6 +4793,8 @@ function clearLegacyDeviceReporterId() {
                 rootG.style.touchAction = 'none';
 
                 const halfBox = MONSTER_HALF_BOX * m.scale;
+                // 手機版移動小怪時，點擊與拖曳感應範圍放大 1/3 倍 (乘以 4/3)，視覺框線維持原尺寸
+                const hitHalfBox = isMobileLayer ? (halfBox * (4 / 3)) : halfBox;
                 const imgHalf = MONSTER_IMG_HALF * m.scale;
 
                 const monsterImg = document.createElementNS(svgNs, 'image');
@@ -4678,11 +4808,12 @@ function clearLegacyDeviceReporterId() {
                 rootG.appendChild(monsterImg);
 
                 const dragHitRect = document.createElementNS(svgNs, 'rect');
-                dragHitRect.setAttribute('x', (-halfBox).toFixed(1));
-                dragHitRect.setAttribute('y', (-halfBox).toFixed(1));
-                dragHitRect.setAttribute('width', (halfBox * 2).toFixed(1));
-                dragHitRect.setAttribute('height', (halfBox * 2).toFixed(1));
+                dragHitRect.setAttribute('x', (-hitHalfBox).toFixed(1));
+                dragHitRect.setAttribute('y', (-hitHalfBox).toFixed(1));
+                dragHitRect.setAttribute('width', (hitHalfBox * 2).toFixed(1));
+                dragHitRect.setAttribute('height', (hitHalfBox * 2).toFixed(1));
                 dragHitRect.setAttribute('fill', 'transparent');
+                dragHitRect.style.touchAction = 'none';
                 rootG.appendChild(dragHitRect);
 
                 dragHitRect.addEventListener('pointerdown', (e) => {
@@ -6201,6 +6332,14 @@ function clearLegacyDeviceReporterId() {
                         requestLeaveRatingPage('./map.html', false);
                         return;
                     }
+                    if (navType === 'board') {
+                        requestLeaveRatingPage('./board.html', false);
+                        return;
+                    }
+                    if (navType === 'handbook') {
+                        requestLeaveRatingPage('./handbook.html', false);
+                        return;
+                    }
                     if (navType === 'profile') {
                         const activeUser = getActiveAuthUser();
                         const dest = (activeUser && activeUser.uid) ? './profile.html' : './index.html';
@@ -6291,15 +6430,15 @@ function clearLegacyDeviceReporterId() {
                 requestLeaveRatingPage(dest, dest === './index.html');
             });
             document.getElementById('ratingTpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeRatingTpDropdownMenu(false);
-                ratingUnderConstructionModalEl?.classList.remove('hidden');
-            });
-            document.getElementById('ratingTpMenuMonsterDexBtn')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeRatingTpDropdownMenu(false);
-                ratingUnderConstructionModalEl?.classList.remove('hidden');
-            });
+    e.stopPropagation();
+    closeRatingTpDropdownMenu(false);
+    requestLeaveRatingPage('./board.html', false); // 👈 改為連結到公廁現況版
+});
+document.getElementById('ratingTpMenuMonsterDexBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeRatingTpDropdownMenu(false);
+    requestLeaveRatingPage('./handbook.html', false); // 👈 改為連結到小怪圖鑑
+});
 
             document.addEventListener('pointerdown', (e) => {
                 if (!ratingTpRollDropdownMenu || !ratingTpRollDropdownMenu.classList.contains('is-open')) return;
