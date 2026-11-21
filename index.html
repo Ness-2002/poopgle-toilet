@@ -2051,10 +2051,10 @@
 
             <!-- 周圍 100m 內無公廁時的「您距離公廁太遠」提示畫面 -->
             <div id="tooFarFromToiletView" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center px-6 text-center select-none">
-                <h2 class="text-[26px] sm:text-[34px] font-black text-[#2A348C] tracking-[0.14em] leading-snug">
+                <h2 id="tooFarTitleText" class="text-[26px] sm:text-[34px] font-black text-[#2A348C] tracking-[0.14em] leading-snug">
                     :( 您距離公廁太遠
                 </h2>
-                <p class="mt-4 sm:mt-5 text-xs sm:text-[13.5px] font-bold tracking-[0.12em] leading-relaxed">
+                <p id="tooFarDescText" class="mt-4 sm:mt-5 text-xs sm:text-[13.5px] font-bold tracking-[0.12em] leading-relaxed">
                     <span class="text-[#2A348C]">最近的公廁：<span id="tooFarNearestToiletName">搜尋中...</span></span><span class="text-[#F26559]">(超過100m)</span>
                 </p>
                 <div class="mt-11 sm:mt-14 flex items-center justify-center gap-5 sm:gap-7">
@@ -4618,12 +4618,18 @@
                     if (Number.isFinite(lat) && Number.isFinite(lng) && lat > 90 && lng >= 10 && lng <= 40) {
                         const tmp = lat; lat = lng; lng = tmp;
                     }
-                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                    // 僅保留台灣本島與離島合理經緯度範圍，過濾 0 或異常錯置座標
+                    if (Number.isFinite(lat) && Number.isFinite(lng) && lat >= 21.5 && lat <= 26.5 && lng >= 118.0 && lng <= 122.5) {
                         list.push({ name, address, exec, lat, lng });
                     }
                 }
                 return list;
             };
+
+            const isValidTaiwanCoord = (lat, lng) => (
+                Number.isFinite(lat) && Number.isFinite(lng) &&
+                lat >= 21.5 && lat <= 26.5 && lng >= 118.0 && lng <= 122.5
+            );
 
             const ensurePublicToiletsLoaded = async () => {
                 if (Array.isArray(cachedPublicToiletsList) && cachedPublicToiletsList.length > 0) {
@@ -4643,6 +4649,7 @@
                                 const getReq = tx.objectStore(MAP_IDB_STORE).get('main_csv_dataset');
                                 getReq.onsuccess = () => { clearTimeout(t); done(getReq.result?.records || null); };
                                 getReq.onerror = () => { clearTimeout(t); done(null); };
+                                tx.onabort = () => { clearTimeout(t); done(null); };
                             } catch (e) { clearTimeout(t); done(null); }
                         };
                         req.onerror = () => { clearTimeout(t); done(null); };
@@ -4650,11 +4657,16 @@
                 });
 
                 if (Array.isArray(fromIdb) && fromIdb.length > 0) {
-                    cachedPublicToiletsList = fromIdb;
-                    return cachedPublicToiletsList;
+                    cachedPublicToiletsList = fromIdb.filter(item => isValidTaiwanCoord(Number(item.lat), Number(item.lng)));
+                    if (cachedPublicToiletsList.length > 0) return cachedPublicToiletsList;
                 }
 
-                const csvCandidates = ['./全國公廁建檔資料.csv', '全國公廁建檔資料.csv', encodeURI('./全國公廁建檔資料.csv'), './toilets.csv'];
+                const csvCandidates = Array.from(new Set([
+                    encodeURI('./全國公廁建檔資料.csv'),
+                    './全國公廁建檔資料.csv',
+                    '全國公廁建檔資料.csv',
+                    './toilets.csv'
+                ]));
                 for (const url of csvCandidates) {
                     try {
                         const res = await fetch(url);
@@ -4670,59 +4682,226 @@
                 return [];
             };
 
+            // 進入回報畫面時預先喚醒 GPS 晶片與預載 CSV，讓點擊粉紅門時更快鎖定真實衛星位置
+            let prewarmedGpsFix = null;
+            let prewarmWatchId = null;
+            let prewarmStopTimer = null;
+
+            const stopSilentGpsPrewarm = () => {
+                if (prewarmWatchId !== null && navigator.geolocation) {
+                    try { navigator.geolocation.clearWatch(prewarmWatchId); } catch (e) {}
+                    prewarmWatchId = null;
+                }
+                if (prewarmStopTimer) {
+                    clearTimeout(prewarmStopTimer);
+                    prewarmStopTimer = null;
+                }
+            };
+
+            const prewarmReportGpsAndData = () => {
+                ensurePublicToiletsLoaded().catch(() => {});
+                if (!navigator.geolocation || !navigator.permissions || typeof navigator.permissions.query !== 'function') return;
+                navigator.permissions.query({ name: 'geolocation' }).then((perm) => {
+                    // 僅在已授權狀態下安靜預熱 GPS，避免還沒點粉紅門就突然跳出權限視窗
+                    if (perm.state !== 'granted') return;
+                    stopSilentGpsPrewarm();
+                    prewarmWatchId = navigator.geolocation.watchPosition(
+                        (pos) => {
+                            const c = pos && pos.coords;
+                            if (!c || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return;
+                            const acc = Number.isFinite(c.accuracy) ? c.accuracy : 9999;
+                            if (!prewarmedGpsFix || acc <= prewarmedGpsFix.accuracy || (Date.now() - prewarmedGpsFix.ts > 6000)) {
+                                prewarmedGpsFix = {
+                                    latitude: c.latitude,
+                                    longitude: c.longitude,
+                                    accuracy: acc,
+                                    ts: Date.now()
+                                };
+                            }
+                            if (acc <= 30) stopSilentGpsPrewarm();
+                        },
+                        () => {},
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 }
+                    );
+                    prewarmStopTimer = setTimeout(stopSilentGpsPrewarm, 9000);
+                }).catch(() => {});
+            };
+
+            // 門檻：誤差半徑超過 600m 代表是電信機房 IP 定位或未開啟精準位置，不拿來誤判遠方公廁
+            const MAX_ACCEPTABLE_ACCURACY_METERS = 600;
+
             const requestUserGpsCoords = () => {
-                return new Promise((resolve) => {
+                return new Promise(async (resolve) => {
                     if (!navigator.geolocation) {
-                        resolve(null);
+                        resolve({ status: 'unavailable', coords: null });
                         return;
                     }
-                    let settled = false;
-                    const done = (coords) => { if (!settled) { settled = true; resolve(coords); } };
-                    const timer = setTimeout(() => done(null), 4200);
 
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => { clearTimeout(timer); done(pos.coords); },
-                        () => {
+                    // 若剛預熱完已有 5 秒內、誤差 <= 40m 的衛星座標，直接採用
+                    if (prewarmedGpsFix && (Date.now() - prewarmedGpsFix.ts < 5000) && prewarmedGpsFix.accuracy <= 40) {
+                        stopSilentGpsPrewarm();
+                        resolve({ status: 'ok', coords: prewarmedGpsFix });
+                        return;
+                    }
+                    stopSilentGpsPrewarm();
+
+                    let settled = false;
+                    let watchId = null;
+                    let overallTimer = null;
+                    let refineTimer = null;
+                    let coarseWaitTimer = null;
+                    let bestCoords = (prewarmedGpsFix && (Date.now() - prewarmedGpsFix.ts < 10000))
+                        ? { ...prewarmedGpsFix }
+                        : null;
+
+                    const cleanup = () => {
+                        if (watchId !== null) {
+                            try { navigator.geolocation.clearWatch(watchId); } catch (e) {}
+                            watchId = null;
+                        }
+                        if (overallTimer) { clearTimeout(overallTimer); overallTimer = null; }
+                        if (refineTimer) { clearTimeout(refineTimer); refineTimer = null; }
+                        if (coarseWaitTimer) { clearTimeout(coarseWaitTimer); coarseWaitTimer = null; }
+                    };
+
+                    const finish = (result) => {
+                        if (settled) return;
+                        settled = true;
+                        cleanup();
+                        resolve(result);
+                    };
+
+                    const settleWithBestOrUnavailable = () => {
+                        if (bestCoords && bestCoords.accuracy <= MAX_ACCEPTABLE_ACCURACY_METERS) {
+                            finish({ status: 'ok', coords: bestCoords });
+                        } else if (bestCoords) {
+                            finish({ status: 'low_accuracy', coords: bestCoords });
+                        } else {
+                            finish({ status: 'unavailable', coords: null });
+                        }
+                    };
+
+                    // 若處於尚未按「允許」的詢問狀態，給予 15 秒充裕時間避免使用者還在看視窗就逾時
+                    let initialTimeoutMs = 8000;
+                    try {
+                        if (navigator.permissions && typeof navigator.permissions.query === 'function') {
+                            const perm = await navigator.permissions.query({ name: 'geolocation' });
+                            if (perm.state === 'denied') {
+                                finish({ status: 'denied', coords: null });
+                                return;
+                            }
+                            if (perm.state === 'prompt') {
+                                initialTimeoutMs = 15000;
+                                perm.onchange = () => {
+                                    if (perm.state === 'denied') {
+                                        finish({ status: 'denied', coords: null });
+                                    } else if (perm.state === 'granted' && overallTimer) {
+                                        clearTimeout(overallTimer);
+                                        overallTimer = setTimeout(settleWithBestOrUnavailable, 7500);
+                                    }
+                                };
+                            }
+                        }
+                    } catch (e) {}
+
+                    overallTimer = setTimeout(settleWithBestOrUnavailable, initialTimeoutMs);
+
+                    watchId = navigator.geolocation.watchPosition(
+                        (pos) => {
+                            const c = pos && pos.coords;
+                            if (!c || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return;
+                            const acc = Number.isFinite(c.accuracy) ? c.accuracy : 9999;
+
+                            if (!bestCoords || acc < bestCoords.accuracy) {
+                                bestCoords = {
+                                    latitude: c.latitude,
+                                    longitude: c.longitude,
+                                    accuracy: acc
+                                };
+                            }
+
+                            // 1. 誤差在 55m 以內（真實 GPS 衛星或精準 Wi-Fi），立即完成定位！
+                            if (acc <= 55) {
+                                finish({ status: 'ok', coords: bestCoords });
+                                return;
+                            }
+
+                            // 2. 誤差在 55m ~ 280m（室內訊號微飄），多等 2.2 秒看衛星能否更準，否則採用最佳值
+                            if (acc <= 280 && !refineTimer) {
+                                refineTimer = setTimeout(() => {
+                                    finish({ status: 'ok', coords: bestCoords });
+                                }, 2200);
+                                return;
+                            }
+
+                            // 3. 第一筆若是粗略座標（> 280m，如電信基地台/IP），不馬上結案！繼續等最多 4.5 秒讓 GPS 鎖定
+                            if (!coarseWaitTimer) {
+                                coarseWaitTimer = setTimeout(settleWithBestOrUnavailable, 4500);
+                            }
+                        },
+                        (err) => {
+                            if (err && err.code === 1) {
+                                finish({ status: 'denied', coords: null });
+                                return;
+                            }
+                            if (bestCoords) {
+                                settleWithBestOrUnavailable();
+                                return;
+                            }
+                            // 僅在硬體高精準完全無回應時嘗試一次 Wi-Fi 定位，且同樣嚴格檢查精準度（拒絕數公里的 IP 定位）
                             navigator.geolocation.getCurrentPosition(
-                                (pos2) => { clearTimeout(timer); done(pos2.coords); },
-                                () => { clearTimeout(timer); done(null); },
-                                { enableHighAccuracy: false, timeout: 2500, maximumAge: 60000 }
+                                (pos2) => {
+                                    const c2 = pos2 && pos2.coords;
+                                    const acc2 = Number.isFinite(c2?.accuracy) ? c2.accuracy : 9999;
+                                    if (c2 && acc2 <= MAX_ACCEPTABLE_ACCURACY_METERS) {
+                                        finish({ status: 'ok', coords: { latitude: c2.latitude, longitude: c2.longitude, accuracy: acc2 } });
+                                    } else if (c2) {
+                                        finish({ status: 'low_accuracy', coords: { latitude: c2.latitude, longitude: c2.longitude, accuracy: acc2 } });
+                                    } else {
+                                        finish({ status: 'unavailable', coords: null });
+                                    }
+                                },
+                                () => finish({ status: 'unavailable', coords: null }),
+                                { enableHighAccuracy: false, timeout: 3000, maximumAge: 0 }
                             );
                         },
-                        { enableHighAccuracy: true, timeout: 3000, maximumAge: 15000 }
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                     );
                 });
             };
 
             let nearestOverallToilet = null;
+            let lastLocateResultMeta = { status: 'unavailable', accuracy: null };
 
             const locateNearestPublicToilet = async () => {
-                const [coords, toilets] = await Promise.all([
+                const [geoResult, toilets] = await Promise.all([
                     requestUserGpsCoords(),
                     ensurePublicToiletsLoaded()
                 ]);
 
-                const fallbackDemoCandidates = [
-                    { name: '銘傳大學設計大樓女廁', exec: '銘傳大學總務處', address: '桃園市龜山區德明路5號', lat: 24.9852, lng: 121.3418, distance: 125 },
-                    { name: '銘傳大學設計大樓男廁', exec: '銘傳大學總務處', address: '桃園市龜山區德明路5號', lat: 24.98525, lng: 121.34185, distance: 138 },
-                    { name: '龜山區大同公園女廁', exec: '龜山區公所', address: '桃園市龜山區大同路與德明路口', lat: 24.9881, lng: 121.3402, distance: 165 }
-                ];
+                const status = geoResult?.status || 'unavailable';
+                const coords = geoResult?.coords || null;
+                lastLocateResultMeta = {
+                    status,
+                    accuracy: coords ? coords.accuracy : null
+                };
 
                 let within100mList = [];
                 nearestOverallToilet = null;
 
-                if (coords && Array.isArray(toilets) && toilets.length > 0) {
+                // 只有精準度合格 (status === 'ok') 時才配對附近公廁，絕不拿粗略 IP 或 CSV 第一筆誤導使用者
+                if (status === 'ok' && coords && Array.isArray(toilets) && toilets.length > 0) {
                     const withDist = [];
                     for (let i = 0; i < toilets.length; i++) {
                         const t = toilets[i];
-                        const d = calcGeoDistanceMeters(coords.latitude, coords.longitude, t.lat, t.lng);
+                        const d = calcGeoDistanceMeters(coords.latitude, coords.longitude, Number(t.lat), Number(t.lng));
                         if (Number.isFinite(d)) {
                             withDist.push({
                                 name: t.name || '公廁名稱',
                                 exec: t.exec || '環境管理單位',
                                 address: t.address || '無詳細地址',
-                                lat: t.lat,
-                                lng: t.lng,
+                                lat: Number(t.lat),
+                                lng: Number(t.lng),
                                 userLat: coords.latitude,
                                 userLng: coords.longitude,
                                 distance: Math.round(d)
@@ -4730,14 +4909,8 @@
                         }
                     }
                     withDist.sort((a, b) => a.distance - b.distance);
-                    nearestOverallToilet = withDist[0] || fallbackDemoCandidates[0];
+                    nearestOverallToilet = withDist[0] || null;
                     within100mList = withDist.filter(item => item.distance <= 100);
-                } else {
-                    // 若未開啟定位權限或無法取得 GPS 座標，視為無法找到 100m 內公廁
-                    nearestOverallToilet = (Array.isArray(toilets) && toilets.length > 0)
-                        ? { name: toilets[0].name || '未知公廁', exec: toilets[0].exec || '', address: toilets[0].address || '', distance: 999 }
-                        : fallbackDemoCandidates[0];
-                    within100mList = [];
                 }
 
                 const seenKeys = new Set();
@@ -4759,6 +4932,34 @@
                 }
 
                 return locatedNearby100mToilets;
+            };
+
+            const updateTooFarViewMessage = () => {
+                const titleEl = document.getElementById('tooFarTitleText');
+                const descEl = document.getElementById('tooFarDescText');
+                if (!titleEl || !descEl) return;
+
+                if (lastLocateResultMeta.status === 'ok' && nearestOverallToilet) {
+                    const d = Number(nearestOverallToilet.distance);
+                    const distText = Number.isFinite(d)
+                        ? (d < 1000 ? `約 ${Math.round(d)}m，` : `約 ${(d / 1000).toFixed(1)}km，`)
+                        : '';
+                    titleEl.textContent = ':( 您距離公廁太遠';
+                    descEl.innerHTML = `<span class="text-[#2A348C]">最近的公廁：<span id="tooFarNearestToiletName">${escapeHtml(nearestOverallToilet.name)}</span></span><span class="text-[#F26559]">(${distText}超過100m)</span>`;
+                } else if (lastLocateResultMeta.status === 'low_accuracy') {
+                    const acc = Number(lastLocateResultMeta.accuracy);
+                    const accText = Number.isFinite(acc)
+                        ? (acc >= 1000 ? `誤差約 ${(acc / 1000).toFixed(1)}km` : `誤差約 ${Math.round(acc)}m`)
+                        : '誤差過大';
+                    titleEl.textContent = ':( 定位精準度不足';
+                    descEl.innerHTML = `<span class="text-[#2A348C]">目前為粗略網路定位</span><span class="text-[#F26559]">(${accText})</span><br><span class="text-[#2A348C]">請開啟手機 GPS／精準位置與 Wi-Fi 後重新定位</span>`;
+                } else if (lastLocateResultMeta.status === 'denied') {
+                    titleEl.textContent = ':( 尚未開啟定位權限';
+                    descEl.innerHTML = `<span class="text-[#2A348C]">請允許瀏覽器「位置權限」，或改用 Safari／Chrome 開啟</span>`;
+                } else {
+                    titleEl.textContent = ':( 尚未取得定位訊號';
+                    descEl.innerHTML = `<span class="text-[#2A348C]">請移至訊號較佳處，並開啟 GPS 與 Wi-Fi 後點擊重新定位</span>`;
+                }
             };
 
             const syncNearby100mCustomScrollbar = () => {
@@ -5106,6 +5307,7 @@
                 isStageTransitioning = true;
                 playHomeClickSfx();
                 resetDoorWheelToStage01();
+                prewarmReportGpsAndData();
 
                 mainHomeStageEl?.classList.remove('is-rising-back');
                 void mainHomeStageEl?.offsetWidth;
@@ -5147,6 +5349,7 @@
                 if (e) e.stopPropagation();
                 if (isStageTransitioning) return;
                 isStageTransitioning = true;
+                stopSilentGpsPrewarm();
                 playHomeClickSfx();
 
                 if (doorWheelAnimFrameId) {
@@ -5202,6 +5405,9 @@
                 if (initParams.get('openReport') === '1') {
                     window.history.replaceState(null, '', window.location.pathname);
                     resetDoorWheelToStage01();
+                    prewarmReportGpsAndData();
+                    prewarmReportGpsAndData();
+                    prewarmReportGpsAndData();
                     mainHomeStageEl?.classList.add('hidden');
                     homeLoginBtnEl?.classList.add('hidden');
                     topRightNavContainerEl?.classList.add('md:hidden');
@@ -5300,9 +5506,7 @@
                         } else {
                             nearby100mMenuWheelGroupEl?.classList.add('hidden');
                             mobileNearby100mMenuWheelGroupEl?.classList.add('hidden');
-                            if (tooFarNearestToiletNameEl) {
-                                tooFarNearestToiletNameEl.textContent = nearestOverallToilet?.name || '附近無建檔公廁';
-                            }
+                            updateTooFarViewMessage();
                         }
 
                         const easeOutSmooth = (t) => 1 - Math.pow(1 - t, 2.35);
@@ -5373,8 +5577,10 @@
             // 點擊「距離公廁太遠」畫面的「重新定位」按鈕 -> 回到粉紅門畫面，讓使用者再次點擊粉紅門定位
             document.getElementById('tooFarRetryLocateBtn')?.addEventListener('click', (e) => {
                 e.stopPropagation();
+                prewarmedGpsFix = null;
                 playHomeClickSfx();
                 resetDoorWheelToStage01();
+                prewarmReportGpsAndData();
 
                 if (reportDoorWheelSvgEl) {
                     reportDoorWheelSvgEl.classList.remove('is-sinking-out', 'is-jumping-up');
