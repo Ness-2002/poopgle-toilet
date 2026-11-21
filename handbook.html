@@ -499,7 +499,7 @@
             <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
             <a href="./index.html?openReport=1" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
             <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-            <a href="#" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+            <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
             <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
             <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
         </div>
@@ -2285,7 +2285,7 @@
                 playPopSfx();
                 underConstructionModal?.classList.remove('hidden');
             };
-            document.getElementById('desktopNavStatusBtn')?.addEventListener('click', openUnderConstruction);
+            
             document.getElementById('closeUnderConstructionBtn')?.addEventListener('click', () => {
                 underConstructionModal?.classList.add('hidden');
             });
@@ -2385,10 +2385,9 @@
             document.getElementById('tpMenuMapBtn')?.addEventListener('click', () => {
                 window.location.href = './map.html';
             });
-            document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
-                closeTpMenu();
-                openUnderConstruction(e);
-            });
+            document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', () => {
+    window.location.href = './board.html';
+});
             document.getElementById('tpMenuMonsterDexBtn')?.addEventListener('click', () => {
                 closeTpMenu();
                 triggerAllRandomShuffle();

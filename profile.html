@@ -317,8 +317,8 @@
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
-                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('profileUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
+                <a href="./board.html" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+<a href="./handbook.html" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
         </nav>
@@ -2183,13 +2183,11 @@
                 window.location.href = './map.html';
             });
             document.getElementById('profileTpMenuStatusBoardBtn')?.addEventListener('click', () => {
-                closeProfileTpDropdownMenu(false);
-                profileUnderConstructionModal?.classList.remove('hidden');
-            });
-            document.getElementById('profileTpMenuMonsterDexBtn')?.addEventListener('click', () => {
-                closeProfileTpDropdownMenu(false);
-                profileUnderConstructionModal?.classList.remove('hidden');
-            });
+    window.location.href = './board.html';
+});
+document.getElementById('profileTpMenuMonsterDexBtn')?.addEventListener('click', () => {
+    window.location.href = './handbook.html';
+});
             document.getElementById('profileTpMenuPersonalSpaceBtn')?.addEventListener('click', () => {
                 closeProfileTpDropdownMenu(false);
             });
