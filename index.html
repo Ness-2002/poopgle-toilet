@@ -35,6 +35,7 @@
             }
         }, true);
     </script>
+    <link rel="preload" as="image" href="./img/logo.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -311,21 +312,7 @@
         /* 中央馬桶掀蓋與選項湧出連動動畫                               */
         /* ========================================================= */
         /* 1. 馬桶蓋由平放透視角度向上掀開 */
-        @keyframes toiletLidFlipOpen {
-            0% {
-                transform: translateY(38px) scaleX(1.055) scaleY(0.295);
-            }
-            68% {
-                transform: translateY(-6px) scaleX(0.99) scaleY(1.03);
-            }
-            100% {
-                transform: translateY(0px) scaleX(1) scaleY(1);
-            }
-        }
-        #toiletOpenUpperGroup.is-animating {
-            transform-origin: 720px 536px;
-            animation: toiletLidFlipOpen 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
+       /* 馬桶蓋掀開與關閉立體翻轉改由 JS 3D 透視投影驅動 */
 
         /* 2. 藍色水花「公廁回報系統」由馬桶內向上湧出 */
         @keyframes waterSplashRise {
@@ -423,95 +410,82 @@
         }
 
         /* ========================================================= */
-        /* 中央馬桶「蓋上馬桶蓋」與內容物收回連動動畫                   */
-        /* ========================================================= */
-        @keyframes toiletLidFlipClose {
-            0% {
-                transform: translateY(0px) scaleX(1) scaleY(1);
-            }
-            100% {
-                transform: translateY(38px) scaleX(1.055) scaleY(0.295);
-            }
-        }
-        @keyframes waterSplashSinkDown {
-            0% {
-                transform: translateY(0px) scaleX(1) scaleY(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(28px) scaleX(0.72) scaleY(0.12);
-                opacity: 0;
-            }
-        }
-        @keyframes pinkPoopSinkDown {
-            0% {
-                transform: translateY(0px) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(90px) scale(0.32) rotate(-10deg);
-                opacity: 0;
-            }
-        }
-        @keyframes toiletLogoJumpDown {
-            0% {
-                transform: translateY(18px) scale(1);
-            }
-            65% {
-                transform: translateY(-4px) scale(1.02);
-            }
-            100% {
-                transform: translateY(0px) scale(1);
-            }
-        }
-        @keyframes toiletClosedLidSettle {
-            0% {
-                transform: translateY(-8px) scaleX(0.985) scaleY(0.94);
-            }
-            60% {
-                transform: translateY(3px) scaleX(1.01) scaleY(1.03);
-            }
-            100% {
-                transform: translateY(0px) scaleX(1) scaleY(1);
-            }
-        }
-        #toiletOpenUpperGroup.is-closing {
-            transform-origin: 720px 536px;
-            animation: toiletLidFlipClose 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        #openReportSystemBtn.is-closing {
-            transform-origin: 720px 542px;
-            animation: waterSplashSinkDown 0.24s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        #openStatusBoardBtn.is-closing {
-            transform-origin: 655px 345px;
-            animation: pinkPoopSinkDown 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        #toiletMainLogoGroup.is-jumping-down {
-            animation: toiletLogoJumpDown 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-        #toiletClosedLidRing.is-settling {
-            transform-origin: 720px 525px;
-            animation: toiletClosedLidSettle 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
+     /* 中央馬桶「蓋上馬桶蓋」與內容物收回連動動畫                   */
+     /* ========================================================= */
+     @keyframes waterSplashSinkDown {
+         0% {
+             transform: translateY(0px) scaleX(1) scaleY(1);
+             opacity: 1;
+         }
+         100% {
+             transform: translateY(28px) scaleX(0.72) scaleY(0.12);
+             opacity: 0;
+         }
+     }
+     @keyframes pinkPoopSinkDown {
+         0% {
+             transform: translateY(0px) scale(1) rotate(0deg);
+             opacity: 1;
+         }
+         100% {
+             transform: translateY(90px) scale(0.32) rotate(-10deg);
+             opacity: 0;
+         }
+     }
+     @keyframes toiletLogoJumpDown {
+         0% {
+             transform: translateY(18px) scale(1);
+         }
+         65% {
+             transform: translateY(-4px) scale(1.02);
+         }
+         100% {
+             transform: translateY(0px) scale(1);
+         }
+     }
+     @keyframes toiletClosedLidSettle {
+         0% {
+             transform: translateY(0px) scaleX(1) scaleY(1);
+         }
+         45% {
+             transform: translateY(2.5px) scaleX(1.005) scaleY(1.015);
+         }
+         100% {
+             transform: translateY(0px) scaleX(1) scaleY(1);
+         }
+     }
+     #openReportSystemBtn.is-closing {
+         transform-origin: 720px 542px;
+         animation: waterSplashSinkDown 0.24s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+     }
+     #openStatusBoardBtn.is-closing {
+         transform-origin: 655px 345px;
+         animation: pinkPoopSinkDown 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+     }
+     #toiletMainLogoGroup.is-jumping-down {
+         animation: toiletLogoJumpDown 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+     }
+     #toiletClosedLidRing.is-settling {
+         transform-origin: 720px 525px;
+         animation: toiletClosedLidSettle 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+     }
 
         /* ========================================================= */
         /* 6 顆小怪泡泡漂浮、輪播切換與點擊破泡重生動畫                 */
         /* ========================================================= */
         @keyframes bubbleRiseUpIn {
-            0% {
-                transform: translateY(520px) scale(0.45);
-                opacity: 0;
-            }
-            72% {
-                transform: translateY(-10px) scale(1.03);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0px) scale(1);
-                opacity: 1;
-            }
-        }
+         0% {
+             transform: translate3d(0, 460px, 0) scale(0.55);
+             opacity: 0;
+         }
+         25% {
+             opacity: 1;
+         }
+         100% {
+             transform: translate3d(0, 0, 0) scale(1);
+             opacity: 1;
+         }
+     }
         @keyframes bubbleRespawnRise {
             0% {
                 transform: translateY(420px) scale(0.35);
@@ -550,8 +524,9 @@
             -webkit-tap-highlight-color: transparent;
         }
         .bubble-travel-wrapper.bubble-rise-in {
-            animation: bubbleRiseUpIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
+         will-change: transform, opacity;
+         animation: bubbleRiseUpIn 0.96s cubic-bezier(0.18, 1.06, 0.32, 1) both;
+     }
         .bubble-travel-wrapper.is-respawning {
             animation: bubbleRespawnRise 0.92s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
@@ -876,19 +851,13 @@
         /* 垃圾桶小蟑螂：預設探頭偷看、Hover 躲進桶內、離開再次探頭     */
         /* ========================================================= */
         @keyframes roachPeekOutFromCan {
-            0% {
-                transform: translate(-26px, 58px);
-            }
-            25% {
-                transform: translate(-20px, 44px);
-            }
-            72% {
-                transform: translate(2.5px, -5px);
-            }
-            100% {
-                transform: translate(0px, 0px);
-            }
-        }
+         0% {
+             transform: translate3d(-26px, 56px, 0);
+         }
+         100% {
+             transform: translate3d(0px, 0px, 0);
+         }
+     }
         @keyframes roachIdleSpyWiggle {
             0%, 100% {
                 transform: translate(393px, 482px) rotate(18deg) scale(1.04);
@@ -906,8 +875,9 @@
             }
         }
         .roach-peek-out-group {
-            animation: roachPeekOutFromCan 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
+         will-change: transform;
+         animation: roachPeekOutFromCan 0.48s cubic-bezier(0.22, 1.26, 0.36, 1) both;
+     }
         .roach-idle-wiggle {
             animation: roachIdleSpyWiggle 2.4s ease-in-out infinite;
         }
@@ -937,7 +907,89 @@
         .nearby-100m-card, .nearby-100m-card * {
             cursor: var(--cursor-hover) !important;
         }
-        
+        /* ========================================================= */
+        /* 頁面初次載入動畫：垃圾桶由左方滑入 & 衛生紙捲由上方依序落下  */
+        /* ========================================================= */
+        @keyframes trashSlideInFromLeft {
+         0% {
+             transform: translate3d(-560px, 0, 0);
+             opacity: 0;
+         }
+         18% {
+             opacity: 1;
+         }
+         100% {
+             transform: translate3d(0, 0, 0);
+             opacity: 1;
+         }
+     }
+     .trash-slide-in-wrapper {
+         transform-box: view-box;
+         transform-origin: 353px 746px;
+         will-change: transform, opacity;
+         animation: trashSlideInFromLeft 0.82s cubic-bezier(0.2, 1.07, 0.32, 1) 0.04s backwards;
+     }
+     /* 讓小蟑螂在垃圾桶滑行到位時順勢探出頭 */
+     .roach-peek-out-group.roach-initial-delay {
+         animation-delay: 0.56s;
+     }
+
+     @keyframes tpRollDropFromSky {
+         0% {
+             transform: translate3d(0, -680px, 0) scale3d(0.97, 1.03, 1);
+             opacity: 0;
+             animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0.28);
+         }
+         18% {
+             opacity: 1;
+         }
+         68% {
+             transform: translate3d(0, 0, 0) scale3d(1.035, 0.955, 1);
+             opacity: 1;
+             animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+         }
+         85% {
+             transform: translate3d(0, -10px, 0) scale3d(0.99, 1.01, 1);
+             opacity: 1;
+             animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+         }
+         100% {
+             transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+             opacity: 1;
+         }
+     }
+     .tp-drop-in {
+         transform-box: view-box;
+         will-change: transform, opacity;
+         animation: tpRollDropFromSky 0.7s both;
+     }
+     .tp-drop-in.tp-drop-1 {
+         transform-origin: 1113px 710px;
+         animation-delay: 0.06s;
+     }
+     .tp-drop-in.tp-drop-2 {
+         transform-origin: 1065px 752px;
+         animation-delay: 0.2s;
+     }
+     .tp-drop-in.tp-drop-3 {
+         transform-origin: 1096px 600px;
+         animation-delay: 0.34s;
+     }
+
+     /* 畫面與首屏圖片解碼就緒前先隱藏主舞台並暫停進場動畫，就緒後同步以滿幀啟動 */
+     body:not(.stage-ready) main {
+         opacity: 0;
+     }
+     body.stage-ready main {
+         opacity: 1;
+         transition: opacity 0.18s ease-out;
+     }
+     body:not(.stage-ready) .bubble-travel-wrapper.bubble-rise-in,
+     body:not(.stage-ready) .trash-slide-in-wrapper,
+     body:not(.stage-ready) .tp-drop-in,
+     body:not(.stage-ready) .roach-peek-out-group {
+         animation-play-state: paused !important;
+     }
     </style>
 </head>
 
@@ -951,8 +1003,8 @@
                 <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="#" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-                <a href="#" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
-                <a href="#" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+                <a href="./board.html" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+                <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
         </nav>
@@ -1408,9 +1460,53 @@
                 </filter>
             
                 <!-- 馬桶水箱裁切遮罩 (確保維修封鎖條完美貼齊水箱左右邊界) -->
-                <clipPath id="toiletTankClip">
-                    <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z" />
-                </clipPath>
+             <!-- 馬桶水箱裁切遮罩 (確保維修封鎖條完美貼齊水箱左右邊界) -->
+             <!-- 馬桶蓋裁切遮罩與「馬桶維修中 請勿使用」黃色封鎖條元件 -->
+             <clipPath id="toiletClosedLidClip">
+                 <ellipse cx="720" cy="517.5" rx="220" ry="71.5" />
+             </clipPath>
+             <g id="toiletLidWarningTape" clip-path="url(#toiletClosedLidClip)">
+                 <g transform="translate(720, 517.5) rotate(8.5)">
+                     <rect x="-240" y="-22" width="480" height="44" fill="#FFF383" stroke="#2A348C" stroke-width="1.8" />
+                     <polygon points="-168,-22 -149,-22 -169,22 -188,22" fill="#2A348C" />
+                     <polygon points="-120,-22 -101,-22 -121,22 -140,22" fill="#2A348C" />
+                     <polygon points="121,-22 140,-22 120,22 101,22" fill="#2A348C" />
+                     <polygon points="169,-22 188,-22 168,22 149,22" fill="#2A348C" />
+                     <text x="0" y="1" transform="skewX(-10)" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
+                         馬桶維修中 請勿使用
+                     </text>
+                 </g>
+             </g>
+             <!-- 馬桶蓋立體側邊厚度漸層（中間受光微亮、兩側順著圓弧轉入柔和陶瓷陰影） -->
+             <linearGradient id="toiletLidRim3DGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                 <stop offset="0%" stop-color="#C8C2DC" />
+                 <stop offset="22%" stop-color="#DDD6C6" />
+                 <stop offset="50%" stop-color="#EFE8D6" />
+                 <stop offset="78%" stop-color="#DDD6C6" />
+                 <stop offset="100%" stop-color="#C8C2DC" />
+             </linearGradient>
+
+             <!-- 2000 年 Windows 復古 3D 標題白邊與立體側面備援濾鏡 -->
+             <filter id="win2kLogoWhiteOutline" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
+                 <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blurAlpha" />
+                 <feComponentTransfer in="blurAlpha" result="solidWhiteMask">
+                     <feFuncA type="linear" slope="18" intercept="-2.2" />
+                 </feComponentTransfer>
+                 <feFlood flood-color="#FFFFFF" result="whiteFill" />
+                 <feComposite in="whiteFill" in2="solidWhiteMask" operator="in" result="whiteOutline" />
+                 <feMerge>
+                     <feMergeNode in="whiteOutline" />
+                     <feMergeNode in="SourceGraphic" />
+                 </feMerge>
+             </filter>
+             <filter id="win2kLogoExtrudeBlock" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
+                 <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blurAlpha" />
+                 <feComponentTransfer in="blurAlpha" result="solidMask">
+                     <feFuncA type="linear" slope="18" intercept="-2.2" />
+                 </feComponentTransfer>
+                 <feFlood flood-color="#283593" result="extrudeColor" />
+                 <feComposite in="extrudeColor" in2="solidMask" operator="in" />
+             </filter>
 
                 <!-- 泡泡圓形裁切遮罩 (放大 1/4：r=90)，確保任何尺寸的小怪 .png 都完美收在泡泡內 -->
                 <clipPath id="bubbleInnerClip">
@@ -1546,7 +1642,7 @@
             </g>
 
             <!-- =============================================================== -->
-            <!-- C. ZONE 2: 公廁地圖 (1:1 還原原圖紅桶綠圈垃圾桶 + 探頭小蟑螂)     -->
+            <!-- C. ZONE 2: 公廁地圖 (左方滑入垃圾桶 + 探頭小蟑螂)                 -->
             <!-- =============================================================== -->
             <g id="zoneMapTrashCan" class="poogle-zone" role="button" aria-label="公廁地圖">
                 <title>點擊進入「公廁地圖」</title>
@@ -1554,62 +1650,64 @@
                 <!-- 固定不縮放的精準感應層 -->
                 <rect x="275" y="438" width="156" height="312" rx="22" fill="transparent" />
 
-                <!-- 1. 預設蓋上的珊瑚紅垃圾桶 -->
-                <g id="trashCanClosedGroup" class="pointer-events-none">
-                    <!-- 預設狀態：從垃圾桶蓋右上方探出頭、觸角與前手偷看的蟑螂 -->
-                    <g id="trashCockroachPeekGroup" class="roach-peek-out-group">
-                        <g class="roach-idle-wiggle">
-                            <use href="#poogleCockroachUnit" />
+                <g class="trash-slide-in-wrapper">
+                    <!-- 1. 預設蓋上的珊瑚紅垃圾桶 -->
+                    <g id="trashCanClosedGroup" class="pointer-events-none">
+                        <!-- 預設狀態：從垃圾桶蓋右上方探出頭偷看的蟑螂 -->
+                        <g id="trashCockroachPeekGroup" class="roach-peek-out-group roach-initial-delay">
+                            <g class="roach-idle-wiggle">
+                                <use href="#poogleCockroachUnit" />
+                            </g>
                         </g>
-                    </g>
 
-                    <path d="M 282,524 L 282,718 A 71,28 0 0,0 424,718 L 424,524"
-                          fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M 282,510 L 282,526 A 71,26 0 0,0 424,526 L 424,510"
-                          fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                    <ellipse cx="353" cy="510" rx="71" ry="26" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
-
-                    <g fill="#2A348C" font-size="24.7" font-weight="700" text-anchor="middle" dominant-baseline="central">
-                        <text x="353" y="595">公</text>
-                        <text x="353" y="622">廁</text>
-                        <text x="353" y="649">地</text>
-                        <text x="353" y="676">圖</text>
-                    </g>
-                </g>
-
-                <!-- 2. 游標靠近時：桶蓋向上彈開 + 蟑螂迅速縮進綠色桶口內部 -->
-                <g id="trashCanOpenGroup" class="hidden pointer-events-none" filter="url(#whiteGlow)">
-                    <g id="trashCanOpenBase">
-                        <path d="M 282,554 L 282,718 A 71,28 0 0,0 424,718 L 424,554"
+                        <path d="M 282,524 L 282,718 A 71,28 0 0,0 424,718 L 424,524"
                               fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="353" cy="554" rx="71" ry="28" fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" />
-
-                        <g fill="#2A348C" font-size="24.7" font-weight="900" text-anchor="middle" dominant-baseline="central">
-                            <text x="353" y="605">公</text>
-                            <text x="353" y="632">廁</text>
-                            <text x="353" y="659">地</text>
-                            <text x="353" y="686">圖</text>
-                        </g>
-                    </g>
-
-                    <!-- Hover 狀態：往下溜進綠色桶口並隱沒在桶身前緣後的蟑螂 -->
-                    <g clip-path="url(#trashCanMouthClip)">
-                        <g class="roach-dive-in-group">
-                            <use href="#poogleCockroachUnit" />
-                        </g>
-                    </g>
-
-                    <!-- 向上掀開的桶蓋 -->
-                    <g id="trashCanOpenLid">
-                        <path d="M 282,472 L 282,488 A 71,26 0 0,0 424,488 L 424,472"
+                        <path d="M 282,510 L 282,526 A 71,26 0 0,0 424,526 L 424,510"
                               fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="353" cy="472" rx="71" ry="26" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
+                        <ellipse cx="353" cy="510" rx="71" ry="26" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
+
+                        <g fill="#2A348C" font-size="24.7" font-weight="700" text-anchor="middle" dominant-baseline="central">
+                            <text x="353" y="595">公</text>
+                            <text x="353" y="622">廁</text>
+                            <text x="353" y="649">地</text>
+                            <text x="353" y="676">圖</text>
+                        </g>
+                    </g>
+
+                    <!-- 2. 游標靠近時：桶蓋向上彈開 + 蟑螂迅速縮進綠色桶口內部 -->
+                    <g id="trashCanOpenGroup" class="hidden pointer-events-none" filter="url(#whiteGlow)">
+                        <g id="trashCanOpenBase">
+                            <path d="M 282,554 L 282,718 A 71,28 0 0,0 424,718 L 424,554"
+                                  fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="353" cy="554" rx="71" ry="28" fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" />
+
+                            <g fill="#2A348C" font-size="24.7" font-weight="900" text-anchor="middle" dominant-baseline="central">
+                                <text x="353" y="605">公</text>
+                                <text x="353" y="632">廁</text>
+                                <text x="353" y="659">地</text>
+                                <text x="353" y="686">圖</text>
+                            </g>
+                        </g>
+
+                        <!-- Hover 狀態：往下溜進綠色桶口並隱沒在桶身前緣後的蟑螂 -->
+                        <g clip-path="url(#trashCanMouthClip)">
+                            <g class="roach-dive-in-group">
+                                <use href="#poogleCockroachUnit" />
+                            </g>
+                        </g>
+
+                        <!-- 向上掀開的桶蓋 -->
+                        <g id="trashCanOpenLid">
+                            <path d="M 282,472 L 282,488 A 71,26 0 0,0 424,488 L 424,472"
+                                  fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="353" cy="472" rx="71" ry="26" fill="#F26559" stroke="#2A348C" stroke-width="1.8" />
+                        </g>
                     </g>
                 </g>
             </g>
 
             <!-- =============================================================== -->
-            <!-- D. ZONE 3: 中央馬桶 (1:1 還原 67主頁馬桶.svg 維修條 & 5主頁馬桶.svg) -->
+            <!-- D. ZONE 3: 中央馬桶 (1.8 細外框 + 掀蓋立體厚度感)                 -->
             <!-- =============================================================== -->
             <g id="zoneCenterToilet" class="poogle-zone">
                 <!-- 固定不縮放的精準馬桶輪廓感應層 -->
@@ -1621,52 +1719,35 @@
                     <ellipse cx="865.5" cy="754" rx="45" ry="25.1" />
                 </g>
 
-                <!-- 1A. 預設狀態上半部：馬桶水箱、沖水孔槽與「馬桶維修中 請勿使用」斜向封鎖條 (1:1 還原 67主頁馬桶.svg) -->
-                <g id="toiletClosedUpperGroup" class="pointer-events-none">
-                    <!-- 水箱主體 -->
-                    <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
+                <!-- 1A. 預設狀態上半部：馬桶水箱、沖水孔槽與「馬桶維修中 請勿使用」斜向封鎖條 -->
+                <!-- 1A. 馬桶後方水箱（常駐保留，底部延伸至 y=550 無縫銜接馬桶底座不露縫隙） -->
+             <!-- 1A. 馬桶後方水箱（常駐保留，底部延伸至 y=550 無縫銜接馬桶底座） -->
+             <g id="toiletClosedUpperGroup" class="pointer-events-none">
+                 <!-- 水箱主體 -->
+                 <path d="M 515.5,274 Q 512,283 512,294 L 512,550 L 928,550 L 928,294 Q 928,283 924.5,274 Z"
+                       fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                 <!-- 水箱圓角上蓋 -->
+                 <rect x="512" y="189" width="416" height="89" rx="15" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                 <!-- 水箱上蓋中央圓角沖水孔槽 -->
+                 <rect x="653" y="206.5" width="134" height="34.5" rx="10.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+             </g>
 
-                    <!-- 水箱上的「馬桶維修中 請勿使用」黃藍斜紋封鎖條 (裁切貼齊水箱邊界) -->
-                    <g clip-path="url(#toiletTankClip)">
-                        <g transform="translate(720, 381) rotate(11.35)">
-                            <!-- 亮黃色封鎖帶底色 (#FFF383) -->
-                            <rect x="-240" y="-24" width="480" height="48" fill="#FFF383" stroke="#2A348C" stroke-width="1.8" />
-                            <!-- 左側兩道深靛藍斜紋 -->
-                            <polygon points="-172,-24 -152,-24 -174,24 -194,24" fill="#2A348C" />
-                            <polygon points="-121,-24 -101,-24 -123,24 -143,24" fill="#2A348C" />
-                            <!-- 右側兩道深靛藍斜紋 -->
-                            <polygon points="123,-24 143,-24 121,24 101,24" fill="#2A348C" />
-                            <polygon points="174,-24 194,-24 172,24 152,24" fill="#2A348C" />
-                            <!-- 中央「馬桶維修中 請勿使用」文字 (斜體 10 度) -->
-                            <text x="0" y="1" transform="skewX(-10)" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.2" text-anchor="middle" dominant-baseline="central">
-                                馬桶維修中 請勿使用
-                            </text>
-                        </g>
-                    </g>
+                <!-- 1B. 游標靠近時上半部：開啟與關閉過程具立體厚度，打開到位後呈現原本 2D 橢圓 -->
+             <!-- 1B. 游標靠近時上半部：3D 翻轉後段（越過水平面展開內側，到位後還原純 2D 橢圓） -->
+             <g id="toiletOpenUpperGroup" class="hidden pointer-events-none">
+                 <path id="toiletOpenBackRimFill" fill="url(#toiletLidRim3DGrad)" stroke="none" />
+                 <ellipse id="toiletOpenBackFace" cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                 <path id="toiletOpenBackCrease" fill="none" stroke="#2A348C" stroke-width="1.2" stroke-opacity="0.26" stroke-linecap="round" />
+                 <path id="toiletOpenBackOutline" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+             </g>
 
-                    <!-- 水箱外框重繪一層確保邊界線完整俐落 -->
-                    <path d="M 515.5,274 Q 512,283 512,294 L 512,505 L 928,505 L 928,294 Q 928,283 924.5,274 Z"
-                          fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
-
-                    <!-- 水箱圓角上蓋 -->
-                    <rect x="512" y="189" width="416" height="89" rx="15" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
-                    <!-- 水箱上蓋中央圓角沖水孔槽 -->
-                    <rect x="653" y="206.5" width="134" height="34.5" rx="10.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
-                </g>
-
-                <!-- 1B. 游標靠近時上半部：掀開的直立橢圓馬桶蓋 (1:1 還原 5主頁馬桶.svg) -->
-                <g id="toiletOpenUpperGroup" class="hidden pointer-events-none" filter="url(#whiteGlow)">
-                    <ellipse cx="720" cy="342" rx="208.5" ry="237" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
-                </g>
-
-                <!-- 2. 馬桶下半部底座、雙腳與表情 (底部貼齊畫面最下方 y=779.1) -->
+                <!-- 2. 馬桶下半部底座、雙腳與表情 -->
                 <g id="toiletLowerBaseGroup" class="pointer-events-none">
                     <path d="M 501.2,538 C 495,608 510,688 553,735 L 575,779.1 L 865,779.1 L 887,735 C 930,688 945,608 938.8,538 Z"
-                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
+                          fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
 
-                    <ellipse cx="574.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
-                    <ellipse cx="865.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
+                    <ellipse cx="574.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                    <ellipse cx="865.5" cy="754" rx="45" ry="25.1" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
 
                     <!-- 待機表情 (雙眼隨游標轉動) -->
                     <g id="toiletFaceIdle">
@@ -1690,26 +1771,28 @@
                     </g>
                 </g>
 
-                <!-- 3A. 預設蓋上的馬桶蓋與湖水藍月牙邊條 -->
-                <g id="toiletClosedLidRing" class="pointer-events-none">
-                    <path d="M 501.2,526
-                             C 499,532 499.5,539 501.5,544
-                             A 220,71.5 0 0,0 938.5,544
-                             C 940.5,539 941,532 938.8,526
-                             L 930,517.5 L 510,517.5 Z"
-                          fill="#80E4FF" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round" />
-                    <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" />
-                </g>
+                <!-- 3A. 預設蓋上的馬桶蓋、湖水藍月牙邊條與「馬桶維修中」黃色封鎖條 -->
+             <g id="toiletClosedLidRing" class="pointer-events-none">
+                 <path d="M 501.2,526
+                          C 499,532 499.5,539 501.5,544
+                          A 220,71.5 0 0,0 938.5,544
+                          C 940.5,539 941,532 938.8,526
+                          L 930,517.5 L 510,517.5 Z"
+                       fill="#80E4FF" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                 <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="#FFF9EC" stroke="none" />
+                 <!-- 貼在馬桶蓋上的黃色維修封鎖條 -->
+                 <use href="#toiletLidWarningTape" />
+                 <!-- 馬桶蓋外框線重繪於封鎖條上方，確保邊緣線條完整俐落 -->
+                 <ellipse cx="720" cy="517.5" rx="220" ry="71.5" fill="none" stroke="#2A348C" stroke-width="1.8" />
+             </g>
 
                 <!-- 3B. 游標靠近馬桶時：打開的坐墊圈 + 湖水藍水花(公廁回報系統) + 粉紅便便旗幟(公廁現況版) -->
                 <g id="toiletOpenOptionsGroup" class="hidden">
-                    <!-- 坐墊外圈 -->
-                    <ellipse cx="720" cy="539" rx="220" ry="63" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.8" class="pointer-events-none" />
-                    <!-- 水池底色與兩側邊框弧線 -->
+                    <ellipse cx="720" cy="539" rx="220" ry="63" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" class="pointer-events-none" />
                     <ellipse cx="720" cy="539" rx="144.5" ry="40.5" fill="#80E4FF" stroke="none" class="pointer-events-none" />
-                    <path d="M 607,514 A 144.5,40.5 0 1,0 822,511" fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linecap="round" class="pointer-events-none" />
+                    <path d="M 607,514 A 144.5,40.5 0 1,0 822,511" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" class="pointer-events-none" />
 
-                    <!-- 選項 1：公廁回報系統 (湖水藍水花，Hover 時微微放大) -->
+                    <!-- 選項 1：公廁回報系統 -->
                     <g id="openReportSystemBtn" class="cursor-pointer" role="button" aria-label="公廁回報系統">
                         <title>點擊進入「公廁回報系統」</title>
                         <g class="toilet-suboption-hover">
@@ -1740,7 +1823,7 @@
                         </g>
                     </g>
 
-                    <!-- 選項 2：公廁現況版 (左上歪頭粉紅便便 + 亮黃色大聲公旗幟，Hover 時微微放大) -->
+                    <!-- 選項 2：公廁現況版 -->
                     <g id="openStatusBoardBtn" class="cursor-pointer" role="button" aria-label="公廁現況版">
                         <title>點擊查看「公廁現況版」</title>
                         <g class="toilet-suboption-hover">
@@ -1767,7 +1850,6 @@
                                       fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linejoin="round" />
                             </g>
 
-                            <!-- 亮黃色大聲公旗幟 (#FFF383) -->
                             <polygon points="689,313 899,284 885,369 689,339"
                                      fill="#FFF383" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                             <g transform="rotate(1.5, 792, 327)">
@@ -1778,15 +1860,23 @@
                         </g>
                     </g>
                 </g>
+            <!-- 3C. 馬桶蓋 3D 翻轉前段（平放抬起至視線水平面高度時，封鎖條隨蓋面同步透視翻轉） -->
+             <g id="toiletFlipForegroundGroup" class="hidden pointer-events-none">
+                 <path id="toiletFlipFrontRimFill" fill="url(#toiletLidRim3DGrad)" stroke="none" />
+                 <ellipse id="toiletFlipFrontFace" cx="720" cy="517.5" rx="220" ry="71.5" fill="#FFF9EC" stroke="none" />
+                 <use id="toiletFlipFrontTape" href="#toiletLidWarningTape" />
+                 <path id="toiletFlipFrontCrease" fill="none" stroke="#2A348C" stroke-width="1.2" stroke-opacity="0.26" stroke-linecap="round" />
+                 <path id="toiletFlipFrontOutline" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+             </g>
 
-                <!-- 4. 「有所味」Logo (1:1 對齊圖例：位於水箱上蓋頂端中央、沖水孔上方；馬桶打開時維持原位) -->
-                <g id="toiletMainLogoGroup" class="pointer-events-none">
-                    <image x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" class="poogle-logo-img" />
-                </g>
             </g>
 
+         <!-- 4. 「有所味」Logo（獨立於馬桶白光濾鏡外，呈現 2000 年 Windows 復古 3D 白邊漂浮效果） -->
+         <g id="toiletMainLogoGroup" class="pointer-events-none">
+             <image x="573" y="95" width="294" height="116" preserveAspectRatio="xMidYMid meet" href="./img/logo.png" class="poogle-logo-img" />
+         </g>
             <!-- =============================================================== -->
-            <!-- E. ZONE 4: 小怪圖鑑 (1:1 還原原圖三捲衛生紙 + 雙行文字印在圖案上)  -->
+            <!-- E. ZONE 4: 小怪圖鑑 (三捲衛生紙由上方一個個落下到定點)            -->
             <!-- =============================================================== -->
             <g id="zoneMonsterDex" class="poogle-zone" role="button" aria-label="小怪圖鑑">
                 <title>點擊開啟「小怪圖鑑」</title>
@@ -1795,34 +1885,40 @@
                 <rect x="984" y="445" width="196" height="318" rx="24" fill="transparent" />
 
                 <g id="toiletPaperStackGroup" class="pointer-events-none">
-                    <!-- 1. 中下偏右直立衛生紙捲 -->
-                    <g id="tpRollRightBase">
-                        <path d="M 1058,576 L 1058,690 A 55,20 0 0,0 1168,690 L 1168,576"
-                              fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="1113" cy="576" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                        <ellipse cx="1113" cy="576" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
+                    <!-- 1. 中下偏右直立衛生紙捲（第 1 個落下） -->
+                    <g class="tp-drop-in tp-drop-1">
+                        <g id="tpRollRightBase">
+                            <path d="M 1058,576 L 1058,690 A 55,20 0 0,0 1168,690 L 1168,576"
+                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="1113" cy="576" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                            <ellipse cx="1113" cy="576" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
+                        </g>
                     </g>
 
-                    <!-- 2. 左下水平橫放衛生紙捲 -->
-                    <g id="tpRollLeftLying">
-                        <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
-                              fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                        <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
+                    <!-- 2. 左下水平橫放衛生紙捲（第 2 個落下） -->
+                    <g class="tp-drop-in tp-drop-2">
+                        <g id="tpRollLeftLying">
+                            <path d="M 1114,642 L 1015,642 A 24,55 0 0,0 1015,752 L 1114,752"
+                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="1114" cy="697" rx="24" ry="55" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                            <ellipse cx="1114" cy="697" rx="8" ry="18" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
+                        </g>
                     </g>
 
-                    <!-- 3. 最上方直立衛生紙捲 -->
-                    <g id="tpRollTopMain">
-                        <path d="M 1041,474 L 1041,580 A 55,20 0 0,0 1151,580 L 1151,474"
-                              fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <ellipse cx="1096" cy="474" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
-                        <ellipse cx="1096" cy="474" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
+                    <!-- 3. 最上方直立衛生紙捲（第 3 個落下疊至頂端） -->
+                    <g class="tp-drop-in tp-drop-3">
+                        <g id="tpRollTopMain">
+                            <path d="M 1041,474 L 1041,580 A 55,20 0 0,0 1151,580 L 1151,474"
+                                  fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <ellipse cx="1096" cy="474" rx="55" ry="20" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" />
+                            <ellipse cx="1096" cy="474" rx="18" ry="6.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
 
-                        <g id="optionMonsterDexText">
-                            <text id="idleLabelMonsterDex" fill="#2A348C" font-size="20" font-weight="700" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
-                                <tspan x="1096" y="525">小怪</tspan>
-                                <tspan x="1096" y="553">圖鑑</tspan>
-                            </text>
+                            <g id="optionMonsterDexText">
+                                <text id="idleLabelMonsterDex" fill="#2A348C" font-size="20" font-weight="700" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
+                                    <tspan x="1096" y="525">小怪</tspan>
+                                    <tspan x="1096" y="553">圖鑑</tspan>
+                                </text>
+                            </g>
                         </g>
                     </g>
                 </g>
@@ -2686,39 +2782,46 @@
         }
 
         function initLogoImagesWithFallback() {
-            const symbolEl = document.getElementById('youSuoWeiLogoVector');
-            const applyUrlToAllLogos = (url) => {
-                document.querySelectorAll('.poogle-logo-img').forEach((el) => {
-                    if (el.tagName && el.tagName.toLowerCase() === 'img') {
-                        el.src = url;
-                    } else {
-                        el.setAttribute('href', url);
-                    }
-                });
-            };
-            if (symbolEl) {
-                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
-                applyUrlToAllLogos(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
-            }
-            const isPreviewSandbox = (
-                window.location.protocol === 'about:' ||
-                window.location.protocol === 'blob:' ||
-                window.location.protocol === 'data:' ||
-                (window.location.hostname || '').includes('usercontent.goog') ||
-                (window.location.hostname || '').includes('googleusercontent.com')
-            );
-            if (isPreviewSandbox) return;
-            const logoCandidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png', 'img/logo.PNG'];
-            let idx = 0;
-            const tryNext = () => {
-                if (idx >= logoCandidates.length) return;
-                const testUrl = logoCandidates[idx++];
-                const probe = new Image();
-                probe.onload = () => applyUrlToAllLogos(testUrl);
-                probe.onerror = () => tryNext();
-                probe.src = testUrl;
-            };
-            tryNext();
+         const symbolEl = document.getElementById('youSuoWeiLogoVector');
+         const applyUrlToAllLogos = (url) => {
+             document.querySelectorAll('.poogle-logo-img').forEach((el) => {
+                 if (el.tagName && el.tagName.toLowerCase() === 'img') {
+                     el.src = url;
+                 } else {
+                     setSvgImageHref(el, url);
+                 }
+             });
+         };
+         const applyVectorFallback = () => {
+             if (!symbolEl) return;
+             const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="560" height="190" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+             applyUrlToAllLogos(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
+         };
+         const isPreviewSandbox = (
+             window.location.protocol === 'about:' ||
+             window.location.protocol === 'blob:' ||
+             window.location.protocol === 'data:' ||
+             (window.location.hostname || '').includes('usercontent.goog') ||
+             (window.location.hostname || '').includes('googleusercontent.com')
+         );
+         if (isPreviewSandbox) {
+             applyVectorFallback();
+             return;
+         }
+         const logoCandidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png', 'img/logo.PNG'];
+         let idx = 0;
+         const tryNext = () => {
+             if (idx >= logoCandidates.length) {
+                 applyVectorFallback();
+                 return;
+             }
+             const testUrl = logoCandidates[idx++];
+             const probe = new Image();
+             probe.onload = () => applyUrlToAllLogos(testUrl);
+             probe.onerror = () => tryNext();
+             probe.src = testUrl;
+         };
+         tryNext();
         }
 
         // 生成滿版全寬度漸變圓點陣列（支援手機版與電腦版響應式間距，且游標/觸控周圍網點具向外擴張放大效果）
@@ -3161,58 +3264,69 @@
                     }
                 }
 
-                // 2. 背景預載並解碼剩餘所有小怪圖片，完成後自動擴充進輪播池
-                const remainingItems = allDraftItems.filter((_, idx) => !firstSixSet.has(idx));
-                await Promise.all(remainingItems.map(m => resolveMonsterImageUrl(m)));
+                // 首屏 6 顆泡泡圖片已解碼完成，立即通知主舞台啟動進場動畫
+             if (typeof window.__revealHomeStage === 'function') {
+                 window.__revealHomeStage();
+             } else {
+                 document.body.classList.add('stage-ready');
+             }
 
-                const allLoadedMonsters = allDraftItems.filter(m => m.isRealFile && m.resolvedUrl);
-                if (allLoadedMonsters.length > 0) {
-                    monsterPool = allLoadedMonsters;
-                    // 對齊目前場上 6 顆泡泡在新 monsterPool 中的索引
-                    for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
-                        const curImg = document.getElementById(`bubbleMonsterImg_${slot}`);
-                        const curHref = curImg ? curImg.getAttribute('href') : null;
-                        const foundIdx = monsterPool.findIndex(m => m.resolvedUrl === curHref);
-                        if (foundIdx !== -1) currentSlotMonsterIdx[slot] = foundIdx;
-                    }
-                    rotationDeck = buildBalancedRotationDeck(monsterPool);
-                    deckCursor = BUBBLE_COUNT % rotationDeck.length;
-                } else {
-                    return;
-                }
+             // 2. 等待進場動畫完全播畢後（1.35 秒後），再於背景以小批次安靜預載剩餘小怪圖檔
+             setTimeout(async () => {
+                 const remainingItems = allDraftItems.filter((_, idx) => !firstSixSet.has(idx));
+                 const BATCH_SIZE = 4;
+                 for (let i = 0; i < remainingItems.length; i += BATCH_SIZE) {
+                     await Promise.all(remainingItems.slice(i, i + BATCH_SIZE).map(m => resolveMonsterImageUrl(m)));
+                 }
 
-                // 3. 啟動平滑無閃爍的小怪氣泡替換輪播
-                setInterval(() => {
-                    const bgGroup = document.getElementById('bubblesGroup');
-                    if (!bgGroup || bgGroup.classList.contains('is-popped') || monsterPool.length === 0) return;
+                 const allLoadedMonsters = allDraftItems.filter(m => m.isRealFile && m.resolvedUrl);
+                 if (allLoadedMonsters.length > 0) {
+                     monsterPool = allLoadedMonsters;
+                     for (let slot = 0; slot < BUBBLE_COUNT; slot++) {
+                         const curImg = document.getElementById(`bubbleMonsterImg_${slot}`);
+                         const curHref = curImg ? curImg.getAttribute('href') : null;
+                         const foundIdx = monsterPool.findIndex(m => m.resolvedUrl === curHref);
+                         if (foundIdx !== -1) currentSlotMonsterIdx[slot] = foundIdx;
+                     }
+                     rotationDeck = buildBalancedRotationDeck(monsterPool);
+                     deckCursor = BUBBLE_COUNT % rotationDeck.length;
+                 } else {
+                     return;
+                 }
 
-                    const slotToSwap = nextRotateBubbleSlot % BUBBLE_COUNT;
-                    nextRotateBubbleSlot++;
+                 // 3. 啟動平滑無閃爍的小怪氣泡替換輪播
+                 setInterval(() => {
+                     const bgGroup = document.getElementById('bubblesGroup');
+                     if (!bgGroup || bgGroup.classList.contains('is-popped') || monsterPool.length === 0) return;
 
-                    const bubbleUnits = document.querySelectorAll('.bubble-unit');
-                    const targetUnit = bubbleUnits[slotToSwap];
-                    if (targetUnit && targetUnit.classList.contains('is-single-popped')) return;
+                     const slotToSwap = nextRotateBubbleSlot % BUBBLE_COUNT;
+                     nextRotateBubbleSlot++;
 
-                    const slotGroup = document.getElementById(`bubbleMonsterSlot_${slotToSwap}`);
-                    const imgEl = document.getElementById(`bubbleMonsterImg_${slotToSwap}`);
-                    if (!slotGroup || !imgEl || slotGroup.classList.contains('is-swapping')) return;
+                     const bubbleUnits = document.querySelectorAll('.bubble-unit');
+                     const targetUnit = bubbleUnits[slotToSwap];
+                     if (targetUnit && targetUnit.classList.contains('is-single-popped')) return;
 
-                    const nextMonsterIdx = pickNextUniqueMonsterIdx();
-                    const nextUrl = monsterPool[nextMonsterIdx]?.resolvedUrl;
-                    if (!nextUrl) return;
+                     const slotGroup = document.getElementById(`bubbleMonsterSlot_${slotToSwap}`);
+                     const imgEl = document.getElementById(`bubbleMonsterImg_${slotToSwap}`);
+                     if (!slotGroup || !imgEl || slotGroup.classList.contains('is-swapping')) return;
 
-                    currentSlotMonsterIdx[slotToSwap] = nextMonsterIdx;
-                    swapSvgMonsterImageSmoothly(slotGroup, imgEl, nextUrl);
+                     const nextMonsterIdx = pickNextUniqueMonsterIdx();
+                     const nextUrl = monsterPool[nextMonsterIdx]?.resolvedUrl;
+                     if (!nextUrl) return;
 
-                    if (slotToSwap < 3) {
-                        const mobileSlotGroup = document.getElementById(`mobileBubbleMonsterSlot_${slotToSwap}`);
-                        const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slotToSwap}`);
-                        if (mobileSlotGroup && mobileImgEl) {
-                            swapSvgMonsterImageSmoothly(mobileSlotGroup, mobileImgEl, nextUrl);
-                        }
-                    }
-                }, 2400);
-            }
+                     currentSlotMonsterIdx[slotToSwap] = nextMonsterIdx;
+                     swapSvgMonsterImageSmoothly(slotGroup, imgEl, nextUrl);
+
+                     if (slotToSwap < 3) {
+                         const mobileSlotGroup = document.getElementById(`mobileBubbleMonsterSlot_${slotToSwap}`);
+                         const mobileImgEl = document.getElementById(`mobileBubbleMonsterImg_${slotToSwap}`);
+                         if (mobileSlotGroup && mobileImgEl) {
+                             swapSvgMonsterImageSmoothly(mobileSlotGroup, mobileImgEl, nextUrl);
+                         }
+                     }
+                 }, 2400);
+             }, 1350);
+         }
 
             initAndStartMonsterRotation();
 
@@ -3261,18 +3375,454 @@
             let activeHoverZone = null;
             let toiletCloseTimer = null;
 
-            setTimeout(() => {
-                document.querySelectorAll('.bubble-travel-wrapper').forEach((el) => {
-                    el.classList.remove('bubble-rise-in');
-                });
-            }, 1450);
+            let hasRevealedStage = false;
+         window.__revealHomeStage = () => {
+             if (hasRevealedStage) return;
+             hasRevealedStage = true;
+             requestAnimationFrame(() => {
+                 requestAnimationFrame(() => {
+                     document.body.classList.add('stage-ready');
+                     setTimeout(() => {
+                         document.querySelectorAll('.bubble-travel-wrapper').forEach((el) => {
+                             el.classList.remove('bubble-rise-in');
+                         });
+                         document.querySelectorAll('.tp-drop-in').forEach((el) => {
+                             el.classList.remove('tp-drop-in', 'tp-drop-1', 'tp-drop-2', 'tp-drop-3');
+                         });
+                         document.querySelectorAll('.trash-slide-in-wrapper').forEach((el) => {
+                             el.classList.remove('trash-slide-in-wrapper');
+                         });
+                         document.getElementById('trashCockroachPeekGroup')?.classList.remove('roach-initial-delay');
+                     }, 1600);
+                 });
+             });
+         };
+         // 安全保底：最多等待 240ms 即強制啟動畫面與動畫，避免網路較慢時久候
+         setTimeout(() => window.__revealHomeStage(), 240);
+
+            // ===================================================================
+         // 2000 年 Windows 復古「3D 文字」白邊厚實擠出 + 微幅傾斜漂浮引擎
+         // ===================================================================
+         (function initRetroWin2k3DLogo() {
+             const SVG_NS = 'http://www.w3.org/2000/svg';
+             const stageLogos = Array.from(document.querySelectorAll('main svg image.poogle-logo-img'));
+             if (stageLogos.length === 0) return;
+
+             const NUM_SLICES = 14;
+             const rigs = [];
+
+             // 直接探測並解碼真實的 ./img/logo.png，不依賴可能被覆寫的 DOM 屬性
+             function loadPrimaryLogoSource() {
+                 const candidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png', 'img/logo.PNG'];
+                 return new Promise((resolve) => {
+                     let idx = 0;
+                     const tryNext = () => {
+                         if (idx >= candidates.length) {
+                             const symbolEl = document.getElementById('youSuoWeiLogoVector');
+                             if (!symbolEl) {
+                                 resolve(null);
+                                 return;
+                             }
+                             const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="560" height="190" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+                             const fallbackUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
+                             const fbImg = new Image();
+                             fbImg.onload = () => resolve({ img: fbImg, url: fallbackUrl });
+                             fbImg.onerror = () => resolve(null);
+                             fbImg.src = fallbackUrl;
+                             return;
+                         }
+                         const testUrl = candidates[idx++];
+                         const probe = new Image();
+                         probe.decoding = 'async';
+                         probe.onload = () => {
+                             if (typeof probe.decode === 'function') {
+                                 probe.decode()
+                                     .catch(() => {})
+                                     .finally(() => resolve({ img: probe, url: testUrl }));
+                             } else {
+                                 resolve({ img: probe, url: testUrl });
+                             }
+                         };
+                         probe.onerror = () => tryNext();
+                         probe.src = testUrl;
+                     };
+                     tryNext();
+                 });
+             }
+
+             // 將已載入的 logo.png 烘焙出「純白粗邊正面」與「三段深淺 OpenGL 立體導角側面貼圖」
+             function buildWin2kLogoTextures(loadedSource, baseW, baseH, padSvg) {
+                 if (!loadedSource || !loadedSource.img) {
+                     return { useFallbackFilter: true, rawUrl: './img/logo.png' };
+                 }
+                 const img = loadedSource.img;
+                 try {
+                     const scale = 2;
+                     const cw = Math.round((baseW + padSvg * 2) * scale);
+                     const ch = Math.round((baseH + padSvg * 2) * scale);
+                     const innerW = baseW * scale;
+                     const innerH = baseH * scale;
+                     const natW = img.naturalWidth || img.width || innerW;
+                     const natH = img.naturalHeight || img.height || innerH;
+                     const fit = Math.min(innerW / natW, innerH / natH);
+                     const drawW = natW * fit;
+                     const drawH = natH * fit;
+                     const drawX = (cw - drawW) / 2;
+                     const drawY = (ch - drawH) / 2;
+                     const borderR = 5.2 * scale;
+
+                     // 1. 製作純白單色印章
+                     const stampCanvas = document.createElement('canvas');
+                     stampCanvas.width = cw;
+                     stampCanvas.height = ch;
+                     const sctx = stampCanvas.getContext('2d');
+                     sctx.drawImage(img, drawX, drawY, drawW, drawH);
+                     sctx.globalCompositeOperation = 'source-in';
+                     sctx.fillStyle = '#FFFFFF';
+                     sctx.fillRect(0, 0, cw, ch);
+
+                     // 2. 多角度環形疊印出圓潤無鋸齒的加粗白邊遮罩
+                     const maskCanvas = document.createElement('canvas');
+                     maskCanvas.width = cw;
+                     maskCanvas.height = ch;
+                     const mctx = maskCanvas.getContext('2d');
+                     mctx.drawImage(stampCanvas, 0, 0);
+                     for (let ring = 1; ring <= 2; ring++) {
+                         const r = borderR * (ring / 2);
+                         const steps = ring === 1 ? 12 : 24;
+                         for (let i = 0; i < steps; i++) {
+                             const rad = (i / steps) * Math.PI * 2;
+                             mctx.drawImage(stampCanvas, Math.cos(rad) * r, Math.sin(rad) * r);
+                         }
+                     }
+
+                     // 3. 正面貼圖：純白粗邊 + 原始高解析 logo.png
+                     const frontCanvas = document.createElement('canvas');
+                     frontCanvas.width = cw;
+                     frontCanvas.height = ch;
+                     const fctx = frontCanvas.getContext('2d');
+                     fctx.drawImage(maskCanvas, 0, 0);
+                     fctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+                     // 4. 復古 OpenGL 上亮下暗立體側面貼圖生成器
+                     function makeNormalLitSlice(midColor, topLitColor, bottomDarkColor) {
+                         const c = document.createElement('canvas');
+                         c.width = cw;
+                         c.height = ch;
+                         const ctx = c.getContext('2d');
+
+                         ctx.drawImage(maskCanvas, 0, 0);
+                         ctx.globalCompositeOperation = 'source-in';
+                         ctx.fillStyle = midColor;
+                         ctx.fillRect(0, 0, cw, ch);
+
+                         const lit = document.createElement('canvas');
+                         lit.width = cw;
+                         lit.height = ch;
+                         const lctx = lit.getContext('2d');
+                         lctx.drawImage(maskCanvas, 0, 0);
+                         lctx.globalCompositeOperation = 'destination-out';
+                         lctx.drawImage(maskCanvas, 3 * scale, 3.5 * scale);
+                         lctx.globalCompositeOperation = 'source-in';
+                         lctx.fillStyle = topLitColor;
+                         lctx.fillRect(0, 0, cw, ch);
+
+                         const dark = document.createElement('canvas');
+                         dark.width = cw;
+                         dark.height = ch;
+                         const dctx = dark.getContext('2d');
+                         dctx.drawImage(maskCanvas, 0, 0);
+                         dctx.globalCompositeOperation = 'destination-out';
+                         dctx.drawImage(maskCanvas, -3.5 * scale, -4 * scale);
+                         dctx.globalCompositeOperation = 'source-in';
+                         dctx.fillStyle = bottomDarkColor;
+                         dctx.fillRect(0, 0, cw, ch);
+
+                         ctx.globalCompositeOperation = 'source-atop';
+                         ctx.drawImage(lit, 0, 0);
+                         ctx.drawImage(dark, 0, 0);
+                         return c.toDataURL('image/png');
+                     }
+
+                     return {
+                         useFallbackFilter: false,
+                         frontUrl: frontCanvas.toDataURL('image/png'),
+                         nearWallUrl: makeNormalLitSlice('#3D5AF1', '#7BE3FF', '#20297C'),
+                         midWallUrl: makeNormalLitSlice('#2E3FA8', '#52AEF7', '#181F60'),
+                         deepWallUrl: makeNormalLitSlice('#1F2978', '#396AC6', '#0F1440')
+                     };
+                 } catch (err) {
+                     return { useFallbackFilter: true, rawUrl: loadedSource.url };
+                 }
+             }
+
+             const logoSourcePromise = loadPrimaryLogoSource();
+
+             stageLogos.forEach(async (baseImg) => {
+                 const x = parseFloat(baseImg.getAttribute('x') || '573');
+                 const y = parseFloat(baseImg.getAttribute('y') || '95');
+                 const w = parseFloat(baseImg.getAttribute('width') || '294');
+                 const h = parseFloat(baseImg.getAttribute('height') || '116');
+
+                 const padSvg = 14;
+                 const cx = x + w / 2;
+                 const cy = y + h / 2;
+                 const boxW = w + padSvg * 2;
+                 const boxH = h + padSvg * 2;
+                 const sizeRatio = w / 294;
+
+                 const loadedSource = await logoSourcePromise;
+                 if (!loadedSource) return;
+
+                 const stageGroup = document.createElementNS(SVG_NS, 'g');
+                 stageGroup.setAttribute('class', 'win2k-3d-logo-stage pointer-events-none');
+                 stageGroup.style.filter = 'drop-shadow(0px 6px 5px rgba(26, 33, 96, 0.22))';
+
+                 const tex = buildWin2kLogoTextures(loadedSource, w, h, padSvg);
+                 const layers = [];
+
+                 for (let k = NUM_SLICES; k >= 0; k--) {
+                     const sliceImg = document.createElementNS(SVG_NS, 'image');
+                     if (tex.useFallbackFilter) {
+                         sliceImg.setAttribute('x', (-w / 2).toFixed(2));
+                         sliceImg.setAttribute('y', (-h / 2).toFixed(2));
+                         sliceImg.setAttribute('width', w.toFixed(2));
+                         sliceImg.setAttribute('height', h.toFixed(2));
+                         sliceImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                         setSvgImageHref(sliceImg, tex.rawUrl);
+                         if (k === 0) {
+                             sliceImg.style.filter = 'drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)';
+                         } else {
+                             sliceImg.style.filter = 'brightness(0.32) sepia(1) hue-rotate(200deg) saturate(5) drop-shadow(2px 0 0 #283593) drop-shadow(-2px 0 0 #283593) drop-shadow(0 2px 0 #283593)';
+                         }
+                     } else {
+                         sliceImg.setAttribute('x', (-boxW / 2).toFixed(2));
+                         sliceImg.setAttribute('y', (-boxH / 2).toFixed(2));
+                         sliceImg.setAttribute('width', boxW.toFixed(2));
+                         sliceImg.setAttribute('height', boxH.toFixed(2));
+                         const sliceUrl = k === 0
+                             ? tex.frontUrl
+                             : (k <= 4 ? tex.nearWallUrl : (k <= 10 ? tex.midWallUrl : tex.deepWallUrl));
+                         setSvgImageHref(sliceImg, sliceUrl);
+                     }
+                     stageGroup.appendChild(sliceImg);
+                     layers.push({ el: sliceImg, depthIndex: k });
+                 }
+
+                 baseImg.style.display = 'none';
+                 baseImg.parentNode.insertBefore(stageGroup, baseImg.nextSibling);
+                 rigs.push({ cx, cy, sizeRatio, layers });
+             });
+
+             function animateWin2kLogo(now) {
+                 const t = now * 0.001;
+
+                 const rxDeg = 14 + Math.sin(t * 1.15) * 6.5;
+                 const ryDeg = -5 + Math.sin(t * 1.32) * 17 + Math.cos(t * 0.68) * 4.5;
+                 const rzDeg = -5.2 + Math.sin(t * 0.94) * 2.6;
+
+                 const rx = (rxDeg * Math.PI) / 180;
+                 const ry = (ryDeg * Math.PI) / 180;
+                 const rz = (rzDeg * Math.PI) / 180;
+
+                 const cxr = Math.cos(rx), sxr = Math.sin(rx);
+                 const cyr = Math.cos(ry), syr = Math.sin(ry);
+                 const czr = Math.cos(rz), szr = Math.sin(rz);
+
+                 const m11 = czr * cyr;
+                 const m21 = szr * cyr;
+                 const m12 = czr * sxr * syr - szr * cxr;
+                 const m22 = szr * sxr * syr + czr * cxr;
+
+                 const ex = -czr * syr - szr * sxr * cyr;
+                 const ey = -szr * syr + czr * sxr * cyr;
+                 const ez = cxr * cyr;
+
+                 const floatBaseX = Math.cos(t * 0.88) * 4.2;
+                 const floatBaseY = Math.sin(t * 1.62) * 6.2;
+
+                 for (let r = 0; r < rigs.length; r++) {
+                     const rig = rigs[r];
+                     const ratio = rig.sizeRatio;
+                     const stepDepth = 1.42 * ratio;
+                     const focal = 330 * ratio;
+                     const fx = rig.cx + floatBaseX * ratio;
+                     const fy = rig.cy + floatBaseY * ratio;
+
+                     for (let i = 0; i < rig.layers.length; i++) {
+                         const layer = rig.layers[i];
+                         const zDepth = layer.depthIndex * stepDepth;
+                         const persp = focal / (focal + zDepth * ez);
+
+                         const tx = (fx + ex * zDepth).toFixed(2);
+                         const ty = (fy + ey * zDepth).toFixed(2);
+                         const a = (m11 * persp).toFixed(4);
+                         const b = (m21 * persp).toFixed(4);
+                         const c = (m12 * persp).toFixed(4);
+                         const d = (m22 * persp).toFixed(4);
+
+                         layer.el.setAttribute('transform', `translate(${tx}, ${ty}) matrix(${a}, ${b}, ${c}, ${d}, 0, 0)`);
+                     }
+                 }
+
+                 requestAnimationFrame(animateWin2kLogo);
+             }
+
+             requestAnimationFrame(animateWin2kLogo);
+         })();
+
+         const toiletFlipForegroundGroup = document.getElementById('toiletFlipForegroundGroup');
+            const toiletFlipFrontRimFill = document.getElementById('toiletFlipFrontRimFill');
+            const toiletFlipFrontFace = document.getElementById('toiletFlipFrontFace');
+         const toiletFlipFrontTape = document.getElementById('toiletFlipFrontTape');
+            const toiletFlipFrontCrease = document.getElementById('toiletFlipFrontCrease');
+            const toiletFlipFrontOutline = document.getElementById('toiletFlipFrontOutline');
+
+            const toiletOpenBackRimFill = document.getElementById('toiletOpenBackRimFill');
+            const toiletOpenBackFace = document.getElementById('toiletOpenBackFace');
+            const toiletOpenBackCrease = document.getElementById('toiletOpenBackCrease');
+            const toiletOpenBackOutline = document.getElementById('toiletOpenBackOutline');
+
+            let toiletLidAnimRafId = null;
+            let currentToiletLidDeg = -19; // -19° = 蓋上平放, 0° = 視線水平側邊厚度, 90° = 完全掀開直立 2D
+
+            function renderToiletLid3DFrame(deg) {
+                currentToiletLidDeg = deg;
+                const cx = 720;
+                const maxRimThickness = 21; // 蓋子側邊立體厚度 (px)
+
+                if (deg < 0) {
+                    // 前段 (-19° ~ 0°)：由平放向上抬起至視線水平面，露出下緣立體厚度
+                    toiletOpenUpperGroup?.classList.add('hidden');
+                    toiletFlipForegroundGroup?.classList.remove('hidden');
+
+                    const u = Math.max(0, Math.min(1, (deg + 19) / 19));
+                    const rx = 220 + (208.5 - 220) * u;
+                    const ry = Math.max(0.8, 71.5 * (1 - u));
+                    const cy = 517.5 + (454.5 - 517.5) * u;
+                    const t = 18.5 + (maxRimThickness - 18.5) * u;
+
+                    const xL = (cx - rx).toFixed(2);
+                    const xR = (cx + rx).toFixed(2);
+                    const cyStr = cy.toFixed(2);
+                    const yBot = (cy + t).toFixed(2);
+                    const rxStr = rx.toFixed(2);
+                    const ryStr = ry.toFixed(2);
+
+                    const outerD = `M ${xL},${cyStr} A ${rxStr},${ryStr} 0 0,1 ${xR},${cyStr} L ${xR},${yBot} A ${rxStr},${ryStr} 0 0,1 ${xL},${yBot} Z`;
+                    const creaseD = `M ${(cx - rx + 3).toFixed(2)},${cyStr} A ${rxStr},${ryStr} 0 0,0 ${(cx + rx - 3).toFixed(2)},${cyStr}`;
+
+                    toiletFlipFrontRimFill?.setAttribute('d', outerD);
+                    if (toiletFlipFrontFace) {
+                     toiletFlipFrontFace.setAttribute('cx', String(cx));
+                     toiletFlipFrontFace.setAttribute('cy', cyStr);
+                     toiletFlipFrontFace.setAttribute('rx', rxStr);
+                     toiletFlipFrontFace.setAttribute('ry', ryStr);
+                 }
+                 if (toiletFlipFrontTape) {
+                     const tapeSx = (rx / 220).toFixed(4);
+                     const tapeSy = (ry / 71.5).toFixed(4);
+                     toiletFlipFrontTape.setAttribute('transform', `translate(${cx}, ${cyStr}) scale(${tapeSx}, ${tapeSy}) translate(-720, -517.5)`);
+                 }
+                    if (toiletFlipFrontCrease) {
+                        toiletFlipFrontCrease.setAttribute('d', creaseD);
+                        toiletFlipFrontCrease.setAttribute('stroke-opacity', (0.26 * (1 - u * 0.7)).toFixed(3));
+                    }
+                    toiletFlipFrontOutline?.setAttribute('d', outerD);
+                } else {
+                    // 後段 (0° ~ 90°)：越過水平面翻出內側蓋面，上緣立體厚度隨 cos(θ) 自然收合至 0 (純 2D)
+                    toiletFlipForegroundGroup?.classList.add('hidden');
+                    toiletOpenUpperGroup?.classList.remove('hidden');
+
+                    const clampedDeg = Math.min(90, deg);
+                    const rad = (clampedDeg * Math.PI) / 180;
+                    const v = Math.sin(rad);
+                    const overshoot = Math.max(0, deg - 90) / 10;
+
+                    const rx = 208.5;
+                    const ry = Math.max(0.8, 0.8 + 236.2 * v + overshoot * 12);
+                    const cy = 475.5 - 133.5 * v - overshoot * 12;
+                    const t = deg >= 90 ? 0 : maxRimThickness * Math.cos(rad);
+
+                    const rxStr = rx.toFixed(2);
+                    const ryStr = ry.toFixed(2);
+                    const cyStr = cy.toFixed(2);
+
+                    if (toiletOpenBackFace) {
+                        toiletOpenBackFace.setAttribute('cx', String(cx));
+                        toiletOpenBackFace.setAttribute('cy', cyStr);
+                        toiletOpenBackFace.setAttribute('rx', rxStr);
+                        toiletOpenBackFace.setAttribute('ry', ryStr);
+                    }
+
+                    if (t <= 0.25) {
+                        // 完全掀開定點：隱藏側邊層，還原為原本純淨的 2D 橢圓蓋
+                        toiletOpenBackRimFill?.setAttribute('d', '');
+                        toiletOpenBackCrease?.setAttribute('d', '');
+                        toiletOpenBackOutline?.setAttribute('d', '');
+                        toiletOpenBackFace?.setAttribute('stroke', '#2A348C');
+                        toiletOpenBackFace?.setAttribute('stroke-width', '1.8');
+                    } else {
+                        toiletOpenBackFace?.setAttribute('stroke', 'none');
+                        const xL = (cx - rx).toFixed(2);
+                        const xR = (cx + rx).toFixed(2);
+                        const yTop = (cy - t).toFixed(2);
+
+                        const outerD = `M ${xL},${yTop} A ${rxStr},${ryStr} 0 0,1 ${xR},${yTop} L ${xR},${cyStr} A ${rxStr},${ryStr} 0 0,1 ${xL},${cyStr} Z`;
+                        const creaseD = `M ${(cx - rx + 3).toFixed(2)},${cyStr} A ${rxStr},${ryStr} 0 0,1 ${(cx + rx - 3).toFixed(2)},${cyStr}`;
+                        const creaseAlpha = Math.min(0.26, (t / 15) * 0.26 * Math.min(1, v * 2.5)).toFixed(3);
+
+                        toiletOpenBackRimFill?.setAttribute('d', outerD);
+                        if (toiletOpenBackCrease) {
+                            toiletOpenBackCrease.setAttribute('d', creaseD);
+                            toiletOpenBackCrease.setAttribute('stroke-opacity', creaseAlpha);
+                        }
+                        toiletOpenBackOutline?.setAttribute('d', outerD);
+                    }
+                }
+            }
+
+            function startToiletLid3DAnimation(toOpen, onComplete) {
+                if (toiletLidAnimRafId) {
+                    cancelAnimationFrame(toiletLidAnimRafId);
+                    toiletLidAnimRafId = null;
+                }
+                const startDeg = currentToiletLidDeg;
+                const targetDeg = toOpen ? 90 : -19;
+                const duration = toOpen ? 450 : 290;
+                const startTime = performance.now();
+
+                const tick = (now) => {
+                    const p = Math.min(1, (now - startTime) / duration);
+                    let eased;
+                    if (toOpen) {
+                        const s = Math.pow(p, 1.35);
+                        eased = 1 - Math.pow(1 - s, 2.4) * Math.cos(s * Math.PI * 0.6);
+                    } else {
+                        eased = Math.pow(p, 1.85);
+                    }
+                    const nextDeg = p >= 1 ? targetDeg : startDeg + (targetDeg - startDeg) * eased;
+                    renderToiletLid3DFrame(nextDeg);
+
+                    if (p < 1) {
+                        toiletLidAnimRafId = requestAnimationFrame(tick);
+                    } else {
+                        toiletLidAnimRafId = null;
+                        if (typeof onComplete === 'function') onComplete();
+                    }
+                };
+                toiletLidAnimRafId = requestAnimationFrame(tick);
+            }
 
             function clearToiletCloseAnimationState() {
                 if (toiletCloseTimer) {
                     clearTimeout(toiletCloseTimer);
                     toiletCloseTimer = null;
                 }
-                if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.remove('is-closing');
+                if (toiletLidAnimRafId) {
+                    cancelAnimationFrame(toiletLidAnimRafId);
+                    toiletLidAnimRafId = null;
+                }
                 if (openReportSystemBtn) openReportSystemBtn.classList.remove('is-closing');
                 if (openStatusBoardBtn) openStatusBoardBtn.classList.remove('is-closing');
                 if (toiletMainLogoGroup) toiletMainLogoGroup.classList.remove('is-jumping-down');
@@ -3299,12 +3849,12 @@
 
                 if (!skipToiletInstantReset) {
                     clearToiletCloseAnimationState();
+                    currentToiletLidDeg = -19;
+                    if (zoneCenterToilet) zoneCenterToilet.removeAttribute('filter');
+                    if (toiletFlipForegroundGroup) toiletFlipForegroundGroup.classList.add('hidden');
                     if (toiletMainLogoGroup) toiletMainLogoGroup.classList.remove('is-jumping-up');
                     if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.remove('hidden');
-                    if (toiletOpenUpperGroup) {
-                        toiletOpenUpperGroup.classList.add('hidden');
-                        toiletOpenUpperGroup.classList.remove('is-animating');
-                    }
+                    if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.add('hidden');
                     if (toiletClosedLidRing) toiletClosedLidRing.classList.remove('hidden');
                     if (toiletOpenOptionsGroup) toiletOpenOptionsGroup.classList.add('hidden');
                     if (openReportSystemBtn) openReportSystemBtn.classList.remove('is-animating');
@@ -3326,24 +3876,18 @@
                 clearToiletCloseAnimationState();
 
                 if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.remove('hidden');
-                if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.remove('is-animating');
                 if (openReportSystemBtn) openReportSystemBtn.classList.remove('is-animating');
                 if (openStatusBoardBtn) openStatusBoardBtn.classList.remove('is-animating');
                 if (toiletMainLogoGroup) toiletMainLogoGroup.classList.remove('is-jumping-up');
 
-                if (toiletOpenUpperGroup) {
-                    void toiletOpenUpperGroup.offsetWidth;
-                    toiletOpenUpperGroup.classList.add('is-closing');
-                }
                 if (openReportSystemBtn) openReportSystemBtn.classList.add('is-closing');
                 if (openStatusBoardBtn) openStatusBoardBtn.classList.add('is-closing');
                 if (toiletMainLogoGroup) toiletMainLogoGroup.classList.add('is-jumping-down');
 
-                toiletCloseTimer = setTimeout(() => {
-                    if (toiletOpenUpperGroup) {
-                        toiletOpenUpperGroup.classList.add('hidden');
-                        toiletOpenUpperGroup.classList.remove('is-closing');
-                    }
+                startToiletLid3DAnimation(false, () => {
+                    if (zoneCenterToilet) zoneCenterToilet.removeAttribute('filter');
+                    if (toiletFlipForegroundGroup) toiletFlipForegroundGroup.classList.add('hidden');
+                    if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.add('hidden');
                     if (toiletOpenOptionsGroup) toiletOpenOptionsGroup.classList.add('hidden');
                     if (openReportSystemBtn) openReportSystemBtn.classList.remove('is-closing');
                     if (openStatusBoardBtn) openStatusBoardBtn.classList.remove('is-closing');
@@ -3358,13 +3902,12 @@
                     if (toiletFaceHover) toiletFaceHover.classList.add('hidden');
                     if (toiletLowerBaseGroup) toiletLowerBaseGroup.removeAttribute('filter');
 
-                    setTimeout(() => {
+                    toiletCloseTimer = setTimeout(() => {
                         if (toiletClosedLidRing) toiletClosedLidRing.classList.remove('is-settling');
                         if (toiletMainLogoGroup) toiletMainLogoGroup.classList.remove('is-jumping-down');
+                        toiletCloseTimer = null;
                     }, 260);
-
-                    toiletCloseTimer = null;
-                }, 260);
+                });
             }
 
             function resetAllZonesToIdle() {
@@ -3384,6 +3927,8 @@
                 if (prevZone === 'toilet' && zoneName !== 'toilet') {
                     resetOptionsOnly(true);
                     playToiletClosingSequence();
+                } else if (zoneName === 'toilet') {
+                    resetOptionsOnly(true);
                 } else {
                     resetOptionsOnly(false);
                 }
@@ -3410,22 +3955,28 @@
                     if (trashCanOpenLid) trashCanOpenLid.classList.add('is-animating');
                     if (trashCanOpenBase) trashCanOpenBase.classList.add('is-animating');
                 } else if (zoneName === 'toilet') {
-                    if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.add('hidden');
-                    if (toiletOpenUpperGroup) toiletOpenUpperGroup.classList.remove('hidden');
+                    clearToiletCloseAnimationState();
+                    // 打開馬桶時保留後方水箱，並由外層統一套用白光濾鏡
+                    if (toiletClosedUpperGroup) toiletClosedUpperGroup.classList.remove('hidden');
                     if (toiletClosedLidRing) toiletClosedLidRing.classList.add('hidden');
                     if (toiletOpenOptionsGroup) toiletOpenOptionsGroup.classList.remove('hidden');
                     if (toiletFaceIdle) toiletFaceIdle.classList.add('hidden');
                     if (toiletFaceHover) toiletFaceHover.classList.remove('hidden');
-                    if (toiletLowerBaseGroup) toiletLowerBaseGroup.setAttribute('filter', 'url(#whiteGlow)');
+                    if (zoneCenterToilet) zoneCenterToilet.setAttribute('filter', 'url(#whiteGlow)');
+                    if (toiletLowerBaseGroup) toiletLowerBaseGroup.removeAttribute('filter');
 
-                    clearToiletCloseAnimationState();
-                    if (toiletOpenUpperGroup) {
-                        void toiletOpenUpperGroup.offsetWidth;
-                        toiletOpenUpperGroup.classList.add('is-animating');
-                    }
+                    startToiletLid3DAnimation(true);
                     if (toiletMainLogoGroup) toiletMainLogoGroup.classList.add('is-jumping-up');
-                    if (openReportSystemBtn) openReportSystemBtn.classList.add('is-animating');
-                    if (openStatusBoardBtn) openStatusBoardBtn.classList.add('is-animating');
+                    if (openReportSystemBtn) {
+                        openReportSystemBtn.classList.remove('is-animating');
+                        void openReportSystemBtn.offsetWidth;
+                        openReportSystemBtn.classList.add('is-animating');
+                    }
+                    if (openStatusBoardBtn) {
+                        openStatusBoardBtn.classList.remove('is-animating');
+                        void openStatusBoardBtn.offsetWidth;
+                        openStatusBoardBtn.classList.add('is-animating');
+                    }
                 } else if (zoneName === 'dex') {
                     if (toiletPaperStackGroup) {
                         toiletPaperStackGroup.setAttribute('filter', 'url(#whiteGlow)');
@@ -4914,22 +5465,35 @@
                 }
             });
 
-            // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 發光並顯示施工中彈窗
+            // 3. 點擊「公廁現況版」或「小怪圖鑑」 -> 播放音效與發光特效並跳轉頁面
             const underConstructionModal = document.getElementById('underConstructionModal');
-            const openUnderConstruction = (e) => {
-                if (e) {
-                    e.stopPropagation();
-                    if (e.currentTarget) triggerPressGlow(e.currentTarget);
-                }
-                playHomeClickSfx();
-                setTimeout(() => {
-                    underConstructionModal?.classList.remove('hidden');
-                }, 140);
+
+            // 跳轉至公廁現況版 ./board.html（保留 stopPropagation 避免觸發馬桶本體的定位門盤）
+            const handleGoBoard = (e) => {
+                if (e) e.stopPropagation();
+                if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
+                playHomeClickSfx(() => {
+                    window.location.href = './board.html';
+                });
             };
-            document.getElementById('openStatusBoardBtn')?.addEventListener('click', openUnderConstruction);
-            document.getElementById('mobileOpenStatusBoardBtn')?.addEventListener('click', openUnderConstruction);
-            zoneMonsterDex?.addEventListener('click', openUnderConstruction);
-            document.getElementById('mobileZoneMonsterDex')?.addEventListener('click', openUnderConstruction);
+
+            // 跳轉至小怪圖鑑 ./handbook.html
+            const handleGoDex = (e) => {
+                if (e) e.stopPropagation();
+                if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
+                playHomeClickSfx(() => {
+                    window.location.href = './handbook.html';
+                });
+            };
+
+            // 主頁馬桶內「公廁現況版」(電腦版與手機版) 跳轉 ./board.html
+            document.getElementById('openStatusBoardBtn')?.addEventListener('click', handleGoBoard);
+            document.getElementById('mobileOpenStatusBoardBtn')?.addEventListener('click', handleGoBoard);
+
+            // 主頁「小怪圖鑑」(電腦版與手機版) 跳轉 ./handbook.html
+            zoneMonsterDex?.addEventListener('click', handleGoDex);
+            document.getElementById('mobileZoneMonsterDex')?.addEventListener('click', handleGoDex);
+
             document.getElementById('closeUnderConstructionBtn')?.addEventListener('click', () => {
                 underConstructionModal?.classList.add('hidden');
             });
@@ -5040,13 +5604,16 @@
                 closeTpDropdownMenu(false);
                 handleGoMap();
             });
+            // 手機版下拉衛生紙選單：公廁現況版
             document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
                 closeTpDropdownMenu(false);
-                openUnderConstruction(e);
+                handleGoBoard(e);
             });
             document.getElementById('tpMenuMonsterDexBtn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
                 closeTpDropdownMenu(false);
-                openUnderConstruction(e);
+                handleGoDex(e);
             });
             document.getElementById('tpMenuPersonalSpaceBtn')?.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -5071,13 +5638,14 @@
                 e.preventDefault();
                 handleGoMap(e);
             });
+            // 電腦版頂部粉紅導覽列：公廁現況版
             document.getElementById('desktopNavStatusBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                openUnderConstruction(e);
+                handleGoBoard(e);
             });
             document.getElementById('desktopNavDexBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();
-                openUnderConstruction(e);
+                handleGoDex(e);
             });
             document.getElementById('desktopNavProfileBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();

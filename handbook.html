@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no, address=no, email=no">
+    <title>有所味 Poopgle｜小怪圖鑑</title>
+    <script>
+        // 攔截預覽沙盒中本機圖檔或跨網域腳本限制產生的空白錯誤事件
+        window.addEventListener('error', function(e) {
+            if (e && e.target && e.target !== window) {
+                if (typeof e.target.onerror === 'function') {
+                    try { e.target.onerror.call(e.target, e); } catch (err) {}
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return;
+            }
+            if (e && (!e.error || e.message === 'Script error.' || (e.message && e.message.indexOf('ResizeObserver') !== -1))) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+            var isSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').indexOf('usercontent.goog') !== -1 ||
+                (window.location.hostname || '').indexOf('googleusercontent.com') !== -1
+            );
+            if (e && (!e.reason || !e.reason.message || isSandbox)) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        }, true);
+    </script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts 圓體備援 + jf open 粉圓體 (與 index.html 完全統一) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;500;700;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- Firebase SDK (用於個人空間登入狀態檢查與同步) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <style>
+        /* ========================================================= */
+        /* 與 index.html 100% 統一的色彩計畫與粉圓體設定               */
+        /* ========================================================= */
+        :root {
+            --poogle-mint-bg: #45E5AC;
+            --poogle-cream: #FFF9EC;
+            --poogle-yellow: #F3EF84;
+            --poogle-blue: #80E4FF;
+            --poogle-pink: #FF99D3;
+            --poogle-pink-stage: #FF85D0;
+            --poogle-red: #F26559;
+            --poogle-ink: #2A348C;
+            --cursor-default: url('./img/mouse.png') 0 0, auto;
+            --cursor-hover: url('./img/hover.png') 0 0, pointer;
+        }
+
+        @font-face {
+            font-family: 'jf-openhuninn';
+            src: local('jf-openhuninn-2.1'),
+                 local('jf-openhuninn-2.0'),
+                 local('jf-openhuninn-1.1'),
+                 local('jf-openhuninn'),
+                 url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-web-font@1.1/font/jf-openhuninn.woff') format('woff'),
+                 url('https://cdn.jsdelivr.net/gh/justfont/open-huninn-font@master/font/jf-openhuninn-2.1.ttf') format('truetype');
+            font-display: swap;
+        }
+
+        body, svg text, button, a {
+            font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
+        }
+
+        button, a, input, select, textarea, svg, g, rect, path, circle, ellipse, polygon, use, image,
+        [role="button"], [tabindex] {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body, svg {
+            cursor: var(--cursor-default) !important;
+        }
+
+        a, button, [role="button"], .cursor-pointer,
+        .tp-menu-item, .tp-menu-item *,
+        .dex-pill-btn, .dex-pill-btn *,
+        .dex-arch-slot image,
+        .mobile-arch-card image,
+        .mobile-cat-pill, .mobile-cat-pill * {
+            cursor: var(--cursor-hover) !important;
+        }
+
+        body {
+            background-color: var(--poogle-pink-stage);
+            color: var(--poogle-ink);
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0;
+            padding: 0;
+        }
+        @media (min-width: 768px) {
+            body {
+                overflow: hidden;
+            }
+        }
+
+        /* 隱藏導覽列小螢幕捲軸 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+        /* ========================================================= */
+        /* 手機版右上角衛生紙捲筒下拉選單動畫 (與 index.html 一致)     */
+        /* ========================================================= */
+        @keyframes tpDropdownUnroll {
+            0%   { opacity: 0; transform: scaleY(0.18); }
+            70%  { opacity: 1; transform: scaleY(1.03); }
+            100% { opacity: 1; transform: scaleY(1); }
+        }
+        @keyframes tpDropdownRollUp {
+            0%   { opacity: 1; transform: scaleY(1); }
+            30%  { opacity: 1; transform: scaleY(1.02); }
+            100% { opacity: 0; transform: scaleY(0.12); }
+        }
+        #tpRollDropdownMenu {
+            transform-origin: top center;
+        }
+        #tpRollDropdownMenu.is-open {
+            display: block;
+            animation: tpDropdownUnroll 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        #tpRollDropdownMenu.is-closing {
+            display: block;
+            pointer-events: none;
+            animation: tpDropdownRollUp 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @media (min-width: 768px) {
+            #tpRollDropdownMenu,
+            #tpRollDropdownMenu.is-open,
+            #tpRollDropdownMenu.is-closing {
+                display: none !important;
+            }
+        }
+        .tp-menu-item {
+            cursor: pointer;
+            transition: transform 0.18s ease, opacity 0.18s ease;
+        }
+        .tp-menu-item:hover {
+            transform: translateX(3px);
+        }
+        .tp-menu-item:hover text {
+            fill: #F26559;
+        }
+
+        .poogle-pill-btn {
+            border: 1.5px solid #2A348C;
+            transition: all 0.16s ease;
+        }
+
+        .report-logo-sticker {
+            filter: url(#logoStickerOutline);
+            -webkit-filter: url(#logoStickerOutline);
+        }
+
+        /* ========================================================= */
+        /* 小怪圖鑑拱門窗格、探頭動畫、分類膠囊與中央貼紙互動特效       */
+        /* ========================================================= */
+        @keyframes archEntrancePop {
+            0% {
+                opacity: 0;
+                transform: translateY(28px) scale(0.92);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.015);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes monsterPeekIdle {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+        @keyframes titleStickerFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        @keyframes titleStickerPop {
+            0%   { transform: scale(1); }
+            35%  { transform: scale(0.92) rotate(-1.5deg); }
+            70%  { transform: scale(1.07) rotate(1.5deg); }
+            100% { transform: scale(1); }
+        }
+
+        .dex-arch-entrance {
+            transform-box: fill-box;
+            transform-origin: center bottom;
+            animation: archEntrancePop 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .dex-monster-idle-float {
+            animation: monsterPeekIdle 3.4s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        /* 小怪切換與 Hover 探頭動畫層 */
+        .dex-monster-swap-group {
+            transform-box: fill-box;
+            transform-origin: center bottom;
+            will-change: transform, opacity;
+            transition: transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease-out;
+        }
+        .dex-monster-swap-group.is-swapping {
+            transform: translateY(48px) scale(0.56);
+            opacity: 0;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s ease-in;
+        }
+        .dex-arch-slot:hover .dex-monster-swap-group:not(.is-swapping) {
+            transform: translateY(-12px) scale(1.06);
+        }
+
+        /* 拱門維持純 2D 平面（移除外發光陰影） */
+        .dex-arch-slot,
+        .dex-arch-slot:hover {
+            filter: none !important;
+        }
+
+        /* 深藍分類膠囊按鈕：順順向上位移＋顏色變淡（無任何立體影子） */
+        .dex-pill-btn {
+            transform-box: fill-box;
+            transform-origin: center;
+            filter: none !important;
+            transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .dex-pill-btn:hover {
+            transform: translateY(-4px);
+            filter: none !important;
+        }
+        .dex-pill-btn:active {
+            transform: translateY(-2px);
+            filter: none !important;
+        }
+        .dex-pill-btn rect {
+            transition: fill 0.2s ease, stroke 0.2s ease;
+        }
+        .dex-pill-btn:not(.is-active):hover rect {
+            fill: #4552B8;
+        }
+        .dex-pill-btn text {
+            transition: fill 0.2s ease;
+        }
+        .dex-pill-btn.is-active rect {
+            fill: #F3EF84;
+            stroke: #2A348C;
+            stroke-width: 2.8;
+        }
+        .dex-pill-btn.is-active:hover rect {
+            fill: #F8F5A6;
+        }
+        .dex-pill-btn.is-active text {
+            fill: #2A348C;
+        }
+
+        /* 中央「小怪圖鑑」貼紙字 */
+        #dexMainTitleGroup {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        /* 手機版分類膠囊：順順向上位移＋顏色變淡（無立體影子） */
+        .mobile-cat-pill {
+            box-shadow: none !important;
+            filter: none !important;
+            transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease, color 0.2s ease;
+        }
+        .mobile-cat-pill:not(.is-active):hover {
+            transform: translateY(-3px);
+            background-color: #4552B8;
+        }
+        .mobile-cat-pill:active {
+            transform: translateY(-1px);
+        }
+        .mobile-cat-pill.is-active {
+            background-color: #F3EF84 !important;
+            color: #2A348C !important;
+            border: 2.5px solid #2A348C;
+        }
+        /* ========================================================= */
+        /* 小怪分類內頁（小仙 & 小妖）純 2D 卡片互動樣式               */
+        /* ========================================================= */
+        .cat-header-back-btn {
+            cursor: var(--cursor-hover) !important;
+            transform-box: fill-box;
+            transform-origin: center;
+            transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .cat-header-back-btn:hover {
+            transform: translateY(-3px);
+        }
+        .cat-header-back-btn rect.cat-pill-main {
+            transition: fill 0.2s ease;
+        }
+        .cat-header-back-btn:hover rect.cat-pill-main {
+            fill: #4552B8;
+        }
+
+        .cat-arch-card {
+            cursor: var(--cursor-hover) !important;
+            transform-box: fill-box;
+            transform-origin: center bottom;
+            animation: archEntrancePop 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .cat-arch-card * {
+            cursor: var(--cursor-hover) !important;
+        }
+        /* 分類內頁與開頭頁小怪：Hover 原地微微放大 + 點擊快速輕跳一下 */
+        @keyframes monsterQuickHop {
+            0%   { transform: translateY(0px) scale(1.06); }
+            42%  { transform: translateY(-11px) scale(1.09); }
+            76%  { transform: translateY(1.5px) scale(1.08, 1.04); }
+            100% { transform: translateY(0px) scale(1.08); }
+        }
+        .cat-arch-card .cat-monster-img,
+        .dex-arch-slot image,
+        .mobile-arch-card image {
+            transform-box: fill-box;
+            transform-origin: 50% 60%;
+            transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .cat-arch-card:hover .cat-monster-img,
+        .dex-arch-slot image:hover,
+        .mobile-arch-card image:hover {
+            transform: scale(1.08);
+        }
+        .is-hopping {
+            animation: monsterQuickHop 0.24s cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+        /* 「小妖」萬聖節抖抖字微顫動畫 */
+        @keyframes impSpookyShiver {
+            0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+            25%      { transform: translate(-0.8px, 0.6px) rotate(-1.2deg); }
+            50%      { transform: translate(0.9px, -0.7px) rotate(1deg); }
+            75%      { transform: translate(-0.6px, -0.5px) rotate(1.4deg); }
+        }
+        .spooky-imp-filter {
+            filter: url(#impHalloweenWiggle);
+            -webkit-filter: url(#impHalloweenWiggle);
+        }
+        .spooky-imp-shiver {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: impSpookyShiver 0.32s steps(2, end) infinite;
+        }
+        /* 「小仙」優雅輕盈飄浮動畫 */
+        @keyframes fairyGracefulFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(-1.2deg);
+            }
+            50% {
+                transform: translateY(-7px) rotate(1.2deg);
+            }
+        }
+        .fairy-graceful-float {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: fairyGracefulFloat 3.2s ease-in-out infinite;
+            will-change: transform;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen md:h-screen w-screen overflow-x-hidden overflow-y-auto md:overflow-hidden select-none relative flex flex-col">
+
+    <!-- 全域共用 SVG 濾鏡：Logo 貼紙框 & 中央「小怪圖鑑」雲朵白邊深藍細線貼紙濾鏡 -->
+    <svg class="fixed top-0 left-0 w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <defs>
+            <!-- 「小妖」專屬：萬聖節波浪扭曲筆畫濾鏡 -->
+            <filter id="impHalloweenWiggle" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+                <feTurbulence type="turbulence" baseFrequency="0.075 0.11" numOctaves="2" seed="8" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="4.2" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <!-- 左上角 Logo 貼紙濾鏡 (與 index.html 一致) -->
+            <filter id="logoStickerOutline" x="-20%" y="-25%" width="140%" height="150%" color-interpolation-filters="sRGB">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2.8" result="whiteBlur" />
+                <feComponentTransfer in="whiteBlur" result="whiteMask">
+                    <feFuncA type="linear" slope="20" intercept="-1" />
+                </feComponentTransfer>
+                <feFlood flood-color="#FFFFFF" flood-opacity="1" result="whiteColor" />
+                <feComposite in="whiteColor" in2="whiteMask" operator="in" result="whiteOutline" />
+
+                <feGaussianBlur in="whiteMask" stdDeviation="1.05" result="navyBlur" />
+                <feComponentTransfer in="navyBlur" result="navyMask">
+                    <feFuncA type="linear" slope="9" intercept="-0.35" />
+                </feComponentTransfer>
+                <feFlood flood-color="#2A348C" flood-opacity="1" result="navyColor" />
+                <feComposite in="navyColor" in2="navyMask" operator="in" result="navyOutline" />
+
+                <feMerge>
+                    <feMergeNode in="navyOutline" />
+                    <feMergeNode in="whiteOutline" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+
+            <!-- 「小怪圖鑑」大標題專屬：圓潤厚白貼紙底 + 外圈 #2A348C 深藍描邊濾鏡 -->
+            <!-- 「小怪圖鑑」大標題專屬：乾淨無雜點雲朵白貼紙底 + 平滑深藍細線濾鏡 -->
+            <filter id="dexTitleCloudSticker" x="-35%" y="-55%" width="170%" height="210%" color-interpolation-filters="sRGB">
+                <!-- 1. 先擴張融合字與字之間的縫隙，徹底消除白框內的深藍碎點 -->
+                <feGaussianBlur in="SourceAlpha" stdDeviation="8.0 6.8" result="fusedBlur" />
+                <feComponentTransfer in="fusedBlur" result="fusedCore">
+                    <feFuncA type="linear" slope="24" intercept="-1.8" />
+                </feComponentTransfer>
+
+                <!-- 2. 微幅平滑收邊並做抗鋸齒，形成乾淨圓潤的純白貼紙底 -->
+                <feGaussianBlur in="fusedCore" stdDeviation="3.2" result="smoothWhiteBlur" />
+                <feComponentTransfer in="smoothWhiteBlur" result="stickerWhiteMask">
+                    <feFuncA type="linear" slope="9" intercept="-6.2" />
+                </feComponentTransfer>
+                <feFlood flood-color="#FFFFFF" flood-opacity="1" result="pureWhite" />
+                <feComposite in="pureWhite" in2="stickerWhiteMask" operator="in" result="whiteStickerBody" />
+
+                <!-- 3. 沿著無雜點的白貼紙外緣，包覆一圈均勻平滑的 #2A348C 深藍框線 -->
+                <feGaussianBlur in="stickerWhiteMask" stdDeviation="2.5" result="borderBlur" />
+                <feComponentTransfer in="borderBlur" result="borderNavyMask">
+                    <feFuncA type="linear" slope="8.5" intercept="-1.1" />
+                </feComponentTransfer>
+                <feFlood flood-color="#2A348C" flood-opacity="1" result="inkNavy" />
+                <feComposite in="inkNavy" in2="borderNavyMask" operator="in" result="navyStickerBorder" />
+
+                <!-- 4. 依序疊合：深藍外框 ➔ 純白貼紙底 ➔ 深藍文字 -->
+                <feMerge>
+                    <feMergeNode in="navyStickerBorder" />
+                    <feMergeNode in="whiteStickerBody" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+
+            <!-- 「有所味」1:1 向量備援 Logo 元件 -->
+            <g id="youSuoWeiLogoVector">
+                <g>
+                    <path d="M 38,32 C 25,33 17,41 18,52 C 19,62 27,68 41,67 L 53,66 C 46,85 35,108 24,125 C 18,135 20,148 30,152 C 40,156 50,149 56,136 C 67,114 76,88 83,64 L 138,59 C 151,58 159,49 158,38 C 157,28 148,22 134,23 L 90,27 C 92,22 92,18 90,14 C 87,7 77,5 70,9 C 64,13 60,21 57,29 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 65,58 L 137,51 C 149,50 156,57 157,69 L 164,142 C 165,155 155,164 142,165 C 131,166 123,159 120,149 C 113,152 103,149 97,140 C 92,132 94,122 100,117 L 89,118 L 93,153 C 94,165 85,174 73,175 C 61,176 52,167 51,155 L 44,81 C 43,68 52,59 65,58 Z"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <line x1="74" y1="79" x2="126" y2="101" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <line x1="125" y1="76" x2="75" y2="103" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <path d="M 122,148 C 110,148 94,138 96,125 C 97,120 101,117 105,119 C 102,114 106,109 111,112 C 109,107 115,103 120,107 C 119,102 127,100 131,106 C 136,113 139,124 147,132"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <g transform="translate(182, 0)">
+                    <path d="M 73,6 C 83,3 93,10 94,20 C 95,29 88,37 76,41 L 44,50 L 38,125 C 37,139 27,148 15,147 C 4,146 -3,136 -1,122 L 9,38 C 11,26 19,19 32,16 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <rect x="29" y="40" width="46" height="71" rx="8"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" />
+                    <circle cx="40" cy="76" r="3.5" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" />
+                    <path d="M 128,8 C 138,5 148,12 149,22 C 150,31 143,39 131,43 L 106,50 L 105,54 L 138,52 C 149,51 157,59 157,69 C 157,79 149,86 138,87 L 132,87 L 132,144 C 132,156 123,164 112,164 C 101,164 93,156 93,144 L 93,89 L 91,89 C 89,112 84,132 76,146 C 70,156 59,159 50,154 C 41,149 39,138 44,127 C 53,110 57,84 59,48 C 60,36 67,28 79,24 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                </g>
+                <g transform="translate(345, 0)">
+                    <path d="M 18,48 L 48,50 C 58,51 64,58 63,69 L 57,140 C 56,151 48,157 37,156 L 11,154 C 1,153 -5,145 -4,134 L 2,63 C 3,53 9,47 18,48 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <line x1="29" y1="74" x2="25" y2="128" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                    <path d="M 80,115 L 55,152 C 49,161 52,172 61,177 C 70,182 81,179 87,169 L 104,142 L 104,162 C 104,173 112,181 122,181 C 132,181 140,173 140,162 L 140,142 L 155,169 C 161,179 172,182 181,177 C 190,172 193,161 187,152 L 164,115 Z"
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 118,22 C 138,18 152,35 138,49 C 162,51 172,76 150,86 C 178,90 182,126 152,130 L 86,125 C 56,121 62,85 88,83 C 68,72 78,46 102,47 C 112,47 122,36 118,22 Z"
+                          fill="#F3EF84" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                    <path d="M 102,48 Q 120,51 138,49" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
+                    <path d="M 88,83 Q 119,88 150,86" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
+                </g>
+            </g>
+        </defs>
+    </svg>
+
+    <!-- 1. TOP NAVBAR + MARQUEE BAR (與 index.html 一致的上方導覽列與 POOPGLE 跑馬燈) -->
+    <header class="sticky top-0 w-full shrink-0 z-40 flex flex-col">
+    <!-- 底色改為 #F3EF84，並已移除下方跑馬燈 -->
+    <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#F3EF84] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+            <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
+            <a href="./index.html?openReport=1" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
+            <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
+            <a href="#" id="desktopNavStatusBtn" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+            <a href="./handbook.html" id="desktopNavDexBtn" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+            <a href="./profile.html" id="desktopNavProfileBtn" class="hover:opacity-70 transition-opacity">個人空間</a>
+        </div>
+    </nav>
+</header>
+
+    <!-- 2. MOBILE TOP BAR (手機版左上角回首頁 Logo + 右上角衛生紙下拉選單) -->
+    <div class="flex md:hidden items-center justify-between px-5 pt-3 pb-1 relative z-30">
+        <a href="./index.html" class="inline-block focus:outline-none transition-transform active:scale-95" title="回到有所味首頁">
+            <img alt="有所味 Logo" class="poogle-logo-img report-logo-sticker w-[126px] h-auto object-contain block" />
+        </a>
+
+        <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
+                class="flex flex-col justify-center gap-[8px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
+            <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+            <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+        </button>
+
+        <!-- 手機版下拉式衛生紙捲筒選單 -->
+        <div id="tpRollDropdownMenu" class="hidden md:hidden absolute right-0 top-[-2px] w-[184px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+                <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+
+                <g id="tpMenuHomeBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="34" width="180" height="48" fill="transparent" />
+                    <text x="22" y="65" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">主頁</text>
+                </g>
+
+                <g id="tpMenuReportSystemBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="98" width="180" height="48" fill="transparent" />
+                    <text x="22" y="129" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
+                </g>
+
+                <g id="tpMenuMapBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="162" width="180" height="48" fill="transparent" />
+                    <text x="22" y="193" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
+                </g>
+
+                <g id="tpMenuStatusBoardBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="226" width="180" height="48" fill="transparent" />
+                    <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況版</text>
+                </g>
+
+                <g id="tpMenuMonsterDexBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="290" width="180" height="48" fill="transparent" />
+                    <text x="22" y="321" fill="#F26559" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
+                </g>
+
+                <g id="tpMenuPersonalSpaceBtn" class="tp-menu-item" role="button" tabindex="0">
+                    <rect x="8" y="354" width="180" height="48" fill="transparent" />
+                    <text x="22" y="385" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
+                </g>
+
+                <path d="M 34,420 L 177,420 A 31,88 0 0,1 177,596 L 34,596 Z"
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                <ellipse cx="34" cy="508" rx="31" ry="88"
+                         fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
+                <ellipse cx="31" cy="508" rx="9" ry="26"
+                         fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- 3. FULL-WIDTH HALFTONE DOTS BACKGROUND (與 index.html 統一的滿版白色漸變互動網點) -->
+    <svg id="fullScreenHalftoneSvg" class="fixed inset-0 w-screen h-screen pointer-events-none z-0" preserveAspectRatio="none">
+        <g id="halftoneDotsBgLayer" fill="#FFFFFF" opacity="0.52"></g>
+    </svg>
+
+    <!-- 4. MAIN MONSTER HANDBOOK STAGE (小怪圖鑑主舞台) -->
+    <main class="flex-1 md:min-h-0 w-full flex items-center justify-center relative z-10 px-2 sm:px-4 md:px-0 pb-8 md:pb-0">
+
+        <!-- =============================================================== -->
+        <!-- 4A. DESKTOP STAGE SVG (>= 768px：1:1 還原設計稿 10 拱門 + 4 分類) -->
+        <!-- =============================================================== -->
+        <svg id="desktopHandbookSvg" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMid meet"
+             class="hidden md:block w-full h-full max-w-full max-h-[calc(100vh-66px)] select-none overflow-visible">
+            <defs>
+                <!-- 上排圓拱門內部裁切遮罩 (中心 x=0, 頂端 y=-286, 底端 y=0, 寬 172, 半徑 86) -->
+                <clipPath id="archClipTop">
+                    <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" />
+                </clipPath>
+
+                <!-- 下排圓拱門內部裁切遮罩 (中心 x=0, 頂端 y=-286, 底端 y=0, 寬 172, 半徑 86) -->
+                <clipPath id="archClipBottom">
+                    <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" />
+                </clipPath>
+            </defs>
+
+            <!-- 由 JS 依座標自動繪製 10 座圓拱門窗格 (上排 5 座 + 下排 5 座) -->
+            <g id="desktopArchesLayer"></g>
+
+            <!-- 中央橫列：4 個深藍膠囊分類按鈕 + 正中央「小怪圖鑑」貼紙大標題 -->
+            <g id="desktopControlsLayer">
+                <!-- 分類按鈕 1：廁間小怪 (對應 img/stall) -->
+                <g transform="translate(232, 332)">
+                    <g class="dex-pill-btn" data-category="stall" role="button" tabindex="0" aria-label="篩選廁間小怪">
+                        <rect x="-102" y="-26" width="204" height="52" rx="26" fill="#2A348C" />
+                        <text x="0" y="1" fill="#FFF9EC" font-size="21" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
+                            廁間小怪
+                        </text>
+                    </g>
+                </g>
+
+                <!-- 分類按鈕 2：小便斗小怪 (對應 img/urinal) -->
+                <g transform="translate(476, 332)">
+                    <g class="dex-pill-btn" data-category="urinal" role="button" tabindex="0" aria-label="篩選小便斗小怪">
+                        <rect x="-102" y="-26" width="204" height="52" rx="26" fill="#2A348C" />
+                        <text x="0" y="1" fill="#FFF9EC" font-size="21" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
+                            小便斗小怪
+                        </text>
+                    </g>
+                </g>
+
+                <!-- 正中央貼紙標題：小怪圖鑑 -->
+                <g transform="translate(720, 332)">
+                    <g id="dexMainTitleGroup" class="pointer-events-none select-none"
+                       font-size="56" font-weight="900" letter-spacing="4"
+                       text-anchor="middle" dominant-baseline="central">
+                        <!-- 第 1 層（最底層）：沿筆畫描繪的深藍色外細框 -->
+                        <text x="0" y="2" fill="#2A348C" stroke="#2A348C" stroke-width="19.5"
+                              stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                        <!-- 第 2 層（中間層）：沿筆畫描繪的乾淨白色外框 -->
+                        <text x="0" y="2" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="15"
+                              stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                        <!-- 第 3 層（最上層）：深藍色文字本體 -->
+                        <text x="0" y="2" fill="#2A348C">小怪圖鑑</text>
+                    </g>
+                </g>
+
+                <!-- 分類按鈕 3：消耗品小怪 (對應 img/consumable) -->
+                <g transform="translate(964, 332)">
+                    <g class="dex-pill-btn" data-category="consumable" role="button" tabindex="0" aria-label="篩選消耗品小怪">
+                        <rect x="-102" y="-26" width="204" height="52" rx="26" fill="#2A348C" />
+                        <text x="0" y="1" fill="#FFF9EC" font-size="21" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
+                            消耗品小怪
+                        </text>
+                    </g>
+                </g>
+
+                <!-- 分類按鈕 4：硬體小怪 (對應 img/hardware) -->
+                <g transform="translate(1208, 332)">
+                    <g class="dex-pill-btn" data-category="hardware" role="button" tabindex="0" aria-label="篩選硬體小怪">
+                        <rect x="-102" y="-26" width="204" height="52" rx="26" fill="#2A348C" />
+                        <text x="0" y="1" fill="#FFF9EC" font-size="21" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
+                            硬體小怪
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </svg>
+
+        <!-- =============================================================== -->
+        <!-- 4B. MOBILE RESPONSIVE STAGE (< 768px：雙欄圓拱門與分類膠囊排版)  -->
+        <!-- =============================================================== -->
+        <div class="block md:hidden w-full max-w-[430px] mx-auto pt-2 flex flex-col items-center">
+            <!-- 手機版中央「小怪圖鑑」貼紙標題 -->
+            <div class="mb-3 pointer-events-none select-none">
+                <svg viewBox="0 0 320 96" class="w-[236px] h-auto overflow-visible block"
+                     font-size="52" font-weight="900" letter-spacing="4"
+                     text-anchor="middle" dominant-baseline="central">
+                    <text x="160" y="50" fill="#2A348C" stroke="#2A348C" stroke-width="18"
+                          stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                    <text x="160" y="50" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14"
+                          stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                    <text x="160" y="50" fill="#2A348C">小怪圖鑑</text>
+                </svg>
+            </div>
+
+            <!-- 手機版 4 大分類深藍膠囊按鈕 -->
+            <div class="grid grid-cols-2 gap-2.5 w-full px-3 mb-5">
+                <button type="button" data-mobile-cat="stall"
+                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                    廁間小怪
+                </button>
+                <button type="button" data-mobile-cat="urinal"
+                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                    小便斗小怪
+                </button>
+                <button type="button" data-mobile-cat="consumable"
+                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                    消耗品小怪
+                </button>
+                <button type="button" data-mobile-cat="hardware"
+                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                    硬體小怪
+                </button>
+            </div>
+
+            <!-- 手機版圓拱門小怪雙欄網格 (由 JS 自動渲染 6 座拱門) -->
+            <div id="mobileArchesGrid" class="grid grid-cols-2 gap-x-4 gap-y-5 w-full px-3"></div>
+        </div>
+    </main>
+    <!-- 4C. CATEGORY DETAIL VIEW (點擊四個分類按鈕後顯示的小仙 & 小妖分類圖鑑) -->
+    <!-- 4C. CATEGORY DETAIL VIEW (左側直式小仙 & 小妖 + 窗戶區塊對齊中間水平線) -->
+    <section id="categoryDetailSection" class="hidden flex-1 md:min-h-0 w-full flex flex-col items-center justify-center relative z-10 px-3 sm:px-6 md:px-0 pb-10 md:pb-0">
+        <!-- 滿版磁磚格線背景 (依分類自動切換淺粉紅 / 淺薄荷綠) -->
+        <svg class="fixed inset-0 w-screen h-screen pointer-events-none z-0" aria-hidden="true">
+            <defs>
+                <pattern id="categoryTilePattern" width="128" height="128" patternUnits="userSpaceOnUse">
+                    <rect id="categoryTileBgRect" width="128" height="128" fill="#FDEBF1" />
+                    <path d="M 128 0 L 0 0 0 128" fill="none" stroke="#FFF9EC" stroke-width="7" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#categoryTilePattern)" />
+        </svg>
+
+        <!-- 電腦版分類圖鑑舞台 (>= 768px：窗戶區塊上下對稱置中於中間水平線 y=384) -->
+        <svg id="desktopCategorySvg" viewBox="0 0 1440 768" preserveAspectRatio="xMidYMid meet"
+             class="hidden md:block relative z-10 w-full h-full max-w-full max-h-[calc(100vh-48px)] select-none overflow-visible">
+            <!-- 頂部深藍分類膠囊 (點擊可返回圖鑑開頭頁) -->
+            <g transform="translate(720, 38)">
+                <g id="desktopCatBackBtn" class="cat-header-back-btn" role="button" tabindex="0" aria-label="返回小怪圖鑑總覽">
+                    <title>點擊返回小怪圖鑑總覽</title>
+                    <rect class="cat-pill-main" x="-98" y="-23" width="196" height="46" rx="23" fill="#2A348C" />
+                    <text id="desktopCatTitleText" x="0" y="1" fill="#FFF9EC" font-size="20" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
+                        廁間小怪
+                    </text>
+                </g>
+            </g>
+
+            <!-- 由 JS 自動渲染左側直式「小仙 / 小妖」與上下兩排圓拱門卡片 -->
+            <g id="desktopCategoryCardsLayer"></g>
+        </svg>
+
+        <!-- 手機版分類圖鑑舞台 (< 768px：左側直式小仙 / 小妖 + 雙欄卡片) -->
+        <div class="block md:hidden relative z-10 w-full max-w-[430px] mx-auto pt-3 flex flex-col items-center">
+            <button id="mobileCatBackBtn" type="button" title="點擊返回小怪圖鑑總覽"
+                    class="h-[42px] px-9 mb-5 rounded-full bg-[#2A348C] text-[#FFF9EC] text-[18px] font-bold tracking-[0.18em] flex items-center justify-center active:scale-95 transition-transform">
+                <span id="mobileCatTitleText">廁間小怪</span>
+            </button>
+
+           <!-- 手機版上區：左側直式「小仙」+ 粉紅圓點拱門 -->
+            <div class="flex items-center w-full px-1 mb-6">
+                <div class="w-6 shrink-0 flex flex-col items-center justify-center text-[#FF85D0] text-[17.5px] font-black leading-[1.2] select-none">
+                    <span class="fairy-graceful-float inline-block">小</span>
+                    <span class="fairy-graceful-float inline-block" style="animation-delay: -0.5s;">仙</span>
+                </div>
+                <div id="mobileFairiesGrid" class="flex-1 flex flex-wrap justify-center gap-x-3 gap-y-5"></div>
+            </div>
+
+            <!-- 手機版下區：左側直式「小妖」+ 薄荷綠圓點拱門 -->
+            <div class="flex items-center w-full px-1">
+                <div class="spooky-imp-filter w-6 shrink-0 flex flex-col items-center justify-center text-[#20D89A] text-[17.5px] font-black leading-[1.2] select-none">
+                    <span class="spooky-imp-shiver inline-block -rotate-6">小</span>
+                    <span class="spooky-imp-shiver inline-block rotate-6" style="animation-delay: -0.15s;">妖</span>
+                </div>
+                <div id="mobileImpsGrid" class="flex-1 flex flex-wrap justify-center gap-x-3 gap-y-5"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- MODALS (公廁現況版施工中彈窗 & 個人空間 Google 登入彈窗)               -->
+    <!-- =================================================================== -->
+
+    <!-- 施工中彈窗 (與 index.html 統一) -->
+    <div id="underConstructionModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
+            <button id="closeUnderConstructionBtn" type="button" class="poogle-pill-btn absolute top-4 right-4 w-8 h-8 rounded-full bg-[#FFF9EC] text-[#2A348C] flex items-center justify-center focus:outline-none" aria-label="關閉">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-2xl sm:text-3xl font-extrabold text-[#2A348C] tracking-wider py-2">
+                ⚠️施工中⚠️
+            </div>
+        </div>
+    </div>
+
+    <!-- Google 帳號登入彈窗 (點擊個人空間未登入時彈出，與 index.html 統一) -->
+    <div id="loginModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="relative bg-white rounded-[36px] max-w-[430px] w-full border-[3px] border-[#2A348C] pt-12 pb-10 px-8 sm:px-12">
+            <div class="absolute -top-[25px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[50px] px-8 sm:px-10 flex items-center justify-center text-lg sm:text-[22px] font-extrabold tracking-[0.16em] whitespace-nowrap select-none">
+                Google帳號登入
+            </div>
+
+            <button id="closeLoginModalBtn"
+                    type="button"
+                    aria-label="關閉登入視窗"
+                    class="absolute -top-3.5 -right-3.5 w-[46px] h-[46px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#2A348C] hover:bg-[#1f276b] text-[#FFF9EC] flex items-center justify-center transition-transform hover:scale-105 cursor-pointer focus:outline-none">
+                <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFF9EC" stroke-width="3.8" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <div class="w-full max-w-[300px] mx-auto flex flex-col items-center text-center">
+                <div id="loginErrorBox" class="hidden w-full p-3.5 rounded-2xl bg-[#F3EF84] border-[1.8px] border-[#2A348C] text-left text-xs space-y-2 mb-4">
+                    <div class="font-extrabold text-[#2A348C] flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-[#F26559]"></i>
+                        <span id="loginErrorTitle">登入提示</span>
+                    </div>
+                    <p id="loginErrorDetail" class="text-[#2A348C] leading-relaxed"></p>
+                </div>
+
+                <button id="googleLoginBtn" type="button" class="poogle-pill-btn w-full h-[64px] my-3 rounded-full bg-white text-[#2A348C] font-extrabold text-sm sm:text-base tracking-wider flex items-center justify-center gap-3 hover:bg-[#FFF9EC] transition-colors">
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0" aria-hidden="true">
+                        <path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                    </svg>
+                    <span>使用 Google 帳號登入</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================
+        // 👾 四大小怪資料夾 PNG 清單設定 (對應 img/stall, img/urinal, img/consumable, img/hardware)
+        // ===================================================================
+        const MONSTER_FOLDER_CONFIG = {
+            stall: [
+                "air_clean.png",
+                "floor_clean.png",
+                "flush_broke.png",
+                "handle_wet.png",
+                "lock_broke.png",
+                "placing_ok.png",
+                "poopee.png",
+                "privacy_ok.png",
+                "smell_nice.png",
+                "toilet_clogged.png"
+            ],
+            urinal: [
+                "panel_not_ok.png",
+                "panel_ok.png",
+                "pee_floor.png",
+                "stinky.png",
+                "urinal_clean.png",
+                "urinal_sensor_broke.png"
+            ],
+            consumable: [
+                "pad_yes.png",
+                "pad_no.png",
+                "paper_no.png",
+                "paper_yes.png",
+                "sanitizer_no.png",
+                "sanitizer_yes.png",
+                "soap_no.png",
+                "soap_yes.png"
+            ],
+            hardware: [
+                "dryer_broke.png",
+                "dryer_strong.png",
+                "mirror_dirty.png",
+                "sink_clean.png",
+                "sink_trash.png",
+                "tools_tidy.png",
+                "trash_too_much.png",
+                "walls_ceiling_tidy.png"
+            ]
+        };
+
+        // 若未來製作各分類子頁面，可在此填入對應網址（留空時點擊按鈕會直接篩選該資料夾的小怪隨機展示）
+        const CATEGORY_TARGET_URLS = {
+            stall: "",       // 例如: "./handbook_stall.html"
+            urinal: "",      // 例如: "./handbook_urinal.html"
+            consumable: "",  // 例如: "./handbook_consumable.html"
+            hardware: ""     // 例如: "./handbook_hardware.html"
+        };
+
+        // 桌面版 10 座圓拱門的座標與小怪活潑探頭姿態設定 (1:1 對應開頭頁視覺構圖)
+        const DESKTOP_ARCH_LAYOUT = [
+            // 上排 5 座拱門 (bottomY = 332)
+            { slot: 0, row: 0, cx: 232,  bottomY: 332, hasPill: true,  dx: 0,   dy: 26, rotate: 0,   size: 162, floatDelay: "0s" },
+            { slot: 1, row: 0, cx: 476,  bottomY: 332, hasPill: true,  dx: 22,  dy: 6,  rotate: -8,  size: 174, floatDelay: "-0.7s" },
+            { slot: 2, row: 0, cx: 720,  bottomY: 332, hasPill: false, dx: -2,  dy: 18, rotate: -5,  size: 168, floatDelay: "-1.4s" },
+            { slot: 3, row: 0, cx: 964,  bottomY: 332, hasPill: true,  dx: 18,  dy: 4,  rotate: 3,   size: 172, floatDelay: "-2.1s" },
+            { slot: 4, row: 0, cx: 1208, bottomY: 332, hasPill: true,  dx: 4,   dy: 20, rotate: 0,   size: 164, floatDelay: "-2.8s" },
+            // 下排 5 座拱門 (bottomY = 678)
+            { slot: 5, row: 1, cx: 232,  bottomY: 678, hasPill: false, dx: 0,   dy: -6, rotate: -3,  size: 176, floatDelay: "-0.4s" },
+            { slot: 6, row: 1, cx: 476,  bottomY: 678, hasPill: false, dx: -12, dy: 14, rotate: 0,   size: 172, floatDelay: "-1.1s" },
+            { slot: 7, row: 1, cx: 720,  bottomY: 678, hasPill: false, dx: -24, dy: 4,  rotate: 4,   size: 178, floatDelay: "-1.8s" },
+            { slot: 8, row: 1, cx: 964,  bottomY: 678, hasPill: false, dx: 2,   dy: -16, rotate: -6, size: 168, floatDelay: "-2.5s" },
+            { slot: 9, row: 1, cx: 1208, bottomY: 678, hasPill: false, dx: 22,  dy: 14, rotate: 0,   size: 172, floatDelay: "-3.1s" }
+        ];
+
+        const MOBILE_ARCH_COUNT = 6;
+
+        // Firebase 設定 (與 index.html 同步)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfUm1MLY9C3Q3ukfCrvxU5ypjpqCbvU2A",
+            authDomain: "toilet-rating-grad-proj.firebaseapp.com",
+            databaseURL: "https://toilet-rating-grad-proj-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "toilet-rating-grad-proj",
+            storageBucket: "toilet-rating-grad-proj.firebasestorage.app",
+            messagingSenderId: "1000677739751",
+            appId: "1:1000677739751:web:4de2b80ebb02cd02aee642",
+            measurementId: "G-0MRLKY3EY8"
+        };
+
+        let auth = null;
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+        } catch (err) {}
+
+        // ===================================================================
+        // 🎨 預覽沙盒備援可愛向量小怪 (僅在本機無 ./img/ 資料夾的線上預覽環境才啟用)
+        // ===================================================================
+        function buildSandboxFallbackMonsterSvg(folder, indexSeed) {
+            const palettes = {
+                stall:      { body: "#FF99D3", accent: "#80E4FF", mouth: "#F26559" },
+                urinal:     { body: "#F3EF84", accent: "#45E5AC", mouth: "#F26559" },
+                consumable: { body: "#80E4FF", accent: "#FF99D3", mouth: "#F26559" },
+                hardware:   { body: "#45E5AC", accent: "#F3EF84", mouth: "#F26559" }
+            };
+            const pal = palettes[folder] || palettes.stall;
+            const variant = indexSeed % 4;
+            let shapeMarkup = "";
+
+            if (variant === 0) {
+                // 圓潤葫蘆便便小怪
+                shapeMarkup = `
+                    <path d="M 80,28 C 66,28 60,40 66,52 C 44,58 36,80 48,98 C 30,110 34,148 64,154 L 96,154 C 126,148 130,110 112,98 C 124,80 116,58 94,52 C 100,40 94,28 80,28 Z"
+                          fill="${pal.body}" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
+                `;
+            } else if (variant === 1) {
+                // 方方設備機器小怪
+                shapeMarkup = `
+                    <rect x="36" y="34" width="88" height="116" rx="18" fill="${pal.body}" stroke="#2A348C" stroke-width="3.2"/>
+                    <rect x="52" y="96" width="56" height="34" rx="8" fill="${pal.accent}" stroke="#2A348C" stroke-width="2.8"/>
+                `;
+            } else if (variant === 2) {
+                // 軟泥水窪小怪
+                shapeMarkup = `
+                    <path d="M 54,38 C 70,32 82,46 96,38 C 114,30 124,52 114,72 C 132,82 128,108 116,118 C 134,132 122,154 96,152 C 74,150 56,158 40,146 C 24,134 32,106 44,92 C 28,74 36,44 54,38 Z"
+                          fill="${pal.body}" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
+                `;
+            } else {
+                // 捲筒消耗品小怪
+                shapeMarkup = `
+                    <ellipse cx="80" cy="52" rx="44" ry="18" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2"/>
+                    <path d="M 36,52 L 36,134 A 44,18 0 0,0 124,134 L 124,52 A 44,18 0 0,1 36,52 Z" fill="${pal.body}" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
+                    <ellipse cx="80" cy="52" rx="15" ry="6" fill="${pal.accent}" stroke="#2A348C" stroke-width="2.6"/>
+                `;
+            }
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 170">
+                ${shapeMarkup}
+                <ellipse cx="68" cy="74" rx="10.5" ry="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.6"/>
+                <ellipse cx="92" cy="74" rx="10.5" ry="13" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.6"/>
+                <ellipse cx="69" cy="76" rx="6.5" ry="8.5" fill="#2A348C"/>
+                <ellipse cx="91" cy="76" rx="6.5" ry="8.5" fill="#2A348C"/>
+                <path d="M 70,95 Q 80,92 90,95 C 91,109 69,109 70,95 Z" fill="${pal.mouth}" stroke="#2A348C" stroke-width="2.5" stroke-linejoin="round"/>
+            </svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        // ===================================================================
+        // 🖼️ 圖片預載解碼與候選路徑解析引擎 (優先抓取真實 img/.../*.png)
+        // ===================================================================
+        const preloadedMonsterCache = new Map();
+
+        function createMonsterEntry(folder, fileName, indexSeed) {
+            const baseName = fileName.replace(/\.(png|PNG|svg|SVG|webp|WEBP|jpg|JPG)$/i, '');
+            const encodedFile = encodeURIComponent(fileName);
+            const encodedBase = encodeURIComponent(baseName);
+            const candidates = Array.from(new Set([
+                `./img/${folder}/${encodedFile}`,
+                `./img/${folder}/${fileName}`,
+                `./img/${folder}/${encodedBase}.png`,
+                `./img/${folder}/${encodedBase}.PNG`,
+                `img/${folder}/${encodedFile}`,
+                `img/${folder}/${encodedBase}.png`
+            ]));
+            return {
+                id: `${folder}_${baseName}`,
+                folder,
+                fileName,
+                baseName,
+                indexSeed,
+                candidates,
+                resolvedUrl: null,
+                isRealPng: false
+            };
+        }
+
+        function resolveMonsterPngUrl(item) {
+            if (item.resolvedUrl && preloadedMonsterCache.has(item.resolvedUrl)) {
+                return Promise.resolve(item.resolvedUrl);
+            }
+
+            const isSandboxEnv = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+
+            if (isSandboxEnv) {
+                const fallbackUri = buildSandboxFallbackMonsterSvg(item.folder, item.indexSeed);
+                item.resolvedUrl = fallbackUri;
+                item.isRealPng = false;
+                preloadedMonsterCache.set(fallbackUri, true);
+                return Promise.resolve(fallbackUri);
+            }
+
+            return new Promise((resolve) => {
+                let idx = 0;
+                let settled = false;
+                const finish = (url, isReal, imgObj) => {
+                    if (settled) return;
+                    settled = true;
+                    item.resolvedUrl = url;
+                    item.isRealPng = isReal;
+                    if (url) preloadedMonsterCache.set(url, imgObj || true);
+                    resolve(url);
+                };
+
+                const tryNextCandidate = () => {
+                    if (settled) return;
+                    if (idx >= item.candidates.length) {
+                        // 若本機所有候選路徑皆找不到該檔案，才使用備援圖示避免空白破圖
+                        const fallbackUri = buildSandboxFallbackMonsterSvg(item.folder, item.indexSeed);
+                        finish(fallbackUri, false, null);
+                        return;
+                    }
+                    const testUrl = item.candidates[idx++];
+                    const probe = new Image();
+                    probe.decoding = 'async';
+                    probe.onload = () => {
+                        if (typeof probe.decode === 'function') {
+                            probe.decode()
+                                .catch(() => {})
+                                .finally(() => finish(testUrl, true, probe));
+                        } else {
+                            finish(testUrl, true, probe);
+                        }
+                    };
+                    probe.onerror = () => tryNextCandidate();
+                    probe.src = testUrl;
+                };
+                tryNextCandidate();
+            });
+        }
+
+        function setSvgImageHref(svgImgEl, url) {
+            if (!svgImgEl || !url) return;
+            svgImgEl.setAttribute('href', url);
+            svgImgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+        }
+
+        // ===================================================================
+        // 🏛️ 建立桌面版 10 座圓拱門 SVG 與手機版 6 座圓拱門 DOM
+        // ===================================================================
+        function buildArchStageDOM() {
+            const svgNs = 'http://www.w3.org/2000/svg';
+            const desktopLayer = document.getElementById('desktopArchesLayer');
+
+            if (desktopLayer) {
+                desktopLayer.innerHTML = '';
+                DESKTOP_ARCH_LAYOUT.forEach((cfg, idx) => {
+                    const slotGroup = document.createElementNS(svgNs, 'g');
+                    slotGroup.setAttribute('transform', `translate(${cfg.cx}, ${cfg.bottomY})`);
+                    slotGroup.setAttribute('class', 'dex-arch-slot');
+                    slotGroup.setAttribute('data-arch-slot', String(cfg.slot));
+
+                    const entranceWrap = document.createElementNS(svgNs, 'g');
+                    entranceWrap.setAttribute('class', 'dex-arch-entrance');
+                    entranceWrap.style.animationDelay = `${(idx * 0.045).toFixed(3)}s`;
+
+                    // 1. 米白圓拱門底板 (#FFF9EC)
+                    const bgPath = document.createElementNS(svgNs, 'path');
+                    bgPath.setAttribute('d', 'M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z');
+                    bgPath.setAttribute('fill', '#FFF9EC');
+                    entranceWrap.appendChild(bgPath);
+
+                    // 2. 圓拱門內部裁切層 (小怪走出 ±86 邊界時會自動隱沒在牆後)
+                    const clippedContainer = document.createElementNS(svgNs, 'g');
+                    clippedContainer.setAttribute('clip-path', cfg.row === 0 ? 'url(#archClipTop)' : 'url(#archClipBottom)');
+
+                    // 小怪動態移動與探頭演員層 (預設先藏在窗外 x=-220)
+                    const actorWrap = document.createElementNS(svgNs, 'g');
+                    actorWrap.setAttribute('id', `desktopArchActor_${cfg.slot}`);
+                    actorWrap.setAttribute('transform', 'translate(-220, 0)');
+
+                    const imgEl = document.createElementNS(svgNs, 'image');
+                    imgEl.setAttribute('id', `desktopArchImg_${cfg.slot}`);
+                    imgEl.setAttribute('x', '-82');
+                    imgEl.setAttribute('y', cfg.row === 0 ? '-178' : '-162');
+                    imgEl.setAttribute('width', '164');
+                    imgEl.setAttribute('height', '164');
+                    imgEl.setAttribute('preserveAspectRatio', 'xMidYMax meet');
+
+                    actorWrap.appendChild(imgEl);
+                    clippedContainer.appendChild(actorWrap);
+                    entranceWrap.appendChild(clippedContainer);
+
+                    // 3. 深靛藍圓點虛線外框 (#2A348C)
+                    const archDotsPath = document.createElementNS(svgNs, 'path');
+                    if (cfg.row === 0 && cfg.hasPill) {
+                        archDotsPath.setAttribute('d', 'M -86,-16 L -86,-200 A 86,86 0 0,1 86,-200 L 86,-16');
+                        archDotsPath.setAttribute('stroke-dasharray', '0.05 13.15');
+                    } else {
+                        archDotsPath.setAttribute('d', 'M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0');
+                        archDotsPath.setAttribute('stroke-dasharray', '0.05 13.39');
+                    }
+                    archDotsPath.setAttribute('fill', 'none');
+                    archDotsPath.setAttribute('stroke', '#2A348C');
+                    archDotsPath.setAttribute('stroke-width', '5.2');
+                    archDotsPath.setAttribute('stroke-linecap', 'round');
+                    entranceWrap.appendChild(archDotsPath);
+
+                    if (cfg.row === 1) {
+                        const bottomDotsLine = document.createElementNS(svgNs, 'line');
+                        bottomDotsLine.setAttribute('x1', '-72.77');
+                        bottomDotsLine.setAttribute('y1', '0');
+                        bottomDotsLine.setAttribute('x2', '72.77');
+                        bottomDotsLine.setAttribute('y2', '0');
+                        bottomDotsLine.setAttribute('stroke', '#2A348C');
+                        bottomDotsLine.setAttribute('stroke-width', '5.2');
+                        bottomDotsLine.setAttribute('stroke-linecap', 'round');
+                        bottomDotsLine.setAttribute('stroke-dasharray', '0.05 13.22');
+                        entranceWrap.appendChild(bottomDotsLine);
+                    }
+
+                    slotGroup.appendChild(entranceWrap);
+                    desktopLayer.appendChild(slotGroup);
+                });
+            }
+
+            // 建立手機版 6 座圓拱門卡片
+            const mobileGrid = document.getElementById('mobileArchesGrid');
+            if (mobileGrid) {
+                mobileGrid.innerHTML = '';
+                for (let m = 0; m < MOBILE_ARCH_COUNT; m++) {
+                    const card = document.createElement('div');
+                    card.className = 'mobile-arch-card relative w-full flex items-center justify-center';
+                    card.setAttribute('data-mobile-slot', String(m));
+                    card.innerHTML = `
+                        <svg viewBox="-92 -294 184 302" class="w-full h-auto block overflow-visible">
+                            <defs>
+                                <clipPath id="mobileArchClip_${m}">
+                                    <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" />
+                                </clipPath>
+                            </defs>
+                            <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" fill="#FFF9EC" />
+                            <g clip-path="url(#mobileArchClip_${m})">
+                                <g id="mobileArchActor_${m}" transform="translate(-220, 0)">
+                                    <image id="mobileArchImg_${m}" x="-82" y="-162" width="164" height="164" preserveAspectRatio="xMidYMax meet" />
+                                </g>
+                            </g>
+                            <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0"
+                                  fill="none" stroke="#2A348C" stroke-width="5.2" stroke-linecap="round" stroke-dasharray="0.05 13.39" />
+                            <line x1="-72.77" y1="0" x2="72.77" y2="0"
+                                  stroke="#2A348C" stroke-width="5.2" stroke-linecap="round" stroke-dasharray="0.05 13.22" />
+                        </svg>
+                    `;
+                    mobileGrid.appendChild(card);
+                }
+            }
+        }
+
+        // ===================================================================
+        // 🎲 四資料夾均衡隨機洗牌、篩選與自動輪播控制器
+        // ===================================================================
+        function shuffleList(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function buildBalancedPoolIndices(pool, filterCategory = null) {
+            if (filterCategory) {
+                const filtered = [];
+                pool.forEach((m, idx) => {
+                    if (m.folder === filterCategory) filtered.push(idx);
+                });
+                return shuffleList(filtered);
+            }
+
+            // 從 stall / urinal / consumable / hardware 四處均衡交錯隨機抽取
+            const byFolder = { stall: [], urinal: [], consumable: [], hardware: [] };
+            pool.forEach((m, idx) => {
+                if (!byFolder[m.folder]) byFolder[m.folder] = [];
+                byFolder[m.folder].push(idx);
+            });
+            const folderKeys = shuffleList(Object.keys(byFolder).filter(k => byFolder[k].length > 0));
+            folderKeys.forEach(k => { byFolder[k] = shuffleList(byFolder[k]); });
+
+            const interleaved = [];
+            const maxLen = Math.max(0, ...folderKeys.map(k => byFolder[k].length));
+            for (let r = 0; r < maxLen; r++) {
+                folderKeys.forEach(k => {
+                    if (r < byFolder[k].length) interleaved.push(byFolder[k][r]);
+                });
+            }
+            return interleaved;
+        }
+
+        // ===================================================================
+        // 🔵 滿版互動漸變圓點網格 (與 index.html 相同的游標靠近擴散效果)
+        // ===================================================================
+        let halftoneDotStates = [];
+        let halftoneCursorX = null;
+        let halftoneCursorY = null;
+        let halftoneLoopStarted = false;
+
+        function renderIllustratorHalftoneGrid() {
+            const svgEl = document.getElementById('fullScreenHalftoneSvg');
+            const group = document.getElementById('halftoneDotsBgLayer');
+            if (!svgEl || !group) return;
+
+            const vw = Math.max(window.innerWidth || 1440, 320);
+            const vh = Math.max(window.innerHeight || 780, 480);
+            svgEl.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+
+            const isMobile = vw < 768;
+            const rows = isMobile ? 21 : 22;
+            const topY = isMobile ? Math.max(150, vh * 0.2) : Math.max(82, vh * 0.125);
+            const bottomY = vh - 14;
+            const dy = (bottomY - topY) / (rows - 1);
+
+            const spacingX = isMobile ? Math.max(25, vw / 15.2) : Math.max(36, dy * 1.38);
+            const cols = Math.ceil(vw / spacingX) + 2;
+            const totalGridWidth = (cols - 1) * spacingX;
+            const startX = (vw - totalGridWidth) / 2;
+
+            const topR = isMobile ? 1.15 : 1.65;
+            const bottomR = isMobile ? 4.4 : 6.75;
+
+            const frag = document.createDocumentFragment();
+            const nextStates = [];
+            const svgNs = 'http://www.w3.org/2000/svg';
+
+            for (let r = 0; r < rows; r++) {
+                const t = r / (rows - 1);
+                const baseY = topY + r * dy;
+                const baseR = topR + t * (bottomR - topR);
+                for (let c = 0; c < cols; c++) {
+                    const baseX = startX + c * spacingX;
+                    const circleEl = document.createElementNS(svgNs, 'circle');
+                    circleEl.setAttribute('cx', baseX.toFixed(2));
+                    circleEl.setAttribute('cy', baseY.toFixed(2));
+                    circleEl.setAttribute('r', baseR.toFixed(2));
+                    frag.appendChild(circleEl);
+
+                    nextStates.push({
+                        el: circleEl,
+                        baseX,
+                        baseY,
+                        baseR,
+                        curX: baseX,
+                        curY: baseY,
+                        curR: baseR,
+                        isDirty: false
+                    });
+                }
+            }
+
+            group.innerHTML = '';
+            group.appendChild(frag);
+            halftoneDotStates = nextStates;
+
+            if (!halftoneLoopStarted) {
+                halftoneLoopStarted = true;
+                let lastTouchTime = 0;
+                const clearCursor = () => { halftoneCursorX = null; halftoneCursorY = null; };
+
+                window.addEventListener('mousemove', (e) => {
+                    if (Date.now() - lastTouchTime < 800) return;
+                    halftoneCursorX = e.clientX;
+                    halftoneCursorY = e.clientY;
+                }, { passive: true });
+                window.addEventListener('mouseleave', clearCursor);
+                window.addEventListener('blur', clearCursor);
+                window.addEventListener('touchstart', (e) => {
+                    lastTouchTime = Date.now();
+                    if (e.touches && e.touches[0]) {
+                        halftoneCursorX = e.touches[0].clientX;
+                        halftoneCursorY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+                window.addEventListener('touchend', clearCursor, { passive: true });
+
+                requestAnimationFrame(animateHalftoneHoverEffect);
+            }
+        }
+
+        function animateHalftoneHoverEffect() {
+            const influenceRadius = 185;
+            const maxOutwardShift = 9.5;
+            const lerpSpeed = 0.2;
+            const hasCursor = (halftoneCursorX !== null && halftoneCursorY !== null);
+
+            for (let i = 0; i < halftoneDotStates.length; i++) {
+                const d = halftoneDotStates[i];
+                let targetX = d.baseX;
+                let targetY = d.baseY;
+                let targetR = d.baseR;
+
+                if (hasCursor) {
+                    const dx = d.baseX - halftoneCursorX;
+                    const dy = d.baseY - halftoneCursorY;
+                    if (Math.abs(dx) < influenceRadius && Math.abs(dy) < influenceRadius) {
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < influenceRadius) {
+                            const proximity = 1 - (dist / influenceRadius);
+                            const ease = Math.pow(proximity, 1.45);
+                            targetR = d.baseR * (1 + ease * 1.45) + (ease * 2.8);
+                            if (dist > 0.1) {
+                                const push = Math.sin(proximity * Math.PI) * maxOutwardShift;
+                                targetX = d.baseX + (dx / dist) * push;
+                                targetY = d.baseY + (dy / dist) * push;
+                            }
+                            d.isDirty = true;
+                        }
+                    }
+                }
+
+                if (d.isDirty) {
+                    d.curX += (targetX - d.curX) * lerpSpeed;
+                    d.curY += (targetY - d.curY) * lerpSpeed;
+                    d.curR += (targetR - d.curR) * lerpSpeed;
+
+                    const settled =
+                        Math.abs(d.curR - d.baseR) < 0.03 &&
+                        Math.abs(d.curX - d.baseX) < 0.05 &&
+                        Math.abs(d.curY - d.baseY) < 0.05 &&
+                        targetR === d.baseR;
+
+                    if (settled) {
+                        d.curX = d.baseX;
+                        d.curY = d.baseY;
+                        d.curR = d.baseR;
+                        d.isDirty = false;
+                    }
+                    d.el.setAttribute('cx', d.curX.toFixed(2));
+                    d.el.setAttribute('cy', d.curY.toFixed(2));
+                    d.el.setAttribute('r', d.curR.toFixed(2));
+                }
+            }
+            requestAnimationFrame(animateHalftoneHoverEffect);
+        }
+
+        // Logo 載入與向量備援
+        function initLogoImagesWithFallback() {
+            const symbolEl = document.getElementById('youSuoWeiLogoVector');
+            const applyUrl = (url) => {
+                document.querySelectorAll('.poogle-logo-img').forEach((el) => {
+                    if (el.tagName && el.tagName.toLowerCase() === 'img') el.src = url;
+                    else el.setAttribute('href', url);
+                });
+            };
+            if (symbolEl) {
+                const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 560 190">${symbolEl.innerHTML}</svg>`;
+                applyUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
+            }
+            const isSandbox = (
+                window.location.protocol === 'about:' ||
+                window.location.protocol === 'blob:' ||
+                window.location.protocol === 'data:' ||
+                (window.location.hostname || '').includes('usercontent.goog') ||
+                (window.location.hostname || '').includes('googleusercontent.com')
+            );
+            if (isSandbox) return;
+            const candidates = ['./img/logo.png', './img/logo.PNG', 'img/logo.png'];
+            let idx = 0;
+            const tryNext = () => {
+                if (idx >= candidates.length) return;
+                const url = candidates[idx++];
+                const probe = new Image();
+                probe.onload = () => applyUrl(url);
+                probe.onerror = () => tryNext();
+                probe.src = url;
+            };
+            tryNext();
+        }
+
+        // ===================================================================
+        // 🚀 主程式初始化
+        // ===================================================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderIllustratorHalftoneGrid();
+            initLogoImagesWithFallback();
+            buildArchStageDOM();
+            window.addEventListener('resize', renderIllustratorHalftoneGrid);
+
+            // 輕巧點擊音效支援
+            let clickAudioCtx = null;
+            function playPopSfx() {
+                try {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return;
+                    if (!clickAudioCtx) clickAudioCtx = new AudioCtx();
+                    if (clickAudioCtx.state === 'suspended') clickAudioCtx.resume();
+                    const now = clickAudioCtx.currentTime;
+                    const osc = clickAudioCtx.createOscillator();
+                    const gain = clickAudioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.connect(gain);
+                    gain.connect(clickAudioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.095);
+                } catch (e) {}
+            }
+
+            // 建立全資料夾小怪清單 (stall, urinal, consumable, hardware)
+            const allMonsters = [];
+            let seedCounter = 0;
+            ['stall', 'urinal', 'consumable', 'hardware'].forEach((folder) => {
+                (MONSTER_FOLDER_CONFIG[folder] || []).forEach((fileName) => {
+                    allMonsters.push(createMonsterEntry(folder, fileName, seedCounter++));
+                });
+            });
+
+            const TOTAL_SLOTS = DESKTOP_ARCH_LAYOUT.length;
+            const ACTION_TYPES = ['walk_ltr', 'walk_rtl', 'peek_left', 'peek_right'];
+
+            let activeCategory = null; // null = 四個資料夾全部隨機抓取
+            let deck = buildBalancedPoolIndices(allMonsters, null);
+            let deckCursor = 0;
+            let recentExitedQueue = []; // 記錄最近剛離開窗戶的小怪，避免短時間重複出現
+            let generationToken = 0;
+
+            // 每扇窗戶各自獨立的動畫狀態機
+            const slotStates = Array.from({ length: TOTAL_SLOTS }, (_, idx) => ({
+                slotIdx: idx,
+                monsterIdx: -1,
+                lastMonsterIdx: -1,
+                phase: 'waiting', // 'waiting' | 'loading' | 'moving' | 'scurry'
+                waitRemaining: 0,
+                elapsed: 0,
+                duration: 3600,
+                action: 'walk_ltr',
+                hasMidPause: false,
+                pauseX: 0,
+                steps: 6,
+                peekX: -52,
+                peekY: 0,
+                peekRot: 20,
+                curX: -205,
+                curY: 0,
+                curRot: 0,
+                scurryStartX: 0,
+                scurryStartY: 0,
+                scurryStartRot: 0,
+                scurryTargetX: 205
+            }));
+
+            function setActorTransform(slotIdx, tx, ty, rot) {
+                const st = slotStates[slotIdx];
+                st.curX = tx;
+                st.curY = ty;
+                st.curRot = rot;
+                const tf = `translate(${tx.toFixed(1)}, ${ty.toFixed(1)}) rotate(${rot.toFixed(1)}, 0, -28)`;
+                document.getElementById(`desktopArchActor_${slotIdx}`)?.setAttribute('transform', tf);
+                if (slotIdx < MOBILE_ARCH_COUNT) {
+                    document.getElementById(`mobileArchActor_${slotIdx}`)?.setAttribute('transform', tf);
+                }
+            }
+
+            // 指定四顆分類按鈕正上方的窗戶固定對應資料夾，其餘窗戶 (2, 5~9) 維持隨機
+            const SLOT_FIXED_FOLDER = {
+                0: 'stall',       // 廁間小怪上方窗戶 -> 只出現 img/stall
+                1: 'urinal',      // 小便斗小怪上方窗戶 -> 只出現 img/urinal
+                3: 'consumable',  // 消耗品小怪上方窗戶 -> 只出現 img/consumable
+                4: 'hardware'     // 硬體小怪上方窗戶 -> 只出現 img/hardware
+            };
+
+            // 挑選下一隻不重複的小怪 (依窗戶位置決定專屬資料夾或全隨機，並排除畫面上已有的小怪)
+            function pickUniqueNextMonster(targetSlotIdx) {
+                const isMobileView = window.innerWidth < 768;
+                const targetFolder = isMobileView
+                    ? (activeCategory || null)
+                    : (SLOT_FIXED_FOLDER[targetSlotIdx] || activeCategory || null);
+
+                // 建立該窗戶專屬或全隨機洗牌後的候選名單
+                const candidatePool = buildBalancedPoolIndices(allMonsters, targetFolder);
+                if (candidatePool.length === 0) return 0;
+
+                const visibleSlotCount = isMobileView ? MOBILE_ARCH_COUNT : TOTAL_SLOTS;
+                const onScreenCounts = new Map();
+                for (let s = 0; s < visibleSlotCount; s++) {
+                    if (s === targetSlotIdx) continue;
+                    const mIdx = slotStates[s].monsterIdx;
+                    if (mIdx !== -1) {
+                        onScreenCounts.set(mIdx, (onScreenCounts.get(mIdx) || 0) + 1);
+                    }
+                }
+
+                const lastInThisSlot = slotStates[targetSlotIdx].lastMonsterIdx;
+
+                // 第一優先：目前不在任何窗戶上、不是這扇窗剛走掉的那隻、也不在近期離開名單內
+                for (let i = 0; i < candidatePool.length; i++) {
+                    const cand = candidatePool[i];
+                    if (!onScreenCounts.has(cand) && cand !== lastInThisSlot && !recentExitedQueue.includes(cand)) {
+                        return cand;
+                    }
+                }
+
+                // 第二優先：目前不在任何窗戶上、且不是這扇窗剛走掉的那隻
+                for (let i = 0; i < candidatePool.length; i++) {
+                    const cand = candidatePool[i];
+                    if (!onScreenCounts.has(cand) && cand !== lastInThisSlot) {
+                        return cand;
+                    }
+                }
+
+                // 第三備援：挑畫面上出現次數最少、且與這扇窗上一隻不同的小怪
+                let bestCand = candidatePool[0];
+                let minCount = Infinity;
+                for (let i = 0; i < candidatePool.length; i++) {
+                    const cand = candidatePool[i];
+                    const cnt = onScreenCounts.get(cand) || 0;
+                    if (cand !== lastInThisSlot && cnt < minCount) {
+                        minCount = cnt;
+                        bestCand = cand;
+                    }
+                }
+                return bestCand;
+            }
+
+            // 為窗戶隨機指派「經過窗戶」或「從窗邊偷看再躲起來」的動作參數
+            function assignRandomAction(st, forcedAction = null) {
+                let nextAction = forcedAction;
+                if (!nextAction) {
+                    const choices = ACTION_TYPES.filter(a => a !== st.action);
+                    nextAction = choices[Math.floor(Math.random() * choices.length)];
+                }
+                st.action = nextAction;
+                st.elapsed = 0;
+
+                if (nextAction === 'walk_ltr' || nextAction === 'walk_rtl') {
+                    st.hasMidPause = Math.random() < 0.42; // 42% 機率走到窗戶中間停下來張望一下再走出去
+                    st.duration = st.hasMidPause ? (4600 + Math.random() * 1100) : (3600 + Math.random() * 1100);
+                    st.pauseX = (Math.random() - 0.5) * 28;
+                    st.steps = 6;
+                } else if (nextAction === 'peek_left') {
+                    st.duration = 2800 + Math.random() * 1100;
+                    st.peekX = -60 + Math.random() * 18;
+                    st.peekY = -8 + Math.random() * 14;
+                    st.peekRot = 17 + Math.random() * 7;
+                } else {
+                    st.duration = 2800 + Math.random() * 1100;
+                    st.peekX = 42 + Math.random() * 18;
+                    st.peekY = -8 + Math.random() * 14;
+                    st.peekRot = -(17 + Math.random() * 7);
+                }
+            }
+
+            function easeOutPeek(x) {
+                const c1 = 1.35;
+                const c3 = c1 + 1;
+                return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+            }
+
+            function easeInHide(x) {
+                return x * x * x;
+            }
+
+            // 根據進度 t (0 ~ 1) 計算小怪當下的位置與歪頭角度
+            function computeMonsterPose(st, t) {
+                if (st.action === 'walk_ltr' || st.action === 'walk_rtl') {
+                    const dir = st.action === 'walk_ltr' ? 1 : -1;
+                    const startX = -205 * dir;
+                    const endX = 205 * dir;
+
+                    if (!st.hasMidPause) {
+                        const tx = startX + (endX - startX) * t;
+                        const wave = Math.sin(t * st.steps * Math.PI);
+                        return { tx, ty: -Math.abs(wave) * 8.5, rot: wave * 4.2 };
+                    }
+
+                    if (t < 0.40) {
+                        const p = t / 0.40;
+                        const tx = startX + (st.pauseX - startX) * (1 - Math.pow(1 - p, 1.3));
+                        const wave = Math.sin(p * 3 * Math.PI);
+                        return { tx, ty: -Math.abs(wave) * 8, rot: wave * 4 };
+                    } else if (t <= 0.62) {
+                        const p = (t - 0.40) / 0.22;
+                        return {
+                            tx: st.pauseX,
+                            ty: -Math.sin(p * Math.PI) * 3,
+                            rot: Math.sin(p * Math.PI * 2) * 6.5
+                        };
+                    } else {
+                        const p = (t - 0.62) / 0.38;
+                        const tx = st.pauseX + (endX - st.pauseX) * Math.pow(p, 1.25);
+                        const wave = Math.sin(p * 3 * Math.PI);
+                        return { tx, ty: -Math.abs(wave) * 8, rot: wave * 4 };
+                    }
+                } else {
+                    const hiddenX = st.action === 'peek_left' ? -205 : 205;
+                    if (t < 0.27) {
+                        const p = easeOutPeek(t / 0.27);
+                        return {
+                            tx: hiddenX + (st.peekX - hiddenX) * p,
+                            ty: st.peekY * p,
+                            rot: st.peekRot * p
+                        };
+                    } else if (t <= 0.74) {
+                        const p = (t - 0.27) / 0.47;
+                        return {
+                            tx: st.peekX + Math.sin(p * Math.PI * 2) * 3.5,
+                            ty: st.peekY - Math.sin(p * Math.PI) * 3.5,
+                            rot: st.peekRot + Math.sin(p * Math.PI * 2) * 3.2
+                        };
+                    } else {
+                        const p = easeInHide((t - 0.74) / 0.26);
+                        return {
+                            tx: st.peekX + (hiddenX - st.peekX) * p,
+                            ty: st.peekY * (1 - p),
+                            rot: st.peekRot * (1 - p)
+                        };
+                    }
+                }
+            }
+
+            // 當小怪在窗外準備進場時，換上新小怪圖檔並啟動動作
+            function spawnNextMonsterInSlot(slotIdx, token) {
+                const st = slotStates[slotIdx];
+                st.phase = 'loading';
+
+                const nextMonsterIdx = pickUniqueNextMonster(slotIdx);
+                st.monsterIdx = nextMonsterIdx; // 立即鎖定編號，防止其他窗戶同時間選到同一隻
+                assignRandomAction(st);
+
+                const startPose = computeMonsterPose(st, 0);
+                setActorTransform(slotIdx, startPose.tx, startPose.ty, startPose.rot);
+
+                const monster = allMonsters[nextMonsterIdx];
+                resolveMonsterPngUrl(monster).then((url) => {
+                    if (token !== generationToken || !url) return;
+                    const dImg = document.getElementById(`desktopArchImg_${slotIdx}`);
+                    const mImg = slotIdx < MOBILE_ARCH_COUNT ? document.getElementById(`mobileArchImg_${slotIdx}`) : null;
+                    if (dImg) setSvgImageHref(dImg, url);
+                    if (mImg) setSvgImageHref(mImg, url);
+
+                    requestAnimationFrame(() => {
+                        if (token !== generationToken) return;
+                        st.phase = 'moving';
+                    });
+                });
+            }
+
+            // 初始化／切換分類時重新分配所有窗戶的小怪
+            async function populateAllArchesRandomly(categoryFilter = null) {
+                generationToken++;
+                const myToken = generationToken;
+
+                activeCategory = categoryFilter;
+                deck = buildBalancedPoolIndices(allMonsters, activeCategory);
+                deckCursor = 0;
+                recentExitedQueue = [];
+
+                document.querySelectorAll('.dex-pill-btn').forEach((btn) => {
+                    btn.classList.toggle('is-active', btn.getAttribute('data-category') === activeCategory);
+                });
+                document.querySelectorAll('.mobile-cat-pill').forEach((btn) => {
+                    btn.classList.toggle('is-active', btn.getAttribute('data-mobile-cat') === activeCategory);
+                });
+
+                slotStates.forEach((st, idx) => {
+                    st.phase = 'loading';
+                    st.monsterIdx = -1;
+                    setActorTransform(idx, -205, 0, 0);
+                });
+
+                const chosenIndices = [];
+                for (let i = 0; i < TOTAL_SLOTS; i++) {
+                    const mIdx = pickUniqueNextMonster(i);
+                    slotStates[i].monsterIdx = mIdx;
+                    chosenIndices.push(mIdx);
+                }
+
+                await Promise.all(chosenIndices.map(idx => resolveMonsterPngUrl(allMonsters[idx])));
+                if (myToken !== generationToken) return;
+
+                // 打亂初始動作組合，讓畫面一打開同時有經過與偷看的小怪
+                const initialActions = shuffleList([
+                    'walk_ltr', 'peek_right', 'peek_left', 'walk_rtl', 'peek_left',
+                    'peek_right', 'walk_ltr', 'walk_rtl', 'peek_left', 'peek_right'
+                ]);
+
+                slotStates.forEach((st, idx) => {
+                    const url = allMonsters[st.monsterIdx]?.resolvedUrl;
+                    const dImg = document.getElementById(`desktopArchImg_${idx}`);
+                    const mImg = idx < MOBILE_ARCH_COUNT ? document.getElementById(`mobileArchImg_${idx}`) : null;
+                    if (dImg && url) setSvgImageHref(dImg, url);
+                    if (mImg && url) setSvgImageHref(mImg, url);
+
+                    assignRandomAction(st, initialActions[idx % initialActions.length]);
+                    // 錯開每扇窗戶的起始時間點，避免所有小怪齊步走
+                    st.elapsed = st.duration * ((idx * 0.17 + Math.random() * 0.12) % 0.72);
+                    const pose = computeMonsterPose(st, st.elapsed / st.duration);
+                    setActorTransform(idx, pose.tx, pose.ty, pose.rot);
+                    st.phase = 'moving';
+                });
+            }
+
+            // 持續運行的動畫主迴圈
+            let lastTickTime = performance.now();
+            function tickWindowAnimations(now) {
+                const dt = Math.min(50, Math.max(0, now - lastTickTime));
+                lastTickTime = now;
+                const curToken = generationToken;
+
+                for (let i = 0; i < TOTAL_SLOTS; i++) {
+                    const st = slotStates[i];
+
+                    if (st.phase === 'moving') {
+                        st.elapsed += dt;
+                        if (st.elapsed >= st.duration) {
+                            // 小怪已完全走出窗框或躲回牆後 -> 釋放編號並記錄至近期名單
+                            if (st.monsterIdx !== -1) {
+                                st.lastMonsterIdx = st.monsterIdx;
+                                recentExitedQueue.push(st.monsterIdx);
+                                const maxRecent = activeCategory ? 3 : 14;
+                                while (recentExitedQueue.length > maxRecent) {
+                                    recentExitedQueue.shift();
+                                }
+                                st.monsterIdx = -1;
+                            }
+                            setActorTransform(i, -205, 0, 0);
+                            st.phase = 'waiting';
+                            st.waitRemaining = 320 + Math.random() * 950;
+                        } else {
+                            const pose = computeMonsterPose(st, st.elapsed / st.duration);
+                            setActorTransform(i, pose.tx, pose.ty, pose.rot);
+                        }
+                    } else if (st.phase === 'scurry') {
+                        // 打地鼠效果：先嚇一跳微彈 (前 24%)，接著慌張擺動縮回窗台下或牆後躲起來
+                        st.elapsed += dt;
+                        const p = Math.min(1, st.elapsed / 340);
+
+                        if (p < 0.24) {
+                            const jolt = Math.sin((p / 0.24) * Math.PI);
+                            const flinchRot = st.scurryStartRot + (st.scurryStartX <= 0 ? 8 : -8) * jolt;
+                            setActorTransform(i, st.scurryStartX, st.scurryStartY - jolt * 12, flinchRot);
+                        } else {
+                            const hideP = (p - 0.24) / 0.76;
+                            const easeIn = hideP * hideP;
+                            const panicWiggle = Math.sin(hideP * Math.PI * 5) * 7 * (1 - hideP * 0.4);
+                            const targetY = (typeof st.scurryTargetY === 'number') ? st.scurryTargetY : 195;
+                            const tx = st.scurryStartX + (st.scurryTargetX - st.scurryStartX) * easeIn;
+                            const ty = st.scurryStartY + (targetY - st.scurryStartY) * easeIn;
+                            const rot = st.scurryStartRot * (1 - easeIn) + panicWiggle;
+                            setActorTransform(i, tx, ty, rot);
+                        }
+
+                        if (p >= 1) {
+                            if (st.monsterIdx !== -1) {
+                                st.lastMonsterIdx = st.monsterIdx;
+                                recentExitedQueue.push(st.monsterIdx);
+                                const maxRecent = activeCategory ? 3 : 14;
+                                while (recentExitedQueue.length > maxRecent) {
+                                    recentExitedQueue.shift();
+                                }
+                                st.monsterIdx = -1;
+                            }
+                            setActorTransform(i, -210, 0, 0);
+                            st.phase = 'waiting';
+                            st.waitRemaining = 700 + Math.random() * 900; // 躲起來後空窗一下再換新小怪探頭
+                        }
+                    } else if (st.phase === 'waiting') {
+                        st.waitRemaining -= dt;
+                        if (st.waitRemaining <= 0) {
+                            spawnNextMonsterInSlot(i, curToken);
+                        }
+                    }
+                }
+
+                requestAnimationFrame(tickWindowAnimations);
+            }
+
+            // 啟動初次載入與連續動畫，並在背景預載全部 32 張小怪 PNG
+            await populateAllArchesRandomly(null);
+            lastTickTime = performance.now();
+            requestAnimationFrame(tickWindowAnimations);
+            Promise.all(allMonsters.map(m => resolveMonsterPngUrl(m)));
+
+            // ===================================================================
+            // 🔊 小怪點擊音效系統 (隨機播放 ./sfx/squeak/*.mp3，最多連續 1~2 次，第 3 次絕不重複)
+            // ===================================================================
+            // 💡 若直接雙擊 HTML 開啟或上傳至 GitHub Pages，可將 sfx/squeak 資料夾內的 mp3 檔名填寫於下方
+            //    例如：const SQUEAK_MP3_FILES = ['squeak1.mp3', 'squeak2.mp3', 'squeak3.mp3'];
+            //    (若使用 VS Code Live Server 預覽，留空也會自動掃描 sfx/squeak 內所有 mp3！)
+            const SQUEAK_MP3_FILES = [];
+
+            const squeakAudioUrls = [];
+            const squeakPreloadMap = new Map();
+            let lastSqueakIdx = -1;
+            let squeakStreakCount = 0;
+
+            function registerSqueakUrl(url) {
+                if (!url || squeakPreloadMap.has(url)) return;
+                const audio = new Audio(url);
+                audio.preload = 'auto';
+                squeakPreloadMap.set(url, audio);
+                squeakAudioUrls.push(url);
+            }
+
+            function probeAudioFile(url) {
+                return new Promise((resolve) => {
+                    let done = false;
+                    const finish = (ok) => {
+                        if (done) return;
+                        done = true;
+                        resolve(ok ? url : null);
+                    };
+                    const probe = new Audio();
+                    probe.preload = 'metadata';
+                    probe.onloadedmetadata = () => finish(true);
+                    probe.oncanplaythrough = () => finish(true);
+                    probe.onerror = () => finish(false);
+                    setTimeout(() => finish(false), 1800);
+                    probe.src = url;
+                });
+            }
+
+            async function initSqueakSoundPool() {
+                // 1. 優先讀取上方 SQUEAK_MP3_FILES 手動指定的檔名
+                if (SQUEAK_MP3_FILES.length > 0) {
+                    const manualResults = await Promise.all(
+                        SQUEAK_MP3_FILES.map((name) => {
+                            const clean = name.replace(/^\.?\/?(sfx\/squeak\/)?/i, '');
+                            const encoded = clean.split('/').map(encodeURIComponent).join('/');
+                            return probeAudioFile(`./sfx/squeak/${encoded}`);
+                        })
+                    );
+                    manualResults.filter(Boolean).forEach(registerSqueakUrl);
+                }
+
+                // 2. 本地伺服器環境 (如 VS Code Live Server) 自動掃描 ./sfx/squeak/ 內所有 .mp3
+                if (squeakAudioUrls.length === 0 && window.location.protocol.startsWith('http')) {
+                    try {
+                        const res = await fetch('./sfx/squeak/');
+                        if (res.ok) {
+                            const html = await res.text();
+                            const dirBase = new URL('./sfx/squeak/', window.location.href).href;
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            doc.querySelectorAll('a[href]').forEach((a) => {
+                                const rawHref = a.getAttribute('href') || '';
+                                const cleanPath = rawHref.split('?')[0].split('#')[0];
+                                if (!cleanPath.toLowerCase().endsWith('.mp3')) return;
+                                const fullUrl = (!rawHref.startsWith('/') && !rawHref.startsWith('http') && rawHref.includes('sfx/squeak/'))
+                                    ? new URL(rawHref, window.location.href).href
+                                    : new URL(rawHref, dirBase).href;
+                                registerSqueakUrl(fullUrl);
+                            });
+                        }
+                    } catch (e) {}
+                }
+
+                // 3. 備援自動探測常見檔名 (1.mp3~10.mp3, 01.mp3~10.mp3, squeak1.mp3~10.mp3, squeak_1.mp3~10.mp3)
+                if (squeakAudioUrls.length === 0) {
+                    const commonNames = ['squeak.mp3'];
+                    for (let i = 1; i <= 10; i++) {
+                        const pad = String(i).padStart(2, '0');
+                        commonNames.push(
+                            `${i}.mp3`,
+                            `${pad}.mp3`,
+                            `squeak${i}.mp3`,
+                            `squeak${pad}.mp3`,
+                            `squeak_${i}.mp3`,
+                            `squeak_${pad}.mp3`,
+                            `squeak-${i}.mp3`
+                        );
+                    }
+                    const probed = await Promise.all(
+                        commonNames.map((n) => probeAudioFile(`./sfx/squeak/${n}`))
+                    );
+                    probed.filter(Boolean).forEach(registerSqueakUrl);
+                }
+            }
+
+            // 隨機播放一首小怪音效（同一種聲音最多連續 1~2 次，第 3 次強制換別首）
+            function playRandomSqueakSfx() {
+                if (squeakAudioUrls.length === 0) {
+                    playPopSfx();
+                    return;
+                }
+
+                let nextIdx = 0;
+                if (squeakAudioUrls.length === 1) {
+                    nextIdx = 0;
+                } else {
+                    const candidates = [];
+                    for (let i = 0; i < squeakAudioUrls.length; i++) {
+                        // 若同一個聲音已經連續播放滿 2 次，第 3 次一定排除它
+                        if (squeakStreakCount >= 2 && i === lastSqueakIdx) continue;
+                        candidates.push(i);
+                    }
+                    nextIdx = candidates[Math.floor(Math.random() * candidates.length)];
+                }
+
+                if (nextIdx === lastSqueakIdx) {
+                    squeakStreakCount++;
+                } else {
+                    lastSqueakIdx = nextIdx;
+                    squeakStreakCount = 1;
+                }
+
+                try {
+                    const player = new Audio(squeakAudioUrls[nextIdx]);
+                    player.volume = 0.85;
+                    player.play().catch(() => {});
+                } catch (e) {}
+            }
+
+            initSqueakSoundPool();
+
+            // 觸發小怪原地快速輕跳一下（支援連續點擊重複起跳）
+            function triggerMonsterHop(imgEl) {
+                if (!imgEl) return;
+                imgEl.classList.remove('is-hopping');
+                void imgEl.getBoundingClientRect();
+                imgEl.classList.add('is-hopping');
+                imgEl.addEventListener('animationend', () => {
+                    imgEl.classList.remove('is-hopping');
+                }, { once: true });
+            }
+
+            // 標題頁打地鼠互動：點到小怪時發出叫聲並匆匆躲回牆後／窗台下
+            function whackMonsterToHide(slotIdx) {
+                const st = slotStates[slotIdx];
+                if (!st || st.phase !== 'moving') return;
+
+                playRandomSqueakSfx();
+                st.phase = 'scurry';
+                st.elapsed = 0;
+                st.scurryStartX = st.curX;
+                st.scurryStartY = st.curY;
+                st.scurryStartRot = st.curRot;
+
+                // 依小怪當下位置決定躲藏方向：靠窗邊就縮回牆後，在窗戶中間就像地鼠往下縮進窗台
+                if (st.action === 'peek_left' || st.curX < -32) {
+                    st.scurryTargetX = -210;
+                    st.scurryTargetY = 30;
+                } else if (st.action === 'peek_right' || st.curX > 32) {
+                    st.scurryTargetX = 210;
+                    st.scurryTargetY = 30;
+                } else {
+                    st.scurryTargetX = st.curX;
+                    st.scurryTargetY = 195;
+                }
+            }
+
+            document.querySelectorAll('.dex-arch-slot').forEach((slotEl) => {
+                slotEl.addEventListener('click', (e) => {
+                    if (e.target.tagName.toLowerCase() !== 'image') return;
+                    const slotIdx = parseInt(slotEl.getAttribute('data-arch-slot') || '0', 10);
+                    whackMonsterToHide(slotIdx);
+                });
+            });
+            document.querySelectorAll('.mobile-arch-card').forEach((cardEl) => {
+                cardEl.addEventListener('click', (e) => {
+                    if (e.target.tagName.toLowerCase() !== 'image') return;
+                    const slotIdx = parseInt(cardEl.getAttribute('data-mobile-slot') || '0', 10);
+                    whackMonsterToHide(slotIdx);
+                });
+            });
+            // 點擊四大分類內頁（小仙 & 小妖）的任何一隻小怪 -> 發出叫聲 + 快速跳一下
+            document.getElementById('categoryDetailSection')?.addEventListener('click', (e) => {
+                const card = e.target.closest('.cat-arch-card');
+                if (card) {
+                    playRandomSqueakSfx();
+                    triggerMonsterHop(card.querySelector('.cat-monster-img'));
+                }
+            });
+
+            // ===================================================================
+            // 📖 四大分類小怪圖鑑完整對照表 (對應 32 張 PNG 檔名、角色名與說明)
+            // ===================================================================
+            const HANDBOOK_CATEGORY_DATA = {
+                stall: {
+                    title: '廁間小怪',
+                    tileBg: '#FDEBF1', // 淺粉紅磁磚
+                    fairies: [
+                        { file: 'floor_clean.png',    name: '地晶',   desc: ['地板乾爽'] },
+                        { file: 'privacy_ok.png',     name: '安心俠', desc: ['隱私完善'] },
+                        { file: 'air_clean.png',      name: '風精靈', desc: ['空氣流通'] },
+                        { file: 'placing_ok.png',     name: '阿置',   desc: ['置物方便'] },
+                        { file: 'smell_nice.png',     name: '香精靈', desc: ['香香的'] }
+                    ],
+                    imps: [
+                        { file: 'toilet_clogged.png', name: '堵堵怪',   desc: ['馬桶堵塞'] },
+                        { file: 'flush_broke.png',    name: '罷沖怪',   desc: ['沖水壞掉'] },
+                        { file: 'handle_wet.png',     name: '濕把濕把', desc: ['門把濕濕'] },
+                        { file: 'lock_broke.png',     name: '壞鎖鎖',   desc: ['無法上鎖'] },
+                        { file: 'poopee.png',         name: '壞驚喜',   desc: ['便便尿尿沒沖'] }
+                    ]
+                },
+                urinal: {
+                    title: '小便斗小怪',
+                    tileBg: '#FDEBF1', // 淺粉紅磁磚
+                    fairies: [
+                        { file: 'urinal_clean.png',        name: '潔斗君', desc: ['便斗乾淨'] },
+                        { file: 'panel_ok.png',            name: '擋擋',   desc: ['擋好擋滿'] }
+                    ],
+                    imps: [
+                        { file: 'pee_floor.png',           name: '尿歪歪', desc: ['地板有尿'] },
+                        { file: 'stinky.png',              name: '臭噗怪', desc: ['臭臭的'] },
+                        { file: 'panel_not_ok.png',        name: '矮擋怪', desc: ['擋板太低'] },
+                        { file: 'urinal_sensor_broke.png', name: '看霧霧', desc: ['小便斗感應不良'] }
+                    ]
+                },
+                consumable: {
+                    title: '消耗品小怪',
+                    tileBg: '#DCFBF5', // 淺薄荷綠磁磚
+                    fairies: [
+                        { file: 'paper_yes.png',     name: '紙緩俠', desc: ['衛生紙充足'] },
+                        { file: 'soap_yes.png',      name: '乳滿滿', desc: ['洗手乳充足'] },
+                        { file: 'pad_yes.png',       name: '棉緩俠', desc: ['有提供衛生棉'] },
+                        { file: 'sanitizer_yes.png', name: '消滿滿', desc: ['消毒液充足'] }
+                    ],
+                    imps: [
+                        { file: 'paper_no.png',      name: '無紙怪', desc: ['衛生紙用完'] },
+                        { file: 'soap_no.png',       name: '乳空空', desc: ['洗手乳不足'] },
+                        { file: 'pad_no.png',        name: '缺棉怪', desc: ['衛生棉販賣機', '售完'] },
+                        { file: 'sanitizer_no.png',  name: '消空空', desc: ['消毒液不足'] }
+                    ]
+                },
+                hardware: {
+                    title: '硬體小怪',
+                    tileBg: '#DCFBF5', // 淺薄荷綠磁磚
+                    fairies: [
+                        { file: 'walls_ceiling_tidy.png', name: '壁完美', desc: ['牆壁天花板', '完善乾淨'] },
+                        { file: 'tools_tidy.png',         name: '排排站', desc: ['掃具整齊'] },
+                        { file: 'dryer_strong.png',       name: '強風王', desc: ['烘手機', '風力足夠'] },
+                        { file: 'sink_clean.png',         name: '潔台君', desc: ['洗手臺潔淨'] }
+                    ],
+                    imps: [
+                        { file: 'mirror_dirty.png',   name: '口水鏡', desc: ['鏡子髒髒的'] },
+                        { file: 'trash_too_much.png', name: '滿滿怪', desc: ['垃圾滿出來'] },
+                        { file: 'dryer_broke.png',    name: '霸風怪', desc: ['烘手機壞掉'] },
+                        { file: 'sink_trash.png',     name: '貪吃台', desc: ['洗手台有垃圾'] }
+                    ]
+                }
+            };
+
+            const mainOpeningStageEl = document.querySelector('main');
+            const halftoneBgSvgEl = document.getElementById('fullScreenHalftoneSvg');
+            const categoryDetailSectionEl = document.getElementById('categoryDetailSection');
+            const categoryTileBgRectEl = document.getElementById('categoryTileBgRect');
+            const desktopCategoryCardsLayerEl = document.getElementById('desktopCategoryCardsLayer');
+            const mobileFairiesGridEl = document.getElementById('mobileFairiesGrid');
+            const mobileImpsGridEl = document.getElementById('mobileImpsGrid');
+
+            function findMonsterEntry(folder, fileName) {
+                return allMonsters.find(m => m.folder === folder && m.fileName === fileName)
+                    || createMonsterEntry(folder, fileName, 0);
+            }
+
+            // 建立單張分類圓拱門的內部 SVG 結構 (上排粉紅點點 #FF85D0 / 下排薄荷綠點點 #20D89A)
+            function buildCategoryCardInnerSvg(item, dotColor, imgDomId) {
+                const isTwoLines = item.desc.length > 1;
+                const nameY = isTwoLines ? -220 : -210;
+                const descMarkup = isTwoLines
+                    ? `<text x="0" y="-189" fill="#2A348C" font-size="15.5" font-weight="700" letter-spacing="1.5" text-anchor="middle" dominant-baseline="central">${item.desc[0]}</text>
+                       <text x="0" y="-168" fill="#2A348C" font-size="15.5" font-weight="700" letter-spacing="1.5" text-anchor="middle" dominant-baseline="central">${item.desc[1]}</text>`
+                    : `<text x="0" y="-177" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="1.8" text-anchor="middle" dominant-baseline="central">${item.desc[0]}</text>`;
+
+                const imgY = isTwoLines ? -152 : -158;
+                const imgH = isTwoLines ? 156 : 162;
+
+                return `
+                    <path d="M -88,0 L -88,-188 A 88,88 0 0,1 88,-188 L 88,0 Z" fill="#FFF9EC" />
+                    <path d="M -88,0 L -88,-188 A 88,88 0 0,1 88,-188 L 88,0"
+                          fill="none" pathLength="500" stroke="${dotColor}" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.05 10" />
+                    <line x1="-74.46" y1="0" x2="74.46" y2="0"
+                          pathLength="110" stroke="${dotColor}" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.05 10" />
+                    <text x="0" y="${nameY}" fill="#2A348C" font-size="25" font-weight="900" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">
+                        ${item.name}
+                    </text>
+                    ${descMarkup}
+                    <image id="${imgDomId}" class="cat-monster-img" x="-84" y="${imgY}" width="168" height="${imgH}" preserveAspectRatio="xMidYMax meet" />
+                `;
+            }
+
+            // 計算桌面版每排拱門的水平置中 X 座標
+            function getRowCentersX(count, maxColsInPage) {
+                const step = maxColsInPage >= 5 ? 232 : 244;
+                const startX = 720 - ((count - 1) * step) / 2;
+                return Array.from({ length: count }, (_, i) => startX + i * step);
+            }
+
+            // 切換顯示指定分類圖鑑頁
+            function openCategoryDetailView(catKey, pushHash = true) {
+                const cfg = HANDBOOK_CATEGORY_DATA[catKey];
+                if (!cfg) return;
+
+                // 1. 切換背景色與隱藏開頭頁
+                document.body.style.backgroundColor = cfg.tileBg;
+                if (categoryTileBgRectEl) categoryTileBgRectEl.setAttribute('fill', cfg.tileBg);
+                mainOpeningStageEl?.classList.add('hidden');
+                halftoneBgSvgEl?.classList.add('hidden');
+                categoryDetailSectionEl?.classList.remove('hidden');
+
+                // 2. 更新標題文字
+                const dTitle = document.getElementById('desktopCatTitleText');
+                const mTitle = document.getElementById('mobileCatTitleText');
+                if (dTitle) dTitle.textContent = cfg.title;
+                if (mTitle) mTitle.textContent = cfg.title;
+
+                // 3. 計算上下兩排座標：整體窗戶區塊(y=89~679)正中心精準對齊畫面中間水平線(y=384)
+                const TOP_ROW_BOTTOM_Y = 365;
+                const BOTTOM_ROW_BOTTOM_Y = 679;
+                const maxCols = Math.max(cfg.fairies.length, cfg.imps.length);
+                const topCenters = getRowCentersX(cfg.fairies.length, maxCols);
+                const bottomCenters = getRowCentersX(cfg.imps.length, maxCols);
+
+                const PINK_DOT = '#FF85D0';
+                const GREEN_DOT = '#20D89A';
+                const topLabelX = topCenters[0] - 138;
+                const bottomLabelX = bottomCenters[0] - 138;
+
+                // 左側直式「小仙」與「小妖」字樣（縮小為 2/3 倍：44 -> 29，並等比收合兩字間距）
+                let desktopSvgMarkup = `
+                    <g transform="translate(${topLabelX}, ${TOP_ROW_BOTTOM_Y})" class="pointer-events-none select-none">
+                        <g class="fairy-graceful-float">
+                            <text x="0" y="-149" fill="${PINK_DOT}" font-size="29" font-weight="900" text-anchor="middle" dominant-baseline="central">小</text>
+                        </g>
+                        <g class="fairy-graceful-float" style="animation-delay: -0.5s;">
+                            <text x="0" y="-113" fill="${PINK_DOT}" font-size="29" font-weight="900" text-anchor="middle" dominant-baseline="central">仙</text>
+                        </g>
+                    </g>
+                    <g transform="translate(${bottomLabelX}, ${BOTTOM_ROW_BOTTOM_Y})" filter="url(#impHalloweenWiggle)" class="pointer-events-none select-none">
+                        <g class="spooky-imp-shiver">
+                            <text x="0" y="-149" transform="rotate(-6, 0, -149)" fill="${GREEN_DOT}" font-size="29" font-weight="900" text-anchor="middle" dominant-baseline="central">小</text>
+                        </g>
+                        <g class="spooky-imp-shiver" style="animation-delay: -0.15s;">
+                            <text x="0" y="-113" transform="rotate(5, 0, -113)" fill="${GREEN_DOT}" font-size="29" font-weight="900" text-anchor="middle" dominant-baseline="central">妖</text>
+                        </g>
+                    </g>
+                `;
+
+                let mobileFairiesMarkup = '';
+                let mobileImpsMarkup = '';
+                const bindTasks = [];
+
+                cfg.fairies.forEach((item, idx) => {
+                    const dId = `catDesktopFairyImg_${idx}`;
+                    const mId = `catMobileFairyImg_${idx}`;
+                    const delay = (idx * 0.04).toFixed(2);
+                    desktopSvgMarkup += `
+                        <g transform="translate(${topCenters[idx]}, ${TOP_ROW_BOTTOM_Y})">
+                            <g class="cat-arch-card" style="animation-delay: ${delay}s;">
+                                ${buildCategoryCardInnerSvg(item, PINK_DOT, dId)}
+                            </g>
+                        </g>`;
+                    mobileFairiesMarkup += `
+                        <div class="w-[46%] flex justify-center">
+                            <svg viewBox="-95 -284 190 294" class="w-full h-auto block overflow-visible">
+                                <g class="cat-arch-card" style="animation-delay: ${delay}s;">
+                                    ${buildCategoryCardInnerSvg(item, PINK_DOT, mId)}
+                                </g>
+                            </svg>
+                        </div>`;
+                    bindTasks.push({ entry: findMonsterEntry(catKey, item.file), dId, mId });
+                });
+
+                cfg.imps.forEach((item, idx) => {
+                    const dId = `catDesktopImpImg_${idx}`;
+                    const mId = `catMobileImpImg_${idx}`;
+                    const delay = ((cfg.fairies.length + idx) * 0.04).toFixed(2);
+                    desktopSvgMarkup += `
+                        <g transform="translate(${bottomCenters[idx]}, ${BOTTOM_ROW_BOTTOM_Y})">
+                            <g class="cat-arch-card" style="animation-delay: ${delay}s;">
+                                ${buildCategoryCardInnerSvg(item, GREEN_DOT, dId)}
+                            </g>
+                        </g>`;
+                    mobileImpsMarkup += `
+                        <div class="w-[46%] flex justify-center">
+                            <svg viewBox="-95 -284 190 294" class="w-full h-auto block overflow-visible">
+                                <g class="cat-arch-card" style="animation-delay: ${delay}s;">
+                                    ${buildCategoryCardInnerSvg(item, GREEN_DOT, mId)}
+                                </g>
+                            </svg>
+                        </div>`;
+                    bindTasks.push({ entry: findMonsterEntry(catKey, item.file), dId, mId });
+                });
+
+                if (desktopCategoryCardsLayerEl) desktopCategoryCardsLayerEl.innerHTML = desktopSvgMarkup;
+                if (mobileFairiesGridEl) mobileFairiesGridEl.innerHTML = mobileFairiesMarkup;
+                if (mobileImpsGridEl) mobileImpsGridEl.innerHTML = mobileImpsMarkup;
+                // 4. 載入並填入對應的小怪 PNG 圖檔
+                bindTasks.forEach(({ entry, dId, mId }) => {
+                    resolveMonsterPngUrl(entry).then((url) => {
+                        if (!url) return;
+                        setSvgImageHref(document.getElementById(dId), url);
+                        setSvgImageHref(document.getElementById(mId), url);
+                    });
+                });
+
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                if (pushHash && window.location.hash !== `#${catKey}`) {
+                    try { history.pushState({ cat: catKey }, '', `#${catKey}`); } catch (e) {}
+                }
+            }
+
+            // 關閉分類頁並返回 10 扇窗戶圖鑑開頭頁
+            function closeCategoryDetailView(clearHash = true) {
+                if (!categoryDetailSectionEl || categoryDetailSectionEl.classList.contains('hidden')) return false;
+                document.body.style.backgroundColor = '';
+                categoryDetailSectionEl.classList.add('hidden');
+                mainOpeningStageEl?.classList.remove('hidden');
+                halftoneBgSvgEl?.classList.remove('hidden');
+                if (clearHash && window.location.hash) {
+                    try { history.pushState(null, '', window.location.pathname + window.location.search); } catch (e) {}
+                }
+                return true;
+            }
+
+            // 點擊中央「小怪圖鑑」貼紙或導覽列的「小怪圖鑑」：返回開頭頁並重新洗牌
+            const dexMainTitleGroup = document.getElementById('dexMainTitleGroup');
+            const triggerAllRandomShuffle = () => {
+                playPopSfx();
+                const wasInCategory = closeCategoryDetailView(true);
+                if (!wasInCategory && dexMainTitleGroup) {
+                    dexMainTitleGroup.classList.remove('is-popping');
+                    void dexMainTitleGroup.offsetWidth;
+                    dexMainTitleGroup.classList.add('is-popping');
+                }
+                populateAllArchesRandomly(null);
+            };
+
+            // 點擊分類頁頂端的深藍膠囊標題：返回圖鑑開頭頁
+            document.getElementById('desktopCatBackBtn')?.addEventListener('click', () => {
+                playPopSfx();
+                closeCategoryDetailView(true);
+            });
+            document.getElementById('mobileCatBackBtn')?.addEventListener('click', () => {
+                playPopSfx();
+                closeCategoryDetailView(true);
+            });
+
+            // 點擊 4 個分類膠囊按鈕 -> 進入對應的小怪分類圖鑑頁
+            const handleCategorySelect = (cat) => {
+                playPopSfx();
+                if (CATEGORY_TARGET_URLS[cat]) {
+                    window.location.href = CATEGORY_TARGET_URLS[cat];
+                    return;
+                }
+                openCategoryDetailView(cat, true);
+            };
+
+            document.querySelectorAll('.dex-pill-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    handleCategorySelect(btn.getAttribute('data-category'));
+                });
+            });
+            document.querySelectorAll('.mobile-cat-pill').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    handleCategorySelect(btn.getAttribute('data-mobile-cat'));
+                });
+            });
+
+            // 支援瀏覽器「上一頁 / 下一頁」與網址直接帶入 #stall 等錨點
+            window.addEventListener('popstate', () => {
+                const hashKey = (window.location.hash || '').replace('#', '');
+                if (HANDBOOK_CATEGORY_DATA[hashKey]) {
+                    openCategoryDetailView(hashKey, false);
+                } else {
+                    closeCategoryDetailView(false);
+                }
+            });
+            const initHashKey = (window.location.hash || '').replace('#', '');
+            if (HANDBOOK_CATEGORY_DATA[initHashKey]) {
+                openCategoryDetailView(initHashKey, false);
+            }
+
+            // ===================================================================
+            // 導覽列、手機衛生紙下拉選單與彈窗控制 (與 index.html 同步)
+            // ===================================================================
+            const underConstructionModal = document.getElementById('underConstructionModal');
+            const loginModal = document.getElementById('loginModal');
+
+            const openUnderConstruction = (e) => {
+                if (e) e.preventDefault();
+                playPopSfx();
+                underConstructionModal?.classList.remove('hidden');
+            };
+            document.getElementById('desktopNavStatusBtn')?.addEventListener('click', openUnderConstruction);
+            document.getElementById('closeUnderConstructionBtn')?.addEventListener('click', () => {
+                underConstructionModal?.classList.add('hidden');
+            });
+            underConstructionModal?.addEventListener('click', (e) => {
+                if (e.target === underConstructionModal) underConstructionModal.classList.add('hidden');
+            });
+
+            // 個人空間登入狀態檢查
+            let pendingProfileRedirect = false;
+            const handleGoProfile = (e) => {
+                if (e) e.preventDefault();
+                let cachedUser = null;
+                try {
+                    cachedUser = JSON.parse(localStorage.getItem('poogle_auth_user') || 'null');
+                } catch (err) {}
+                const currentUser = (auth && auth.currentUser) ? auth.currentUser : cachedUser;
+                if (currentUser && currentUser.uid) {
+                    window.location.href = './profile.html';
+                } else {
+                    pendingProfileRedirect = true;
+                    loginModal?.classList.remove('hidden');
+                }
+            };
+            document.getElementById('desktopNavProfileBtn')?.addEventListener('click', handleGoProfile);
+            document.getElementById('closeLoginModalBtn')?.addEventListener('click', () => {
+                pendingProfileRedirect = false;
+                loginModal?.classList.add('hidden');
+            });
+
+            if (auth) {
+                auth.onAuthStateChanged((user) => {
+                    if (user && pendingProfileRedirect) {
+                        pendingProfileRedirect = false;
+                        window.location.href = './profile.html';
+                    }
+                });
+                document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    provider.setCustomParameters({ prompt: 'select_account' });
+                    try {
+                        await auth.signInWithPopup(provider);
+                        loginModal?.classList.add('hidden');
+                    } catch (err) {
+                        const errBox = document.getElementById('loginErrorBox');
+                        const errDetail = document.getElementById('loginErrorDetail');
+                        errBox?.classList.remove('hidden');
+                        if (errDetail) errDetail.textContent = err?.message || '請確認網域已加入 Firebase 授權清單。';
+                    }
+                });
+            }
+
+            // 頂部 Navbar 點擊「小怪圖鑑」時重新隨機洗牌
+            document.getElementById('desktopNavDexBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerAllRandomShuffle();
+            });
+
+            // 手機版衛生紙下拉選單控制
+            const topHamburgerBtn = document.getElementById('topHamburgerBtn');
+            const tpRollDropdownMenu = document.getElementById('tpRollDropdownMenu');
+            let tpCloseTimer = null;
+
+            const closeTpMenu = () => {
+                if (!tpRollDropdownMenu) return;
+                if (tpCloseTimer) clearTimeout(tpCloseTimer);
+                topHamburgerBtn?.setAttribute('aria-expanded', 'false');
+                tpRollDropdownMenu.classList.remove('is-open');
+                void tpRollDropdownMenu.offsetWidth;
+                tpRollDropdownMenu.classList.add('is-closing');
+                tpCloseTimer = setTimeout(() => {
+                    tpRollDropdownMenu.classList.remove('is-closing');
+                    tpRollDropdownMenu.classList.add('hidden');
+                }, 260);
+            };
+
+            topHamburgerBtn?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!tpRollDropdownMenu) return;
+                const isOpen = tpRollDropdownMenu.classList.contains('is-open');
+                if (isOpen) {
+                    closeTpMenu();
+                } else {
+                    if (tpCloseTimer) clearTimeout(tpCloseTimer);
+                    tpRollDropdownMenu.classList.remove('hidden', 'is-closing');
+                    void tpRollDropdownMenu.offsetWidth;
+                    tpRollDropdownMenu.classList.add('is-open');
+                    topHamburgerBtn?.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            document.getElementById('tpMenuHomeBtn')?.addEventListener('click', () => {
+                window.location.href = './index.html';
+            });
+            document.getElementById('tpMenuReportSystemBtn')?.addEventListener('click', () => {
+                window.location.href = './index.html?openReport=1';
+            });
+            document.getElementById('tpMenuMapBtn')?.addEventListener('click', () => {
+                window.location.href = './map.html';
+            });
+            document.getElementById('tpMenuStatusBoardBtn')?.addEventListener('click', (e) => {
+                closeTpMenu();
+                openUnderConstruction(e);
+            });
+            document.getElementById('tpMenuMonsterDexBtn')?.addEventListener('click', () => {
+                closeTpMenu();
+                triggerAllRandomShuffle();
+            });
+            document.getElementById('tpMenuPersonalSpaceBtn')?.addEventListener('click', (e) => {
+                closeTpMenu();
+                handleGoProfile(e);
+            });
+
+            document.addEventListener('pointerdown', (e) => {
+                if (!tpRollDropdownMenu || !tpRollDropdownMenu.classList.contains('is-open')) return;
+                if (tpRollDropdownMenu.contains(e.target) || topHamburgerBtn?.contains(e.target)) return;
+                closeTpMenu();
+            }, true);
+        });
+    </script>
+</body>
+</html>

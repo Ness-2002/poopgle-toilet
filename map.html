@@ -352,8 +352,8 @@
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
-                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('mapUnderConstructionModal')?.classList.remove('hidden'); return false;">公廁現況版</a>
-                <a href="#" class="hover:opacity-70 transition-opacity" onclick="document.getElementById('mapUnderConstructionModal')?.classList.remove('hidden'); return false;">小怪圖鑑</a>
+                <a href="./board.html" class="hover:opacity-70 transition-opacity">公廁現況版</a>
+<a href="./handbook.html" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
         </nav>
@@ -850,22 +850,22 @@
             privacy_ok: { id: 'privacy_ok', name: '隱私完善', folder: 'stall', kind: '小仙' },
             smell_nice: { id: 'smell_nice', name: '香香的', folder: 'stall', kind: '小仙' },
             flush_broke: { id: 'flush_broke', name: '沖水壞掉', folder: 'stall', kind: '小妖' },
-            handle_wet: { id: 'handle_wet', name: '門把潮濕', folder: 'stall', kind: '小妖' },
+            handle_wet: { id: 'handle_wet', name: '門把濕濕', folder: 'stall', kind: '小妖' },
             lock_broke: { id: 'lock_broke', name: '無法上鎖', folder: 'stall', kind: '小妖' },
-            poopee: { id: 'poopee', name: '便便/尿尿沒沖', folder: 'stall', kind: '小妖' },
+            poopee: { id: 'poopee', name: '便便尿尿沒沖', folder: 'stall', kind: '小妖' },
             toilet_clogged: { id: 'toilet_clogged', name: '馬桶堵塞', folder: 'stall', kind: '小妖' },
             pad_yes: { id: 'pad_yes', name: '有提供衛生棉', folder: 'consumable', kind: '小仙' },
             paper_yes: { id: 'paper_yes', name: '衛生紙充足', folder: 'consumable', kind: '小仙' },
             sanitizer_yes: { id: 'sanitizer_yes', name: '消毒液充足', folder: 'consumable', kind: '小仙' },
             soap_yes: { id: 'soap_yes', name: '洗手乳充足', folder: 'consumable', kind: '小仙' },
-            pad_no: { id: 'pad_no', name: '衛生棉販售機賣完', folder: 'consumable', kind: '小妖' },
+            pad_no: { id: 'pad_no', name: '衛生棉販賣機售完', folder: 'consumable', kind: '小妖' },
             paper_no: { id: 'paper_no', name: '衛生紙用完', folder: 'consumable', kind: '小妖' },
             sanitizer_no: { id: 'sanitizer_no', name: '消毒液不足', folder: 'consumable', kind: '小妖' },
             soap_no: { id: 'soap_no', name: '洗手乳不足', folder: 'consumable', kind: '小妖' },
             dryer_strong: { id: 'dryer_strong', name: '烘手機風力足夠', folder: 'hardware', kind: '小仙' },
             sink_clean: { id: 'sink_clean', name: '洗手台潔淨', folder: 'hardware', kind: '小仙' },
             tools_tidy: { id: 'tools_tidy', name: '掃具整齊', folder: 'hardware', kind: '小仙' },
-            walls_ceiling_tidy: { id: 'walls_ceiling_tidy', name: '牆壁天花板完善', folder: 'hardware', kind: '小仙' },
+            walls_ceiling_tidy: { id: 'walls_ceiling_tidy', name: '牆壁天花板完善乾淨', folder: 'hardware', kind: '小仙' },
             dryer_broke: { id: 'dryer_broke', name: '烘手機損壞', folder: 'hardware', kind: '小妖' },
             mirror_dirty: { id: 'mirror_dirty', name: '鏡子髒髒', folder: 'hardware', kind: '小妖' },
             trash_too_much: { id: 'trash_too_much', name: '垃圾滿出來', folder: 'hardware', kind: '小妖' },
@@ -3244,12 +3244,10 @@
                 closeMapTpDropdownMenu(false);
             });
             document.getElementById('mapTpMenuStatusBoardBtn')?.addEventListener('click', () => {
-                closeMapTpDropdownMenu(false);
-                mapUnderConstructionModal?.classList.remove('hidden');
+                window.location.href = './board.html';
             });
             document.getElementById('mapTpMenuMonsterDexBtn')?.addEventListener('click', () => {
-                closeMapTpDropdownMenu(false);
-                mapUnderConstructionModal?.classList.remove('hidden');
+                window.location.href = './handbook.html';
             });
             document.getElementById('mapTpMenuPersonalSpaceBtn')?.addEventListener('click', () => {
                 const uid = getCurrentUserUid();

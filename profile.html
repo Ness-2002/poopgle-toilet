@@ -43,11 +43,28 @@
 
         body {
             font-family: 'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif;
-            background-color: var(--poogle-cream);
+            /* 薄荷綠磁磚底色 + 米色直線與橫線磚縫 */
+            background-color: #D2F7EC;
+            background-image:
+                linear-gradient(to right, #FCF5E5 9px, transparent 9px),
+                linear-gradient(to bottom, #FCF5E5 9px, transparent 9px);
+            background-size: 156px 156px;
+            background-position: center -18px;
             color: var(--poogle-navy);
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+        }
+
+        /* 手機版磁磚格縮小，維持畫面比例協調 */
+        @media (max-width: 767px) {
+            body {
+                background-image:
+                    linear-gradient(to right, #FCF5E5 6px, transparent 6px),
+                    linear-gradient(to bottom, #FCF5E5 6px, transparent 6px);
+                background-size: 104px 104px;
+                background-position: center top;
+            }
         }
 
         button, a {
@@ -250,6 +267,41 @@
                 display: none !important;
             }
         }
+        /* 右側稱號櫥窗黃色店員探頭動畫（與粉紅店員一致柔和上升） */
+        .yellow-clerk-peek {
+            transform: translateY(78px);
+            transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .yellow-clerk-peek.is-peeking {
+            transform: translateY(4px);
+        }
+
+        /* 手機版隱藏粉紅店員與黃色店員，僅保留中間的小藍店員 */
+        @media (max-width: 767px) {
+            #pinkClerkGroup,
+            #yellowClerkGroup {
+                display: none !important;
+            }
+        }
+
+        /* 稱號 Popup：卡片上下圓點虛線與 lv. 藍底深藍描邊字 */
+        .title-card-dots {
+            background-image: radial-gradient(circle, #1E2470 2px, transparent 2.3px);
+            background-size: 11px 6px;
+            background-repeat: repeat-x;
+            background-position: center;
+            height: 6px;
+            width: 100%;
+        }
+        .title-lv-outlined {
+            color: #3FE0FF;
+            -webkit-text-stroke: 3.2px #1E2470;
+            paint-order: stroke fill;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            line-height: 1.1;
+        }
     </style>
 </head>
 
@@ -381,10 +433,10 @@
             </div>
         </div>
 
-        <!-- 變更頭貼按鈕 (縮小 1/3 並改為細體字) -->
+        <!-- 變更頭貼按鈕 -->
         <button id="openChangeAvatarModalBtn"
                 type="button"
-                class="mt-4 w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-transparent hover:bg-[#1E2470]/5 text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+                class="mt-4 w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
             變更頭貼
         </button>
 
@@ -413,6 +465,16 @@
                 <div class="w-full h-[320px] relative select-none">
                     <svg viewBox="0 0 320 300" preserveAspectRatio="none" class="w-full h-full block">
                         <defs>
+                            <!-- 右側稱號櫥窗裁切範圍 -->
+                            <clipPath id="rightTitleWindowClip">
+                                <rect x="201.33" y="186" width="82.67" height="82" />
+                            </clipPath>
+                            <clipPath id="yellowClerkLeftEyeClip">
+                                <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
+                            <clipPath id="yellowClerkRightEyeClip">
+                                <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" />
+                            </clipPath>
                             <!-- 左側獎品櫥窗裁切範圍，底部貼齊 y=268 黃色檯面上緣 -->
                             <clipPath id="leftPrizeWindowClip">
                                 <rect x="36" y="186" width="82.67" height="82" />
@@ -504,7 +566,33 @@
                                   stroke-linecap="round"
                                   stroke-linejoin="round" />
                         </g>
-
+                        <!-- 右側稱號櫥窗內的黃色店員 (Hover 時柔和上升) -->
+                        <g clip-path="url(#rightTitleWindowClip)">
+                            <g id="yellowClerkGroup" transform="translate(213.66, 198)">
+                                <g id="yellowClerkPeekInner" class="yellow-clerk-peek">
+                                    <!-- 無邊框黃色圓頭與向下延伸的梯形身體 -->
+                                    <circle cx="29" cy="27" r="21.5" fill="#F7EC65" />
+                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#F7EC65" />
+                                    <!-- 雙眼米白眼白 -->
+                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <!-- 深藍大眼珠 -->
+                                    <g clip-path="url(#yellowClerkLeftEyeClip)">
+                                        <ellipse id="yellowClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                    </g>
+                                    <g clip-path="url(#yellowClerkRightEyeClip)">
+                                        <ellipse id="yellowClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                    </g>
+                                    <!-- 粗深藍上眼瞼弧線 -->
+                                    <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
+                                          fill="none"
+                                          stroke="#1E2470"
+                                          stroke-width="2.8"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round" />
+                                </g>
+                            </g>
+                        </g>
                         <!-- 三格白色櫥窗外框線 -->
                         <rect x="36" y="186" width="82.67" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
                         <rect x="118.67" y="186" width="82.66" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
@@ -514,24 +602,29 @@
                         <rect x="30" y="268" width="260" height="19" fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
                     </svg>
 
-                    <!-- 櫥窗上方的三個分類按鈕：獎品 / 規則 / 稱號 -->
+                    <!-- 櫥窗上方的分類標題：獎品 / (空白) / 稱號 -->
                     <div class="absolute left-[11.25%] right-[11.25%] top-[53%] grid grid-cols-3 text-center z-10">
                         <button id="prizeLabelBtn" type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
                             獎品
                         </button>
-                        <button type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
-                            規則
-                        </button>
-                        <button type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                        <span aria-hidden="true"></span>
+                        <button id="titleLabelBtn" type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
                             稱號
                         </button>
                     </div>
 
-                    <!-- 左側「獎品窗戶」透明點擊與 Hover 感應區 (涵蓋「獎品」文字與左側櫥窗) -->
+                    <!-- 左側「獎品窗戶」透明點擊與 Hover 感應區 -->
                     <button id="prizeWindowHitBtn"
                             type="button"
                             aria-label="開啟獎品專區"
                             class="absolute left-[11.25%] top-[52%] w-[25.85%] h-[37.5%] z-20 bg-transparent cursor-pointer focus:outline-none">
+                    </button>
+
+                    <!-- 右側「稱號窗戶」透明點擊與 Hover 感應區 -->
+                    <button id="titleWindowHitBtn"
+                            type="button"
+                            aria-label="開啟對應等級與稱號"
+                            class="absolute right-[11.25%] top-[52%] w-[25.85%] h-[37.5%] z-20 bg-transparent cursor-pointer focus:outline-none">
                     </button>
                 </div>
             </div>
@@ -721,7 +814,7 @@
     <!-- =================================================================== -->
     <!-- POPUP 1: 兌換商店 - 獎品專區 -->
     <div id="prizeShopModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-modal-card relative w-full max-w-[568px] bg-white rounded-[38px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-10 pb-8 px-6 sm:px-11">
+        <div class="poogle-modal-card relative w-full max-w-[568px] bg-[#FCF5E5] rounded-[38px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-10 pb-8 px-6 sm:px-11">
             <!-- 頂部置中深藍膠囊標題 -->
             <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap">
                 兌換商店
@@ -750,7 +843,7 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 一滴香瓶身插畫 -->
                             <g transform="translate(0, -6)">
                                 <!-- 黃色長圓蓋 -->
@@ -779,7 +872,7 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 所味紙巾盒插畫 -->
                             <g transform="translate(0, -4)">
                                 <!-- 水藍面紙盒 -->
@@ -805,7 +898,7 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 所味慕斯壓瓶插畫 -->
                             <g transform="translate(0, -4)">
                                 <!-- 黃色壓頭噴嘴 -->
@@ -837,7 +930,7 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="none" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 水藍便便問號吊飾插畫 -->
                             <g transform="translate(0, -4)">
                                 <path d="M 100 50
@@ -866,6 +959,150 @@
                     </span>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- POPUP 1-2: 兌換商店 - 對應等級與稱號                                -->
+    <!-- =================================================================== -->
+    <div id="titleTierModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+        <div class="poogle-modal-card relative w-full max-w-[960px] bg-[#FCF5E5] rounded-[34px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-9 sm:pt-10 pb-7 sm:pb-10 px-4 sm:px-9">
+            <!-- 頂部置中深藍膠囊標題 -->
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
+                兌換商店
+            </div>
+
+            <!-- 右上角深藍圓形關閉按鈕 -->
+            <button id="closeTitleTierModalBtn"
+                    type="button"
+                    aria-label="關閉對應等級與稱號"
+                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
+                <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <!-- 副標題：對應等級與稱號 -->
+            <h2 class="text-center text-[#1E2470] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-4 sm:mb-6">
+                對應等級與稱號
+            </h2>
+
+            <!-- 10 個等級與稱號卡片網格 (電腦版 5x2，手機版 2x5 可捲動) -->
+            <div class="max-h-[70vh] overflow-y-auto no-scrollbar px-0.5">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+
+                    <!-- lv.1 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-2">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.1</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">探廁小白</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">0～3 間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.2 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-1.5">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.2</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">推門試探者</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">4～7間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.3 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-1.5">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.3</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">初級探廁家</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">8～16間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.4 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-2">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.4</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">街頭遊俠</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">17～25間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.5 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-1 px-2">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.5</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">巷弄衛生<br>推手</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">26～34間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.6 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-1.5">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.6</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">乾淨大隊長</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">35～43間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.7 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-1">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.7</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.04em] leading-snug">文明守「味」</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">44～52 間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.8 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-2 px-1.5">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.8</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">五星級顧問</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">53～61間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.9 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-1 px-2">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.9</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">有所味<br>首席代表</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">62～70間</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                    <!-- lv.10 -->
+                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                        <div class="title-card-dots"></div>
+                        <div class="flex flex-col items-center justify-center gap-1 px-2">
+                            <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.10</span>
+                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">究極<br>所味之神</span>
+                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">70 間以上</span>
+                        </div>
+                        <div class="title-card-dots"></div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -988,7 +1225,25 @@
                 remainingToNext
             };
         }
+        // 根據使用者目前等級 (1~10)，動態將對應的稱號卡片設為粉紅底色
+        function updateTitleTierModalHighlight(currentLevel) {
+            const modal = document.getElementById('titleTierModal');
+            if (!modal) return;
+            const grid = modal.querySelector('.grid');
+            if (!grid) return;
 
+            const activeLv = Math.min(10, Math.max(1, parseInt(currentLevel, 10) || 1));
+            Array.from(grid.children).forEach((card, idx) => {
+                const cardLv = idx + 1;
+                if (cardLv === activeLv) {
+                    card.classList.remove('bg-white');
+                    card.classList.add('bg-[#FF85D0]');
+                } else {
+                    card.classList.remove('bg-[#FF85D0]');
+                    card.classList.add('bg-white');
+                }
+            });
+        }
         function renderUserLevelUI(totalReports) {
             const { currentTier, nextTier, remainingToNext } = getLevelProgression(totalReports);
 
@@ -1010,6 +1265,7 @@
                     progressHintEl.innerHTML = `已達成最高等級<span class="text-base sm:text-[21px] font-bold mx-0.5">「${escapeHtml(currentTier.title)}」</span>稱號！`;
                 }
             }
+        updateTitleTierModalHighlight(currentTier.level);
         }
 
         // ===================================================================
@@ -2057,8 +2313,51 @@
                     }
                 });
             }
+            // 4-2. 「稱號窗戶」Hover 黃色店員探頭動畫 & 點擊開啟「對應等級與稱號」Popup
+            const titleWindowHitBtn = document.getElementById('titleWindowHitBtn');
+            const titleLabelBtn = document.getElementById('titleLabelBtn');
+            const yellowClerkPeekInner = document.getElementById('yellowClerkPeekInner');
+            const titleTierModal = document.getElementById('titleTierModal');
+            const closeTitleTierModalBtn = document.getElementById('closeTitleTierModalBtn');
 
+            const showYellowClerk = () => {
+                if (window.innerWidth < 768) return; // 手機版不觸發黃色店員探頭
+                if (yellowClerkPeekInner) yellowClerkPeekInner.classList.add('is-peeking');
+            };
+            const hideYellowClerk = () => {
+                if (yellowClerkPeekInner) yellowClerkPeekInner.classList.remove('is-peeking');
+            };
+            const openTitleModal = () => {
+                const { currentTier } = getLevelProgression(profileState.totalReports);
+                updateTitleTierModalHighlight(currentTier.level);
+                if (titleTierModal) titleTierModal.classList.remove('hidden');
+            };
+            if (titleWindowHitBtn) {
+                titleWindowHitBtn.addEventListener('mouseenter', showYellowClerk);
+                titleWindowHitBtn.addEventListener('mouseleave', hideYellowClerk);
+                titleWindowHitBtn.addEventListener('click', openTitleModal);
+            }
+            if (titleLabelBtn) {
+                titleLabelBtn.addEventListener('mouseenter', showYellowClerk);
+                titleLabelBtn.addEventListener('mouseleave', hideYellowClerk);
+                titleLabelBtn.addEventListener('click', openTitleModal);
+            }
+            if (closeTitleTierModalBtn && titleTierModal) {
+                closeTitleTierModalBtn.addEventListener('click', () => {
+                    titleTierModal.classList.add('hidden');
+                });
+            }
+            if (titleTierModal) {
+                titleTierModal.addEventListener('click', (e) => {
+                    if (e.target === titleTierModal) {
+                        titleTierModal.classList.add('hidden');
+                    }
+                });
+            }
             // 5. 兌換商店店員（藍色店員與粉紅店員）眼珠跟隨游標移動互動
+            const yellowClerkGroup = document.getElementById('yellowClerkGroup');
+            const yellowPupilLeft = document.getElementById('yellowClerkPupilLeft');
+            const yellowPupilRight = document.getElementById('yellowClerkPupilRight');
             const clerkGroup = document.getElementById('shopClerkGroup');
             const pupilLeft = document.getElementById('clerkPupilLeft');
             const pupilRight = document.getElementById('clerkPupilRight');
@@ -2096,6 +2395,7 @@
             const updateAllClerksEyes = (clientX, clientY) => {
                 updateSingleClerkEyes(clerkGroup, pupilLeft, pupilRight, clientX, clientY);
                 updateSingleClerkEyes(pinkClerkGroup, pinkPupilLeft, pinkPupilRight, clientX, clientY);
+                updateSingleClerkEyes(yellowClerkGroup, yellowPupilLeft, yellowPupilRight, clientX, clientY);
             };
 
             window.addEventListener('mousemove', (e) => {
