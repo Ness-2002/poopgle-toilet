@@ -842,10 +842,16 @@
             scrollbar-width: none;
         }
 
-        /* 定位畫面左上角 Logo：貼紙白框＋深藍細線濾鏡 */
+        /* 定位畫面左上角 Logo：手機版無白邊，電腦版保留貼紙白框＋深藍細線濾鏡 */
         .report-logo-sticker {
-            filter: url(#logoStickerOutline);
-            -webkit-filter: url(#logoStickerOutline);
+            filter: none;
+            -webkit-filter: none;
+        }
+        @media (min-width: 768px) {
+            .report-logo-sticker {
+                filter: url(#logoStickerOutline);
+                -webkit-filter: url(#logoStickerOutline);
+            }
         }
         /* ========================================================= */
         /* 垃圾桶小蟑螂：預設探頭偷看、Hover 躲進桶內、離開再次探頭     */
