@@ -642,12 +642,19 @@
             </div>
         </div>
 
-        <!-- 變更頭貼按鈕 -->
-        <button id="openChangeAvatarModalBtn"
-                type="button"
-                class="mt-4 w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
-            變更頭貼
-        </button>
+        <!-- 變更頭貼 與 我的評鑑 按鈕 -->
+        <div class="mt-4 flex items-center justify-center gap-3">
+            <button id="openChangeAvatarModalBtn"
+                    type="button"
+                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+                變更頭貼
+            </button>
+            <button id="openMyEvaluationsModalBtn"
+                    type="button"
+                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-[#F7EC65] hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+                我的評鑑
+            </button>
+        </div>
 
         <!-- 稱號進度提示文字 (文字變細 1 級) -->
         <p id="levelProgressHint" class="mt-4 text-[#1E2470] font-medium tracking-[0.12em] text-sm sm:text-[16px]">
@@ -1367,6 +1374,82 @@
             </div>
         </div>
     </div>
+    <!-- =================================================================== -->
+    <!-- POPUP 4: 我的評鑑紀錄彈窗 (檢視歷史評鑑星等與刪除紀錄)              -->
+    <!-- =================================================================== -->
+    <div id="myEvaluationsModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-modal-card relative w-full max-w-[560px] bg-[#FCF5E5] rounded-[34px] sm:rounded-[42px] border-[2px] border-[#1E2470] pt-10 pb-7 px-4 sm:px-8">
+            <!-- 頂部置中深藍膠囊標題 -->
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
+                我的評鑑
+            </div>
+
+            <!-- 右上角深藍圓形關閉按鈕 -->
+            <button id="closeMyEvaluationsModalBtn"
+                    type="button"
+                    aria-label="關閉我的評鑑"
+                    class="absolute -top-2.5 -right-2.5 w-[42px] h-[42px] sm:w-[48px] sm:h-[48px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
+                <svg viewBox="0 0 32 32" class="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <!-- 副標題：統計間數 -->
+            <h2 class="text-center text-[#1E2470] text-xs sm:text-[15px] font-extrabold tracking-[0.14em] mb-4">
+                共評鑑過 <span id="myEvalTotalCountText" class="text-[#FF5A52] mx-0.5">0</span> 間公廁
+            </h2>
+
+            <!-- 評鑑列表滾動區 -->
+            <div id="myEvaluationsListContainer" class="max-h-[58vh] overflow-y-auto receipt-scroll space-y-3 pr-1">
+                <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                    載入評鑑紀錄中...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- POPUP 5: 確定刪除評鑑提醒視窗                                       -->
+    <!-- =================================================================== -->
+    <div id="confirmDeleteEvalModal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-modal-card relative w-full max-w-[420px] bg-white rounded-[32px] border-[2px] border-[#1E2470] px-6 sm:px-8 pt-10 pb-7 flex flex-col items-center text-center shadow-[0_8px_0_#1E2470]">
+            <!-- 右上角關閉按鈕 -->
+            <button id="closeConfirmDeleteEvalBtn"
+                    type="button"
+                    aria-label="關閉刪除提醒"
+                    class="absolute -top-2.5 -right-2.5 w-[40px] h-[40px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                <svg viewBox="0 0 32 32" class="w-4 h-4 pointer-events-none">
+                    <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+                </svg>
+            </button>
+
+            <h3 class="text-[#1E2470] text-base sm:text-[19px] font-black tracking-[0.14em]">
+                確定要刪除此筆評鑑嗎？
+            </h3>
+
+            <div id="confirmDeleteEvalNameText" class="mt-2.5 px-4 py-1.5 rounded-full bg-[#FCF5E5] border-[1.6px] border-[#1E2470] text-[#1E2470] text-xs sm:text-sm font-black tracking-wider max-w-full truncate">
+                公廁名稱
+            </div>
+
+            <p class="mt-3.5 text-[#1E2470]/85 text-xs sm:text-[13.5px] font-bold tracking-wider leading-relaxed">
+                刪除後將同步移除地圖與現況板上的紀錄，<br>
+                且總功德點數將<span class="text-[#FF5A52] font-black mx-0.5">扣除 1 點</span>。
+            </p>
+
+            <div class="mt-6 w-full flex items-center justify-center gap-3.5">
+                <button id="cancelDeleteEvalBtn"
+                        type="button"
+                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
+                    取消
+                </button>
+                <button id="confirmDeleteEvalSubmitBtn"
+                        type="button"
+                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#1E2470] bg-[#FF5A52] hover:bg-[#ff746d] text-white text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
+                    確定刪除
+                </button>
+            </div>
+        </div>
+    </div>
 <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -1594,7 +1677,9 @@
             hasAnimatedInitialLoad: false,
             profileUnsubscribe: null,
             evalUnsubscribe: null,
-            redeemUnsubscribe: null
+            redeemUnsubscribe: null,
+            isDeletingEval: false,
+            pendingDeleteEval: null
         };
 
         function escapeHtml(str) {
@@ -2135,8 +2220,8 @@
         }
 
         function recalculateAndRenderPointsAndHistory() {
+            if (profileState.isDeletingEval) return;
             reconcileAndSyncProfileCounts();
-
             const currentPoints = profileState.currentPoints;
             const totalReports = profileState.totalReports;
             
@@ -2252,6 +2337,252 @@
         }
 
         // ===================================================================
+        // 我的評鑑列表渲染、二次確認彈窗與同步刪除扣點邏輯
+        // ===================================================================
+        function renderMiniStarsRowSvg(score) {
+            const rounded = Math.round(Number(score) || 0);
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                const fill = i <= rounded ? '#F7EC65' : '#FCF5E5';
+                html += `
+                    <svg viewBox="-24 -24 48 48" class="w-[15px] h-[15px] shrink-0 overflow-visible pointer-events-none">
+                        <path d="M 1.2,-19.5 C 4.2,-19.4 6.3,-10.2 8.8,-8.4 C 11.3,-6.6 20.4,-6.8 21.2,-3.9 C 22.0,-1.0 14.3,4.6 13.4,7.4 C 12.5,10.2 15.4,18.8 12.8,20.5 C 10.2,22.2 2.9,16.6 0,16.5 C -2.9,16.4 -10.6,21.7 -13.1,19.8 C -15.6,17.9 -12.2,9.6 -13.0,6.7 C -13.8,3.8 -21.3,-2.0 -20.2,-4.8 C -19.1,-7.6 -10.0,-7.0 -7.4,-8.7 C -4.8,-10.4 -1.9,-19.6 1.2,-19.5 Z"
+                              fill="${fill}" stroke="#1E2470" stroke-width="3.2" stroke-linejoin="round" />
+                    </svg>
+                `;
+            }
+            return html;
+        }
+
+        function renderMyEvaluationsModalList() {
+            const listEl = document.getElementById('myEvaluationsListContainer');
+            const countTextEl = document.getElementById('myEvalTotalCountText');
+            if (!listEl) return;
+
+            const sortedEvals = [...profileState.evaluations].sort((a, b) =>
+                String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || ''))
+            );
+
+            if (countTextEl) {
+                countTextEl.textContent = String(sortedEvals.length);
+            }
+
+            if (!profileState.evalLoaded && sortedEvals.length === 0) {
+                listEl.innerHTML = `
+                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                        載入評鑑紀錄中...
+                    </div>
+                `;
+                return;
+            }
+
+            if (sortedEvals.length === 0) {
+                listEl.innerHTML = `
+                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider text-center">
+                        目前還沒有任何評鑑紀錄喔！
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = sortedEvals.map((ev) => {
+                const rt = ev.ratings || {};
+                const fb = Number(ev.stars ?? 3);
+                const cl = Number(rt.cleanliness ?? fb);
+                const li = Number(rt.lighting ?? fb);
+                const eq = Number(rt.equipment ?? rt.smell ?? fb);
+                const sp = Number(rt.space ?? fb);
+                const overall = Number.isFinite(Number(ev.stars))
+                    ? Number(ev.stars).toFixed(1)
+                    : ((cl + li + eq + sp) / 4).toFixed(1);
+
+                const dateStr = String(ev.updatedAt || ev.createdAt || '').slice(0, 10) || '近期';
+                const sceneLabel = ev.sceneType === 'urinal' ? '小便斗' : '一般廁間';
+                const commentText = String(ev.comment || '').trim();
+
+                return `
+                    <div class="bg-white rounded-[20px] border-[1.8px] border-[#1E2470] p-3.5 sm:p-4 flex items-center justify-between gap-3">
+                        <div class="min-w-0 flex-1 space-y-1.5 text-left">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-[#1E2470] text-sm sm:text-[16px] font-black tracking-wide break-words">
+                                    ${escapeHtml(ev.name || '未命名公廁')}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full bg-[#3FE0FF]/35 border border-[#1E2470] text-[#1E2470] text-[10px] font-extrabold">
+                                    ${escapeHtml(sceneLabel)}
+                                </span>
+                                <span class="text-[#1E2470]/55 text-[11px] font-bold">
+                                    ${escapeHtml(dateStr)}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-0.5">
+                                    ${renderMiniStarsRowSvg(overall)}
+                                </div>
+                                <span class="ml-1 text-[#1E2470] text-xs sm:text-sm font-black">${escapeHtml(overall)} ★</span>
+                            </div>
+
+                            <div class="text-[#1E2470]/75 text-[11px] font-bold tracking-wide flex flex-wrap gap-x-2 gap-y-0.5">
+                                <span>整潔 ${cl}★</span>
+                                <span>明亮 ${li}★</span>
+                                <span>設備 ${eq}★</span>
+                                <span>空間 ${sp}★</span>
+                            </div>
+
+                            ${commentText ? `<p class="text-[#1E2470] text-xs font-bold bg-[#FCF5E5] px-2.5 py-1.5 rounded-xl border border-[#1E2470]/20 break-words">「${escapeHtml(commentText)}」</p>` : ''}
+                        </div>
+
+                        <button type="button"
+                                data-delete-eval-id="${escapeHtml(ev.id)}"
+                                class="shrink-0 px-3.5 py-1.5 rounded-full bg-[#FF5A52] hover:bg-[#ff746d] border-[1.8px] border-[#1E2470] text-white text-xs font-extrabold tracking-wider transition-transform active:scale-95 cursor-pointer">
+                            刪除
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.querySelectorAll('[data-delete-eval-id]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-delete-eval-id');
+                    const found = profileState.evaluations.find(item => item.id === targetId);
+                    if (found) openConfirmDeleteEvalModal(found);
+                });
+            });
+        }
+
+        function openConfirmDeleteEvalModal(evalRecord) {
+            profileState.pendingDeleteEval = evalRecord;
+            const nameEl = document.getElementById('confirmDeleteEvalNameText');
+            if (nameEl) {
+                nameEl.textContent = `「${evalRecord.name || '未命名公廁'}」`;
+            }
+            document.getElementById('confirmDeleteEvalModal')?.classList.remove('hidden');
+        }
+
+        function closeConfirmDeleteEvalModal() {
+            profileState.pendingDeleteEval = null;
+            document.getElementById('confirmDeleteEvalModal')?.classList.add('hidden');
+        }
+
+        function purgeDeletedEvalFromLocalStorage(docId, evalId, toiletName, uid) {
+            try {
+                const raw = localStorage.getItem('poogle_local_evaluations_v2');
+                if (!raw) return;
+                const list = JSON.parse(raw);
+                if (!Array.isArray(list)) return;
+                const cleanName = String(toiletName || '').trim();
+                const nextList = list.filter((item) => {
+                    if (!item) return false;
+                    const itemId = item.evalId || item.id;
+                    if (docId && itemId === docId) return false;
+                    if (evalId && itemId === evalId) return false;
+                    if (uid && cleanName && item.userId === uid && String(item.name || '').trim() === cleanName) {
+                        return false;
+                    }
+                    return true;
+                });
+                localStorage.setItem('poogle_local_evaluations_v2', JSON.stringify(nextList));
+            } catch (e) {}
+        }
+
+        async function executeDeleteMyEvaluation() {
+            const target = profileState.pendingDeleteEval;
+            if (!target || profileState.isDeletingEval || !profileState.uid) return;
+
+            const submitBtn = document.getElementById('confirmDeleteEvalSubmitBtn');
+            profileState.isDeletingEval = true;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '刪除中...';
+            }
+
+            try {
+                const uid = profileState.uid;
+                const docId = target.id;
+                const evalId = target.evalId || target.id;
+                const cleanName = String(target.name || '').trim();
+                const nowIso = new Date().toISOString();
+
+                // 1. 清除本機評鑑快取，確保重新評鑑同間公廁時不會出現舊紀錄或「已評鑑」文字
+                purgeDeletedEvalFromLocalStorage(docId, evalId, cleanName, uid);
+
+                // 2. 找出此筆公廁評鑑對應的所有雲端文件，並扣除 1 點功德點數與 1 次回報數
+                const docsToDelete = profileState.evaluations.filter((item) =>
+                    item.id === docId ||
+                    (evalId && (item.id === evalId || item.evalId === evalId)) ||
+                    (cleanName && String(item.name || '').trim() === cleanName)
+                );
+
+                const remainingEvals = profileState.evaluations.filter((item) => !docsToDelete.includes(item));
+                const nextRawEvalCount = remainingEvals.length;
+                const rawSpentPoints = profileState.redemptions.reduce((sum, r) => sum + (Number(r.pointsUsed) || 0), 0);
+                const nextPoints = Math.max(0, profileState.currentPoints - 1);
+                const nextReports = Math.max(0, profileState.totalReports - 1);
+
+                // 3. 同步刪除雲端 evaluations (自動同步移除 map 與 board 紀錄) 並更新 user_profiles 點數
+                if (db) {
+                    const batch = db.batch();
+                    const deletedKeys = new Set();
+
+                    docsToDelete.forEach((d) => {
+                        if (d.id && !deletedKeys.has(d.id)) {
+                            deletedKeys.add(d.id);
+                            batch.delete(db.collection('evaluations').doc(d.id));
+                        }
+                        if (d.evalId && !deletedKeys.has(d.evalId)) {
+                            deletedKeys.add(d.evalId);
+                            batch.delete(db.collection('evaluations').doc(d.evalId));
+                        }
+                    });
+                    if (docId && !deletedKeys.has(docId)) {
+                        deletedKeys.add(docId);
+                        batch.delete(db.collection('evaluations').doc(docId));
+                    }
+                    if (evalId && !deletedKeys.has(evalId)) {
+                        deletedKeys.add(evalId);
+                        batch.delete(db.collection('evaluations').doc(evalId));
+                    }
+
+                    const profileRef = db.collection('user_profiles').doc(uid);
+                    batch.set(profileRef, {
+                        userId: uid,
+                        meritPoints: nextPoints,
+                        totalReports: nextReports,
+                        _rawEvalCount: nextRawEvalCount,
+                        _rawSpentPoints: rawSpentPoints,
+                        updatedAt: nowIso
+                    }, { merge: true });
+
+                    await batch.commit();
+                }
+
+                // 4. 更新畫面記憶體狀態並即時刷新點數、等級、收據與評鑑列表
+                profileState.evaluations = remainingEvals;
+                profileState.profileDoc = {
+                    ...(profileState.profileDoc || {}),
+                    meritPoints: nextPoints,
+                    totalReports: nextReports,
+                    _rawEvalCount: nextRawEvalCount,
+                    _rawSpentPoints: rawSpentPoints,
+                    updatedAt: nowIso
+                };
+
+                profileState.isDeletingEval = false;
+                closeConfirmDeleteEvalModal();
+                recalculateAndRenderPointsAndHistory();
+                renderMyEvaluationsModalList();
+            } catch (err) {
+                console.warn('Delete evaluation error:', err);
+                profileState.isDeletingEval = false;
+                alert('刪除失敗，請檢查網路連線後再試一次。');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '確定刪除';
+                }
+            }
+        }
+        // ===================================================================
         // 訂閱使用者雲端資料 (user_profiles / evaluations / redemptions)
         // ===================================================================
         function subscribeUserCloudData(uid) {
@@ -2300,6 +2631,8 @@
                         evals.push({ id: doc.id, ...doc.data() });
                     });
                     profileState.evaluations = evals;
+                    recalculateAndRenderPointsAndHistory();
+                    renderMyEvaluationsModalList();
                     recalculateAndRenderPointsAndHistory();
                 }, (err) => {
                     console.warn('Evaluations listener error:', err);
@@ -2547,7 +2880,33 @@ document.getElementById('profileTpMenuMonsterDexBtn')?.addEventListener('click',
                     }
                 });
             }
+            // 3-2. 「我的評鑑」與「確定刪除提醒」彈窗開關綁定
+            const openMyEvaluationsBtn = document.getElementById('openMyEvaluationsModalBtn');
+            const myEvaluationsModal = document.getElementById('myEvaluationsModal');
+            const closeMyEvaluationsBtn = document.getElementById('closeMyEvaluationsModalBtn');
+            const confirmDeleteEvalModal = document.getElementById('confirmDeleteEvalModal');
 
+            openMyEvaluationsBtn?.addEventListener('click', () => {
+                renderMyEvaluationsModalList();
+                myEvaluationsModal?.classList.remove('hidden');
+            });
+            closeMyEvaluationsBtn?.addEventListener('click', () => {
+                myEvaluationsModal?.classList.add('hidden');
+            });
+            myEvaluationsModal?.addEventListener('click', (e) => {
+                if (e.target === myEvaluationsModal) {
+                    myEvaluationsModal.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('closeConfirmDeleteEvalBtn')?.addEventListener('click', closeConfirmDeleteEvalModal);
+            document.getElementById('cancelDeleteEvalBtn')?.addEventListener('click', closeConfirmDeleteEvalModal);
+            document.getElementById('confirmDeleteEvalSubmitBtn')?.addEventListener('click', executeDeleteMyEvaluation);
+            confirmDeleteEvalModal?.addEventListener('click', (e) => {
+                if (e.target === confirmDeleteEvalModal) {
+                    closeConfirmDeleteEvalModal();
+                }
+            });
             // 4. 「獎品窗戶」Hover 粉紅店員探頭動畫 & 點擊開啟「兌換商店 - 獎品專區」Popup
             const prizeWindowHitBtn = document.getElementById('prizeWindowHitBtn');
             const prizeLabelBtn = document.getElementById('prizeLabelBtn');
