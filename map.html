@@ -179,6 +179,7 @@
         @media (max-width: 767px) {
             .squat-toilet-shell {
                 width: min(90vw, 396px) !important;
+                height: auto !important;
                 margin-left: auto;
                 margin-right: auto;
                 padding-top: 28px !important;
@@ -190,6 +191,7 @@
             .squat-toilet-map-well {
                 width: 100%;
                 height: 360px !important;
+                flex-shrink: 0 !important;
                 border-radius: 0px !important;
                 border-width: 0px !important;
             }
@@ -1455,10 +1457,10 @@
                 `;
 
              return `
-              <div class="${isMobileInline ? 'w-full' : 'w-[296px]'} select-none font-['jf-openhuninn','Varela_Round','Kosugi_Maru','Noto_Sans_TC',sans-serif]" onclick="event.stopPropagation()">
-                  <div class="poopgle-popup-card bg-[#FFF9EC] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
-                      <div class="relative px-7 py-2 bg-[#FFF9EC] flex items-center justify-center border-b-[2px]" style="border-bottom-color: ${themeMainHex};">
-                          <h3 class="text-[#2A348C] text-[17px] font-black tracking-wider text-center leading-snug truncate m-0">
+              <div class="${isMobileInline ? 'w-full h-auto' : 'w-[296px] h-auto'} select-none font-['jf-openhuninn','Varela_Round','Kosugi_Maru','Noto_Sans_TC',sans-serif]" onclick="event.stopPropagation()">
+                  <div class="poopgle-popup-card h-auto bg-[#FFF9EC] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
+                      <div class="relative ${isMobileInline ? 'px-3.5 py-2.5' : 'pl-4 pr-8 py-2.5'} h-auto bg-[#FFF9EC] flex items-center justify-center border-b-[2px]" style="border-bottom-color: ${themeMainHex};">
+                          <h3 class="w-full min-w-0 text-[#2A348C] text-[17px] font-black tracking-wider text-center leading-snug whitespace-normal break-words [overflow-wrap:anywhere] m-0">
                               ${escapeHtml(toilet.name)}
                           </h3>
                           ${isMobileInline ? '' : `

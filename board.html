@@ -647,7 +647,7 @@
         }
 
         /* ========================================================= */
-        /* 粉紅小鳥「打瞌睡模式 (鳥-32)」與「嚇醒跌下馬桶」互動動畫     */
+        /* 粉紅小鳥「打瞌睡模式 (鳥-32)」與「眨眨眼＋不耐煩」互動動畫   */
         /* ========================================================= */
         #pinkBirdSleepLayer {
             display: none;
@@ -668,62 +668,84 @@
             cursor: var(--cursor-hover) !important;
         }
 
+        /* 鎖定 SVG 局部變形原點，確保電腦版與手機版縮放零偏移 */
+        #sleepBirdMover,
+        #sleepBirdAnnoyMark {
+            transform-box: view-box;
+            transform-origin: 0px 0px;
+        }
+
         /* 打瞌睡待機：托腮輕微點頭呼吸 */
         @keyframes sleepBirdDozeNod {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50%      { transform: translateY(2.2px) rotate(1.4deg); }
-        }
-        #sleepBirdMover {
-            transform-origin: 154.6px 265px;
+            0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+            50%      { transform: translate(0px, 2.2px) rotate(1.4deg); }
         }
         #pinkBirdCharacterGroup.is-sleep-mode.is-dozing #sleepBirdMover {
             animation: sleepBirdDozeNod 2.6s ease-in-out infinite;
         }
 
-        /* 嚇醒表情預設隱藏 */
-        #sleepBirdStartledEyes,
-        #sleepBirdShockMouth,
-        #sleepBirdShockTicks {
+        /* 睜眼、不耐煩半瞇眼瞼、撇嘴與青筋預設隱藏 */
+        #sleepBirdAwakeEyes,
+        #sleepBirdAnnoyedLids,
+        #sleepBirdAnnoyedMouth,
+        #sleepBirdAnnoyMark {
             opacity: 0;
             pointer-events: none;
         }
-        #sleepBirdCheekHandFlail {
-            transform-origin: 235px 150px;
-            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+
+        /* 1.55 秒序列：眨眨眼兩下 (0%~37%) -> 半瞇死魚眼＋撇嘴不耐煩瞪人 (38%~100%) */
+        @keyframes sleepBlinkToOpenEyes {
+            0%, 6.9%    { opacity: 0; }
+            7%, 15.9%   { opacity: 1; } /* 眨眼睜開 1 */
+            16%, 21.9%  { opacity: 0; } /* 閉眼 1 */
+            22%, 30.9%  { opacity: 1; } /* 眨眼睜開 2 */
+            31%, 37.9%  { opacity: 0; } /* 閉眼 2 */
+            38%, 100%   { opacity: 1; } /* 維持睜眼底層（搭配半瞇眼瞼） */
         }
-        #sleepBirdLapHandFlail {
-            transform-origin: 115px 255px;
-            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+        @keyframes sleepBlinkClosedLines {
+            0%, 6.9%    { opacity: 1; }
+            7%, 15.9%   { opacity: 0; }
+            16%, 21.9%  { opacity: 1; }
+            22%, 30.9%  { opacity: 0; }
+            31%, 37.9%  { opacity: 1; }
+            38%, 100%   { opacity: 0; }
+        }
+        @keyframes sleepAnnoyedHalfLids {
+            0%, 37.9%   { opacity: 0; }
+            38%, 100%   { opacity: 1; } /* 壓下半睜死魚眼瞼與不耐煩撇嘴 */
+        }
+        @keyframes sleepCalmMouthHide {
+            0%, 37.9%   { opacity: 1; }
+            38%, 100%   { opacity: 0; }
+        }
+        @keyframes sleepAnnoyMarkPop {
+            0%, 39%     { opacity: 0; transform: scale(0) rotate(-18deg); }
+            52%         { opacity: 1; transform: scale(1.22) rotate(6deg); }
+            62%, 100%   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        @keyframes sleepAnnoyedSighBody {
+            0%, 37%     { transform: translate(0px, 0px) rotate(0deg); }
+            52%, 100%   { transform: translate(-1.5px, 2.2px) rotate(-3.2deg); }
         }
 
-        /* 點擊小鳥：嚇醒跳起 ➔ 重心不穩滑落跌下馬桶 ➔ 落地小彈跳 */
-        @keyframes sleepBirdFallOffToilet {
-            0%   { transform: translate(0px, 0px) rotate(0deg); }
-            18%  { transform: translate(-4px, -22px) rotate(-10deg); }
-            34%  { transform: translate(10px, -6px) rotate(18deg); }
-            74%  { transform: translate(26px, 214px) rotate(56deg); }
-            88%  { transform: translate(28px, 196px) rotate(50deg); }
-            100% { transform: translate(30px, 212px) rotate(58deg); }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdAwakeEyes {
+            animation: sleepBlinkToOpenEyes 1.55s linear forwards;
         }
-
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdMover {
-            transform-origin: 154.6px 195px;
-            animation: sleepBirdFallOffToilet 0.66s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdClosedEyes {
+            animation: sleepBlinkClosedLines 1.55s linear forwards;
         }
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdClosedEyes,
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdCalmMouth {
-            opacity: 0 !important;
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdAnnoyedLids,
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdAnnoyedMouth {
+            animation: sleepAnnoyedHalfLids 1.55s linear forwards;
         }
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdStartledEyes,
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdShockMouth,
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdShockTicks {
-            opacity: 1;
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdCalmMouth {
+            animation: sleepCalmMouthHide 1.55s linear forwards;
         }
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdCheekHandFlail {
-            transform: translate(14px, -22px) rotate(24deg);
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdAnnoyMark {
+            animation: sleepAnnoyMarkPop 1.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdLapHandFlail {
-            transform: translate(-22px, -32px) rotate(-28deg);
+        #pinkBirdCharacterGroup.is-sleep-mode.is-waking-annoyed #sleepBirdMover {
+            animation: sleepAnnoyedSighBody 1.55s ease-out forwards;
         }
     </style>
 </head>
@@ -1580,11 +1602,11 @@
                 </svg>
             </div>
 
-            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊橫向並排 ＋ 中央公廁名稱與四顆星等 -->
+            <!-- 頂部資訊列：左上「變更公廁＋返回」（手機橫排／電腦上下排列）＋ 中央公廁名稱與四顆星等 -->
             <div class="relative z-10 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0">
-                <div class="flex items-start justify-start gap-2 lg:pointer-events-none">
-                    <!-- 左上角：變更公廁（左）＋ 返回鍵（右） -->
-                    <div class="relative flex flex-row items-center gap-2 sm:gap-2.5 shrink-0 lg:pointer-events-auto z-20">
+                <div class="flex items-start justify-start gap-2 md:pointer-events-none">
+                    <!-- 左上角：手機版左右並排，電腦版「返回」擺在「變更公廁」下方 -->
+                    <div class="relative flex flex-row md:flex-col items-center md:items-start gap-2 sm:gap-2.5 shrink-0 md:pointer-events-auto z-20">
                         <button id="openChangeToiletModalBtn" type="button"
                                 class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
                             變更公廁
@@ -1597,7 +1619,7 @@
                 </div>
 
                 <!-- 中央：目前公廁標題（後方加上 1/2 字型大小的 |留言板）＋ 四項圓潤星星評分 -->
-                <div class="mt-3 lg:-mt-[38px] flex flex-col items-center text-center px-2 lg:px-[325px]">
+                <div class="mt-3 md:-mt-[86px] flex flex-col items-center text-center px-2 md:px-[165px]">
                     <h1 class="text-[#2A348C] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
                         <span id="mbCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|留言板</span>
                     </h1>
@@ -1789,10 +1811,10 @@
                 <!-- 由 JS 動態生成 24 小時內出現的散步小怪 -->
             </div>
 
-            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊橫向並排 ＋ 中央「公廁名稱|小怪板」與四顆星等 -->
+            <!-- 頂部資訊列：左上「變更公廁＋返回」（手機橫排／電腦上下排列）＋ 中央「公廁名稱|小怪板」與四顆星等 -->
             <div class="relative z-20 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0 pointer-events-none">
                 <div class="flex items-start justify-start gap-2">
-                    <div id="mkTopLeftBtnsBox" class="relative flex flex-row items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto z-20">
+                    <div id="mkTopLeftBtnsBox" class="relative flex flex-row md:flex-col items-center md:items-start gap-2 sm:gap-2.5 shrink-0 pointer-events-auto z-20">
                         <button id="openChangeToiletFromMonsterBtn" type="button"
                                 class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
                             變更公廁
@@ -1804,7 +1826,7 @@
                     </div>
                 </div>
 
-                <div class="mt-3 lg:-mt-[38px] flex flex-col items-center text-center px-2 lg:px-[325px]">
+                <div class="mt-3 md:-mt-[86px] flex flex-col items-center text-center px-2 md:px-[165px]">
                     <div id="mkTopCenterHeaderBox" class="inline-flex flex-col items-center">
                         <h1 class="text-[#2A348C] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
                             <span id="mkCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|小怪板</span>
@@ -3126,11 +3148,12 @@
             // ===============================================================
             // 🔊 音效音量微調設定區（數值範圍：0.0 靜音 ～ 1.0 最大聲）
             // ===============================================================
-            const BIRD_GAME_LOOP_VOLUME   = 0.1; // 小鳥打電動背景循環音 (sfx/game.mp3)
+            const BIRD_GAME_LOOP_VOLUME   = 0.1;  // 小鳥打電動背景循環音 (sfx/game.mp3)
             const BIRD_GUITAR_LOOP_VOLUME = 0.28; // 小鳥彈吉他背景循環音 (sfx/guitar.mp3)
             const BIRD_ANGRY_VOLUME       = 0.85; // 按下打電動小鳥生氣音效 (sfx/bird_angry.mp3)
             const STRING_BROKE_VOLUME     = 0.90; // 按下彈吉他小鳥斷弦音效 (sfx/string_broke.mp3)
             const DOOR_SLAM_VOLUME        = 0.90; // 小鳥關門音效 (sfx/door_slam.mp3)
+            const BIRD_BLINK_VOLUME       = 0.85; // 小鳥眨眼醒來音效 (sfx/blink.mp3)
 
             const clampVolume = (v) => Math.min(1, Math.max(0, Number(v) || 0));
 
@@ -3139,6 +3162,7 @@
             let birdAngryAudio = null;
             let stringBrokeAudio = null;
             let doorSlamAudio = null;
+            let birdBlinkAudio = null;
 
             let currentBirdActivity = 'gaming'; // 'gaming' 預設打電動 <-> 'guitar' 彈吉他
             let shouldBirdBgLoopPlay = false;
@@ -3169,8 +3193,14 @@
                 doorSlamAudio.preload = 'none';
                 doorSlamAudio.addEventListener('error', () => { doorSlamAudio = null; });
 
+                birdBlinkAudio = new Audio('./sfx/blink.mp3');
+                birdBlinkAudio.preload = 'none';
+                birdBlinkAudio.addEventListener('error', () => { birdBlinkAudio = null; });
+
+            
+
                 introAssetsReadyPromise.then(() => {
-                    [birdGameLoopAudio, birdGuitarLoopAudio, birdAngryAudio, stringBrokeAudio, doorSlamAudio].forEach((aud) => {
+                    [birdGameLoopAudio, birdGuitarLoopAudio, birdAngryAudio, stringBrokeAudio, doorSlamAudio, birdBlinkAudio].forEach((aud) => {
                         if (!aud) return;
                         aud.preload = 'auto';
                         if (aud.readyState === 0 && aud.paused) {
@@ -3418,78 +3448,89 @@
                     pinkBirdCharacterGroup.appendChild(guitarLayer);
                 }
 
-                // 一併掛載「鳥-32.svg」打瞌睡與嚇醒跌落圖層
+                // 一併掛載「鳥-32.svg」打瞌睡、眨眨眼與不耐煩表情圖層
                 if (!document.getElementById('pinkBirdSleepLayer')) {
                     const sleepLayer = document.createElementNS(svgNs, 'g');
                     sleepLayer.setAttribute('id', 'pinkBirdSleepLayer');
                     sleepLayer.innerHTML = `
                         <g id="pinkBirdSleepAlignGroup">
-                            <g id="sleepBirdMover">
-                                <!-- 粉紅小鳥身體主輪廓 -->
-                                <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
-                                      d="M227.3,140.3c2.6-7.7,4-15.8,4-24.3c0-15.9-5-31.5-14.1-44.4c-4.6-6.5-10.2-12.2-16.5-17c-6.2-4.7-12.3-9.1-20.1-10.8c-0.9-0.2-2.7-0.3-2.6-1.6c0.1-1.1,0.9-2.2,1-3.4c0.1-1.2,0-2.4-0.4-3.6c-0.6-1.7-1.9-3.2-3.4-4.1c-1.8-1-3.4,0-5.2,0.1c-0.5-2-1.1-3.7-2.6-5.2c-1.4-1.4-3.5-2.2-5.4-1.9c-2,0.3-3.8,1.7-4.3,3.6c-1.2-1.8-1.8-3.9-3-5.7c-1.1-1.8-2.5-3.4-4-4.9c-3.4-3.3-7.2-4.4-11.8-4.7c-2.9-0.2-5.9-0.1-8.7,1c-5,1.9-8.7,6.6-9.3,11.9c-0.6,5.3,2,10.8,6.4,13.7c0.8,0.6,1.7,1,2.4,1.8c0.7,0.8,1,1.9,0.6,2.8c-3,0.5-6.1,1.7-8.8,3c-6.3,3-12.1,6.8-17.3,11.4c-16.7,14.5-26.4,35.9-26.4,58c0,8.5,1.4,16.7,4,24.3c-29.7,6.8-52,33.5-52,65.1c0,36.7,30.1,66.8,66.8,66.8h116.3c36.8,0,66.8-30.1,66.8-66.8C279.4,173.7,257,147,227.3,140.3z"/>
-
-                                <!-- 雙腳（位於身體前方） -->
-                                <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
-                                      d="M131,320.9L131,320.9c-7.2-1.3-12-8.1-10.7-15.3l7.1-40.2c1.3-7.2,8.1-12,15.3-10.7l0,0c7.2,1.3,12,8.1,10.7,15.3l-7.1,40.2C145,317.3,138.1,322.1,131,320.9z"/>
-                                <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
-                                      d="M177.8,320.9L177.8,320.9c-7.2,1.3-14-3.6-15.3-10.7l-7.1-40.2c-1.3-7.2,3.6-14,10.7-15.3h0c7.2-1.3,14,3.6,15.3,10.7l7.1,40.2C189.8,312.7,185,319.6,177.8,320.9z"/>
-
-                                <!-- 頭頂捲毛 -->
-                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
-                                      d="M130.1,42.9c-4.2,3.4-6,9.4-4.4,14.6c0.7,2.2,1.9,4.1,3.6,5.7c2.4,2.2,5.5,3.5,8.8,3.6c3.2,0.1,6.5-1.1,8.9-3.2c2-1.7,3.5-4,3.9-6.6c0.4-2.6-0.4-5.4-2.3-7.1c-0.9-0.9-2.1-1.5-3.4-1.5c-1.3,0-2.5,0.8-2.9,2s0.4,2.7,1.6,2.9"/>
-
-                                <!-- 托腮右手（自然遮蓋右側脖子凹角，位於眼鏡框下層） -->
-                                <g id="sleepBirdCheekHandFlail">
-                                    <g transform="translate(26.5, -43.8)">
+                            <g transform="translate(154.6, 265)">
+                                <g id="sleepBirdMover">
+                                    <g transform="translate(-154.6, -265)">
+                                        <!-- 粉紅小鳥身體主輪廓 -->
                                         <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
-                                              d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
+                                              d="M227.3,140.3c2.6-7.7,4-15.8,4-24.3c0-15.9-5-31.5-14.1-44.4c-4.6-6.5-10.2-12.2-16.5-17c-6.2-4.7-12.3-9.1-20.1-10.8c-0.9-0.2-2.7-0.3-2.6-1.6c0.1-1.1,0.9-2.2,1-3.4c0.1-1.2,0-2.4-0.4-3.6c-0.6-1.7-1.9-3.2-3.4-4.1c-1.8-1-3.4,0-5.2,0.1c-0.5-2-1.1-3.7-2.6-5.2c-1.4-1.4-3.5-2.2-5.4-1.9c-2,0.3-3.8,1.7-4.3,3.6c-1.2-1.8-1.8-3.9-3-5.7c-1.1-1.8-2.5-3.4-4-4.9c-3.4-3.3-7.2-4.4-11.8-4.7c-2.9-0.2-5.9-0.1-8.7,1c-5,1.9-8.7,6.6-9.3,11.9c-0.6,5.3,2,10.8,6.4,13.7c0.8,0.6,1.7,1,2.4,1.8c0.7,0.8,1,1.9,0.6,2.8c-3,0.5-6.1,1.7-8.8,3c-6.3,3-12.1,6.8-17.3,11.4c-16.7,14.5-26.4,35.9-26.4,58c0,8.5,1.4,16.7,4,24.3c-29.7,6.8-52,33.5-52,65.1c0,36.7,30.1,66.8,66.8,66.8h116.3c36.8,0,66.8-30.1,66.8-66.8C279.4,173.7,257,147,227.3,140.3z"/>
+
+                                        <!-- 雙腳（位於身體前方） -->
+                                        <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
+                                              d="M131,320.9L131,320.9c-7.2-1.3-12-8.1-10.7-15.3l7.1-40.2c1.3-7.2,8.1-12,15.3-10.7l0,0c7.2,1.3,12,8.1,10.7,15.3l-7.1,40.2C145,317.3,138.1,322.1,131,320.9z"/>
+                                        <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
+                                              d="M177.8,320.9L177.8,320.9c-7.2,1.3-14-3.6-15.3-10.7l-7.1-40.2c-1.3-7.2,3.6-14,10.7-15.3h0c7.2-1.3,14,3.6,15.3,10.7l7.1,40.2C189.8,312.7,185,319.6,177.8,320.9z"/>
+
+                                        <!-- 頭頂捲毛 -->
+                                        <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                              d="M130.1,42.9c-4.2,3.4-6,9.4-4.4,14.6c0.7,2.2,1.9,4.1,3.6,5.7c2.4,2.2,5.5,3.5,8.8,3.6c3.2,0.1,6.5-1.1,8.9-3.2c2-1.7,3.5-4,3.9-6.6c0.4-2.6-0.4-5.4-2.3-7.1c-0.9-0.9-2.1-1.5-3.4-1.5c-1.3,0-2.5,0.8-2.9,2s0.4,2.7,1.6,2.9"/>
+
+                                        <!-- 微向右傾的五官與圓框眼鏡（對應 鳥-32.svg 角度） -->
+                                        <g transform="translate(4.8, -2.6) rotate(9.5, 154.6, 114.3)">
+                                            <!-- 打瞌睡閉眼弧線 -->
+                                            <g id="sleepBirdClosedEyes">
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9-8.3,23.4-18.5,23.4c-7.9,0-14.6-6.2-17.3-14.9"/>
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9,8.3,23.4,18.5,23.4c7.9,0,14.6-6.2,17.3-14.9"/>
+                                            </g>
+
+                                            <!-- 眨眼時的睜眼底層 -->
+                                            <g id="sleepBirdAwakeEyes">
+                                                <ellipse transform="matrix(0.1562 -0.9877 0.9877 0.1562 -0.0839 233.5289)" fill="#FFF9EC" cx="136.6" cy="116.8" rx="23.7" ry="19.4"/>
+                                                <ellipse transform="matrix(0.9877 -0.1562 0.1562 0.9877 -16.1319 28.3799)" fill="#FFF9EC" cx="172.5" cy="116.8" rx="19.4" ry="23.7"/>
+                                                <ellipse fill="#2A348C" cx="140.3" cy="124.1" rx="12" ry="14.7"/>
+                                                <ellipse fill="#2A348C" cx="168.8" cy="124.1" rx="12" ry="14.7"/>
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9-8.3,23.4-18.5,23.4c-7.9,0-14.6-6.2-17.3-14.9"/>
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9,8.3,23.4,18.5,23.4c7.9,0,14.6-6.2,17.3-14.9"/>
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,107.5c0-7.9-7.5-14.3-16.7-14.3c-7.1,0-13.1,3.8-15.5,9.1"/>
+                                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,107.5c0-7.9,7.5-14.3,16.7-14.3c7.1,0,13.1,3.8,15.5,9.1"/>
+                                            </g>
+
+                                            <!-- 不耐煩半瞇死魚眼瞼遮罩（位於眼鏡框下層，遮住上半眼白與瞳孔） -->
+                                            <g id="sleepBirdAnnoyedLids">
+                                                <path d="M 114,120.2 L 154.6,123.2 L 195.2,120.2 L 195.2,90 L 114,90 Z" fill="#FF99D3" />
+                                                <path d="M 116.5,120.2 L 154.6,123.2 L 192.7,120.2" fill="none" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                            </g>
+
+                                            <!-- 黃色鳥喙：平靜嘴線 vs 不耐煩下垂撇嘴 -->
+                                            <circle fill="#F3EF84" cx="154.6" cy="152.5" r="9.8"/>
+                                            <path id="sleepBirdCalmMouth" fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10"
+                                                  d="M166.4,151.6c0,1.6-5.4,2.8-12,2.8c-6.6,0-12-1.2-12-2.8"/>
+                                            <path id="sleepBirdAnnoyedMouth" fill="none" stroke="#2A348C" stroke-width="1.3" stroke-linecap="round"
+                                                  d="M 143.5,154.8 Q 154.6,149.2 165.7,154.8"/>
+
+                                            <!-- 圓框眼鏡與鏡腳 -->
+                                            <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="125.2" cy="114.3" rx="29.4" ry="30.8"/>
+                                            <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="184.1" cy="114.3" rx="29.4" ry="30.8"/>
+                                            <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M95.4,112.8H85c-0.8,1.2-1.4,2.8-1,4.1c0.4,1.2,1.7,2,2.9,1.7"/>
+                                            <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M213.4,112.8h10.4c0.8,1.2,1.4,2.8,1,4.1c-0.4,1.2-1.7,2-2.9,1.7"/>
+                                        </g>
+
+                                        <!-- 托腮右手（放在眼鏡圖層上方，手指自然貼合右鏡框下緣，還原 鳥-32.svg） -->
+                                        <g transform="translate(26.5, -43.8)">
+                                            <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                                  d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
+                                        </g>
+
+                                        <!-- 垂放在左腿前方的左手 -->
+                                        <g transform="translate(106.2, 256.5) rotate(192) translate(-214.8, -196)">
+                                            <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                                  d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
+                                        </g>
+
+                                        <!-- 不耐煩時額頭旁冒出的小青筋符號 -->
+                                        <g transform="translate(212, 58)">
+                                            <g id="sleepBirdAnnoyMark">
+                                                <path d="M -2.6,-9.5 Q -2.6,-2.6 -9.5,-2.6 M 2.6,-9.5 Q 2.6,-2.6 9.5,-2.6 M -2.6,9.5 Q -2.6,2.6 -9.5,2.6 M 2.6,9.5 Q 2.6,2.6 9.5,2.6"
+                                                      fill="none" stroke="#F26559" stroke-width="2.8" stroke-linecap="round" />
+                                            </g>
+                                        </g>
                                     </g>
-                                </g>
-
-                                <!-- 微向右傾的五官與圓框眼鏡（對應 鳥-32.svg 角度） -->
-                                <g transform="translate(4.8, -2.6) rotate(9.5, 154.6, 114.3)">
-                                    <!-- 打瞌睡閉眼弧線 -->
-                                    <g id="sleepBirdClosedEyes">
-                                        <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9-8.3,23.4-18.5,23.4c-7.9,0-14.6-6.2-17.3-14.9"/>
-                                        <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9,8.3,23.4,18.5,23.4c7.9,0,14.6-6.2,17.3-14.9"/>
-                                    </g>
-
-                                    <!-- 嚇醒瞬間瞪大雙眼 -->
-                                    <g id="sleepBirdStartledEyes">
-                                        <ellipse transform="matrix(0.1562 -0.9877 0.9877 0.1562 -0.0839 233.5289)" fill="#FFF9EC" cx="136.6" cy="116.8" rx="23.7" ry="19.4"/>
-                                        <ellipse transform="matrix(0.9877 -0.1562 0.1562 0.9877 -16.1319 28.3799)" fill="#FFF9EC" cx="172.5" cy="116.8" rx="19.4" ry="23.7"/>
-                                        <ellipse fill="#2A348C" cx="141.2" cy="122.5" rx="5.8" ry="7.2"/>
-                                        <ellipse fill="#2A348C" cx="167.8" cy="122.5" rx="5.8" ry="7.2"/>
-                                    </g>
-
-                                    <!-- 黃色鳥喙（打瞌睡平靜嘴線 vs 嚇醒張嘴） -->
-                                    <circle fill="#F3EF84" cx="154.6" cy="152.5" r="9.8"/>
-                                    <path id="sleepBirdCalmMouth" fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10"
-                                          d="M166.4,151.6c0,1.6-5.4,2.8-12,2.8c-6.6,0-12-1.2-12-2.8"/>
-                                    <ellipse id="sleepBirdShockMouth" cx="154.6" cy="153.6" rx="5.2" ry="6.8"
-                                             fill="#F26559" stroke="#2A348C" stroke-width="1.3"/>
-
-                                    <!-- 圓框眼鏡與鏡腳 -->
-                                    <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="125.2" cy="114.3" rx="29.4" ry="30.8"/>
-                                    <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="184.1" cy="114.3" rx="29.4" ry="30.8"/>
-                                    <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M95.4,112.8H85c-0.8,1.2-1.4,2.8-1,4.1c0.4,1.2,1.7,2,2.9,1.7"/>
-                                    <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M213.4,112.8h10.4c0.8,1.2,1.4,2.8,1,4.1c-0.4,1.2-1.7,2-2.9,1.7"/>
-                                </g>
-
-                                <!-- 垂放在左腿前方的左手 -->
-                                <g id="sleepBirdLapHandFlail">
-                                    <g transform="translate(106.2, 256.5) rotate(192) translate(-214.8, -196)">
-                                        <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
-                                              d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
-                                    </g>
-                                </g>
-
-                                <!-- 嚇醒瞬間頭頂驚嚇紅線 -->
-                                <g id="sleepBirdShockTicks" stroke="#F26559" stroke-width="2.6" stroke-linecap="round">
-                                    <line x1="76" y1="62" x2="64" y2="50"/>
-                                    <line x1="154" y1="6" x2="154" y2="-9"/>
-                                    <line x1="233" y1="62" x2="245" y2="50"/>
                                 </g>
                             </g>
                         </g>
@@ -3664,13 +3705,22 @@
                     }, 620);
 
                 } else {
-                    // 【階段 C：目前在打瞌睡】-> 嚇醒跌下馬桶 -> 關門 -> 開門變回打電動
+                    // 【階段 C：目前在打瞌睡】-> 眨眨眼 (blink.mp3) -> 露出很不耐煩表情 -> 關門 -> 開門變回打電動
                     stopBirdGameLoop();
-                    playBoardSfx(birdAngryAudio, BIRD_ANGRY_VOLUME);
                     pinkBirdCharacterGroup.classList.remove('is-dozing');
-                    pinkBirdCharacterGroup.classList.add('is-busy', 'is-falling-off');
+                    pinkBirdCharacterGroup.classList.add('is-busy', 'is-waking-annoyed');
 
-                    // 停留 720ms 完整呈現嚇醒跳起與滑落跌下馬桶動畫，接著關門
+                    // 1. 配合兩次眨眼播放 sfx/blink.mp3
+                    setTimeout(() => {
+                        playBoardSfx(birdBlinkAudio, BIRD_BLINK_VOLUME);
+                    }, 100);
+                    setTimeout(() => {
+                        if (birdBlinkAudio && birdBlinkAudio.ended) {
+                            playBoardSfx(birdBlinkAudio, BIRD_BLINK_VOLUME);
+                        }
+                    }, 340);
+
+                    // 2. 眨完眼後維持不耐煩死魚眼瞪人，至 1550ms 用力關門
                     setTimeout(() => {
                         const slamEase = (t) => 0.35 * t * t + 0.65 * t * t * t;
                         animateMiddleDoor(0, 1, 250, slamEase, () => {
@@ -3682,9 +3732,9 @@
                                 middleDoorSlamShakeGroup.classList.add('is-slam-shaking');
                             }
 
-                            // 關門期間爬回馬桶上，換回打電動待機姿勢
+                            // 關門期間收起打瞌睡圖層，換回打電動待機姿勢
                             setTimeout(() => {
-                                pinkBirdCharacterGroup.classList.remove('is-falling-off', 'is-dozing', 'is-sleep-mode');
+                                pinkBirdCharacterGroup.classList.remove('is-waking-annoyed', 'is-dozing', 'is-sleep-mode');
                                 if (birdConsoleMotionGroup) {
                                     birdConsoleMotionGroup.style.transform = '';
                                 }
@@ -3703,7 +3753,7 @@
                                 });
                             }, 900);
                         });
-                    }, 720);
+                    }, 1550);
                 }
             });
 

@@ -995,7 +995,7 @@
          transform-box: view-box;
          transform-origin: 720px 153px;
          will-change: transform, opacity;
-         animation: stageLogoPopIn 0.56s cubic-bezier(0.34, 1.56, 0.64, 1) 0.02s both;
+         animation: stageLogoPopIn 0.56s cubic-bezier(0.34, 1.56, 0.64, 1) 1.26s both;
      }
      .logo-entrance-wrapper.mobile-logo-origin {
          transform-origin: 0px 0px;
@@ -3438,7 +3438,7 @@
             let activeHoverZone = null;
             let toiletCloseTimer = null;
 
-            const stageInitTime = performance.now();
+        const stageInitTime = performance.now();
          const MIN_TOILET_SOLO_MS = 380; // 讓馬桶先單獨呈現在正中間 0.38 秒，再觸發其他元素動畫
          let hasRevealedStage = false;
          window.__revealHomeStage = () => {
@@ -3467,7 +3467,7 @@
                                  el.classList.remove('personal-entrance-wrapper', 'mobile-personal-origin');
                              });
                              document.getElementById('trashCockroachPeekGroup')?.classList.remove('roach-initial-delay');
-                         }, 1600);
+                         }, 2100);
                      });
                  });
              }, waitMs);
