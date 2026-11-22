@@ -4344,6 +4344,16 @@
                 return `${hh}:${mm}`;
             }
 
+            function formatChatDateMMDD(rawTime) {
+                const ms = toEpochMs(rawTime);
+                if (!ms) return '';
+                const d = new Date(ms);
+                if (Number.isNaN(d.getTime())) return '';
+                const mo = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${mo}/${dd}`;
+            }
+
             function getBoardToiletStats(toiletName) {
                 const cleanName = String(toiletName || '').trim();
                 if (!cleanName) return null;
@@ -4375,10 +4385,12 @@
                     const msg = String(r.comment ?? r.commentText ?? r.content ?? '').trim();
                     if (msg.length > 0) {
                         const uniqueDocKey = r._docId || r.id || r.evalId || `${cleanName}_${idx}`;
+                        const rawTs = r.updatedAt || r.createdAt || r.timestamp;
                         textComments.push({
                             id: `${uniqueDocKey}__${msg}`,
                             text: msg,
-                            timestamp: formatChatTimeHHMM(r.updatedAt || r.createdAt || r.timestamp)
+                            datestamp: formatChatDateMMDD(rawTs),
+                            timestamp: formatChatTimeHHMM(rawTs)
                         });
                     }
                 });
@@ -4592,9 +4604,16 @@
                     </div>
                 `;
 
-                // 左邊對話框：時間在膠囊右側下方與膠囊切齊；右邊對話框：時間在膠囊左邊與膠囊切齊
-                const timeHtml = safeTime
-                    ? `<span class="text-[#2A348C] text-[12px] sm:text-[16px] font-black tracking-[0.14em] leading-none whitespace-nowrap pb-[2px] select-none shrink-0 ${side === 'left' ? 'ml-2.5 sm:ml-3.5' : 'mr-2.5 sm:mr-3.5'}">${safeTime}</span>`
+                // 左邊對話框：半透明日期與時間在膠囊右側切齊；右邊對話框：半透明日期與時間在膠囊左側切齊
+                const safeDate = escapeHtmlBoard(commentObj.datestamp || '');
+                const metaAlignClass = (side === 'left')
+                    ? 'ml-2.5 sm:ml-3.5 items-start text-left'
+                    : 'mr-2.5 sm:mr-3.5 items-end text-right';
+                const timeHtml = (safeDate || safeTime)
+                    ? `<div class="flex flex-col ${metaAlignClass} gap-1 sm:gap-1.5 pb-[2px] select-none shrink-0">
+                        ${safeDate ? `<span class="text-[#2A348C]/50 text-[11px] sm:text-[13.5px] font-extrabold tracking-[0.12em] leading-none whitespace-nowrap">${safeDate}</span>` : ''}
+                        ${safeTime ? `<span class="text-[#2A348C] text-[12px] sm:text-[16px] font-black tracking-[0.14em] leading-none whitespace-nowrap">${safeTime}</span>` : ''}
+                       </div>`
                     : '';
 
                 row.innerHTML = (side === 'left')
