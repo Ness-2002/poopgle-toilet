@@ -4427,8 +4427,63 @@
              }, 420);
          };
 
-         function playHomeClickSfx(onComplete) {
-             if (typeof onComplete === 'function') onComplete();
+         const homeBoopAudio = new Audio('./sfx/boop.mp3');
+         homeBoopAudio.preload = 'auto';
+         let homeBoopCleanup = null;
+
+         function playHomeClickSfx(onComplete, eventObj) {
+             const targetEl = eventObj && (eventObj.currentTarget || eventObj.target);
+             const isMainStageOption = Boolean(targetEl && typeof targetEl.closest === 'function' && targetEl.closest('main'));
+
+             if (!isMainStageOption) {
+                 if (typeof onComplete === 'function') onComplete();
+                 return;
+             }
+
+             if (typeof homeBoopCleanup === 'function') {
+                 homeBoopCleanup();
+                 homeBoopCleanup = null;
+             }
+
+             try {
+                 homeBoopAudio.pause();
+                 if (homeBoopAudio.readyState > 0) {
+                     homeBoopAudio.currentTime = 0;
+                 }
+             } catch (err) {}
+
+             let finished = false;
+             let safetyTimer = null;
+             const handleEnded = () => done();
+
+             function done() {
+                 if (finished) return;
+                 finished = true;
+                 if (safetyTimer) clearTimeout(safetyTimer);
+                 homeBoopAudio.removeEventListener('ended', handleEnded);
+                 homeBoopCleanup = null;
+                 if (typeof onComplete === 'function') onComplete();
+             }
+
+             if (typeof onComplete === 'function') {
+                 homeBoopAudio.addEventListener('ended', handleEnded, { once: true });
+                 safetyTimer = setTimeout(done, 420);
+                 homeBoopCleanup = () => {
+                     if (safetyTimer) clearTimeout(safetyTimer);
+                     homeBoopAudio.removeEventListener('ended', handleEnded);
+                 };
+             }
+
+             try {
+                 const playPromise = homeBoopAudio.play();
+                 if (playPromise && typeof playPromise.catch === 'function') {
+                     playPromise.catch(() => {
+                         done();
+                     });
+                 }
+             } catch (err) {
+                 done();
+             }
          }
 
             // 1. 點擊「公廁地圖」 -> 發光並跳轉至 ./map.html
@@ -4436,7 +4491,7 @@
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 playHomeClickSfx(() => {
                     window.location.href = './map.html';
-                });
+                }, e);
             };
             zoneMapTrashCan?.addEventListener('click', handleGoMap);
             document.getElementById('mobileZoneMapTrashCan')?.addEventListener('click', handleGoMap);
@@ -5386,7 +5441,7 @@
                 }
 
                 isStageTransitioning = true;
-                playHomeClickSfx();
+                playHomeClickSfx(null, e);
                 resetDoorWheelToStage01();
                 prewarmReportGpsAndData();
 
@@ -5721,7 +5776,7 @@
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 playHomeClickSfx(() => {
                     window.location.href = './board.html';
-                });
+                }, e);
             };
 
             // 跳轉至小怪圖鑑 ./handbook.html
@@ -5730,7 +5785,7 @@
                 if (e && e.currentTarget) triggerPressGlow(e.currentTarget);
                 playHomeClickSfx(() => {
                     window.location.href = './handbook.html';
-                });
+                }, e);
             };
 
             // 主頁馬桶內「公廁現況板」(電腦版與手機版) 跳轉 ./board.html
@@ -5760,9 +5815,9 @@
                 if (currentUser && currentUser.uid) {
                     playHomeClickSfx(() => {
                         window.location.href = './profile.html';
-                    });
+                    }, e);
                 } else {
-                    playHomeClickSfx();
+                    playHomeClickSfx(null, e);
                     pendingPersonalSpaceRedirect = true;
                     const statusText = document.getElementById('loginModalStatusText');
                     if (statusText) {

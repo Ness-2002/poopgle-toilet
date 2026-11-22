@@ -5530,23 +5530,144 @@ function clearLegacyDeviceReporterId() {
             document.getElementById('ratingMainStage')?.classList.remove('is-completed');
         }
 
-        async function convertUrlToDataUri(url) {
-            if (!url || url.startsWith('data:')) return url;
-            try {
-                const res = await fetch(url);
-                const blob = await res.blob();
-                return await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result || url);
-                    reader.onerror = () => resolve(url);
-                    reader.readAsDataURL(blob);
-                });
-            } catch (e) {
-                return url;
-            }
+        function traceExportRoundedRect(ctx, x, y, w, h, r) {
+            const radius = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + w, y, x + w, y + h, radius);
+            ctx.arcTo(x + w, y + h, x, y + h, radius);
+            ctx.arcTo(x, y + h, x, y, radius);
+            ctx.arcTo(x, y, x + w, y, radius);
+            ctx.closePath();
         }
 
+        function drawFittedImageOnCanvas(ctx, img, boxX, boxY, boxW, boxH, alignY = 'mid') {
+            if (!img) return;
+            const natW = img.naturalWidth || img.width || boxW;
+            const natH = img.naturalHeight || img.height || boxH;
+            if (natW <= 0 || natH <= 0) return;
+
+            const scale = Math.min(boxW / natW, boxH / natH);
+            const drawW = natW * scale;
+            const drawH = natH * scale;
+            const drawX = boxX + (boxW - drawW) / 2;
+            const drawY = alignY === 'min' ? boxY : (boxY + (boxH - drawH) / 2);
+            ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        }
+
+        async function loadHtmlImageDecoded(src) {
+            return new Promise((resolve, reject) => {
+                if (!src) {
+                    reject(new Error('Empty image src'));
+                    return;
+                }
+                const img = new Image();
+                if (/^https?:\/\//i.test(src) && !src.startsWith(window.location.origin)) {
+                    img.crossOrigin = 'anonymous';
+                }
+                img.onload = async () => {
+                    try {
+                        if (typeof img.decode === 'function') {
+                            await img.decode();
+                        }
+                    } catch (e) {}
+                    resolve(img);
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        async function loadRenderableCardImage(url, fallbackDataUri = '') {
+            const isCanvasSafe = (img) => {
+                try {
+                    const testCvs = document.createElement('canvas');
+                    testCvs.width = 1;
+                    testCvs.height = 1;
+                    const testCtx = testCvs.getContext('2d');
+                    testCtx.drawImage(img, 0, 0, 1, 1);
+                    testCvs.toDataURL('image/png');
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            };
+
+            if (url && url.startsWith('data:')) {
+                try {
+                    return await loadHtmlImageDecoded(url);
+                } catch (e) {}
+            }
+
+            if (url && !url.startsWith('data:')) {
+                try {
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const buf = await res.arrayBuffer();
+                        let mime = (res.headers.get('content-type') || '').split(';')[0].trim();
+                        if (!mime || mime === 'application/octet-stream' || mime.startsWith('text/')) {
+                            if (/\.svg(\?|$)/i.test(url)) mime = 'image/svg+xml';
+                            else if (/\.jpe?g(\?|$)/i.test(url)) mime = 'image/jpeg';
+                            else if (/\.webp(\?|$)/i.test(url)) mime = 'image/webp';
+                            else mime = 'image/png';
+                        }
+                        const fixedBlob = new Blob([buf], { type: mime });
+                        const dataUri = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(fixedBlob);
+                        });
+                        if (typeof dataUri === 'string' && dataUri.startsWith('data:image/')) {
+                            return await loadHtmlImageDecoded(dataUri);
+                        }
+                    }
+                } catch (e) {}
+
+                try {
+                    const directImg = await loadHtmlImageDecoded(url);
+                    if (isCanvasSafe(directImg)) {
+                        return directImg;
+                    }
+                } catch (e) {}
+            }
+
+            if (fallbackDataUri) {
+                try {
+                    return await loadHtmlImageDecoded(fallbackDataUri);
+                } catch (e) {}
+            }
+            return null;
+        }
+
+        async function renderPureVectorSvgLayerToImage(innerMarkup, exportW, exportH, exportScale, withOuterBg = false) {
+            const svgStr = `
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                     width="${exportW * exportScale}" height="${exportH * exportScale}" viewBox="0 0 ${exportW} ${exportH}">
+                    <defs>
+                        <style>
+                            text { font-family: 'jf-openhuninn', 'Huninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif; }
+                            .hidden { display: none !important; }
+                            .chick-face-active { display: none !important; }
+                        </style>
+                        <clipPath id="cardSceneRoundedClip">
+                            <rect x="288" y="28" width="864" height="724" rx="34" />
+                        </clipPath>
+                    </defs>
+                    ${withOuterBg ? `<rect x="0" y="0" width="${exportW}" height="${exportH}" rx="40" fill="#FFF9EC" />` : ''}
+                    ${innerMarkup}
+                </svg>
+            `;
+            const svgDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+            return loadHtmlImageDecoded(svgDataUri);
+        }
+
+        let isDownloadingToiletCard = false;
+
         async function downloadToiletCardAsPng() {
+            if (isDownloadingToiletCard) return;
+            isDownloadingToiletCard = true;
+
             const btnTextEl = document.getElementById('downloadCardBtnText');
             const inlineBtnTextEl = document.getElementById('inlineDownloadCardBtnText');
             const mobileInlineBtnTextEl = document.getElementById('mobileInlineDownloadCardText');
@@ -5555,68 +5676,123 @@ function clearLegacyDeviceReporterId() {
             if (mobileInlineBtnTextEl) mobileInlineBtnTextEl.textContent = '產生中...';
 
             try {
+                populateCompletionCardStage();
+
                 const cardRootEl = document.getElementById('exportableToiletCardRoot');
                 if (!cardRootEl) return;
 
-                const clonedCardRoot = cardRootEl.cloneNode(true);
-                clonedCardRoot.setAttribute('transform', 'translate(-276, -16)');
-
-                const imageNodes = clonedCardRoot.querySelectorAll('image');
-                for (let i = 0; i < imageNodes.length; i++) {
-                    const imgNode = imageNodes[i];
-                    const rawHref = imgNode.getAttribute('href') || imgNode.getAttribute('xlink:href') || '';
-                    const inlineUri = await convertUrlToDataUri(rawHref);
-                    imgNode.setAttribute('href', inlineUri);
-                    imgNode.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', inlineUri);
-                }
-
                 const exportW = 888;
                 const exportH = 748;
-                const standaloneSvgStr = `
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                         width="${exportW * 2}" height="${exportH * 2}" viewBox="0 0 ${exportW} ${exportH}">
-                        <defs>
-                            <style>
-                                text { font-family: 'Huninn', 'jf-openhuninn', sans-serif; }
-                                .hidden { display: none !important; }
-                            </style>
-                            <clipPath id="cardSceneRoundedClip">
-                                <rect x="288" y="28" width="864" height="724" rx="34" />
-                            </clipPath>
-                        </defs>
-                        <rect x="0" y="0" width="${exportW}" height="${exportH}" rx="40" fill="#FFF9EC" />
-                        ${clonedCardRoot.outerHTML}
-                    </svg>
-                `;
+                const exportScale = 2;
+                const offsetX = -276;
+                const offsetY = -16;
 
-                const svgDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(standaloneSvgStr);
-                const img = new Image();
-                await new Promise((resolve, reject) => {
-                    img.onload = resolve;
-                    img.onerror = reject;
-                    img.src = svgDataUri;
+                // 1. 底層純向量背景（門板／小便斗背景，不含任何 image）
+                const bgClone = cardRootEl.cloneNode(true);
+                bgClone.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
+                bgClone.querySelectorAll('#cardSceneStallFg, #cardSceneUrinalFg, #cardToiletStampGroup, #cardStickyNoteGroup, #cardPlacedMonstersLayer, image').forEach((el) => el.remove());
+                Array.from(bgClone.children).find((el) => el.tagName.toLowerCase() === 'rect')?.remove();
+
+                // 2. 中層純向量前景（膝蓋與短褲／綠長褲與小雞、左上印章、右上便利貼，不含任何 image）
+                const fgClone = cardRootEl.cloneNode(true);
+                fgClone.setAttribute('transform', `translate(${offsetX}, ${offsetY})`);
+                Array.from(fgClone.firstElementChild?.children || []).find((el) => el.tagName.toLowerCase() === 'rect')?.remove();
+                fgClone.querySelectorAll('#cardSceneStallBg, #cardSceneUrinalBg, #cardPlacedMonstersLayer, image').forEach((el) => el.remove());
+                Array.from(fgClone.children).find((el) => el.tagName.toLowerCase() === 'rect')?.remove();
+
+                // 3. 預先載入並完整解碼所有圖層
+                const isUrinal = (currentSceneType === 'urinal');
+                const shoeUrl = isUrinal
+                    ? await resolveUrinalShoeImageUrl(currentUrinalShoeType)
+                    : await resolveStallShoeImageUrl(currentStallShoeType);
+                const shoeFallbackUri = isUrinal
+                    ? getUrinalShoeFallbackDataUri(currentUrinalShoeType)
+                    : getStallShoeFallbackDataUri(currentStallShoeType);
+
+                const [bgLayerImg, shoeImg, fgLayerImg, monsterImgs] = await Promise.all([
+                    renderPureVectorSvgLayerToImage(bgClone.outerHTML, exportW, exportH, exportScale, true),
+                    loadRenderableCardImage(shoeUrl, shoeFallbackUri),
+                    renderPureVectorSvgLayerToImage(fgClone.outerHTML, exportW, exportH, exportScale, false),
+                    Promise.all(placedMonstersState.map(async (m) => {
+                        const folder = m.folder || findMonsterCatalogInfo(m.id)?.folder || 'stall';
+                        const primaryUrl = m.url || await resolveMonsterImageUrl({ id: m.id, name: m.name, folder });
+                        const fallbackUri = getMonsterFallbackDataUri(m.id);
+                        return loadRenderableCardImage(primaryUrl, fallbackUri);
+                    }))
+                ]);
+
+                // 4. 依正確圖層順序直接合成至 Canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = exportW * exportScale;
+                canvas.height = exportH * exportScale;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(exportScale, exportScale);
+
+                // (A) 繪製底層場景背景
+                ctx.drawImage(bgLayerImg, 0, 0, exportW, exportH);
+
+                // (B) 在圓角裁切範圍內依序繪製：腳／鞋子 → 前景褲子／印章／便利貼 → 擺放的小怪
+                ctx.save();
+                traceExportRoundedRect(ctx, 288 + offsetX, 28 + offsetY, 864, 724, 34);
+                ctx.clip();
+
+                if (shoeImg) {
+                    if (isUrinal) {
+                        drawFittedImageOnCanvas(ctx, shoeImg, 614 + offsetX, 492 + offsetY, 212, 165, 'min');
+                    } else {
+                        drawFittedImageOnCanvas(ctx, shoeImg, 544 + offsetX, 492 + offsetY, 352, 242, 'mid');
+                    }
+                }
+
+                ctx.drawImage(fgLayerImg, 0, 0, exportW, exportH);
+
+                placedMonstersState.forEach((m, idx) => {
+                    const mImg = monsterImgs[idx];
+                    if (!mImg) return;
+                    const imgHalf = MONSTER_IMG_HALF * m.scale;
+                    ctx.save();
+                    ctx.translate(m.x + offsetX, m.y + offsetY);
+                    ctx.rotate((m.rotation * Math.PI) / 180);
+                    drawFittedImageOnCanvas(ctx, mImg, -imgHalf, -imgHalf, imgHalf * 2, imgHalf * 2, 'mid');
+                    ctx.restore();
                 });
 
-                const canvas = document.createElement('canvas');
-                canvas.width = exportW * 2;
-                canvas.height = exportH * 2;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
 
+                // (C) 繪製最上層深藍圓角外框線
+                traceExportRoundedRect(ctx, 288 + offsetX, 28 + offsetY, 864, 724, 34);
+                ctx.strokeStyle = '#2A348C';
+                ctx.lineWidth = 3.2;
+                ctx.stroke();
+
+                // 5. 輸出 PNG 並觸發下載
                 const safeToiletName = ((currentSelectedToilet && currentSelectedToilet.name) ? currentSelectedToilet.name : '公廁圖卡')
                     .replace(/[\\/:*?"<>|]/g, '_');
                 const fileName = `有所味_${safeToiletName}_${getFormattedTodayDate()}.png`;
 
-                const dataUrl = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = dataUrl;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+                if (blob) {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                } else {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = dataUrl;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             } catch (err) {
                 console.warn('Export card error:', err);
             } finally {
+                isDownloadingToiletCard = false;
                 if (btnTextEl) btnTextEl.textContent = '下載圖卡';
                 if (inlineBtnTextEl) inlineBtnTextEl.textContent = '下載圖卡';
                 if (mobileInlineBtnTextEl) mobileInlineBtnTextEl.textContent = '下載圖卡';
