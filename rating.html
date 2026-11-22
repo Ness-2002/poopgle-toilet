@@ -49,9 +49,9 @@
         :root {
             --poogle-cream: #FFF9EC;
             --poogle-yellow: #F3EF84;
-            --poogle-blue: #59E1FF;
+            --poogle-blue: #80E4FF;
             --poogle-pink: #FF99D3;
-            --poogle-green: #08F29A;
+            --poogle-green: #45E5AC;
             --poogle-ink: #2A348C;
         }
         * {
@@ -198,11 +198,11 @@
             fill: #FAF8BE;
         }
 
-        /* 天藍底按鈕 (下載圖卡)：#59E1FF -> #A3EEFF */
-        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn) .svg-action-inner [fill="#59E1FF"] {
-            fill: #59E1FF;
+        /* 天藍底按鈕 (下載圖卡)：#80E4FF -> #A3EEFF */
+        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn) .svg-action-inner [fill="#80E4FF"] {
+            fill: #80E4FF;
         }
-        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn):hover .svg-action-inner [fill="#59E1FF"] {
+        :is(#inlineDownloadCardBtn, #mobileInlineDownloadCardBtn, #downloadToiletCardBtn):hover .svg-action-inner [fill="#80E4FF"] {
             fill: #A3EEFF;
         }
 
@@ -216,11 +216,11 @@
             fill-opacity: 0.72;
         }
 
-        /* 珊瑚紅底按鈕 (編輯評鑑)：#FF5A4E -> #FF948C */
-        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn) .svg-action-inner [fill="#FF5A4E"] {
-            fill: #FF5A4E;
+        /* 珊瑚紅底按鈕 (編輯評鑑)：#F26559 -> #FF948C */
+        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn) .svg-action-inner [fill="#F26559"] {
+            fill: #F26559;
         }
-        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn):hover .svg-action-inner [fill="#FF5A4E"] {
+        :is(#inlineEditRatingBtn, #mobileInlineEditRatingBtn, #resultEditReportBtn):hover .svg-action-inner [fill="#F26559"] {
             fill: #FF948C;
         }
         .logo-link-group:hover .logo-visual-inner {
@@ -711,8 +711,8 @@
 <!-- 頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (與 profile.html 一致)       -->
 <!-- =================================================================== -->
 <header id="ratingTopHeader" class="hidden md:block w-full relative z-40 shrink-0">
-    <nav class="w-full h-[40px] sm:h-[48px] bg-[#FF85D0] flex items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-        <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+    <nav class="w-full h-[40px] sm:h-[48px] bg-[#FF99D3] flex items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+        <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
             <a href="./index.html" data-rating-nav="home" class="hover:opacity-70 transition-opacity">首頁</a>
             <a href="./index.html?openReport=1" data-rating-nav="report" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
             <a href="./map.html" data-rating-nav="map" class="hover:opacity-70 transition-opacity">公廁地圖</a>
@@ -741,15 +741,15 @@
     <!-- 1. 主評鑑畫面 (支援 電腦版 1550x780 與 手機版 430x968 手機ui-26 / 28) -->
     <!-- =================================================================== -->
 <main id="ratingMainStage" class="relative flex-1 w-full min-h-0 flex items-start md:items-center justify-center overflow-x-hidden overflow-y-auto md:overflow-hidden bg-[#FFF9EC] transition-all duration-200">        <!-- 手機版右上角漢堡選單與下拉式衛生紙捲筒選單 (取代原本手機版右上角 Logo) -->
-        <div id="ratingMobileNavContainer" class="absolute top-[36px] right-[7.4%] z-40 flex md:hidden items-center justify-end">
+        <div id="ratingMobileNavContainer" class="absolute top-[26px] right-5 z-40 flex md:hidden items-center justify-end">
             <button id="ratingMobileHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
                     class="flex flex-col justify-center gap-[8px] p-1.5 focus:outline-none group transition-transform active:scale-95">
                 <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
                 <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             </button>
 
-            <div id="ratingTpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-36px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-                <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+            <div id="ratingTpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[-2px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+                <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                     <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
                           fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
@@ -897,7 +897,7 @@
             <g id="mobileHeaderGroup" class="mobile-scatter-left">
                 <!-- 編輯模式提示徽章 (手機版：移至公廁名稱上方) -->
                 <g id="mobileEditModeBadgeGroup" class="hidden" transform="translate(36, 18)">
-                    <rect x="0" y="0" width="168" height="20" rx="10" fill="#08F29A" stroke="#2A348C" stroke-width="1.4" />
+                    <rect x="0" y="0" width="168" height="20" rx="10" fill="#45E5AC" stroke="#2A348C" stroke-width="1.4" />
                     <text x="84" y="10.5" fill="#2A348C" font-size="9.5" font-weight="900" letter-spacing="0.4" text-anchor="middle" dominant-baseline="central">
                         ✓ 已評鑑過・目前為編輯模式
                     </text>
@@ -916,7 +916,7 @@
 
                 <!-- 編輯模式提示徽章 (手機版) -->
                 <g id="mobileEditModeBadgeGroup" class="hidden" transform="translate(36, 142)">
-                    <rect x="0" y="0" width="168" height="20" rx="10" fill="#08F29A" stroke="#2A348C" stroke-width="1.4" />
+                    <rect x="0" y="0" width="168" height="20" rx="10" fill="#45E5AC" stroke="#2A348C" stroke-width="1.4" />
                     <text x="84" y="10.5" fill="#2A348C" font-size="9.5" font-weight="900" letter-spacing="0.4" text-anchor="middle" dominant-baseline="central">
                         ✓ 已評鑑過・目前為編輯模式
                     </text>
@@ -957,8 +957,8 @@
                         <g class="svg-action-inner">
                             <path d="M 644,174 C 632,96 672,56 720,56 C 768,56 808,96 796,174 L 782,174 C 792,108 758,74 720,74 C 682,74 648,108 658,174 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
-                            <circle cx="720" cy="110" r="25" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" />
-                            <polygon points="703,48 737,48 724,108 716,108" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
+                            <circle cx="720" cy="110" r="25" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" />
+                            <polygon points="703,48 737,48 724,108 716,108" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
                             <ellipse cx="720" cy="48" rx="17" ry="12" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6" />
                             <path d="M 623,174 L 817,174 L 786,312 Q 780,334 756,334 L 684,334 Q 660,334 654,312 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
@@ -971,7 +971,7 @@
                     <!-- 門鎖滑釦 -->
                     <polygon points="826,274 900,274 895,290 831,290" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                     <rect x="866" y="279" width="16" height="5" rx="2.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
-                    <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#59E1FF" stroke="#2A348C" stroke-width="1.8" />
+                    <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#80E4FF" stroke="#2A348C" stroke-width="1.8" />
 
                     <!-- 右側牆上捲筒衛生紙 -->
                     <polygon points="996,322 938,472 971,576 1042,404" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
@@ -982,7 +982,7 @@
                     <ellipse cx="1062" cy="372" rx="36" ry="46" transform="rotate(22, 1062, 372)"
                              fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" />
                     <ellipse cx="1064" cy="373" rx="12.5" ry="16" transform="rotate(22, 1064, 373)"
-                             fill="#59E1FF" stroke="#2A348C" stroke-width="2.2" />
+                             fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" />
 
                     <!-- 一般廁間前景：雙腳、自訂拖鞋/鞋子、膝蓋與藍色短褲 -->
                     <g id="mobileMainStallForegroundUse" class="pointer-events-none"></g>
@@ -1446,7 +1446,7 @@
 
                         <g class="svg-action-inner">
 
-                            <rect id="mobileInlineDownloadCardRect" x="0" y="0" width="148" height="48" rx="12" fill="#59E1FF" stroke="#2A348C" stroke-width="2" />
+                            <rect id="mobileInlineDownloadCardRect" x="0" y="0" width="148" height="48" rx="12" fill="#80E4FF" stroke="#2A348C" stroke-width="2" />
 
                             <g transform="translate(16, 11) scale(0.78)" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
 
@@ -1502,7 +1502,7 @@
 
                         <g class="svg-action-inner">
 
-                            <rect x="0" y="0" width="140" height="30" rx="15" fill="#FF5A4E" stroke="#2A348C" stroke-width="2" />
+                            <rect x="0" y="0" width="140" height="30" rx="15" fill="#F26559" stroke="#2A348C" stroke-width="2" />
 
                             <text x="70" y="15.5" fill="#2A348C" font-size="13" font-weight="800" letter-spacing="2.5" text-anchor="middle" dominant-baseline="central">
 
@@ -1568,7 +1568,7 @@
 
                <div class="w-full px-4 pt-1.5 flex items-center">
                     <div id="mobileMonsterScrollTrack" class="relative w-full h-[6px] rounded-full bg-white border-[1.2px] border-[#2A348C] cursor-pointer flex items-center">
-                        <div id="mobileMonsterScrollThumb" class="h-[6px] rounded-full bg-[#59E1FF] border-[1.2px] border-[#2A348C] transition-transform duration-75" style="width: 30%; transform: translateX(0px);"></div>
+                        <div id="mobileMonsterScrollThumb" class="h-[6px] rounded-full bg-[#80E4FF] border-[1.2px] border-[#2A348C] transition-transform duration-75" style="width: 30%; transform: translateX(0px);"></div>
 
                     </div>
 
@@ -1579,12 +1579,12 @@
 
 
             <!-- 右側：縮小 1/3 版粉紅底直立切換欄 (小妖 ⇅ 小仙) -->
-            <div class="w-[44px] shrink-0 bg-[#FF85D6] border-l-[1.8px] border-[#2A348C] flex flex-col items-center justify-between py-2.5 px-1">
+            <div class="w-[44px] shrink-0 bg-[#FF99D3] border-l-[1.8px] border-[#2A348C] flex flex-col items-center justify-between py-2.5 px-1">
                 <!-- 上方膠囊：小妖 -->
 
                 <button id="mobileTabYaoBtn" type="button"
 
-                        class="w-[26px] h-[64px] rounded-full border-[1.4px] border-[#2A348C] bg-[#FF85D6] text-[#2A348C] text-[11px] font-black leading-[1.15] flex flex-col items-center justify-center transition-colors focus:outline-none">
+                        class="w-[26px] h-[64px] rounded-full border-[1.4px] border-[#2A348C] bg-[#FF99D3] text-[#2A348C] text-[11px] font-black leading-[1.15] flex flex-col items-center justify-center transition-colors focus:outline-none">
                     <span>小</span>
 
                     <span>妖</span>
@@ -1752,8 +1752,8 @@
                         <g class="svg-action-inner">
                             <path d="M 644,174 C 632,96 672,56 720,56 C 768,56 808,96 796,174 L 782,174 C 792,108 758,74 720,74 C 682,74 648,108 658,174 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
-                            <circle cx="720" cy="110" r="25" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" />
-                            <polygon points="703,48 737,48 724,108 716,108" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
+                            <circle cx="720" cy="110" r="25" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" />
+                            <polygon points="703,48 737,48 724,108 716,108" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
                             <ellipse cx="720" cy="48" rx="17" ry="12" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6" />
                             <path d="M 623,174 L 817,174 L 786,312 Q 780,334 756,334 L 684,334 Q 660,334 654,312 Z"
                                   fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
@@ -1766,7 +1766,7 @@
                     <!-- 門鎖滑釦 -->
                     <polygon points="826,274 900,274 895,290 831,290" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                     <rect x="866" y="279" width="16" height="5" rx="2.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
-                    <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#59E1FF" stroke="#2A348C" stroke-width="1.8" />
+                    <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#80E4FF" stroke="#2A348C" stroke-width="1.8" />
 
                     <!-- 右側牆上捲筒衛生紙 -->
                    <polygon points="996,322 938,472 971,576 1042,404" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
@@ -1777,7 +1777,7 @@
                     <ellipse cx="1062" cy="372" rx="36" ry="46" transform="rotate(22, 1062, 372)"
                              fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" />
                     <ellipse cx="1064" cy="373" rx="12.5" ry="16" transform="rotate(22, 1064, 373)"
-                             fill="#59E1FF" stroke="#2A348C" stroke-width="2.2" />
+                             fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" />
                 </g>
 
                 <!-- 場景 B：小便斗視角 -->
@@ -1936,7 +1936,7 @@
             <!-- 編輯模式提示徽章 (電腦版：置於選鞋框上方並向右切齊 x=1448) -->
             <g class="fade-on-complete">
                 <g id="editModeBadgeGroup" class="hidden" transform="translate(1224, 34)">
-                    <rect x="0" y="0" width="224" height="28" rx="14" fill="#08F29A" stroke="#2A348C" stroke-width="1.8" />
+                    <rect x="0" y="0" width="224" height="28" rx="14" fill="#45E5AC" stroke="#2A348C" stroke-width="1.8" />
                     <text x="112" y="14.5" fill="#2A348C" font-size="12" font-weight="900" letter-spacing="0.6" text-anchor="middle" dominant-baseline="central">
                         ✓ 已評鑑過・目前為編輯模式
                     </text>
@@ -2137,7 +2137,7 @@
                     <g id="inlineDownloadCardBtn" class="svg-action-btn" transform="translate(0, 72)" role="button" tabindex="0" aria-label="下載圖卡">
                         <rect x="0" y="0" width="208" height="66" rx="14" fill="transparent" />
                         <g class="svg-action-inner">
-                            <rect id="inlineDownloadCardBtnRect" x="0" y="0" width="208" height="66" rx="14" fill="#59E1FF" stroke="#2A348C" stroke-width="2.5" />
+                            <rect id="inlineDownloadCardBtnRect" x="0" y="0" width="208" height="66" rx="14" fill="#80E4FF" stroke="#2A348C" stroke-width="2.5" />
                             <g transform="translate(26, 16)" fill="none" stroke="#2A348C" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="16" y1="2" x2="16" y2="23" />
                                 <polyline points="8,15 16,24 24,15" />
@@ -2164,7 +2164,7 @@
                     <g id="inlineEditRatingBtn" class="svg-action-btn" transform="translate(4, 152)" role="button" tabindex="0" aria-label="編輯評鑑">
                         <rect x="0" y="0" width="200" height="35" rx="17.5" fill="transparent" />
                         <g class="svg-action-inner">
-                            <rect x="0" y="0" width="200" height="35" rx="17.5" fill="#FF5A4E" stroke="#2A348C" stroke-width="2.5" />
+                            <rect x="0" y="0" width="200" height="35" rx="17.5" fill="#F26559" stroke="#2A348C" stroke-width="2.5" />
                             <text x="100" y="18" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
                                 編輯評鑑
                             </text>
@@ -2196,7 +2196,7 @@
                 <!-- 頂部粉紅切換條：小仙 ⇄ 小妖 (移至上方 y=206~254) -->
                 <g id="stallMonsterMenuFooter">
                     <path d="M 900,254 L 1236,254 L 1236,224 Q 1236,206 1218,206 L 918,206 Q 900,206 900,224 Z"
-                          fill="#FF85D6" stroke="#2A348C" stroke-width="2.5" stroke-linejoin="round" />
+                          fill="#FF99D3" stroke="#2A348C" stroke-width="2.5" stroke-linejoin="round" />
 
                     <g id="stallTabXianBtn" class="cursor-pointer" role="button" tabindex="0" aria-label="切換至小仙選單">
                         <rect id="stallTabXianRect" x="926" y="216" width="108" height="28" rx="14"
@@ -2218,7 +2218,7 @@
 
                     <g id="stallTabYaoBtn" class="cursor-pointer" role="button" tabindex="0" aria-label="切換至小妖選單">
                         <rect id="stallTabYaoRect" x="1102" y="216" width="108" height="28" rx="14"
-                              fill="#FF85D6" stroke="#2A348C" stroke-width="2" />
+                              fill="#FF99D3" stroke="#2A348C" stroke-width="2" />
                         <text x="1156" y="228" fill="#2A348C" font-size="15" font-weight="900" letter-spacing="2" text-anchor="middle" dominant-baseline="central">
                             小妖
                         </text>
@@ -2267,7 +2267,7 @@
                     <rect id="stallScrollTrack" x="1195" y="280" width="11" height="444" rx="5.5"
                           fill="#FFFFFF" stroke="#2A348C" stroke-width="1.4" class="cursor-pointer" />
                     <rect id="stallScrollThumb" x="1195" y="280" width="11" height="118" rx="5.5"
-                          fill="#59E1FF" stroke="#2A348C" stroke-width="1.6" class="cursor-pointer" />
+                          fill="#80E4FF" stroke="#2A348C" stroke-width="1.6" class="cursor-pointer" />
                 </g>
             </g>
 
@@ -2305,15 +2305,15 @@
                         <!-- 門上掛勾與白桶 (無文字) -->
                         <path d="M 644,174 C 632,96 672,56 720,56 C 768,56 808,96 796,174 L 782,174 C 792,108 758,74 720,74 C 682,74 648,108 658,174 Z"
                               fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
-                        <circle cx="720" cy="110" r="25" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" />
-                        <polygon points="703,48 737,48 724,108 716,108" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
+                        <circle cx="720" cy="110" r="25" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" />
+                        <polygon points="703,48 737,48 724,108 716,108" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
                         <ellipse cx="720" cy="48" rx="17" ry="12" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6" />
                         <path d="M 623,174 L 817,174 L 786,312 Q 780,334 756,334 L 684,334 Q 660,334 654,312 Z"
                               fill="#FFFFFF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" />
                         <!-- 門鎖滑釦 -->
                         <polygon points="826,274 900,274 895,290 831,290" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                         <rect x="866" y="279" width="16" height="5" rx="2.5" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
-                        <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#59E1FF" stroke="#2A348C" stroke-width="1.8" />
+                        <ellipse cx="884" cy="281.5" rx="6" ry="3.2" fill="#80E4FF" stroke="#2A348C" stroke-width="1.8" />
                         <!-- 捲筒衛生紙 -->
                         <polygon points="996,322 938,472 971,576 1042,404" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                         <line x1="977" y1="386" x2="1009" y2="486" stroke="#2A348C" stroke-width="2" stroke-dasharray="3 5" />
@@ -2323,7 +2323,7 @@
                         <ellipse cx="1062" cy="372" rx="36" ry="46" transform="rotate(22, 1062, 372)"
                                  fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" />
                         <ellipse cx="1064" cy="373" rx="12.5" ry="16" transform="rotate(22, 1064, 373)"
-                                 fill="#59E1FF" stroke="#2A348C" stroke-width="2.2" />
+                                 fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" />
                     </g>
 
                     <!-- 圖卡場景 B：小便斗背景 -->
@@ -2415,7 +2415,7 @@
                 <g id="downloadToiletCardBtn" class="svg-action-btn" transform="translate(0, 74)" role="button" tabindex="0" aria-label="下載圖卡">
                     <rect x="0" y="0" width="204" height="68" rx="16" fill="transparent" />
                     <g class="svg-action-inner">
-                        <rect x="0" y="0" width="204" height="68" rx="16" fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" />
+                        <rect x="0" y="0" width="204" height="68" rx="16" fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" />
                         <g transform="translate(24, 17)" fill="none" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="16" y1="2" x2="16" y2="23" />
                             <polyline points="8,15 16,24 24,15" />
@@ -2442,7 +2442,7 @@
                 <g id="resultEditReportBtn" class="svg-action-btn" transform="translate(2, 156)" role="button" tabindex="0" aria-label="編輯評鑑">
                     <rect x="0" y="0" width="200" height="36" rx="18" fill="transparent" />
                     <g class="svg-action-inner">
-                        <rect x="0" y="0" width="200" height="36" rx="18" fill="#FF5A4E" stroke="#2A348C" stroke-width="2.4" />
+                        <rect x="0" y="0" width="200" height="36" rx="18" fill="#F26559" stroke="#2A348C" stroke-width="2.4" />
                         <text x="100" y="18.5" fill="#2A348C" font-size="16" font-weight="700" letter-spacing="3.5" text-anchor="middle" dominant-baseline="central">
                             編輯評鑑
                         </text>
@@ -2464,7 +2464,7 @@
 
             <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
             <button id="closeSwitchToiletModalBtn" type="button" aria-label="關閉"
-                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#2A348C] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
                 <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
                     <line x1="9" y1="9" x2="23" y2="23" />
                     <line x1="23" y1="9" x2="9" y2="23" />
@@ -2475,7 +2475,7 @@
             <div class="px-8 sm:px-12 pt-2 pb-5 border-b border-[#2A348C]/25">
                 <input id="switchModalSearchInput" type="text" placeholder="搜尋附近100m內的公廁..."
                        style="user-select: text; -webkit-user-select: text;"
-                       class="w-full h-[44px] px-6 rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] placeholder-[#2A348C]/30 text-sm sm:text-[16px] font-bold tracking-[0.14em] focus:outline-none focus:ring-2 focus:ring-[#59E1FF]" />
+                       class="w-full h-[44px] px-6 rounded-full bg-white border-[2px] border-[#2A348C] text-[#2A348C] placeholder-[#2A348C]/30 text-sm sm:text-[16px] font-bold tracking-[0.14em] focus:outline-none focus:ring-2 focus:ring-[#80E4FF]" />
             </div>
 
             <!-- 一般廁間 / 小便斗 切換按鈕 + 100m 公廁清單 -->
@@ -2511,7 +2511,7 @@
 </div>
             <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
             <button id="closeLeaveCommentModalBtn" type="button" aria-label="關閉"
-                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#2A348C] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
                 <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
                     <line x1="9" y1="9" x2="23" y2="23" />
                     <line x1="23" y1="9" x2="9" y2="23" />
@@ -2529,7 +2529,7 @@
                         (0/100)
                     </span>
                     <button id="submitModalCommentBtn" type="button" aria-label="送出留言"
-                            class="w-11 h-11 rounded-full bg-[#4CE0FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] flex items-center justify-center transition-all focus:outline-none">
+                            class="w-11 h-11 rounded-full bg-[#80E4FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] flex items-center justify-center transition-all focus:outline-none">
                         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="#2A348C">
                             <path d="M 3,11.5 L 20,4 L 14.5,20.5 L 11,13.5 Z" stroke="#2A348C" stroke-width="1.5" stroke-linejoin="round" />
                         </svg>
@@ -2546,7 +2546,7 @@
         <div class="relative w-full max-w-[500px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] px-7 sm:px-10 pt-12 pb-9 flex flex-col items-center text-center shadow-2xl">
             <!-- 右上角跨邊框深藍圓形關閉按鈕 (同步放大 1/3) -->
             <button id="closeConfirmReturnModalBtn" type="button" aria-label="關閉"
-                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#2A348C] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
                 <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
                     <line x1="9" y1="9" x2="23" y2="23" />
                     <line x1="23" y1="9" x2="9" y2="23" />
@@ -2566,7 +2566,7 @@
                     回主頁
                 </button>
                 <button id="continueRatingEditBtn" type="button"
-                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-[#08F29A] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
+                        class="flex-1 max-w-[162px] h-[46px] rounded-full bg-[#45E5AC] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
                     繼續編輯
                 </button>
             </div>
@@ -2579,7 +2579,7 @@
         <div class="relative w-full max-w-[460px] bg-white rounded-[42px] border-[2.5px] border-[#2A348C] px-7 sm:px-10 pt-12 pb-9 flex flex-col items-center text-center shadow-2xl">
             <!-- 右上角跨邊框深藍圓形關閉按鈕 -->
             <button id="closeMonsterLimitModalBtn" type="button" aria-label="關閉"
-                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#1E2470] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
+                    class="absolute -top-3 -right-3 w-[48px] h-[48px] sm:w-[54px] sm:h-[54px] rounded-full bg-[#2A348C] hover:bg-[#2A348C] active:scale-95 flex items-center justify-center transition-transform focus:outline-none">
                 <svg viewBox="0 0 32 32" class="w-6 h-6" fill="none" stroke="#FFF9EC" stroke-width="4" stroke-linecap="round">
                     <line x1="9" y1="9" x2="23" y2="23" />
                     <line x1="23" y1="9" x2="9" y2="23" />
@@ -2593,7 +2593,7 @@
 
             <!-- 底部確認按鈕 -->
             <button id="confirmMonsterLimitBtn" type="button"
-                    class="w-full max-w-[162px] h-[46px] rounded-full bg-[#08F29A] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
+                    class="w-full max-w-[162px] h-[46px] rounded-full bg-[#45E5AC] hover:bg-[#06d688] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-base sm:text-[18px] font-black tracking-[0.16em] flex items-center justify-center transition-all focus:outline-none">
                 知道了
             </button>
         </div>
@@ -2696,25 +2696,25 @@
             stall_flippers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="544 492 352 242">
                 <path d="M 554,650 C 546,568 574,500 622,498 C 668,496 686,542 686,612 C 686,658 682,692 674,730 L 560,730 Z" fill="#FFFFFF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
                 <path d="M 564,562 C 562,542 578,538 582,550 C 584,534 600,532 604,546 C 608,532 624,532 626,546 C 630,520 652,506 668,520 C 682,534 680,572 676,614 L 672,732 L 574,732 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="655" cy="534" r="17" fill="#59E1FF" stroke="#2A348C" stroke-width="2.8"/>
+                <circle cx="655" cy="534" r="17" fill="#80E4FF" stroke="#2A348C" stroke-width="2.8"/>
                 <path d="M 569,553 Q 574,547 579,553 M 590,547 Q 595,541 600,547 M 610,545 Q 615,539 620,545" fill="none" stroke="#2A348C" stroke-width="2.6" stroke-linecap="round"/>
                 <path d="M 628,536 L 628,565 M 562,608 L 628,562 L 684,586" fill="none" stroke="#2A348C" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 628,536 L 628,565 M 562,608 L 628,562 L 684,586" fill="none" stroke="#59E1FF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 628,536 L 628,565 M 562,608 L 628,562 L 684,586" fill="none" stroke="#80E4FF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M 886,650 C 894,568 866,500 818,498 C 772,496 754,542 754,612 C 754,658 758,692 766,730 L 880,730 Z" fill="#FFFFFF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
                 <path d="M 876,562 C 878,542 862,538 858,550 C 856,534 840,532 836,546 C 832,532 816,532 814,546 C 810,520 788,506 772,520 C 758,534 760,572 764,614 L 768,732 L 866,732 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
-                <circle cx="785" cy="534" r="17" fill="#59E1FF" stroke="#2A348C" stroke-width="2.8"/>
+                <circle cx="785" cy="534" r="17" fill="#80E4FF" stroke="#2A348C" stroke-width="2.8"/>
                 <path d="M 871,553 Q 866,547 861,553 M 850,547 Q 845,541 840,547 M 830,545 Q 825,539 820,545" fill="none" stroke="#2A348C" stroke-width="2.6" stroke-linecap="round"/>
                 <path d="M 812,536 L 812,565 M 878,608 L 812,562 L 756,586" fill="none" stroke="#2A348C" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 812,536 L 812,565 M 878,608 L 812,562 L 756,586" fill="none" stroke="#59E1FF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M 812,536 L 812,565 M 878,608 L 812,562 L 756,586" fill="none" stroke="#80E4FF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>`,
             stall_leather: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="544 492 352 242"><g><path d="M 618,495 C 568,495 546,532 550,584 C 553,624 566,670 576,714 L 674,714 C 680,670 686,622 686,580 C 686,530 664,495 618,495 Z" fill="#5B4638" stroke="#2A348C" stroke-width="3.2"/><path d="M 618,507 C 575,507 556,540 560,587 C 563,625 574,666 584,700 L 666,700 C 672,665 676,623 676,583 C 676,537 657,507 618,507 Z" fill="#8F5D30" stroke="#2A348C" stroke-width="3"/><path d="M 559,618 Q 618,598 676,620 L 673,650 Q 618,632 563,648 Z" fill="#8F5D30" stroke="#2A348C" stroke-width="3"/></g><g transform="translate(1440,0) scale(-1,1)"><path d="M 618,495 C 568,495 546,532 550,584 C 553,624 566,670 576,714 L 674,714 C 680,670 686,622 686,580 C 686,530 664,495 618,495 Z" fill="#5B4638" stroke="#2A348C" stroke-width="3.2"/><path d="M 618,507 C 575,507 556,540 560,587 C 563,625 574,666 584,700 L 666,700 C 672,665 676,623 676,583 C 676,537 657,507 618,507 Z" fill="#8F5D30" stroke="#2A348C" stroke-width="3"/><path d="M 559,618 Q 618,598 676,620 L 673,650 Q 618,632 563,648 Z" fill="#8F5D30" stroke="#2A348C" stroke-width="3"/></g></svg>`,
-            stall_plastic: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="544 492 352 242"><g><path d="M 618,494 C 567,494 544,532 548,586 C 552,632 568,678 580,716 L 668,716 C 678,678 686,630 686,582 C 686,530 664,494 618,494 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><path d="M 553,636 Q 620,612 684,634 C 691,637 691,656 682,662 Q 620,641 557,662 C 548,657 548,639 553,636 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><circle cx="602" cy="534" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="626" cy="532" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="603" cy="568" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="627" cy="566" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/></g><g transform="translate(1440,0) scale(-1,1)"><path d="M 618,494 C 567,494 544,532 548,586 C 552,632 568,678 580,716 L 668,716 C 678,678 686,630 686,582 C 686,530 664,494 618,494 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><path d="M 553,636 Q 620,612 684,634 C 691,637 691,656 682,662 Q 620,641 557,662 C 548,657 548,639 553,636 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><circle cx="602" cy="534" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="626" cy="532" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="603" cy="568" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="627" cy="566" r="7" fill="#4CE0FF" stroke="#2A348C" stroke-width="2.6"/></g></svg>`,
+            stall_plastic: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="544 492 352 242"><g><path d="M 618,494 C 567,494 544,532 548,586 C 552,632 568,678 580,716 L 668,716 C 678,678 686,630 686,582 C 686,530 664,494 618,494 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><path d="M 553,636 Q 620,612 684,634 C 691,637 691,656 682,662 Q 620,641 557,662 C 548,657 548,639 553,636 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><circle cx="602" cy="534" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="626" cy="532" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="603" cy="568" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="627" cy="566" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/></g><g transform="translate(1440,0) scale(-1,1)"><path d="M 618,494 C 567,494 544,532 548,586 C 552,632 568,678 580,716 L 668,716 C 678,678 686,630 686,582 C 686,530 664,494 618,494 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><path d="M 553,636 Q 620,612 684,634 C 691,637 691,656 682,662 Q 620,641 557,662 C 548,657 548,639 553,636 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2"/><circle cx="602" cy="534" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="626" cy="532" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="603" cy="568" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/><circle cx="627" cy="566" r="7" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6"/></g></svg>`,
             stall_sneakers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="544 492 352 242"><g><path d="M 618,495 C 568,495 546,534 550,588 C 554,632 568,678 580,714 L 668,714 C 678,678 686,630 686,584 C 686,532 664,495 618,495 Z" fill="#06EB98" stroke="#2A348C" stroke-width="3.2"/><path d="M 578,498 Q 618,492 658,498 L 637,632 C 637,650 599,650 599,632 Z" fill="#FF8FD2"/><path d="M 582,535 L 652,553 M 650,532 L 580,554 M 580,558 L 654,576 M 654,558 L 582,578" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/></g><g transform="translate(1440,0) scale(-1,1)"><path d="M 618,495 C 568,495 546,534 550,588 C 554,632 568,678 580,714 L 668,714 C 678,678 686,630 686,584 C 686,532 664,495 618,495 Z" fill="#06EB98" stroke="#2A348C" stroke-width="3.2"/><path d="M 578,498 Q 618,492 658,498 L 637,632 C 637,650 599,650 599,632 Z" fill="#FF8FD2"/><path d="M 582,535 L 652,553 M 650,532 L 580,554 M 580,558 L 654,576 M 654,558 L 582,578" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/></g></svg>`
         };
 
         const URINAL_SHOE_FALLBACK_SVGS = {
-            urinal_flippers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,572 C 618,520 632,494 656,494 C 680,494 694,522 694,572 Z M 818,572 C 822,520 808,494 784,494 C 760,494 746,522 746,572 Z" fill="#FFFFFF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><path d="M 656,518 L 656,534 M 624,556 L 656,532 L 690,550 M 784,518 L 784,534 M 816,556 L 784,532 L 750,550" fill="none" stroke="#2A348C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M 656,518 L 656,534 M 624,556 L 656,532 L 690,550 M 784,518 L 784,534 M 816,556 L 784,532 L 750,550" fill="none" stroke="#59E1FF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-            urinal_plastic: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,572 C 618,518 632,494 656,494 C 680,494 694,520 694,572 Z M 818,572 C 822,518 808,494 784,494 C 760,494 746,520 746,572 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><g fill="#4CE0FF" stroke="#2A348C" stroke-width="2.2"><circle cx="645" cy="518" r="4.5"/><circle cx="665" cy="518" r="4.5"/><circle cx="645" cy="536" r="4.5"/><circle cx="665" cy="536" r="4.5"/><circle cx="775" cy="518" r="4.5"/><circle cx="795" cy="518" r="4.5"/><circle cx="775" cy="536" r="4.5"/><circle cx="795" cy="536" r="4.5"/></g></svg>`,
+            urinal_flippers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,572 C 618,520 632,494 656,494 C 680,494 694,522 694,572 Z M 818,572 C 822,520 808,494 784,494 C 760,494 746,522 746,572 Z" fill="#FFFFFF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><path d="M 656,518 L 656,534 M 624,556 L 656,532 L 690,550 M 784,518 L 784,534 M 816,556 L 784,532 L 750,550" fill="none" stroke="#2A348C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M 656,518 L 656,534 M 624,556 L 656,532 L 690,550 M 784,518 L 784,534 M 816,556 L 784,532 L 750,550" fill="none" stroke="#80E4FF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+            urinal_plastic: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,572 C 618,518 632,494 656,494 C 680,494 694,520 694,572 Z M 818,572 C 822,518 808,494 784,494 C 760,494 746,520 746,572 Z" fill="#FF594A" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><g fill="#80E4FF" stroke="#2A348C" stroke-width="2.2"><circle cx="645" cy="518" r="4.5"/><circle cx="665" cy="518" r="4.5"/><circle cx="645" cy="536" r="4.5"/><circle cx="665" cy="536" r="4.5"/><circle cx="775" cy="518" r="4.5"/><circle cx="795" cy="518" r="4.5"/><circle cx="775" cy="536" r="4.5"/><circle cx="795" cy="536" r="4.5"/></g></svg>`,
             urinal_sneakers_b: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,570 C 618,518 632,494 655,494 C 678,494 692,520 694,570 Z M 818,570 C 822,518 808,494 785,494 C 762,494 748,520 746,570 Z" fill="#3B82F6" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><path d="M 632,542 C 632,512 642,502 655,502 C 668,502 678,512 678,542 C 678,552 632,552 632,542 Z M 808,542 C 808,512 798,502 785,502 C 772,502 762,512 762,542 C 762,552 808,552 808,542 Z" fill="#FFFFFF"/><path d="M 638,548 L 672,548 M 640,554 L 670,554 M 768,548 L 802,548 M 770,554 L 800,554" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/></svg>`,
             urinal_sneakers_g: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="614 492 212 88"><path d="M 622,570 C 618,518 632,494 655,494 C 678,494 692,520 694,570 Z M 818,570 C 822,518 808,494 785,494 C 762,494 748,520 746,570 Z" fill="#00B894" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/><path d="M 632,542 C 632,512 642,502 655,502 C 668,502 678,512 678,542 C 678,552 632,552 632,542 Z M 808,542 C 808,512 798,502 785,502 C 772,502 762,512 762,542 C 762,552 808,552 808,542 Z" fill="#FFFFFF"/><g fill="#00B894"><circle cx="648" cy="516" r="1.4"/><circle cx="655" cy="515" r="1.4"/><circle cx="662" cy="516" r="1.4"/><circle cx="644" cy="523" r="1.4"/><circle cx="651" cy="522" r="1.4"/><circle cx="659" cy="522" r="1.4"/><circle cx="666" cy="523" r="1.4"/><circle cx="778" cy="516" r="1.4"/><circle cx="785" cy="515" r="1.4"/><circle cx="792" cy="516" r="1.4"/><circle cx="774" cy="523" r="1.4"/><circle cx="781" cy="522" r="1.4"/><circle cx="789" cy="522" r="1.4"/><circle cx="796" cy="523" r="1.4"/></g><path d="M 638,548 L 672,548 M 640,554 L 670,554 M 768,548 L 802,548 M 770,554 L 800,554" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/></svg>`
         };
@@ -2837,7 +2837,7 @@
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
                 <!-- 藍色短褲 -->
                 <path d="M 494,686 Q 590,715 680,702 L 720,676 L 760,702 Q 850,715 946,686 L 960,746 Q 720,768 480,746 Z"
-                      fill="#59E1FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                      fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
             `;
         }
 
@@ -2853,7 +2853,7 @@
                        preserveAspectRatio="xMidYMin meet" />
                 <!-- 左側幾何綠長褲與深綠折線色塊 -->
                 <path d="M 624,554 L 664,544 L 705,576 L 713,622 L 690,642 L 700,694 L 680,752 L 502,752 L 496,738 L 578,616 L 594,616 Z"
-                      fill="#08F29A" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                      fill="#45E5AC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
                 <polygon points="668,564 700,584 700,596" fill="#00B894" />
                 <polygon points="605,606 668,638 600,620" fill="#00B894" />
                 <polygon points="650,636 686,656 684,668" fill="#00B894" />
@@ -2862,7 +2862,7 @@
 
                 <!-- 右側幾何綠長褲與深綠折線色塊 -->
                 <path d="M 816,554 L 776,544 L 735,576 L 727,622 L 750,642 L 740,694 L 760,752 L 938,752 L 944,738 L 862,616 L 846,616 Z"
-                      fill="#08F29A" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
+                      fill="#45E5AC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
                 <polygon points="782,554 742,584 740,596 782,562" fill="#00B894" />
                 <polygon points="742,622 805,610 748,630" fill="#00B894" />
                 <polygon points="814,626 860,626 874,644 796,642" fill="#00B894" />
@@ -2900,7 +2900,7 @@
                         <polygon points="724,691.5 731.5,700.5 724,709.5 716.5,700.5"
                                  fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <path d="M 717.2,700.5 Q 724,696.2 730.8,700.5 Q 724,704.8 717.2,700.5 Z"
-                              fill="#FF5A4E" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                              fill="#F26559" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <!-- 胸前三個小弧線 -->
                         <path d="M 712,712 Q 711,718 708,721 M 724,713 L 724,721 M 736,712 Q 737,718 740,721"
                               fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linecap="round" />
@@ -3060,7 +3060,7 @@
                 mobileStallCatWrapper?.classList.add('hidden');
                 mobileUrinalCatWrapper?.classList.remove('hidden');
                 mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 238) scale(0.485) translate(-720, 0)');
-                if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#59E1FF');
+                if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#80E4FF');
 
                 updateUrinalShoeSelectorUI();
             } else {
@@ -3078,14 +3078,14 @@
                 urinalCatWrapper?.classList.add('hidden');
                 stallFgUse?.classList.remove('hidden');
                 urinalFgUse?.classList.add('hidden');
-                if (inlineDownloadRect) inlineDownloadRect.setAttribute('fill', '#59E1FF');
+                if (inlineDownloadRect) inlineDownloadRect.setAttribute('fill', '#80E4FF');
 
                 mobileStallGroup?.classList.remove('hidden');
                 mobileUrinalGroup?.classList.add('hidden');
                 mobileStallCatWrapper?.classList.remove('hidden');
                 mobileUrinalCatWrapper?.classList.add('hidden');
                 mobilePlacedTransformG?.setAttribute('transform', 'translate(215, 238) scale(0.485) translate(-720, 0)');
-                if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#59E1FF');
+                if (mobileInlineDownloadRect) mobileInlineDownloadRect.setAttribute('fill', '#80E4FF');
 
                 updateStallShoeSelectorUI();
             }
@@ -3941,7 +3941,7 @@ function clearLegacyDeviceReporterId() {
                         </div>
 
                         <button type="button"
-                                class="shrink-0 w-[80px] h-[36px] rounded-full bg-[#4CE0FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-[0.12em] flex items-center justify-center transition-all focus:outline-none">
+                                class="shrink-0 w-[80px] h-[36px] rounded-full bg-[#80E4FF] hover:bg-[#35d2f2] active:scale-95 border-[2px] border-[#2A348C] text-[#2A348C] text-sm sm:text-[15px] font-black tracking-[0.12em] flex items-center justify-center transition-all focus:outline-none">
                             ${escapeHtml(distLabel)}
                         </button>
                     </div>
@@ -4109,15 +4109,15 @@ function clearLegacyDeviceReporterId() {
 
         const MONSTER_FALLBACK_SVGS = {
             air_clean: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
-                <path d="M 65,42 C 45,26 82,12 96,30 C 112,14 148,30 132,58 C 148,70 132,96 112,88 C 110,104 122,118 134,112 C 146,106 154,124 136,136 C 122,144 106,136 104,126 C 108,142 94,156 80,148 C 68,140 72,126 76,122 C 66,136 48,140 42,126 C 36,112 52,102 64,108 C 70,96 66,86 56,82 C 38,74 44,44 65,42 Z" fill="#59E1FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
+                <path d="M 65,42 C 45,26 82,12 96,30 C 112,14 148,30 132,58 C 148,70 132,96 112,88 C 110,104 122,118 134,112 C 146,106 154,124 136,136 C 122,144 106,136 104,126 C 108,142 94,156 80,148 C 68,140 72,126 76,122 C 66,136 48,140 42,126 C 36,112 52,102 64,108 C 70,96 66,86 56,82 C 38,74 44,44 65,42 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
                 <path d="M 75,64 Q 81,72 87,64 M 95,64 Q 101,72 107,64" fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linecap="round"/>
                 <path d="M 85,75 Q 91,82 97,75" fill="none" stroke="#2A348C" stroke-width="2.8" stroke-linecap="round"/>
-                <path d="M 32,102 Q 48,96 60,102" fill="none" stroke="#59E1FF" stroke-width="4" stroke-linecap="round"/>
-                <path d="M 118,144 Q 138,146 148,132" fill="none" stroke="#59E1FF" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 32,102 Q 48,96 60,102" fill="none" stroke="#80E4FF" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 118,144 Q 138,146 148,132" fill="none" stroke="#80E4FF" stroke-width="4" stroke-linecap="round"/>
             </svg>`,
             floor_clean: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                 <path d="M 72,36 L 108,36 L 108,60 L 136,60 Q 144,60 144,68 L 144,136 Q 144,146 134,146 L 46,146 Q 36,146 36,136 L 36,68 Q 36,60 44,60 L 72,60 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
-                <path d="M 38,88 L 142,88 M 38,118 L 142,118 M 72,60 L 72,144 M 108,60 L 108,144" stroke="#59E1FF" stroke-width="5" stroke-linecap="round"/>
+                <path d="M 38,88 L 142,88 M 38,118 L 142,118 M 72,60 L 72,144 M 108,60 L 108,144" stroke="#80E4FF" stroke-width="5" stroke-linecap="round"/>
                 <ellipse cx="84" cy="48" rx="4.5" ry="6.5" fill="#2A348C"/>
                 <ellipse cx="96" cy="48" rx="4.5" ry="6.5" fill="#2A348C"/>
                 <path d="M 42,32 Q 42,48 28,48 Q 42,48 42,64 Q 42,48 56,48 Q 42,48 42,32 Z" fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round"/>
@@ -4133,7 +4133,7 @@ function clearLegacyDeviceReporterId() {
                 <path d="M 38,76 Q 46,96 56,82 M 142,76 Q 134,96 124,82" fill="none" stroke="#45E5AC" stroke-width="6" stroke-linecap="round"/>
                 <rect x="34" y="96" width="20" height="44" rx="5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6"/>
                 <rect x="126" y="96" width="20" height="44" rx="5" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6"/>
-                <rect x="78" y="114" width="24" height="24" rx="5" fill="#FF85D6" stroke="#2A348C" stroke-width="2.4"/>
+                <rect x="78" y="114" width="24" height="24" rx="5" fill="#FF99D3" stroke="#2A348C" stroke-width="2.4"/>
             </svg>`,
             privacy_ok: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                 <rect x="48" y="28" width="84" height="124" rx="14" fill="#FF99D3" stroke="#2A348C" stroke-width="3.2"/>
@@ -4160,8 +4160,8 @@ function clearLegacyDeviceReporterId() {
             handle_wet: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                 <circle cx="66" cy="84" r="24" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2"/>
                 <rect x="66" y="72" width="72" height="24" rx="12" fill="#F3EF84" stroke="#2A348C" stroke-width="3.2"/>
-                <path d="M 118,104 C 118,104 106,124 118,132 C 130,124 118,104 118,104 Z" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round"/>
-                <path d="M 92,100 C 92,100 83,116 92,122 C 101,116 92,100 92,100 Z" fill="#59E1FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="M 118,104 C 118,104 106,124 118,132 C 130,124 118,104 118,104 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round"/>
+                <path d="M 92,100 C 92,100 83,116 92,122 C 101,116 92,100 92,100 Z" fill="#80E4FF" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round"/>
                 <ellipse cx="58" cy="82" rx="4" ry="6" fill="#2A348C"/>
                 <ellipse cx="72" cy="82" rx="4" ry="6" fill="#2A348C"/>
             </svg>`,
@@ -4181,7 +4181,7 @@ function clearLegacyDeviceReporterId() {
             toilet_clogged: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                 <ellipse cx="90" cy="64" rx="46" ry="50" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2"/>
                 <path d="M 42,96 C 42,134 62,150 90,150 C 118,150 138,134 138,96 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round"/>
-                <ellipse cx="90" cy="96" rx="48" ry="16" fill="#59E1FF" stroke="#2A348C" stroke-width="3.2"/>
+                <ellipse cx="90" cy="96" rx="48" ry="16" fill="#80E4FF" stroke="#2A348C" stroke-width="3.2"/>
                 <rect x="85" y="34" width="10" height="52" rx="4" fill="#F3EF84" stroke="#2A348C" stroke-width="2.6"/>
                 <path d="M 68,86 C 68,70 112,70 112,86 Z" fill="#F26559" stroke="#2A348C" stroke-width="2.8" stroke-linejoin="round"/>
             </svg>`,
@@ -4262,7 +4262,7 @@ function clearLegacyDeviceReporterId() {
                 <ellipse cx="78" cy="68" rx="5.5" ry="7.5" fill="#2A348C"/>
                 <ellipse cx="102" cy="68" rx="5.5" ry="7.5" fill="#2A348C"/>
                 <path d="M 82,84 Q 90,92 98,84" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 68,118 Q 60,136 72,150 M 90,118 Q 90,138 90,154 M 112,118 Q 120,136 108,150" fill="none" stroke="#59E1FF" stroke-width="5" stroke-linecap="round"/>
+                <path d="M 68,118 Q 60,136 72,150 M 90,118 Q 90,138 90,154 M 112,118 Q 120,136 108,150" fill="none" stroke="#80E4FF" stroke-width="5" stroke-linecap="round"/>
             </svg>`,
             sink_clean: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
                 <path d="M 84,56 L 84,36 C 84,26 104,26 104,38" fill="none" stroke="#2A348C" stroke-width="5" stroke-linecap="round"/>
@@ -4536,13 +4536,13 @@ function clearLegacyDeviceReporterId() {
         function updateStallMonsterTabStyles() {
             if (currentStallMonsterTab === 'xian') {
                 stallTabXianRectEl?.setAttribute('fill', '#F3EF84');
-                stallTabYaoRectEl?.setAttribute('fill', '#FF85D6');
+                stallTabYaoRectEl?.setAttribute('fill', '#FF99D3');
                 if (mobileTabXianBtnEl) mobileTabXianBtnEl.style.backgroundColor = '#F3EF84';
-                if (mobileTabYaoBtnEl) mobileTabYaoBtnEl.style.backgroundColor = '#FF85D6';
+                if (mobileTabYaoBtnEl) mobileTabYaoBtnEl.style.backgroundColor = '#FF99D3';
             } else {
-                stallTabXianRectEl?.setAttribute('fill', '#FF85D6');
+                stallTabXianRectEl?.setAttribute('fill', '#FF99D3');
                 stallTabYaoRectEl?.setAttribute('fill', '#F3EF84');
-                if (mobileTabXianBtnEl) mobileTabXianBtnEl.style.backgroundColor = '#FF85D6';
+                if (mobileTabXianBtnEl) mobileTabXianBtnEl.style.backgroundColor = '#FF99D3';
                 if (mobileTabYaoBtnEl) mobileTabYaoBtnEl.style.backgroundColor = '#F3EF84';
             }
         }
@@ -5500,7 +5500,7 @@ function clearLegacyDeviceReporterId() {
 
             const inlineDownloadRect = document.getElementById('inlineDownloadCardBtnRect');
             if (inlineDownloadRect) {
-                inlineDownloadRect.setAttribute('fill', currentSceneType === 'urinal' ? '#FFF9EC' : '#59E1FF');
+                inlineDownloadRect.setAttribute('fill', currentSceneType === 'urinal' ? '#FFF9EC' : '#80E4FF');
             }
 
             document.getElementById('ratingMainStage')?.classList.add('is-completed');

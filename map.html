@@ -51,13 +51,13 @@
 
     <style>
         :root {
-            --pm-cyan-bg: #47DEFF;
-            --pm-cyan-bar: #4BE0FF;
-            --pm-pink: #FF94DA;
-            --pm-yellow: #F5F078;
-            --pm-cream: #FFF8EA;
+            --pm-cyan-bg: #80E4FF;
+            --pm-cyan-bar: #80E4FF;
+            --pm-pink: #FF99D3;
+            --pm-yellow: #F3EF84;
+            --pm-cream: #FFF9EC;
             --pm-navy: #2A348C;
-            --pm-coral: #EE5A5A;
+            --pm-coral: #F26559;
         }
         * {
             box-sizing: border-box;
@@ -133,11 +133,11 @@
             width: 6px;
         }
         .pm-modal-scroll::-webkit-scrollbar-track {
-            background: #FFF8EA;
+            background: #FFF9EC;
             border-radius: 9999px;
         }
         .pm-modal-scroll::-webkit-scrollbar-thumb {
-            background: #4BE0FF;
+            background: #80E4FF;
             border: 1.5px solid #2A348C;
             border-radius: 9999px;
         }
@@ -319,7 +319,7 @@
             transform: translateX(3px);
         }
         .map-tp-menu-item:hover text {
-            fill: #EE5A5A;
+            fill: #F26559;
         }
         /* ========================================================= */
         /* 自訂游標設定 (Default: img/mouse / Hover: img/hover)       */
@@ -345,45 +345,46 @@
     </style>
 </head>
 
-<body class="min-h-screen md:h-screen w-full md:overflow-hidden select-none relative flex items-start md:items-center justify-center pt-[112px] pb-10 px-3 sm:px-6 md:pt-[84px] md:pb-4 md:px-0">    <!-- 電腦版頂部粉紅導覽列 + 左上角原位置覆蓋 LOGO (手機版隱藏) -->
-    <header class="hidden md:block w-full fixed top-0 left-0 z-50">
-        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-native-scrollbar">
-            <div class="flex items-center gap-7 xl:gap-10 text-[#1E2470] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+<body class="min-h-screen md:h-screen w-full md:overflow-hidden select-none relative flex items-start md:items-center justify-center pt-[112px] pb-10 px-3 sm:px-6 md:pt-[84px] md:pb-4 md:px-0">
+    <!-- 頂部導覽列（電腦版顯示）+ 左上角 LOGO（手機版統一左上角位置，電腦版維持原位） -->
+    <header class="block w-full absolute md:fixed top-0 left-0 z-40 md:z-50 pointer-events-none">
+        <nav class="hidden md:flex pointer-events-auto w-full h-[48px] bg-[#FF99D3] items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-native-scrollbar">
+            <div class="flex items-center gap-7 xl:gap-10 text-[#2A348C] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
                 <a href="./board.html" class="hover:opacity-70 transition-opacity">公廁現況板</a>
-<a href="./handbook.html" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
+                <a href="./handbook.html" class="hover:opacity-70 transition-opacity">小怪圖鑑</a>
                 <a href="./profile.html" class="hover:opacity-70 transition-opacity">個人空間</a>
             </div>
         </nav>
 
-        <!-- 左上角 LOGO（與 profile.html 相同大小與位置，自然覆蓋於導覽列上方） -->
+        <!-- 左上角 LOGO -->
         <div class="absolute inset-x-0 top-0 pointer-events-none z-40">
-            <div class="w-full max-w-[1440px] mx-auto relative px-6">
-                <a href="./index.html" class="group pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-40" title="回到有所味主頁">
+            <div class="w-full max-w-[1440px] mx-auto relative md:px-6">
+                <a href="./index.html" class="group pointer-events-auto absolute top-[22px] left-5 md:static md:inline-block md:mt-3 lg:absolute lg:top-4 lg:left-10 lg:mt-0 z-40 focus:outline-none transition-transform duration-200 hover:scale-105 active:scale-95" title="回到有所味主頁">
                     <img id="mapDesktopLogoImg"
                          data-local-src="./img/logo.png"
                          src="./img/logo.png"
                          alt="有所味 Logo"
-                         class="w-[195px] h-auto object-contain transition-transform duration-200 group-hover:scale-105" />
+                         class="w-[118px] md:w-[195px] h-auto object-contain block" />
                 </a>
             </div>
         </div>
     </header>
 
     <!-- 手機版右上角漢堡選單與下拉式衛生紙捲筒選單 -->
-    <div id="mapMobileNavContainer" class="fixed top-[34px] right-[7.4%] z-50 flex md:hidden items-center justify-end">
+    <div id="mapMobileNavContainer" class="absolute top-[26px] right-5 z-[45] flex md:hidden items-center justify-end">
         <button id="mapMobileHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
                 class="flex flex-col justify-center gap-[8px] p-1.5 focus:outline-none group transition-transform active:scale-95">
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
-        <div id="mapTpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-34px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+        <div id="mapTpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[-2px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                 <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
-                      fill="#FFF8EA" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                 <g id="mapTpMenuHomeBtn" class="map-tp-menu-item" role="button" tabindex="0">
                     <rect x="8" y="34" width="180" height="48" fill="transparent" />
@@ -416,11 +417,11 @@
                 </g>
 
                 <path d="M 34,420 L 177,420 A 31,88 0 0,1 177,596 L 34,596 Z"
-                      fill="#FFF8EA" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                      fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                 <ellipse cx="34" cy="508" rx="31" ry="88"
-                         fill="#FFF8EA" stroke="#2A348C" stroke-width="2.4" />
+                         fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
                 <ellipse cx="31" cy="508" rx="9" ry="26"
-                         fill="#F5F078" stroke="#2A348C" stroke-width="2.2" />
+                         fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
             </svg>
         </div>
     </div>
@@ -464,7 +465,7 @@
 
             <!-- 1:1 還原 06066-06.svg 所在位置粉紅便便圖示 -->
             <g id="poopgleCurrentLocSymbol">
-                <ellipse cx="40" cy="58.5" rx="33" ry="9" fill="#232D8B" />
+                <ellipse cx="40" cy="58.5" rx="33" ry="9" fill="#2A348C" />
                 <path d="M 39.5,8.5
                          C 37.2,13.5 35.5,16 31.5,16.5
                          C 24.5,17.3 21.5,22.8 23.2,29
@@ -474,29 +475,29 @@
                          C 68.5,41.8 65.5,32.2 56.8,29
                          C 58.5,22.8 55.5,17.3 48.5,16.5
                          C 44.5,16 42.2,13.5 39.5,8.5 Z"
-                      fill="#FF90D4" stroke="#232D8B" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
+                      fill="#FF99D3" stroke="#2A348C" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
                 <ellipse cx="34.2" cy="31.8" rx="6.1" ry="7.2" fill="#FFFFFF" />
                 <ellipse cx="45.8" cy="31.8" rx="6.1" ry="7.2" fill="#FFFFFF" />
                 <path d="M 27.8,31.5 C 27.8,22.5 40,22.5 40,30.5 C 40,22.5 52.2,22.5 52.2,31.5"
-                      fill="none" stroke="#232D8B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                <ellipse cx="35.8" cy="32.2" rx="3.5" ry="4.7" fill="#232D8B" />
-                <ellipse cx="44.2" cy="32.2" rx="3.5" ry="4.7" fill="#232D8B" />
+                      fill="none" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <ellipse cx="35.8" cy="32.2" rx="3.5" ry="4.7" fill="#2A348C" />
+                <ellipse cx="44.2" cy="32.2" rx="3.5" ry="4.7" fill="#2A348C" />
             </g>
 
             <!-- 1:1 還原 常用-07.svg「常用公廁」青藍圓潤五角星大眼圖示 -->
             <g id="poopgleSaveSpiritSymbol">
                 <!-- 圓潤胖胖五角星本體 -->
                 <polygon points="22,7.2 26.9,15.5 36.2,17.6 29.9,24.8 30.8,34.3 22,30.5 13.2,34.3 14.1,24.8 7.8,17.6 17.1,15.5"
-                         fill="#4BE0FF" stroke="#4BE0FF" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round" />
+                         fill="#80E4FF" stroke="#80E4FF" stroke-width="5.2" stroke-linejoin="round" stroke-linecap="round" />
                 <!-- 雙眼眼白 -->
                 <ellipse cx="18.9" cy="20.4" rx="3.2" ry="4.1" fill="#FFFFFF" />
                 <ellipse cx="25.1" cy="20.4" rx="3.2" ry="4.1" fill="#FFFFFF" />
                 <!-- 上眼瞼深藍細弧線 -->
                 <path d="M 15.5,20.0 C 15.5,14.8 22,14.8 22,19.4 C 22,14.8 28.5,14.8 28.5,20.0"
-                      fill="none" stroke="#232D8B" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+                      fill="none" stroke="#2A348C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
                 <!-- 微向內看的深藍眼珠 -->
-                <ellipse cx="19.6" cy="20.7" rx="1.95" ry="2.75" fill="#232D8B" />
-                <ellipse cx="24.4" cy="20.7" rx="1.95" ry="2.75" fill="#232D8B" />
+                <ellipse cx="19.6" cy="20.7" rx="1.95" ry="2.75" fill="#2A348C" />
+                <ellipse cx="24.4" cy="20.7" rx="1.95" ry="2.75" fill="#2A348C" />
             </g>
         </defs>
     </svg>
@@ -511,21 +512,10 @@
     <!-- =================================================================== -->
     <main class="squat-toilet-shell relative z-10 w-full max-w-[1460px] md:w-[95vw] bg-white border-[2.5px] border-[#2A348C] pt-12 pb-8 px-6 sm:px-10 flex flex-col md:flex-row items-stretch gap-4 md:gap-5 lg:gap-7 shadow-[0_10px_30px_rgba(42,52,140,0.12)]">
 
-         <!-- 壓在蹲式馬桶頂部的「有所味 Logo + POOPGLE MAP」：手機版上下垂直置中，電腦版左右並排 -->
-      <div class="absolute -top-[84px] md:-top-[44px] lg:-top-[52px] xl:-top-[56px] left-1/2 -translate-x-1/2 z-30 flex flex-col md:flex-row items-center md:items-end gap-0 md:gap-2.5 lg:gap-3 pointer-events-none select-none whitespace-nowrap">
-          <!-- 手機版頂部「有所味」Logo（無白框，保留原比例與對齊位置） -->
-          <a href="./index.html"
-             class="pointer-events-auto group focus:outline-none block md:hidden shrink-0"
-             title="返回有所味主頁">
-              <svg viewBox="-32 -28 610 246" class="w-[146px] sm:w-[158px] h-auto overflow-visible transition-transform duration-200 group-hover:scale-105">
-                  <g>
-                      <image id="mapTopLeftLogoImg" x="0" y="0" width="545" height="190" preserveAspectRatio="xMidYMid meet" />
-                  </g>
-              </svg>
-          </a>
-
-           <!-- 下方/右側：「POOPGLE MAP」立體白邊貼紙標題 -->
-          <div class="pointer-events-none select-none shrink-0 -mt-1.5 md:mt-0">
+         <!-- 壓在蹲式馬桶頂部的「POOPGLE MAP」標題 -->
+      <div class="absolute -top-[34px] sm:-top-[38px] md:-top-[44px] lg:-top-[52px] xl:-top-[56px] left-1/2 -translate-x-1/2 z-30 flex items-center justify-center pointer-events-none select-none whitespace-nowrap">
+           <!-- 「POOPGLE MAP」立體白邊貼紙標題 -->
+          <div class="pointer-events-none select-none shrink-0">
               <svg viewBox="0 0 480 86" class="w-[262px] sm:w-[286px] md:w-[328px] lg:w-[402px] xl:w-[442px] h-auto overflow-visible drop-shadow-[0_2px_0_rgba(42,52,140,0.08)]">
 
                     <g font-family="'jf-openhuninn', 'Varela Round', 'Kosugi Maru', 'Noto Sans TC', sans-serif" font-size="54" font-weight="700" letter-spacing="3" text-anchor="middle" dominant-baseline="central">
@@ -533,8 +523,8 @@
                         <text x="392" y="45" fill="#2A348C" stroke="#2A348C" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">MAP</text>
                         <text x="160" y="45" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="21.5" stroke-linejoin="round" stroke-linecap="round">POOPGLE</text>
                         <text x="392" y="45" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="21.5" stroke-linejoin="round" stroke-linecap="round">MAP</text>
-                        <text x="160" y="45" fill="#FF94DA">POOPGLE</text>
-                        <text x="392" y="45" fill="#4BE0FF">MAP</text>
+                        <text x="160" y="45" fill="#FF99D3">POOPGLE</text>
+                        <text x="392" y="45" fill="#80E4FF">MAP</text>
                     </g>
                 </svg>
             </div>
@@ -550,7 +540,7 @@
                 <!-- 頂部搜尋與篩選群組 -->
                 <div class="space-y-2.5 lg:space-y-3 shrink-0">
                     <!-- 1. 電腦版粉紅搜尋框 (手機版改嵌在下方青藍列表標題列中) -->
-                    <div class="hidden md:flex relative w-full h-[38px] lg:h-[42px] bg-[#FF94DA] items-center px-3.5">
+                    <div class="hidden md:flex relative w-full h-[38px] lg:h-[42px] bg-[#FF99D3] items-center px-3.5">
                         <svg viewBox="0 0 24 24" class="w-4 h-4 lg:w-5 lg:h-5 text-[#2A348C] shrink-0 mr-2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="10.5" cy="10.5" r="6.5" />
                             <line x1="15.5" y1="15.5" x2="21" y2="21" />
@@ -564,7 +554,7 @@
 
                     <!-- 2. 篩選按鈕列：縣市 / 鄉鎮 / 類型 / (登入後顯示)常用公廁星星 -->
 <div id="topFilterButtonsGrid" class="w-[82%] md:w-full mx-auto grid grid-cols-4 gap-2 lg:gap-2.5">
-                        <div id="countyFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF94DA] flex items-center justify-center px-1 cursor-pointer">
+                        <div id="countyFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF99D3] flex items-center justify-center px-1 cursor-pointer">
                             <span id="countyBtnLabel" class="text-[#2A348C] text-[13px] md:text-[14px] lg:text-[15px] font-black md:font-semibold tracking-widest truncate pointer-events-none">縣市</span>
                             <select id="countyFilterSelect" aria-label="選擇縣市" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
                                 <option value="">全部縣市</option>
@@ -572,7 +562,7 @@
                         </div>
 
                         <!-- 鄉鎮 -->
-                        <div id="townFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF94DA] flex items-center justify-center px-1 cursor-pointer">
+                        <div id="townFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF99D3] flex items-center justify-center px-1 cursor-pointer">
                             <span id="townBtnLabel" class="text-[#2A348C] text-[13px] md:text-[14px] lg:text-[15px] font-black md:font-semibold tracking-widest truncate pointer-events-none">鄉鎮</span>
                             <select id="townFilterSelect" aria-label="選擇鄉鎮" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
                                 <option value="">全部鄉鎮</option>
@@ -580,7 +570,7 @@
                         </div>
 
                         <!-- 類型 -->
-                        <div id="typeFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF94DA] flex items-center justify-center px-1 cursor-pointer">
+                        <div id="typeFilterBox" class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF99D3] flex items-center justify-center px-1 cursor-pointer">
                             <span id="typeBtnLabel" class="text-[#2A348C] text-[13px] md:text-[14px] lg:text-[15px] font-black md:font-semibold tracking-widest truncate pointer-events-none">類型</span>
                             <select id="typeFilterSelect" aria-label="選擇公廁類型" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
                                 <option value="">全部類型</option>
@@ -589,7 +579,7 @@
 
                         <!-- 常用公廁切換按鈕 -->
                         <button id="favoriteFilterBtn" type="button"
-                                class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F5F078] flex items-center justify-center overflow-hidden focus:outline-none"
+                                class="pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F3EF84] flex items-center justify-center overflow-hidden focus:outline-none"
                                 title="篩選「常用公廁」">
                             <img id="favBtnCustomSvgImg" alt="常用公廁" class="hidden w-full h-full object-contain pointer-events-none" />
                             <svg id="favBtnInlineSpiritSvg" viewBox="0 0 44 42" class="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 pointer-events-none block">
@@ -602,9 +592,9 @@
                 <!-- 3. 中間公廁列表框 (手機版頂部青藍列內嵌粉紅搜尋框，電腦版顯示「公廁列表」標題) -->
                 <div class="w-[96%] md:w-full mx-auto h-[248px] md:h-auto md:flex-1 md:min-h-0 flex flex-col overflow-hidden">
                     <!-- 青藍列表標題列 -->
-                    <div class="h-[34px] md:h-[38px] lg:h-[42px] bg-[#4BE0FF] flex items-center justify-center relative px-3 shrink-0">
+                    <div class="h-[34px] md:h-[38px] lg:h-[42px] bg-[#80E4FF] flex items-center justify-center relative px-3 shrink-0">
                         <!-- 手機版：青藍列內嵌粉紅搜尋關鍵字框 (1:1 還原設計圖) -->
-                        <div class="flex md:hidden items-center w-[66%] h-[22px] bg-[#FF94DA] px-2.5">
+                        <div class="flex md:hidden items-center w-[66%] h-[22px] bg-[#FF99D3] px-2.5">
                             <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-[#2A348C] shrink-0 mr-1.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="10.5" cy="10.5" r="6.5" />
                                 <line x1="15.5" y1="15.5" x2="21" y2="21" />
@@ -619,7 +609,7 @@
                     </div>
 
                     <!-- 卡片容器 -->
-                    <div id="toiletListBodyWrapper" class="flex-1 min-h-0 bg-[#FF94DA] relative flex flex-col overflow-hidden pt-2 pb-2 px-3.5 md:pt-1.5 md:pb-1.5 md:pl-1.5 md:pr-5 transition-colors duration-200">
+                    <div id="toiletListBodyWrapper" class="flex-1 min-h-0 bg-[#FF99D3] relative flex flex-col overflow-hidden pt-2 pb-2 px-3.5 md:pt-1.5 md:pb-1.5 md:pl-1.5 md:pr-5 transition-colors duration-200">
                         <div id="toiletListContainer" class="w-full flex-1 min-h-0 overflow-y-auto no-native-scrollbar space-y-2.5 py-1 md:pl-1 md:pr-1.5">
                             <div class="h-full flex flex-col items-center justify-center text-center p-5 text-[#2A348C] font-bold text-xs space-y-2">
                                 <i class="fa-solid fa-spinner fa-spin text-lg"></i>
@@ -628,12 +618,12 @@
                         </div>
 
                         <!-- 右側專屬黃色膠囊捲軸 (手機版隱藏，電腦版顯示) -->
-                        <div id="customScrollbarWrapper" class="hidden md:flex absolute right-1.5 top-1/2 -translate-y-1/2 h-[66%] min-h-[100px] w-[14px] rounded-full bg-[#FFF8EA] border-2 border-[#4BE0FF] flex-col items-center justify-between py-1 select-none z-10">
-                            <button id="listScrollUpBtn" type="button" class="text-[#FF94DA] hover:text-[#2A348C] leading-none text-[8px] focus:outline-none" aria-label="向上捲動">▲</button>
+                        <div id="customScrollbarWrapper" class="hidden md:flex absolute right-1.5 top-1/2 -translate-y-1/2 h-[66%] min-h-[100px] w-[14px] rounded-full bg-[#FFF9EC] border-2 border-[#80E4FF] flex-col items-center justify-between py-1 select-none z-10">
+                            <button id="listScrollUpBtn" type="button" class="text-[#FF99D3] hover:text-[#2A348C] leading-none text-[8px] focus:outline-none" aria-label="向上捲動">▲</button>
                             <div id="listScrollTrack" class="relative flex-1 w-full my-0.5 flex justify-center cursor-pointer">
-                                <div id="listScrollThumb" class="w-[8px] h-[44px] rounded-full bg-[#F5F078] cursor-grab active:cursor-grabbing transition-colors hover:bg-[#ebe454]" style="transform: translateY(0px);"></div>
+                                <div id="listScrollThumb" class="w-[8px] h-[44px] rounded-full bg-[#F3EF84] cursor-grab active:cursor-grabbing transition-colors hover:bg-[#ebe454]" style="transform: translateY(0px);"></div>
                             </div>
-                            <button id="listScrollDownBtn" type="button" class="text-[#FF94DA] hover:text-[#2A348C] leading-none text-[8px] focus:outline-none" aria-label="向下捲動">▼</button>
+                            <button id="listScrollDownBtn" type="button" class="text-[#FF99D3] hover:text-[#2A348C] leading-none text-[8px] focus:outline-none" aria-label="向下捲動">▼</button>
                         </div>
                     </div>
                 </div>
@@ -641,19 +631,19 @@
                 <!-- 4. 底部四顆距離篩選按鈕：100m / 500m / 1km+ / All -->
                 <div class="w-[82%] md:w-full mx-auto grid grid-cols-4 gap-2 lg:gap-2.5 shrink-0">
                     <button type="button" data-radius="100"
-                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF94DA] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
+                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF99D3] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
                         100m
                     </button>
                     <button type="button" data-radius="500"
-                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF94DA] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
+                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF99D3] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
                         500m
                     </button>
                     <button type="button" data-radius="1000plus"
-                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF94DA] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
+                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#FF99D3] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
                         1km+
                     </button>
                     <button type="button" data-radius="0"
-                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#F5F078] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
+                            class="radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] bg-[#F3EF84] text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none">
                         All
                     </button>
                 </div>
@@ -667,7 +657,7 @@
                 <!-- 右下角「返回公廁列表」粉色按鈕 -->
                 <div class="w-full flex justify-end mt-2.5">
                     <button id="mobileBackToListBtn" type="button"
-                            class="pm-flat-btn w-[166px] h-[30px] bg-[#FF94DA] text-[#2A348C] text-[13px] font-black tracking-[0.18em] flex items-center justify-center focus:outline-none">
+                            class="pm-flat-btn w-[166px] h-[30px] bg-[#FF99D3] text-[#2A348C] text-[13px] font-black tracking-[0.18em] flex items-center justify-center focus:outline-none">
                         返回公廁列表
                     </button>
                 </div>
@@ -677,7 +667,7 @@
         <!-- =============================================================== -->
         <!-- 右欄：蹲式馬桶右側同心圓角青藍外框地圖 + 左下定位雙按鈕         -->
         <!-- =============================================================== -->
-        <section class="squat-toilet-map-well flex-1 h-[400px] sm:h-[460px] md:h-full relative border-[6px] border-[#4BE0FF] overflow-hidden bg-[#E8F4F8] order-1 md:order-2">
+        <section class="squat-toilet-map-well flex-1 h-[400px] sm:h-[460px] md:h-full relative border-[6px] border-[#80E4FF] overflow-hidden bg-[#E8F4F8] order-1 md:order-2">
 
             <!-- Leaflet 地圖主體 -->
             <div id="map"></div>
@@ -686,11 +676,11 @@
           <div class="absolute left-2.5 sm:left-3.5 bottom-2.5 sm:bottom-3.5 z-[420] flex items-center gap-2 sm:gap-2.5">
               <!-- 左卡：定位最近公廁 -->
               <button id="btnLocateCurrentPos" type="button"
-                      class="pm-flat-btn w-[68px] h-[72px] sm:w-[72px] sm:h-[76px] bg-[#FF94DA] border-[3px] border-[#4BE0FF] flex flex-col items-center justify-between pt-1.5 pb-1.5 px-1 shadow-md focus:outline-none"
+                      class="pm-flat-btn w-[68px] h-[72px] sm:w-[72px] sm:h-[76px] bg-[#FF99D3] border-[3px] border-[#80E4FF] flex flex-col items-center justify-between pt-1.5 pb-1.5 px-1 shadow-md focus:outline-none"
                       title="定位距離您最近的公廁">
                   <svg viewBox="0 0 40 42" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0">
                       <path d="M 20,3 C 11.2,3 4,10.2 4,19 C 4,29.5 20,40 20,40 C 20,40 36,29.5 36,19 C 36,10.2 28.8,3 20,3 Z" fill="#FFFFFF" />
-                      <circle cx="20" cy="18" r="6" fill="#FF94DA" />
+                      <circle cx="20" cy="18" r="6" fill="#FF99D3" />
                   </svg>
                   <span class="text-[#2A348C] text-[10px] font-black leading-[1.15] tracking-tight text-center">
                       定位<br>最近公廁
@@ -699,7 +689,7 @@
 
               <!-- 右卡：目前位置 (顯示 06066-06.svg 粉紅便便圖示) -->
               <button id="btnPanToCurrentPos" type="button"
-                      class="pm-flat-btn w-[68px] h-[72px] sm:w-[72px] sm:h-[76px] bg-[#FF94DA] border-[3px] border-[#4BE0FF] flex flex-col items-center justify-between pt-1 pb-1.5 px-1 shadow-md focus:outline-none"
+                      class="pm-flat-btn w-[68px] h-[72px] sm:w-[72px] sm:h-[76px] bg-[#FF99D3] border-[3px] border-[#80E4FF] flex flex-col items-center justify-between pt-1 pb-1.5 px-1 shadow-md focus:outline-none"
                       title="將地圖移至您的目前位置">
                   <svg viewBox="0 0 80 68" class="w-10 h-9 sm:w-11 sm:h-10 shrink-0">
                       <use href="#poopgleCurrentLocSymbol" />
@@ -717,17 +707,17 @@
     <!-- MODAL 1: 公廁詳細評論、4 項同步星等與最常出現小怪 (>=5 人門檻)       -->
     <!-- =================================================================== -->
     <div id="toiletReviewsModal" class="hidden fixed inset-0 z-[650] bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FFF8EA] rounded-[28px] max-w-xl w-full border-[2.5px] border-[#2A348C] shadow-[0_10px_0_#2A348C] overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="bg-[#FF94DA] border-b-[2.5px] border-[#2A348C] px-6 py-4 flex items-start justify-between gap-3 shrink-0">
+        <div class="bg-[#FFF9EC] rounded-[28px] max-w-xl w-full border-[2.5px] border-[#2A348C] shadow-[0_10px_0_#2A348C] overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-[#FF99D3] border-b-[2.5px] border-[#2A348C] px-6 py-4 flex items-start justify-between gap-3 shrink-0">
                 <div class="min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <span id="modalToiletTypeBadge" class="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#F5F078] border-[1.5px] border-[#2A348C] text-[#2A348C]">公廁</span>
+                        <span id="modalToiletTypeBadge" class="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#F3EF84] border-[1.5px] border-[#2A348C] text-[#2A348C]">公廁</span>
                         <span id="modalToiletGradeBadge" class="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-white border-[1.5px] border-[#2A348C] text-[#2A348C]">特優級</span>
                     </div>
                     <h3 id="modalToiletName" class="font-black text-base sm:text-xl text-[#2A348C] mt-1.5 break-words">公廁名稱</h3>
                     <p id="modalToiletAddress" class="text-xs font-bold text-[#2A348C]/80 mt-0.5 break-words"></p>
                 </div>
-                <button id="closeReviewsModalBtn" type="button" class="w-9 h-9 rounded-full bg-[#FFF8EA] hover:bg-[#F5F078] border-2 border-[#2A348C] text-[#2A348C] flex items-center justify-center shrink-0 transition-colors focus:outline-none">
+                <button id="closeReviewsModalBtn" type="button" class="w-9 h-9 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-2 border-[#2A348C] text-[#2A348C] flex items-center justify-center shrink-0 transition-colors focus:outline-none">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -740,13 +730,13 @@
     <!-- MODAL 2: 檢舉不當留言彈窗 (送交管理員後台人工審核)                  -->
     <!-- =================================================================== -->
     <div id="reportCommentModal" class="hidden fixed inset-0 z-[680] bg-[#2A348C]/55 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FFF8EA] rounded-[28px] max-w-md w-full border-[2.5px] border-[#2A348C] shadow-[0_8px_0_#2A348C] overflow-hidden flex flex-col">
-            <div class="bg-[#FF94DA] border-b-[2.5px] border-[#2A348C] px-6 py-4 flex items-center justify-between">
+        <div class="bg-[#FFF9EC] rounded-[28px] max-w-md w-full border-[2.5px] border-[#2A348C] shadow-[0_8px_0_#2A348C] overflow-hidden flex flex-col">
+            <div class="bg-[#FF99D3] border-b-[2.5px] border-[#2A348C] px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-flag text-[#2A348C]"></i>
                     <h3 class="font-black text-base text-[#2A348C]">檢舉不當留言（人工審核）</h3>
                 </div>
-                <button id="closeReportModalBtn" type="button" class="w-8 h-8 rounded-full bg-[#FFF8EA] border-2 border-[#2A348C] text-[#2A348C] flex items-center justify-center">
+                <button id="closeReportModalBtn" type="button" class="w-8 h-8 rounded-full bg-[#FFF9EC] border-2 border-[#2A348C] text-[#2A348C] flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -777,7 +767,7 @@
                     <button id="cancelReportBtn" type="button" class="px-5 py-2 rounded-full bg-white border-2 border-[#2A348C] font-bold text-xs sm:text-sm">
                         取消
                     </button>
-                    <button id="submitReportBtn" type="button" class="px-5 py-2 rounded-full bg-[#F5F078] hover:bg-[#ebe454] border-2 border-[#2A348C] font-black text-xs sm:text-sm">
+                    <button id="submitReportBtn" type="button" class="px-5 py-2 rounded-full bg-[#F3EF84] hover:bg-[#ebe454] border-2 border-[#2A348C] font-black text-xs sm:text-sm">
                         送出檢舉
                     </button>
                 </div>
@@ -786,16 +776,16 @@
     </div>
 
     <!-- Toast 訊息提示框 -->
-    <div id="toastBox" class="fixed bottom-5 right-5 z-[700] hidden max-w-sm bg-[#F5F078] text-[#2A348C] px-4 py-3 rounded-2xl border-2 border-[#2A348C] shadow-[0_5px_0_#2A348C] flex items-center gap-3 text-xs sm:text-sm transition-all">
+    <div id="toastBox" class="fixed bottom-5 right-5 z-[700] hidden max-w-sm bg-[#F3EF84] text-[#2A348C] px-4 py-3 rounded-2xl border-2 border-[#2A348C] shadow-[0_5px_0_#2A348C] flex items-center gap-3 text-xs sm:text-sm transition-all">
         <i id="toastIcon" class="fa-solid fa-circle-info text-base"></i>
         <span id="toastMessage" class="font-black leading-snug">訊息提示</span>
     </div>
 
     <!-- 施工中彈窗 (供手機版漢堡選單點擊「公廁現況板 / 小怪圖鑑」使用) -->
     <div id="mapUnderConstructionModal" class="hidden fixed inset-0 z-[720] bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-[#FFF8EA] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
+        <div class="bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
             <button id="closeMapUnderConstructionBtn" type="button" aria-label="關閉"
-                    class="w-9 h-9 rounded-full bg-[#FFF8EA] hover:bg-[#F5F078] border-[2px] border-[#2A348C] absolute top-4 right-4 flex items-center justify-center focus:outline-none">
+                    class="w-9 h-9 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-[2px] border-[#2A348C] absolute top-4 right-4 flex items-center justify-center focus:outline-none">
                 <i class="fa-solid fa-xmark text-[#2A348C]"></i>
             </button>
             <div class="text-2xl sm:text-3xl font-extrabold text-[#2A348C] tracking-wider py-2">
@@ -964,7 +954,7 @@
             msg.textContent = message;
             if (icon) {
                 if (type === 'success') icon.className = 'fa-solid fa-circle-check text-base text-[#2A348C]';
-                else if (type === 'error') icon.className = 'fa-solid fa-triangle-exclamation text-base text-[#EE5A5A]';
+                else if (type === 'error') icon.className = 'fa-solid fa-triangle-exclamation text-base text-[#F26559]';
                 else icon.className = 'fa-solid fa-circle-info text-base text-[#2A348C]';
             }
             box.classList.remove('hidden');
@@ -1036,11 +1026,11 @@
 
         function initMapTopLeftLogoAndSpiritAssets() {
             // 1. 初始化左上角「有所味」圓潤白邊貼紙 Logo (內建向量備援 + 自動探測 ./img/logo.png)
-            const logoImgEl = document.getElementById('mapTopLeftLogoImg');
+            const desktopLogoEl = document.getElementById('mapDesktopLogoImg');
             const symbolEl = document.getElementById('youSuoWeiLogoMapSymbol');
-            if (logoImgEl && symbolEl) {
+            if (IS_STRICT_SANDBOX && desktopLogoEl && symbolEl) {
                 const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 0 555 190">${symbolEl.innerHTML}</svg>`;
-                logoImgEl.setAttribute('href', `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`);
+                desktopLogoEl.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
             }
 
             if (IS_STRICT_SANDBOX) return;
@@ -1107,8 +1097,8 @@
                     favBtn.className = 'hidden';
                 } else {
                     favBtn.className = state.onlyFavorites
-                        ? 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F5F078] border-[2.5px] border-[#FF94DA] flex items-center justify-center overflow-hidden focus:outline-none'
-                        : 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F5F078] flex items-center justify-center overflow-hidden focus:outline-none';
+                        ? 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F3EF84] border-[2.5px] border-[#FF99D3] flex items-center justify-center overflow-hidden focus:outline-none'
+                        : 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#F3EF84] flex items-center justify-center overflow-hidden focus:outline-none';
                 }
             }
 
@@ -1117,8 +1107,8 @@
                 headerTitle.textContent = showFavMode ? '常用' : '公廁列表';
             }
             if (listBodyWrapper) {
-                listBodyWrapper.classList.toggle('bg-[#F5F078]', showFavMode);
-                listBodyWrapper.classList.toggle('bg-[#FF94DA]', !showFavMode);
+                listBodyWrapper.classList.toggle('bg-[#F3EF84]', showFavMode);
+                listBodyWrapper.classList.toggle('bg-[#FF99D3]', !showFavMode);
             }
         }
 
@@ -1163,12 +1153,12 @@
         }
 
         function getMonsterBadgeIconFallbackUri(kind) {
-            const fill = kind === '小妖' ? '#FF94DA' : '#4BE0FF';
+            const fill = kind === '小妖' ? '#FF99D3' : '#80E4FF';
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="${fill}" stroke="#2A348C" stroke-width="3"/><ellipse cx="25" cy="28" rx="4" ry="5.5" fill="#2A348C"/><ellipse cx="39" cy="28" rx="4" ry="5.5" fill="#2A348C"/><path d="M 24,40 Q 32,46 40,40" fill="none" stroke="#2A348C" stroke-width="3" stroke-linecap="round"/></svg>`;
             return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
         }
 
-        function getFallbackPfpUri(bgHex = '#2A348C', fgHex = '#FF94DA') {
+        function getFallbackPfpUri(bgHex = '#2A348C', fgHex = '#FF99D3') {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104"><circle cx="52" cy="52" r="52" fill="${bgHex}"/><path d="M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z" fill="${fgHex}"/></svg>`;
             return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
         }
@@ -1206,7 +1196,7 @@
                 pink_poop: 'free_toilet'
             };
             const cleanKey = String(legacyMap[avatarType] || avatarType || DEFAULT_LOGGED_IN_PFP).replace(/\.(png|PNG|svg|jpg|webp)$/i, '');
-            const fallback = getFallbackPfpUri('#4BE0FF', '#F5F078');
+            const fallback = getFallbackPfpUri('#80E4FF', '#F3EF84');
             return `<img src="${fallback}" data-local-src="./img/pfp/${escapeHtml(cleanKey)}.png" alt="頭貼" class="w-full h-full object-cover block rounded-full" />`;
         }
 
@@ -1215,7 +1205,7 @@
             const savedKey = (review && typeof review.avatarType === 'string' && anonList.includes(review.avatarType))
                 ? review.avatarType
                 : anonList[rIdx % anonList.length];
-            const fallback = getFallbackPfpUri('#2A348C', '#FF94DA');
+            const fallback = getFallbackPfpUri('#2A348C', '#FF99D3');
             return `<img src="${fallback}" data-local-src="./img/pfp/${escapeHtml(savedKey)}.png" alt="匿名頭貼" class="w-full h-full object-cover block rounded-full" />`;
         }
 
@@ -1387,7 +1377,7 @@
             const rounded = Math.round(num);
             let starsHtml = '';
             for (let i = 1; i <= 5; i++) {
-                const fill = i <= rounded ? '#F5F078' : '#FFFFFF';
+                const fill = i <= rounded ? '#F3EF84' : '#FFFFFF';
                 starsHtml += `
                     <svg viewBox="-24 -24 48 48" class="w-[18px] h-[18px] shrink-0 overflow-visible">
                         <path d="M 1.2,-19.5 C 4.2,-19.4 6.3,-10.2 8.8,-8.4 C 11.3,-6.6 20.4,-6.8 21.2,-3.9 C 22.0,-1.0 14.3,4.6 13.4,7.4 C 12.5,10.2 15.4,18.8 12.8,20.5 C 10.2,22.2 2.9,16.6 0,16.5 C -2.9,16.4 -10.6,21.7 -13.1,19.8 C -15.6,17.9 -12.2,9.6 -13.0,6.7 C -13.8,3.8 -21.3,-2.0 -20.2,-4.8 C -19.1,-7.6 -10.0,-7.0 -7.4,-8.7 C -4.8,-10.4 -1.9,-19.6 1.2,-19.5 Z"
@@ -1405,30 +1395,30 @@
             const isSaved = isLoggedIn && state.savedToiletKeys.has(getToiletFavoriteId(toilet));
             const safeKey = escapeHtml(toilet.key);
 
-            const themeMainHex = isSaved ? '#F5F078' : '#4BE0FF';
-            const themeDividerHex = isSaved ? '#F5F078' : 'rgba(75, 224, 255, 0.45)';
+            const themeMainHex = isSaved ? '#F3EF84' : '#80E4FF';
+            const themeDividerHex = isSaved ? '#F3EF84' : 'rgba(75, 224, 255, 0.45)';
             const themeCopyBtnClasses = isSaved
-                ? 'bg-[#F5F078] hover:bg-[#ebe458] active:bg-[#dfd848]'
-                : 'bg-[#4BE0FF] hover:bg-[#35d4f5] active:bg-[#28c6e8]';
+                ? 'bg-[#F3EF84] hover:bg-[#ebe458] active:bg-[#dfd848]'
+                : 'bg-[#80E4FF] hover:bg-[#35d4f5] active:bg-[#28c6e8]';
 
             const reviewsLabelText = stats ? `查看評論(${stats.count})` : '查看評論';
             const saveLabelText = isSaved ? '已存常用' : '存到常用';
             const saveCircleClasses = isSaved
-                ? 'bg-[#F5F078] border-[#FF94DA]'
-                : 'bg-[#F5F078] border-transparent';
+                ? 'bg-[#F3EF84] border-[#FF99D3]'
+                : 'bg-[#F3EF84] border-transparent';
 
             const gmapNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(toilet.lat + ',' + toilet.lng)}`;
             const distStr = escapeHtml(formatDistanceText(toilet.distance));
 
             const starDisplaySectionHtml = stats
                 ? `
-                    <div class="px-3.5 py-2.5 bg-[#FFF8EA] space-y-2">
+                    <div class="px-3.5 py-2.5 bg-[#FFF9EC] space-y-2">
                         <div class="flex items-center justify-between gap-1.5">
                             <div class="flex items-center gap-1">
                                 ${renderPopupStarsRowSvg(stats.avgOverall)}
                                 <span class="ml-1 text-[15px] font-black text-[#2A348C]">${stats.avgOverall}</span>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full bg-[#F5F078] border border-[#2A348C] text-[10.5px] font-extrabold text-[#2A348C]">
+                            <span class="px-2 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] text-[10.5px] font-extrabold text-[#2A348C]">
                                 ${stats.count} 則評鑑
                             </span>
                         </div>
@@ -1439,14 +1429,14 @@
                             <div class="flex items-center justify-between"><span>空間寬敞</span><span class="font-black">${stats.avgSpace} ★</span></div>
                         </div>
                         ${(stats.frequentMonsters && stats.frequentMonsters.length > 0)
-                            ? `<div class="flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FF94DA]/35 border border-[#2A348C]/40 text-[10.5px] font-extrabold text-[#2A348C]">
+                            ? `<div class="flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FF99D3]/35 border border-[#2A348C]/40 text-[10.5px] font-extrabold text-[#2A348C]">
                                    <span>👾 最常出現：${escapeHtml(stats.frequentMonsters[0].name)}（${stats.frequentMonsters[0].count}人）</span>
                                </div>`
                             : ''}
                     </div>
                 `
                 : `
-                    <div class="px-3.5 py-2.5 bg-[#FFF8EA] space-y-2">
+                    <div class="px-3.5 py-2.5 bg-[#FFF9EC] space-y-2">
                         <div class="flex items-center justify-between gap-1.5">
                             <div class="flex items-center gap-1 opacity-55">
                                 ${renderPopupStarsRowSvg(0)}
@@ -1466,14 +1456,14 @@
 
              return `
               <div class="${isMobileInline ? 'w-full' : 'w-[296px]'} select-none font-['jf-openhuninn','Varela_Round','Kosugi_Maru','Noto_Sans_TC',sans-serif]" onclick="event.stopPropagation()">
-                  <div class="poopgle-popup-card bg-[#FFF8EA] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
-                      <div class="relative px-7 py-2 bg-[#FFF8EA] flex items-center justify-center border-b-[2px]" style="border-bottom-color: ${themeMainHex};">
+                  <div class="poopgle-popup-card bg-[#FFF9EC] border-[2.5px] ${isMobileInline ? '' : 'shadow-[0_8px_24px_rgba(42,52,140,0.24)]'} flex flex-col overflow-hidden" style="border-color: ${themeMainHex};">
+                      <div class="relative px-7 py-2 bg-[#FFF9EC] flex items-center justify-center border-b-[2px]" style="border-bottom-color: ${themeMainHex};">
                           <h3 class="text-[#2A348C] text-[17px] font-black tracking-wider text-center leading-snug truncate m-0">
                               ${escapeHtml(toilet.name)}
                           </h3>
                           ${isMobileInline ? '' : `
                           <button type="button" onclick="window.closeActiveToiletPopup(event)"
-                                  class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full hover:bg-[#FF94DA]/40 text-[#2A348C] flex items-center justify-center text-xs focus:outline-none"
+                                  class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full hover:bg-[#FF99D3]/40 text-[#2A348C] flex items-center justify-center text-xs focus:outline-none"
                                   aria-label="關閉資訊卡">
                               <i class="fa-solid fa-xmark"></i>
                           </button>`}
@@ -1485,17 +1475,17 @@
                             ★ ${escapeHtml(displayType)}
                         </div>
 
-                        <div class="px-3 py-2.5 bg-[#FFF8EA] space-y-2">
+                        <div class="px-3 py-2.5 bg-[#FFF9EC] space-y-2">
                             <div class="grid ${isLoggedIn ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5 text-center">
                                 <!-- 1. 查看評論 -->
                                 <button type="button" onclick="window.openToiletReviewsModal('${safeKey}')"
                                         class="pm-flat-btn flex flex-col items-center gap-1 focus:outline-none">
-                                    <span class="w-10 h-10 rounded-full bg-[#FF94DA] flex items-center justify-center">
+                                    <span class="w-10 h-10 rounded-full bg-[#FF99D3] flex items-center justify-center">
                                         <svg viewBox="0 0 36 36" class="w-6 h-6">
                                             <ellipse cx="14" cy="16" rx="8.5" ry="7" fill="#FFFFFF" />
                                             <polygon points="8,20 6,25 12,22" fill="#FFFFFF" />
-                                            <ellipse cx="22.5" cy="20" rx="7.5" ry="6" fill="#4BE0FF" />
-                                            <polygon points="27,24 30,28 24,25.5" fill="#4BE0FF" />
+                                            <ellipse cx="22.5" cy="20" rx="7.5" ry="6" fill="#80E4FF" />
+                                            <polygon points="27,24 30,28 24,25.5" fill="#80E4FF" />
                                         </svg>
                                     </span>
                                     <span class="text-[11px] font-semibold text-[#2A348C] tracking-tight whitespace-nowrap">${reviewsLabelText}</span>
@@ -1504,7 +1494,7 @@
                                 <!-- 2. 導航至此 -->
                                 <a href="${gmapNavUrl}" target="_blank" rel="noopener noreferrer"
                                    class="pm-flat-btn flex flex-col items-center gap-1 no-underline">
-                                    <span class="w-10 h-10 rounded-full bg-[#FF94DA] flex items-center justify-center">
+                                    <span class="w-10 h-10 rounded-full bg-[#FF99D3] flex items-center justify-center">
                                         <svg viewBox="0 0 36 36" class="w-6 h-6">
                                             <path d="M 10,23 C 10,16 14,14 20,14 L 20,9.5 L 28,16.5 L 20,23.5 L 20,19 C 15.5,19 13.5,20.5 12.5,24 Z" fill="#FFFFFF" />
                                         </svg>
@@ -1745,11 +1735,11 @@
             } else {
                 const renderBar = (label, val) => {
                     const pct = Math.min(100, Math.max(0, (Number(val) / 5) * 100));
-                    const barColor = Number(val) >= 4 ? '#4BE0FF' : (Number(val) >= 3 ? '#F5F078' : '#FF94DA');
+                    const barColor = Number(val) >= 4 ? '#80E4FF' : (Number(val) >= 3 ? '#F3EF84' : '#FF99D3');
                     return `
                         <div class="flex items-center gap-2 text-xs text-[#2A348C]">
                             <span class="w-16 font-black text-right shrink-0">${label}</span>
-                            <div class="flex-1 h-3 rounded-full bg-[#FFF8EA] border-[1.5px] border-[#2A348C] overflow-hidden p-0.5">
+                            <div class="flex-1 h-3 rounded-full bg-[#FFF9EC] border-[1.5px] border-[#2A348C] overflow-hidden p-0.5">
                                 <div class="h-full rounded-full transition-all" style="width:${pct}%; background-color:${barColor};"></div>
                             </div>
                             <span class="w-8 font-black text-right">${val}</span>
@@ -1769,7 +1759,7 @@
                            <div class="flex items-center gap-2.5 overflow-x-auto pb-1">
                                ${stats.frequentMonsters.slice(0, 5).map((m) => {
                                    const fallbackIcon = getMonsterBadgeIconFallbackUri(m.kind);
-                                   const tagBg = m.kind === '小妖' ? 'bg-[#FF94DA]/40' : 'bg-[#4BE0FF]/40';
+                                   const tagBg = m.kind === '小妖' ? 'bg-[#FF99D3]/40' : 'bg-[#80E4FF]/40';
                                    return `
                                        <div class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-2xl ${tagBg} border-[1.5px] border-[#2A348C]">
                                            <img src="${fallbackIcon}" data-local-src="./img/${escapeHtml(m.folder)}/${escapeHtml(m.id)}.png"
@@ -1795,7 +1785,7 @@
 
                 summaryBox.innerHTML = `
                     <div class="flex flex-col sm:flex-row items-center gap-5">
-                        <div class="flex flex-col items-center justify-center px-5 py-3 rounded-2xl bg-[#F5F078] border-2 border-[#2A348C] text-[#2A348C] shrink-0">
+                        <div class="flex flex-col items-center justify-center px-5 py-3 rounded-2xl bg-[#F3EF84] border-2 border-[#2A348C] text-[#2A348C] shrink-0">
                             <span class="text-[11px] font-bold">綜合星等</span>
                             <span class="text-3xl font-black leading-tight my-0.5">${stats.avgOverall}</span>
                             <span class="text-[11px] font-black">共 ${stats.count} 則評鑑</span>
@@ -1830,7 +1820,7 @@
                     const hasTextComment = Boolean(r.comment && String(r.comment).trim().length > 0);
                     const reportBtnHtml = (!isOwnComment && hasTextComment)
                         ? `<button type="button" onclick="window.openReportCommentByIndex(${rIdx})"
-                                   class="px-2 py-0.5 rounded-full bg-white hover:bg-[#FF94DA] border border-[#2A348C] text-[10px] font-bold text-[#2A348C] flex items-center gap-1">
+                                   class="px-2 py-0.5 rounded-full bg-white hover:bg-[#FF99D3] border border-[#2A348C] text-[10px] font-bold text-[#2A348C] flex items-center gap-1">
                                <i class="fa-regular fa-flag"></i><span>檢舉</span>
                            </button>`
                         : '';
@@ -1842,7 +1832,7 @@
                                ${reviewMonsterIds.map((mId) => {
                                    const info = MAP_MONSTER_CATALOG[mId];
                                    if (!info) return '';
-                                   const pillBg = info.kind === '小妖' ? 'bg-[#FF94DA]/45' : 'bg-[#4BE0FF]/45';
+                                   const pillBg = info.kind === '小妖' ? 'bg-[#FF99D3]/45' : 'bg-[#80E4FF]/45';
                                    return `<span class="px-2 py-0.5 rounded-full ${pillBg} border border-[#2A348C] text-[10px] font-black text-[#2A348C]">${escapeHtml(info.name)}</span>`;
                                }).join('')}
                            </div>`
@@ -1852,10 +1842,10 @@
                         <div class="p-3.5 rounded-2xl bg-white border-2 border-[#2A348C] space-y-1.5 text-[#2A348C]">
                             <div class="flex items-center justify-between gap-2 flex-wrap">
                                 <div class="flex items-center gap-2 min-w-0 flex-wrap">
-                                    <span class="w-8 h-8 rounded-full border-[1.5px] border-[#2A348C] overflow-hidden shrink-0 bg-[#FFF8EA]">${avatarHtml}</span>
+                                    <span class="w-8 h-8 rounded-full border-[1.5px] border-[#2A348C] overflow-hidden shrink-0 bg-[#FFF9EC]">${avatarHtml}</span>
                                     <span class="font-black text-xs truncate">${escapeHtml(reviewerName)}</span>
-                                    ${userTotalCount > 0 ? `<span class="px-2 py-0.5 rounded-full bg-[#4BE0FF]/40 border border-[#2A348C] font-bold text-[10px]">累積 ${userTotalCount} 則</span>` : ''}
-                                    <span class="px-2 py-0.5 rounded-full bg-[#F5F078] border border-[#2A348C] font-black text-[11px]">${Number(r.stars || 3).toFixed(1)} ★</span>
+                                    ${userTotalCount > 0 ? `<span class="px-2 py-0.5 rounded-full bg-[#80E4FF]/40 border border-[#2A348C] font-bold text-[10px]">累積 ${userTotalCount} 則</span>` : ''}
+                                    <span class="px-2 py-0.5 rounded-full bg-[#F3EF84] border border-[#2A348C] font-black text-[11px]">${Number(r.stars || 3).toFixed(1)} ★</span>
                                 </div>
                                 <div class="flex items-center gap-2 shrink-0">
                                     <span class="text-[11px] opacity-65 font-bold">${escapeHtml(dateStr)}</span>
@@ -1870,7 +1860,7 @@
                             </div>
                             ${reviewMonstersHtml}
                             ${hasTextComment
-                                ? `<p class="font-bold text-xs sm:text-sm bg-[#FFF8EA] p-2.5 rounded-xl border border-[#2A348C]/25 break-words">「${escapeHtml(r.comment)}」</p>`
+                                ? `<p class="font-bold text-xs sm:text-sm bg-[#FFF9EC] p-2.5 rounded-xl border border-[#2A348C]/25 break-words">「${escapeHtml(r.comment)}」</p>`
                                 : `<p class="opacity-50 text-xs italic">（僅提交星等評分）</p>`}
                         </div>
                     `;
@@ -2196,7 +2186,7 @@
             townSelect.innerHTML = `<option value="">全部鄉鎮</option>` + towns.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
              state.townFilter = '';
             document.getElementById('townBtnLabel').textContent = '鄉鎮';
-            document.getElementById('townFilterBox').className = 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF94DA] flex items-center justify-center px-1 cursor-pointer';
+            document.getElementById('townFilterBox').className = 'pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] bg-[#FF99D3] flex items-center justify-center px-1 cursor-pointer';
         }
         // ===================================================================
         // 6. 地圖初始化、06066-06.svg 目前位置標記與紅色公廁圖示
@@ -2360,7 +2350,7 @@
                     color: '#2A348C',
                     weight: 1.8,
                     dashArray: '5, 6',
-                    fillColor: '#FF94DA',
+                    fillColor: '#FF99D3',
                     fillOpacity: 0.10
                 }).addTo(state.map);
             } else {
@@ -2397,13 +2387,13 @@
                 const visualSize = isSelected ? 38 : 32;
                 const hitSize = visualSize + 6; // 完整覆蓋整個圓圈與邊框緩衝
 
-                // 女廁粉色 (#FF94DA)、男廁藍色 (#4BE0FF)、其他黃色 (#F5F078)
+                // 女廁粉色 (#FF99D3)、男廁藍色 (#80E4FF)、其他黃色 (#F3EF84)
                 const toiletType = t.normalizedType || normalizeToiletType(t.type, t.type2, t.name);
-                let pinBgColor = '#F5F078';
+                let pinBgColor = '#F3EF84';
                 if (toiletType === '女廁所') {
-                    pinBgColor = '#FF94DA';
+                    pinBgColor = '#FF99D3';
                 } else if (toiletType === '男廁所') {
-                    pinBgColor = '#4BE0FF';
+                    pinBgColor = '#80E4FF';
                 }
 
                 const ringStyle = isSelected
@@ -2746,10 +2736,10 @@
             // 2. 若手機網路瞬斷導致 CSV 下載失敗，提供一鍵重新載入按鈕
             if (state.allToilets.length === 0 && state.datasetLoadFinished) {
                 container.innerHTML = `
-                    <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-2.5">
+                    <div class="bg-[#FFF9EC] rounded-2xl p-5 text-center text-[#2A348C] space-y-2.5">
                         <div class="font-black text-sm">公廁資料載入未完成</div>
                         <p class="text-xs font-bold opacity-75">可能因行動網路不穩導致中斷，請點擊下方重新載入</p>
-                        <button type="button" onclick="window.location.reload()" class="pm-flat-btn px-4 py-1.5 rounded-full bg-[#F5F078] border-2 border-[#2A348C] text-xs font-black">重新載入</button>
+                        <button type="button" onclick="window.location.reload()" class="pm-flat-btn px-4 py-1.5 rounded-full bg-[#F3EF84] border-2 border-[#2A348C] text-xs font-black">重新載入</button>
                     </div>`;
                 setTimeout(syncCustomListScrollbar, 20);
                 return;
@@ -2769,19 +2759,19 @@
             if (state.filteredToilets.length === 0) {
                 if (state.onlyFavorites && state.savedToiletKeys.size === 0) {
                     container.innerHTML = `
-                        <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-1.5">
+                        <div class="bg-[#FFF9EC] rounded-2xl p-5 text-center text-[#2A348C] space-y-1.5">
                             <div class="font-black text-sm">尚未加入常用公廁</div>
                             <p class="text-xs font-bold opacity-75">點擊地圖上任一公廁的「存到常用」即可收藏於此處！</p>
                         </div>`;
                 } else if (state.radiusFilter !== '0' && state.userLat === null) {
                     container.innerHTML = `
-                        <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-2">
+                        <div class="bg-[#FFF9EC] rounded-2xl p-5 text-center text-[#2A348C] space-y-2">
                             <div class="font-black text-sm">尚未取得目前位置</div>
                             <p class="text-xs font-bold opacity-75">請點擊地圖左下角「定位最近公廁」，或切回下方「All」瀏覽全部公廁</p>
                         </div>`;
                 } else {
                     container.innerHTML = `
-                        <div class="bg-[#FFF8EA] rounded-2xl p-5 text-center text-[#2A348C] space-y-1.5">
+                        <div class="bg-[#FFF9EC] rounded-2xl p-5 text-center text-[#2A348C] space-y-1.5">
                             <div class="font-black text-sm">找不到符合條件的公廁</div>
                             <p class="text-xs font-bold opacity-70">請嘗試調整搜尋關鍵字、區域或距離範圍</p>
                         </div>`;
@@ -2813,18 +2803,18 @@
                 const rightButtonsHtml = isLoggedIn
                     ? `<div class="grid grid-cols-2 gap-2 shrink-0 items-center justify-items-center">
                            <button type="button" data-action="reviews" data-key="${escapeHtml(t.key)}"
-                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center focus:outline-none"
+                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF99D3] flex items-center justify-center focus:outline-none"
                                    title="查看評論">
                                <svg viewBox="0 0 36 36" class="w-6 h-6 pointer-events-none">
-                                   <ellipse cx="14" cy="15.5" rx="8.5" ry="7" fill="#4BE0FF" />
-                                   <polygon points="8.5,19.5 6,24.5 12.5,21.5" fill="#4BE0FF" />
-                                   <ellipse cx="22.5" cy="19.5" rx="7.8" ry="6.4" fill="#FFF8EA" />
-                                   <polygon points="27,23.5 30,27.5 23.5,25" fill="#FFF8EA" />
+                                   <ellipse cx="14" cy="15.5" rx="8.5" ry="7" fill="#80E4FF" />
+                                   <polygon points="8.5,19.5 6,24.5 12.5,21.5" fill="#80E4FF" />
+                                   <ellipse cx="22.5" cy="19.5" rx="7.8" ry="6.4" fill="#FFF9EC" />
+                                   <polygon points="27,23.5 30,27.5 23.5,25" fill="#FFF9EC" />
                                </svg>
                            </button>
 
                            <button type="button" data-action="save" data-key="${escapeHtml(t.key)}"
-                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#F5F078] border-2 ${isSavedFav ? 'border-[#FF94DA]' : 'border-transparent'} flex items-center justify-center overflow-hidden focus:outline-none"
+                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#F3EF84] border-2 ${isSavedFav ? 'border-[#FF99D3]' : 'border-transparent'} flex items-center justify-center overflow-hidden focus:outline-none"
                                    title="${isSavedFav ? '從常用移除' : '存到常用'}">
                                <svg viewBox="0 0 44 42" class="w-7 h-7 pointer-events-none block">
                                    <use href="#poopgleSaveSpiritSymbol" />
@@ -2834,45 +2824,45 @@
                            <span class="w-[38px] h-[38px] pointer-events-none"></span>
 
                            <a href="${gmapNavUrl}" target="_blank" rel="noopener noreferrer" data-action="nav"
-                              class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center no-underline"
+                              class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF99D3] flex items-center justify-center no-underline"
                               title="開啟 Google Maps 導航">
                                <svg viewBox="0 0 36 36" class="w-7 h-7 pointer-events-none">
-                                   <polygon points="18,4.5 31.5,18 18,31.5 4.5,18" fill="#4BE0FF" />
-                                   <path d="M 13.5,22 L 13.5,16.5 Q 13.5,14.5 15.5,14.5 L 19.5,14.5 L 19.5,11.5 L 24.5,16.2 L 19.5,21 L 19.5,18 L 16.8,18 L 16.8,22 Z" fill="#FFF8EA" />
+                                   <polygon points="18,4.5 31.5,18 18,31.5 4.5,18" fill="#80E4FF" />
+                                   <path d="M 13.5,22 L 13.5,16.5 Q 13.5,14.5 15.5,14.5 L 19.5,14.5 L 19.5,11.5 L 24.5,16.2 L 19.5,21 L 19.5,18 L 16.8,18 L 16.8,22 Z" fill="#FFF9EC" />
                                </svg>
                            </a>
                        </div>`
                     : `<div class="flex flex-col gap-2 shrink-0 items-center justify-center">
                            <button type="button" data-action="reviews" data-key="${escapeHtml(t.key)}"
-                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center focus:outline-none"
+                                   class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF99D3] flex items-center justify-center focus:outline-none"
                                    title="查看評論">
                                <svg viewBox="0 0 36 36" class="w-6 h-6 pointer-events-none">
-                                   <ellipse cx="14" cy="15.5" rx="8.5" ry="7" fill="#4BE0FF" />
-                                   <polygon points="8.5,19.5 6,24.5 12.5,21.5" fill="#4BE0FF" />
-                                   <ellipse cx="22.5" cy="19.5" rx="7.8" ry="6.4" fill="#FFF8EA" />
-                                   <polygon points="27,23.5 30,27.5 23.5,25" fill="#FFF8EA" />
+                                   <ellipse cx="14" cy="15.5" rx="8.5" ry="7" fill="#80E4FF" />
+                                   <polygon points="8.5,19.5 6,24.5 12.5,21.5" fill="#80E4FF" />
+                                   <ellipse cx="22.5" cy="19.5" rx="7.8" ry="6.4" fill="#FFF9EC" />
+                                   <polygon points="27,23.5 30,27.5 23.5,25" fill="#FFF9EC" />
                                </svg>
                            </button>
 
                            <a href="${gmapNavUrl}" target="_blank" rel="noopener noreferrer" data-action="nav"
-                              class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF94DA] flex items-center justify-center no-underline"
+                              class="pm-flat-btn w-[38px] h-[38px] rounded-full bg-[#FF99D3] flex items-center justify-center no-underline"
                               title="開啟 Google Maps 導航">
                                <svg viewBox="0 0 36 36" class="w-7 h-7 pointer-events-none">
-                                   <polygon points="18,4.5 31.5,18 18,31.5 4.5,18" fill="#4BE0FF" />
-                                   <path d="M 13.5,22 L 13.5,16.5 Q 13.5,14.5 15.5,14.5 L 19.5,14.5 L 19.5,11.5 L 24.5,16.2 L 19.5,21 L 19.5,18 L 16.8,18 L 16.8,22 Z" fill="#FFF8EA" />
+                                   <polygon points="18,4.5 31.5,18 18,31.5 4.5,18" fill="#80E4FF" />
+                                   <path d="M 13.5,22 L 13.5,16.5 Q 13.5,14.5 15.5,14.5 L 19.5,14.5 L 19.5,11.5 L 24.5,16.2 L 19.5,21 L 19.5,18 L 16.8,18 L 16.8,22 Z" fill="#FFF9EC" />
                                </svg>
                            </a>
                        </div>`;
 
                 return `
                   <div data-card-key="${escapeHtml(t.key)}"
-                       class="toilet-list-card relative bg-[#FFF8EA] rounded-[18px] border-2 ${isSelected ? 'border-[#2A348C] shadow-sm' : 'border-transparent'} px-4 py-3 cursor-pointer transition-all hover:brightness-[1.01] flex items-center justify-between gap-2.5">
+                       class="toilet-list-card relative bg-[#FFF9EC] rounded-[18px] border-2 ${isSelected ? 'border-[#2A348C] shadow-sm' : 'border-transparent'} px-4 py-3 cursor-pointer transition-all hover:brightness-[1.01] flex items-center justify-between gap-2.5">
                       ${favStarBadgeHtml}
                       <div class="min-w-0 flex-1 pr-1">
                           <h4 class="text-[#2A348C] text-[15.5px] font-black tracking-wide leading-snug break-words">
                               ${escapeHtml(t.name)}
                           </h4>
-                          <div class="text-[#EE5A5A] text-[12px] font-extrabold mt-1 tracking-wide">
+                          <div class="text-[#F26559] text-[12px] font-extrabold mt-1 tracking-wide">
                               ★ ${escapeHtml(displayType)}${escapeHtml(ratingTag)}${escapeHtml(distTag)}
                           </div>
                           <div class="flex items-start gap-1.5 text-[#2A348C] text-[12px] font-bold mt-1 leading-snug">
@@ -3103,7 +3093,7 @@
             document.getElementById('countyFilterSelect').addEventListener('change', (e) => {
                 state.countyFilter = e.target.value;
                 document.getElementById('countyBtnLabel').textContent = state.countyFilter || '縣市';
-                document.getElementById('countyFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.countyFilter ? 'bg-[#F5F078]' : 'bg-[#FF94DA]'} flex items-center justify-center px-1 cursor-pointer`;
+                document.getElementById('countyFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.countyFilter ? 'bg-[#F3EF84]' : 'bg-[#FF99D3]'} flex items-center justify-center px-1 cursor-pointer`;
                 updateTownDropdown();
                 refreshDistancesAndRender();
                 if (state.countyFilter && state.filteredToilets.length > 0 && state.map) {
@@ -3114,7 +3104,7 @@
             document.getElementById('townFilterSelect').addEventListener('change', (e) => {
                 state.townFilter = e.target.value;
                 document.getElementById('townBtnLabel').textContent = state.townFilter || '鄉鎮';
-                document.getElementById('townFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.townFilter ? 'bg-[#F5F078]' : 'bg-[#FF94DA]'} flex items-center justify-center px-1 cursor-pointer`;
+                document.getElementById('townFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.townFilter ? 'bg-[#F3EF84]' : 'bg-[#FF99D3]'} flex items-center justify-center px-1 cursor-pointer`;
                 refreshDistancesAndRender();
                 if (state.townFilter && state.filteredToilets.length > 0 && state.map) {
                     state.map.setView([state.filteredToilets[0].lat, state.filteredToilets[0].lng], 15);
@@ -3135,7 +3125,7 @@
                 } else {
                     labelEl.className = 'text-[#2A348C] text-[12px] md:text-[13px] lg:text-[14px] font-black md:font-semibold tracking-wide truncate pointer-events-none';
                 }
-                document.getElementById('typeFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.typeFilter ? 'bg-[#F5F078]' : 'bg-[#FF94DA]'} flex items-center justify-center px-1 cursor-pointer`;
+                document.getElementById('typeFilterBox').className = `pm-flat-btn relative h-[32px] md:h-[38px] lg:h-[42px] ${state.typeFilter ? 'bg-[#F3EF84]' : 'bg-[#FF99D3]'} flex items-center justify-center px-1 cursor-pointer`;
                 refreshDistancesAndRender();
             });
 
@@ -3152,7 +3142,7 @@
                     state.radiusFilter = rad;
                     document.querySelectorAll('.radius-btn').forEach((b) => {
                         const isAct = b.getAttribute('data-radius') === rad;
-                        b.className = `radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] ${isAct ? 'bg-[#F5F078]' : 'bg-[#FF94DA]'} text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none`;
+                        b.className = `radius-btn pm-flat-btn h-[32px] md:h-[36px] lg:h-[40px] ${isAct ? 'bg-[#F3EF84]' : 'bg-[#FF99D3]'} text-[#2A348C] text-xs lg:text-sm font-black tracking-wide flex items-center justify-center focus:outline-none`;
                     });
                     if (rad !== '0' && state.userLat === null) {
                         triggerUserGeolocation(true);

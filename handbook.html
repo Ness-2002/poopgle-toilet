@@ -60,7 +60,7 @@
             --poogle-yellow: #F3EF84;
             --poogle-blue: #80E4FF;
             --poogle-pink: #FF99D3;
-            --poogle-pink-stage: #FF85D0;
+            --poogle-pink-stage: #FF99D3;
             --poogle-red: #F26559;
             --poogle-ink: #2A348C;
             --cursor-default: url('./img/mouse.png') 0 0, auto;
@@ -391,8 +391,7 @@
     </style>
 </head>
 
-<body class="min-h-screen md:h-screen w-screen overflow-x-hidden overflow-y-auto md:overflow-hidden select-none relative flex flex-col">
-
+<body class="min-h-screen md:h-screen w-full overflow-x-hidden overflow-y-auto md:overflow-hidden select-none relative flex flex-col">
     <!-- 全域共用 SVG 濾鏡：Logo 貼紙框 & 中央「小怪圖鑑」雲朵白邊深藍細線貼紙濾鏡 -->
     <svg class="fixed top-0 left-0 w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <defs>
@@ -522,24 +521,24 @@
     </header>
 
     <!-- 2. MOBILE TOP BAR (手機版左上角回首頁 Logo + 右上角衛生紙下拉選單) -->
-    <div class="flex md:hidden items-center justify-between px-5 pt-3 pb-1 relative z-30">
-        <a href="./index.html" class="inline-block focus:outline-none transition-transform active:scale-95" title="回到有所味首頁">
+    <div class="w-full flex md:hidden items-start justify-between px-5 pt-[22px] pb-1 relative z-40 pointer-events-none">
+        <a href="./index.html" class="pointer-events-auto inline-block focus:outline-none transition-transform active:scale-95" title="回到有所味首頁">
             <img src="./img/logo.png"
                  alt="有所味 Logo"
                  fetchpriority="high"
                  decoding="sync"
-                 class="poogle-logo-img report-logo-sticker w-[126px] h-auto object-contain block" />
+                 class="poogle-logo-img w-[118px] h-auto object-contain block" />
         </a>
 
         <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
-                class="flex flex-col justify-center gap-[8px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
+                class="pointer-events-auto mt-[4px] flex flex-col justify-center gap-[8px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
         <!-- 手機版下拉式衛生紙捲筒選單 -->
-        <div id="tpRollDropdownMenu" class="hidden md:hidden absolute right-0 top-[-2px] w-[184px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+        <div id="tpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[-2px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                 <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
@@ -565,7 +564,7 @@
 
                 <g id="tpMenuMonsterDexBtn" class="tp-menu-item" role="button" tabindex="0">
                     <rect x="8" y="290" width="180" height="48" fill="transparent" />
-                    <text x="22" y="321" fill="#F26559" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
+                    <text x="22" y="321" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
                 </g>
 
                 <g id="tpMenuPersonalSpaceBtn" class="tp-menu-item" role="button" tabindex="0">
@@ -589,7 +588,7 @@
     </svg>
 
     <!-- 4. MAIN MONSTER HANDBOOK STAGE (小怪圖鑑主舞台) -->
-    <main class="flex-1 md:min-h-0 w-full flex items-center justify-center relative z-10 px-2 sm:px-4 md:px-0 pb-8 md:pb-0">
+    <main class="flex-1 md:min-h-0 w-full flex items-start md:items-center justify-center relative z-10 px-0 pb-8 md:pb-0">
 
         <!-- =============================================================== -->
         <!-- 4A. DESKTOP STAGE SVG (>= 768px：1:1 還原設計稿 10 拱門 + 4 分類) -->
@@ -672,49 +671,65 @@
         </svg>
 
         <!-- =============================================================== -->
-        <!-- 4B. MOBILE RESPONSIVE STAGE (< 768px：雙欄圓拱門與分類膠囊排版)  -->
+        <!-- 4B. MOBILE RESPONSIVE STAGE (< 768px：頂部旋轉馬桶拱門 + 上2下3拱門) -->
         <!-- =============================================================== -->
-        <div class="block md:hidden w-full max-w-[430px] mx-auto pt-2 flex flex-col items-center">
-            <!-- 手機版中央「小怪圖鑑」貼紙標題 -->
-            <div class="mb-3 pointer-events-none select-none">
-                <svg viewBox="0 0 320 96" class="w-[236px] h-auto overflow-visible block"
-                     font-size="52" font-weight="900" letter-spacing="4"
-                     text-anchor="middle" dominant-baseline="central">
-                    <text x="160" y="50" fill="#2A348C" stroke="#2A348C" stroke-width="18"
-                          stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
-                    <text x="160" y="50" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="14"
-                          stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
-                    <text x="160" y="50" fill="#2A348C">小怪圖鑑</text>
+        <div class="flex md:hidden w-full max-w-[430px] mx-auto -mt-[30px] overflow-hidden flex-col items-center"
+             style="--m-arch-w: min(31.5vw, 135px); --m-arch-gap: min(9.5vw, 40px);">
+            <!-- 手機版頂部：旋轉馬桶圓拱門 + 底部重疊「小怪圖鑑」貼紙標題 -->
+            <div class="mb-3 select-none">
+                <svg viewBox="-146 -294 292 334"
+                     style="width: calc(var(--m-arch-w) * 1.587);"
+                     class="h-auto overflow-visible block">
+                    <defs>
+                        <clipPath id="mobileToiletArchClip">
+                            <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" />
+                        </clipPath>
+                    </defs>
+                    <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0 Z" fill="#FFF9EC" />
+                    <g clip-path="url(#mobileToiletArchClip)">
+                        <g id="mobileRetro3dToiletStage" class="pointer-events-none select-none"></g>
+                    </g>
+                    <path d="M -86,0 L -86,-200 A 86,86 0 0,1 86,-200 L 86,0"
+                          fill="none" stroke="#2A348C" stroke-width="5.2" stroke-linecap="round" stroke-dasharray="0.05 13.39" />
+                    <g class="pointer-events-none select-none"
+                       font-size="58" font-weight="900" letter-spacing="4"
+                       text-anchor="middle" dominant-baseline="central">
+                        <text x="0" y="2" fill="#2A348C" stroke="#2A348C" stroke-width="19.5"
+                              stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                        <text x="0" y="2" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="15"
+                              stroke-linejoin="round" stroke-linecap="round" style="paint-order: stroke fill;">小怪圖鑑</text>
+                        <text x="0" y="2" fill="#2A348C">小怪圖鑑</text>
+                    </g>
                 </svg>
             </div>
 
             <!-- 手機版 4 大分類深藍膠囊按鈕 -->
-            <div class="grid grid-cols-2 gap-2.5 w-full px-3 mb-5">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-3 w-[82%] max-w-[336px] mb-5">
                 <button type="button" data-mobile-cat="stall"
-                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                        class="mobile-cat-pill h-[40px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[15px] font-bold tracking-[0.16em] flex items-center justify-center">
                     廁間小怪
                 </button>
-                <button type="button" data-mobile-cat="urinal"
-                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
-                    小便斗小怪
-                </button>
                 <button type="button" data-mobile-cat="consumable"
-                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                        class="mobile-cat-pill h-[40px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[15px] font-bold tracking-[0.16em] flex items-center justify-center">
                     消耗品小怪
                 </button>
+                <button type="button" data-mobile-cat="urinal"
+                        class="mobile-cat-pill h-[40px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[15px] font-bold tracking-[0.16em] flex items-center justify-center">
+                    小便斗小怪
+                </button>
                 <button type="button" data-mobile-cat="hardware"
-                        class="mobile-cat-pill h-[42px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[16px] font-bold tracking-[0.16em] flex items-center justify-center">
+                        class="mobile-cat-pill h-[40px] rounded-full bg-[#2A348C] text-[#FFF9EC] text-[15px] font-bold tracking-[0.16em] flex items-center justify-center">
                     硬體小怪
                 </button>
             </div>
 
-            <!-- 手機版圓拱門小怪雙欄網格 (由 JS 自動渲染 6 座拱門) -->
-            <div id="mobileArchesGrid" class="grid grid-cols-2 gap-x-4 gap-y-5 w-full px-3"></div>
+            <!-- 手機版圓拱門小怪舞台 (由 JS 自動渲染上排 2 座 + 下排 3 座拱門) -->
+            <div id="mobileArchesGrid" class="w-full flex flex-col items-center gap-4"></div>
         </div>
     </main>
     <!-- 4C. CATEGORY DETAIL VIEW (點擊四個分類按鈕後顯示的小仙 & 小妖分類圖鑑) -->
-    <!-- 4C. CATEGORY DETAIL VIEW (左側直式小仙 & 小妖 + 窗戶區塊對齊中間水平線) -->
-    <section id="categoryDetailSection" class="hidden flex-1 md:min-h-0 w-full flex flex-col items-center justify-center relative z-10 px-3 sm:px-6 md:px-0 pb-10 md:pb-0">
+    <!-- 4C. CATEGORY DETAIL VIEW (電腦版左側直式 / 手機版橫向滑動 + 底部色帶) -->
+    <section id="categoryDetailSection" class="hidden flex-1 md:min-h-0 w-full flex flex-col items-center justify-start md:justify-center relative z-10 px-0 pb-10 md:pb-0">
         <!-- 滿版磁磚格線背景 (依分類自動切換淺粉紅 / 淺薄荷綠) -->
         <svg class="fixed inset-0 w-screen h-screen pointer-events-none z-0" aria-hidden="true">
             <defs>
@@ -744,29 +759,43 @@
             <g id="desktopCategoryCardsLayer"></g>
         </svg>
 
-        <!-- 手機版分類圖鑑舞台 (< 768px：左側直式小仙 / 小妖 + 雙欄卡片) -->
-        <div class="block md:hidden relative z-10 w-full max-w-[430px] mx-auto pt-3 flex flex-col items-center">
+        <!-- 手機版分類圖鑑舞台 (< 768px：超過 2 隻橫條滑動 + 下方滿版小仙 / 小妖色帶) -->
+        <div class="flex md:hidden relative z-10 w-full pt-3 flex-col items-center">
             <button id="mobileCatBackBtn" type="button" title="點擊返回小怪圖鑑總覽"
-                    class="h-[42px] px-9 mb-5 rounded-full bg-[#2A348C] text-[#FFF9EC] text-[18px] font-bold tracking-[0.18em] flex items-center justify-center active:scale-95 transition-transform">
+                    class="h-[44px] min-w-[168px] px-9 mt-2 mb-6 rounded-full bg-[#2A348C] text-[#FFF9EC] text-[18px] font-bold tracking-[0.18em] flex items-center justify-center active:scale-95 transition-transform">
                 <span id="mobileCatTitleText">廁間小怪</span>
             </button>
 
-           <!-- 手機版上區：左側直式「小仙」+ 粉紅圓點拱門 -->
-            <div class="flex items-center w-full px-1 mb-6">
-                <div class="w-6 shrink-0 flex flex-col items-center justify-center text-[#FF85D0] text-[17.5px] font-black leading-[1.2] select-none">
-                    <span class="fairy-graceful-float inline-block">小</span>
-                    <span class="fairy-graceful-float inline-block" style="animation-delay: -0.5s;">仙</span>
+            <!-- 手機版上區：粉紅圓點拱門 + 下方橫條「小仙」（延用電腦版飄浮字效） -->
+            <div class="w-full flex flex-col items-center mb-9">
+                <div id="mobileFairiesGrid" class="w-full"></div>
+                <div class="w-full h-[34px] mt-1 bg-[#FFD6EB] flex items-center justify-center select-none overflow-visible">
+                    <svg viewBox="0 0 88 34" class="w-[88px] h-[34px] overflow-visible block pointer-events-none select-none">
+                        <g class="fairy-graceful-float">
+                            <text x="31" y="20" fill="#FF99D3" font-size="19" font-weight="900" text-anchor="middle" dominant-baseline="central">小</text>
+                        </g>
+                        <g class="fairy-graceful-float" style="animation-delay: -0.5s;">
+                            <text x="57" y="20" fill="#FF99D3" font-size="19" font-weight="900" text-anchor="middle" dominant-baseline="central">仙</text>
+                        </g>
+                    </svg>
                 </div>
-                <div id="mobileFairiesGrid" class="flex-1 flex flex-wrap justify-center gap-x-3 gap-y-5"></div>
             </div>
 
-            <!-- 手機版下區：左側直式「小妖」+ 薄荷綠圓點拱門 -->
-            <div class="flex items-center w-full px-1">
-                <div class="spooky-imp-filter w-6 shrink-0 flex flex-col items-center justify-center text-[#20D89A] text-[17.5px] font-black leading-[1.2] select-none">
-                    <span class="spooky-imp-shiver inline-block -rotate-6">小</span>
-                    <span class="spooky-imp-shiver inline-block rotate-6" style="animation-delay: -0.15s;">妖</span>
+            <!-- 手機版下區：薄荷綠圓點拱門 + 下方橫條「小妖」（延用電腦版扭曲抖動字效） -->
+            <div class="w-full flex flex-col items-center">
+                <div id="mobileImpsGrid" class="w-full"></div>
+                <div class="w-full h-[34px] mt-1 bg-[#BFF2DF] flex items-center justify-center select-none overflow-visible">
+                    <svg viewBox="0 0 88 34" class="w-[88px] h-[34px] overflow-visible block pointer-events-none select-none">
+                        <g filter="url(#impHalloweenWiggle)">
+                            <g class="spooky-imp-shiver">
+                                <text x="31" y="17" transform="rotate(-6, 31, 17)" fill="#45E5AC" font-size="19" font-weight="900" text-anchor="middle" dominant-baseline="central">小</text>
+                            </g>
+                            <g class="spooky-imp-shiver" style="animation-delay: -0.15s;">
+                                <text x="57" y="17" transform="rotate(5, 57, 17)" fill="#45E5AC" font-size="19" font-weight="900" text-anchor="middle" dominant-baseline="central">妖</text>
+                            </g>
+                        </g>
+                    </svg>
                 </div>
-                <div id="mobileImpsGrid" class="flex-1 flex flex-wrap justify-center gap-x-3 gap-y-5"></div>
             </div>
         </div>
     </section>
@@ -896,7 +925,7 @@
             { slot: 9, row: 1, cx: 1208, bottomY: 678, hasPill: false, dx: 22,  dy: 14, rotate: 0,   size: 172, floatDelay: "-3.1s" }
         ];
 
-        const MOBILE_ARCH_COUNT = 6;
+        const MOBILE_ARCH_COUNT = 5;
 
         // Firebase 設定 (與 index.html 同步)
         const firebaseConfig = {
@@ -1152,13 +1181,22 @@
                 });
             }
 
-            // 建立手機版 6 座圓拱門卡片
+            // 建立手機版 5 座圓拱門卡片（上排 2 座置中 + 下排 3 座交錯延伸）
             const mobileGrid = document.getElementById('mobileArchesGrid');
             if (mobileGrid) {
                 mobileGrid.innerHTML = '';
+                const topRow = document.createElement('div');
+                topRow.className = 'flex justify-center items-center';
+                topRow.style.gap = 'var(--m-arch-gap)';
+
+                const bottomRow = document.createElement('div');
+                bottomRow.className = 'flex justify-center items-center';
+                bottomRow.style.gap = 'var(--m-arch-gap)';
+
                 for (let m = 0; m < MOBILE_ARCH_COUNT; m++) {
                     const card = document.createElement('div');
-                    card.className = 'mobile-arch-card relative w-full flex items-center justify-center';
+                    card.className = 'mobile-arch-card relative shrink-0 flex items-center justify-center';
+                    card.style.width = 'var(--m-arch-w)';
                     card.setAttribute('data-mobile-slot', String(m));
                     card.innerHTML = `
                         <svg viewBox="-92 -294 184 302" class="w-full h-auto block overflow-visible">
@@ -1179,8 +1217,14 @@
                                   stroke="#2A348C" stroke-width="5.2" stroke-linecap="round" stroke-dasharray="0.05 13.22" />
                         </svg>
                     `;
-                    mobileGrid.appendChild(card);
+                    if (m < 2) {
+                        topRow.appendChild(card);
+                    } else {
+                        bottomRow.appendChild(card);
+                    }
                 }
+                mobileGrid.appendChild(topRow);
+                mobileGrid.appendChild(bottomRow);
             }
         }
 
@@ -1778,8 +1822,10 @@
             // 🚽 上排正中央窗戶：Windows XP 3D 旋轉馬桶 + 點擊同風格 3D 爆炸與 sfx/boom 音效
             // ===================================================================
             (function initRetro3dSpinningToilet() {
-                const stageEl = document.getElementById('retro3dToiletStage');
-                if (!stageEl) return;
+                const stageEls = ['retro3dToiletStage', 'mobileRetro3dToiletStage']
+                    .map(id => document.getElementById(id))
+                    .filter(Boolean);
+                if (stageEls.length === 0) return;
 
                 // 💡 可自由微調參數：
                 const SPRITE_RES = 78;       // 點陣解析度（72~84 最有 XP 小幫手質感）
@@ -1789,7 +1835,6 @@
                 const EXPLODE_FRAMES = 16;   // 3D 爆炸動畫總格數
                 const SPIN_FPS = 14;         // 馬桶旋轉每秒格數
                 const EXPLODE_FPS = 18;      // 爆炸播放每秒格數
-                // 💡 若部署至 GitHub Pages 且 sfx/boom 為資料夾，也可直接把檔名填進下方陣列
                 const BOOM_MP3_FILES = [];
 
                 const CACHE_KEY = 'poogle_xp_toilet_boom_v1_' + SPRITE_RES + '_' + TOTAL_FRAMES;
@@ -1797,36 +1842,46 @@
                     sessionStorage.removeItem('poogle_xp_toilet_v3_' + SPRITE_RES + '_' + TOTAL_FRAMES);
                 } catch (e) {}
 
-                // 開啟點擊互動並建立貼合馬桶輪廓的專屬感應區
-                stageEl.classList.remove('pointer-events-none');
-                stageEl.innerHTML = '';
-
                 const svgNs = 'http://www.w3.org/2000/svg';
-                const shakeWrap = document.createElementNS(svgNs, 'g');
-                stageEl.appendChild(shakeWrap);
+                const toiletInstances = stageEls.map((stageEl) => {
+                    stageEl.classList.remove('pointer-events-none');
+                    stageEl.innerHTML = '';
 
-                const spriteImg = document.createElementNS(svgNs, 'image');
-                spriteImg.setAttribute('x', String(-TOILET_SIZE / 2));
-                spriteImg.setAttribute('y', String(TOILET_Y));
-                spriteImg.setAttribute('width', String(TOILET_SIZE));
-                spriteImg.setAttribute('height', String(TOILET_SIZE));
-                spriteImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-                spriteImg.style.imageRendering = 'pixelated';
-                spriteImg.style.pointerEvents = 'none';
-                spriteImg.style.transformBox = 'fill-box';
-                spriteImg.style.transformOrigin = '50% 58%';
-                spriteImg.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
-                shakeWrap.appendChild(spriteImg);
+                    const shakeWrap = document.createElementNS(svgNs, 'g');
+                    stageEl.appendChild(shakeWrap);
 
-                const hitboxEl = document.createElementNS(svgNs, 'ellipse');
-                hitboxEl.setAttribute('cx', '0');
-                hitboxEl.setAttribute('cy', String(TOILET_Y + TOILET_SIZE * 0.52));
-                hitboxEl.setAttribute('rx', '50');
-                hitboxEl.setAttribute('ry', '65');
-                hitboxEl.setAttribute('fill', 'transparent');
-                hitboxEl.setAttribute('role', 'button');
-                hitboxEl.setAttribute('aria-label', '點擊引爆馬桶');
-                stageEl.appendChild(hitboxEl);
+                    const spriteImg = document.createElementNS(svgNs, 'image');
+                    spriteImg.setAttribute('x', String(-TOILET_SIZE / 2));
+                    spriteImg.setAttribute('y', String(TOILET_Y));
+                    spriteImg.setAttribute('width', String(TOILET_SIZE));
+                    spriteImg.setAttribute('height', String(TOILET_SIZE));
+                    spriteImg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    spriteImg.style.imageRendering = 'pixelated';
+                    spriteImg.style.pointerEvents = 'none';
+                    spriteImg.style.transformBox = 'fill-box';
+                    spriteImg.style.transformOrigin = '50% 58%';
+                    spriteImg.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+                    shakeWrap.appendChild(spriteImg);
+
+                    const hitboxEl = document.createElementNS(svgNs, 'ellipse');
+                    hitboxEl.setAttribute('cx', '0');
+                    hitboxEl.setAttribute('cy', String(TOILET_Y + TOILET_SIZE * 0.52));
+                    hitboxEl.setAttribute('rx', '50');
+                    hitboxEl.setAttribute('ry', '65');
+                    hitboxEl.setAttribute('fill', 'transparent');
+                    hitboxEl.setAttribute('role', 'button');
+                    hitboxEl.setAttribute('aria-label', '點擊引爆馬桶');
+                    stageEl.appendChild(hitboxEl);
+
+                    return { stageEl, shakeWrap, spriteImg, hitboxEl };
+                });
+
+                const setAllToiletHref = (url) => toiletInstances.forEach(inst => setSvgImageHref(inst.spriteImg, url));
+                const setAllToiletShake = (tf) => toiletInstances.forEach(inst => inst.shakeWrap.setAttribute('transform', tf));
+                const setAllToiletOpacity = (op) => toiletInstances.forEach(inst => { inst.spriteImg.style.opacity = op; });
+                const setAllToiletTransform = (tf) => toiletInstances.forEach(inst => { inst.spriteImg.style.transform = tf; });
+                const setAllToiletTransition = (tr) => toiletInstances.forEach(inst => { inst.spriteImg.style.transition = tr; });
+                const setAllHitboxEvents = (pe) => toiletInstances.forEach(inst => { inst.hitboxEl.style.pointerEvents = pe; });
 
                 function playBoomSfx() {
                     poogleAudioEngine.playBoom();
@@ -1849,7 +1904,7 @@
                         boomFrames = cached.boom;
                         spinReadyCount = TOTAL_FRAMES;
                         boomReadyCount = EXPLODE_FRAMES;
-                        setSvgImageHref(spriteImg, spinFrames[0]);
+                        setAllToiletHref(spinFrames[0]);
                     }
                 } catch (e) {}
 
@@ -2495,7 +2550,7 @@
                                 spinFrames[msg.idx] = url;
                                 spinReadyCount++;
                                 if (msg.idx === 0 && mode === 'spin') {
-                                    setSvgImageHref(spriteImg, url);
+                                    setAllToiletHref(url);
                                 }
                             }
                         };
@@ -2505,7 +2560,7 @@
                 // ===============================================================
                 // 🎮 互動狀態機：旋轉 (spin) -> 點擊爆炸 (explode) -> 冷卻 -> 彈跳重生
                 // ===============================================================
-                let mode = 'spin'; // 'spin' | 'explode' | 'cooldown' | 'respawn'
+                let mode = 'spin';
                 let currentSpinIdx = 0;
                 let currentBoomIdx = 0;
                 let respawnStep = 0;
@@ -2515,26 +2570,27 @@
                 const RESPAWN_SCALES = [0.32, 1.12, 0.95, 1.0];
                 const SHAKE_OFFSETS = [[-3.5, 2], [3.5, -2.5], [-2.5, -1.5], [2.5, 1.5], [0, 0]];
 
-                hitboxEl.addEventListener('mouseenter', () => {
-                    isHovering = true;
-                    if (mode === 'spin') spriteImg.style.transform = 'scale(1.07)';
-                });
-                hitboxEl.addEventListener('mouseleave', () => {
-                    isHovering = false;
-                    if (mode === 'spin') spriteImg.style.transform = 'scale(1)';
-                });
+                toiletInstances.forEach(({ hitboxEl }) => {
+                    hitboxEl.addEventListener('mouseenter', () => {
+                        isHovering = true;
+                        if (mode === 'spin') setAllToiletTransform('scale(1.07)');
+                    });
+                    hitboxEl.addEventListener('mouseleave', () => {
+                        isHovering = false;
+                        if (mode === 'spin') setAllToiletTransform('scale(1)');
+                    });
+                    hitboxEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (mode !== 'spin') return;
 
-                hitboxEl.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (mode !== 'spin') return;
-
-                    playBoomSfx();
-                    mode = 'explode';
-                    currentBoomIdx = 0;
-                    lastStepTime = performance.now() - 1000;
-                    hitboxEl.style.pointerEvents = 'none';
-                    spriteImg.style.transition = 'none';
-                    spriteImg.style.transform = 'scale(1)';
+                        playBoomSfx();
+                        mode = 'explode';
+                        currentBoomIdx = 0;
+                        lastStepTime = performance.now() - 1000;
+                        setAllHitboxEvents('none');
+                        setAllToiletTransition('none');
+                        setAllToiletTransform('scale(1)');
+                    });
                 });
 
                 const mainStageEl = document.querySelector('main');
@@ -2547,7 +2603,7 @@
                                 const nextIdx = (currentSpinIdx + 1) % TOTAL_FRAMES;
                                 if (spinFrames[nextIdx]) {
                                     currentSpinIdx = nextIdx;
-                                    setSvgImageHref(spriteImg, spinFrames[currentSpinIdx]);
+                                    setAllToiletHref(spinFrames[currentSpinIdx]);
                                 }
                             }
                         } else if (mode === 'explode') {
@@ -2556,14 +2612,14 @@
                                     const bUrl = boomFrames[currentBoomIdx];
                                     if (bUrl) {
                                         lastStepTime = now;
-                                        setSvgImageHref(spriteImg, bUrl);
+                                        setAllToiletHref(bUrl);
                                         const shk = SHAKE_OFFSETS[currentBoomIdx] || [0, 0];
-                                        shakeWrap.setAttribute('transform', `translate(${shk[0]}, ${shk[1]})`);
+                                        setAllToiletShake(`translate(${shk[0]}, ${shk[1]})`);
                                         currentBoomIdx++;
                                     }
                                 } else {
-                                    shakeWrap.setAttribute('transform', 'translate(0, 0)');
-                                    spriteImg.style.opacity = '0';
+                                    setAllToiletShake('translate(0, 0)');
+                                    setAllToiletOpacity('0');
                                     mode = 'cooldown';
                                     lastStepTime = now;
                                 }
@@ -2574,21 +2630,21 @@
                                 respawnStep = 0;
                                 lastStepTime = now - 1000;
                                 if (spinFrames[currentSpinIdx]) {
-                                    setSvgImageHref(spriteImg, spinFrames[currentSpinIdx]);
+                                    setAllToiletHref(spinFrames[currentSpinIdx]);
                                 }
-                                spriteImg.style.opacity = '1';
+                                setAllToiletOpacity('1');
                             }
                         } else if (mode === 'respawn') {
                             if (now - lastStepTime >= 48) {
                                 lastStepTime = now;
                                 if (respawnStep < RESPAWN_SCALES.length) {
-                                    spriteImg.style.transform = `scale(${RESPAWN_SCALES[respawnStep]})`;
+                                    setAllToiletTransform(`scale(${RESPAWN_SCALES[respawnStep]})`);
                                     respawnStep++;
                                 } else {
                                     mode = 'spin';
-                                    hitboxEl.style.pointerEvents = 'auto';
-                                    spriteImg.style.transition = 'transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
-                                    spriteImg.style.transform = isHovering ? 'scale(1.07)' : 'scale(1)';
+                                    setAllHitboxEvents('auto');
+                                    setAllToiletTransition('transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)');
+                                    setAllToiletTransform(isHovering ? 'scale(1.07)' : 'scale(1)');
                                 }
                             }
                         }
@@ -3149,7 +3205,7 @@
                     || createMonsterEntry(folder, fileName, 0);
             }
 
-            // 建立單張分類圓拱門的內部 SVG 結構 (上排粉紅點點 #FF85D0 / 下排薄荷綠點點 #20D89A)
+            // 建立單張分類圓拱門的內部 SVG 結構 (上排粉紅點點 #FF99D3 / 下排薄荷綠點點 #45E5AC)
             function buildCategoryCardInnerSvg(item, dotColor, imgDomId) {
                 const isTwoLines = item.desc.length > 1;
                 const nameY = isTwoLines ? -220 : -210;
@@ -3207,8 +3263,8 @@
                 const topCenters = getRowCentersX(cfg.fairies.length, maxCols);
                 const bottomCenters = getRowCentersX(cfg.imps.length, maxCols);
 
-                const PINK_DOT = '#FF85D0';
-                const GREEN_DOT = '#20D89A';
+                const PINK_DOT = '#FF99D3';
+                const GREEN_DOT = '#45E5AC';
                 const topLabelX = topCenters[0] - 138;
                 const bottomLabelX = bottomCenters[0] - 138;
 
@@ -3247,8 +3303,8 @@
                             </g>
                         </g>`;
                     mobileFairiesMarkup += `
-                        <div class="w-[46%] flex justify-center">
-                            <svg viewBox="-95 -284 190 294" class="w-full h-auto block overflow-visible">
+                        <div class="w-[30.5vw] max-w-[132px] shrink-0 flex justify-center">
+                            <svg viewBox="-95 -284 190 304" class="w-full h-auto block overflow-visible">
                                 <g class="cat-arch-card" style="animation-delay: ${delay}s;">
                                     ${buildCategoryCardInnerSvg(item, PINK_DOT, mId)}
                                 </g>
@@ -3268,8 +3324,8 @@
                             </g>
                         </g>`;
                     mobileImpsMarkup += `
-                        <div class="w-[46%] flex justify-center">
-                            <svg viewBox="-95 -284 190 294" class="w-full h-auto block overflow-visible">
+                        <div class="w-[30.5vw] max-w-[132px] shrink-0 flex justify-center">
+                            <svg viewBox="-95 -284 190 304" class="w-full h-auto block overflow-visible">
                                 <g class="cat-arch-card" style="animation-delay: ${delay}s;">
                                     ${buildCategoryCardInnerSvg(item, GREEN_DOT, mId)}
                                 </g>
@@ -3278,9 +3334,24 @@
                     bindTasks.push({ entry: findMonsterEntry(catKey, item.file), dId, mId });
                 });
 
+                const applyMobileRowLayout = (gridEl, count) => {
+                    if (!gridEl) return;
+                    gridEl.className = count > 2
+                        ? 'w-full flex flex-nowrap justify-start overflow-x-auto no-scrollbar pt-2 pb-4 px-[7.5vw] gap-[9.5vw]'
+                        : 'w-full flex flex-nowrap justify-center overflow-x-hidden pt-2 pb-4 px-4 gap-[9.5vw]';
+                    gridEl.style.webkitOverflowScrolling = 'touch';
+                    gridEl.scrollLeft = 0;
+                };
+
                 if (desktopCategoryCardsLayerEl) desktopCategoryCardsLayerEl.innerHTML = desktopSvgMarkup;
-                if (mobileFairiesGridEl) mobileFairiesGridEl.innerHTML = mobileFairiesMarkup;
-                if (mobileImpsGridEl) mobileImpsGridEl.innerHTML = mobileImpsMarkup;
+                if (mobileFairiesGridEl) {
+                    mobileFairiesGridEl.innerHTML = mobileFairiesMarkup;
+                    applyMobileRowLayout(mobileFairiesGridEl, cfg.fairies.length);
+                }
+                if (mobileImpsGridEl) {
+                    mobileImpsGridEl.innerHTML = mobileImpsMarkup;
+                    applyMobileRowLayout(mobileImpsGridEl, cfg.imps.length);
+                }
                 // 4. 載入並填入對應的小怪 PNG 圖檔
                 bindTasks.forEach(({ entry, dId, mId }) => {
                     resolveMonsterPngUrl(entry).then((url) => {

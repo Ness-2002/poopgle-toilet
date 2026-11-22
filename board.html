@@ -38,7 +38,7 @@
             --poogle-mint-bg: #45E5AC;
             --poogle-cream: #FFF9EC;
             --poogle-yellow: #F3EF84;
-            --poogle-blue: #46E0FF;
+            --poogle-blue: #80E4FF;
             --poogle-pink: #FF99D3;
             --poogle-red: #F26559;
             --poogle-ink: #2A348C;
@@ -134,7 +134,14 @@
             opacity: 0.45;
             filter: blur(11px);
             -webkit-filter: blur(11px);
-            will-change: filter, opacity;
+        }
+        @media (max-width: 767px) {
+            #leftDoorEmblemGroup text, #rightDoorEmblemGroup text { font-size: 31.7px; }
+            #boardFinalSceneSvg {
+                opacity: 0.95;
+                filter: blur(10px);
+                -webkit-filter: blur(10px);
+            }
         }
 
         @keyframes consoleStageAppear {
@@ -231,12 +238,19 @@
         }
 
         /* 預先於 GPU 展開並快取小鳥手部與縮小版遊戲機幾何範圍，消除接住瞬間的排版跳動與閃爍 */
-        #boardFinalSceneSvg {
+        #boardFinalSceneSvg,
+        #consoleTitleStage {
             overflow: visible;
+        }
+        #consoleTitleStage {
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
         #consoleFrontFace.hidden,
         #consoleBackFace.hidden,
-        #console3dSideRim.hidden,
+        #console3dSideRim.hidden {
+            display: none !important;
+        }
         #birdCatchHandsOverlay.hidden,
         #birdHeldConsoleStatic.hidden,
         #birdHandsStatic.hidden {
@@ -244,54 +258,31 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
-        #pinkBirdCharacterGroup,
+        /* 統一鎖定 SVG 局部動畫元件座標盒與原點為 (0, 0) */
         #pinkBirdCatchBounceGroup,
-        #birdConsoleMotionGroup {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
+        #birdConsoleMotionGroup,
+        #birdLeftHandGaming,
+        #birdRightHandGaming,
+        #birdAngerMark,
+        #leftDoorSpeechBubble1,
+        #leftDoorSpeechBubble2 {
+            transform-box: view-box;
+            transform-origin: 0px 0px;
         }
 
-        /* 遊戲機落入小鳥手中時以 80ms 微淡出無縫交接，避免雙層 SVG 切換產生 1 幀空白斷層 */
-        #consoleTitleStage {
-            transition: opacity 0.08s ease-out;
-            will-change: opacity;
-        }
+        /* 遊戲機落入小鳥手中時無縫切換 */
         #consoleTitleStage.hidden {
-            display: var(--stage-display, block) !important;
+            display: none !important;
             opacity: 0 !important;
             pointer-events: none !important;
-            visibility: hidden;
-            transition: opacity 0.08s ease-out, visibility 0s linear 0.08s;
         }
 
-        #consoleEntranceMover {
+        #consoleEntranceMover:not(.is-ready) {
             opacity: 0;
-            transform-origin: 720px 390px;
-            will-change: transform, opacity;
-        }
-        #consoleEntranceMover.is-ready {
-            opacity: 1;
-            animation: consoleStageAppear 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-        #consoleEntranceMover.is-ready {
-            animation: consoleStageAppear 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
         .pop-hidden {
             opacity: 0;
-            transform: scale(0);
-        }
-
-        #cloudPopTarget.is-popped {
-            animation: cloudElasticPop 0.46s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        .title-char-pop.is-popped {
-            animation: charElasticPop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        #startPopTarget.is-popped {
-            animation: startArcadePop 0.44s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         #pinkBirdCatchBounceGroup.is-caught {
@@ -409,15 +400,7 @@
             50%      { transform: translate(-1.6px, -2.6px) rotate(4.8deg); }
         }
 
-        #pinkBirdCharacterGroup.is-gaming #birdConsoleMotionGroup {
-            animation: birdConsoleGamingJiggle 0.44s ease-in-out infinite;
-        }
-        #pinkBirdCharacterGroup.is-gaming #birdLeftHandGaming {
-            animation: birdLeftHandTap 0.25s ease-in-out infinite;
-        }
-        #pinkBirdCharacterGroup.is-gaming #birdRightHandGaming {
-            animation: birdRightHandTap 0.21s ease-in-out -0.1s infinite;
-        }
+        /* 打電動待機微動改由原生 SVG transform 驅動，消除手機版放大圖層閃爍與模糊 */
 
         /* 點擊後小鳥生氣表情、雙手張開與氣到發抖動畫 */
         @keyframes birdAngryHopTremble {
@@ -662,6 +645,86 @@
             animation: none;
             transform: translate(5px, 3.5px) rotate(8deg);
         }
+
+        /* ========================================================= */
+        /* 粉紅小鳥「打瞌睡模式 (鳥-32)」與「嚇醒跌下馬桶」互動動畫     */
+        /* ========================================================= */
+        #pinkBirdSleepLayer {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode .bird-gaming-only-part {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode #pinkBirdSleepLayer {
+            display: inline;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #boardFinalSceneSvg.is-interactive #pinkBirdCharacterGroup:not(.is-busy) #pinkBirdSleepLayer,
+        #boardFinalSceneSvg.is-interactive #pinkBirdCharacterGroup:not(.is-busy) #pinkBirdSleepLayer * {
+            cursor: var(--cursor-hover) !important;
+        }
+
+        /* 打瞌睡待機：托腮輕微點頭呼吸 */
+        @keyframes sleepBirdDozeNod {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50%      { transform: translateY(2.2px) rotate(1.4deg); }
+        }
+        #sleepBirdMover {
+            transform-origin: 154.6px 265px;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-dozing #sleepBirdMover {
+            animation: sleepBirdDozeNod 2.6s ease-in-out infinite;
+        }
+
+        /* 嚇醒表情預設隱藏 */
+        #sleepBirdStartledEyes,
+        #sleepBirdShockMouth,
+        #sleepBirdShockTicks {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #sleepBirdCheekHandFlail {
+            transform-origin: 235px 150px;
+            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #sleepBirdLapHandFlail {
+            transform-origin: 115px 255px;
+            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 點擊小鳥：嚇醒跳起 ➔ 重心不穩滑落跌下馬桶 ➔ 落地小彈跳 */
+        @keyframes sleepBirdFallOffToilet {
+            0%   { transform: translate(0px, 0px) rotate(0deg); }
+            18%  { transform: translate(-4px, -22px) rotate(-10deg); }
+            34%  { transform: translate(10px, -6px) rotate(18deg); }
+            74%  { transform: translate(26px, 214px) rotate(56deg); }
+            88%  { transform: translate(28px, 196px) rotate(50deg); }
+            100% { transform: translate(30px, 212px) rotate(58deg); }
+        }
+
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdMover {
+            transform-origin: 154.6px 195px;
+            animation: sleepBirdFallOffToilet 0.66s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdClosedEyes,
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdCalmMouth {
+            opacity: 0 !important;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdStartledEyes,
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdShockMouth,
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdShockTicks {
+            opacity: 1;
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdCheekHandFlail {
+            transform: translate(14px, -22px) rotate(24deg);
+        }
+        #pinkBirdCharacterGroup.is-sleep-mode.is-falling-off #sleepBirdLapHandFlail {
+            transform: translate(-22px, -32px) rotate(-28deg);
+        }
     </style>
 </head>
 
@@ -669,8 +732,8 @@
 
     <!-- 1. 頂部導覽列 + 轉場後顯示的左上角 LOGO（樣式與位置同 index.html） -->
     <header class="relative w-full shrink-0 z-40">
-        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#FF85D0] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#FF99D3] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
@@ -731,28 +794,28 @@
             </defs>
         </svg>
 
-        <!-- 轉場完成後淡入顯示的左上角 LOGO（預設 hidden，點擊返回 index.html） -->
+        <!-- 轉場完成後淡入顯示的左上角 LOGO（手機版統一左上角位置，電腦版維持原位） -->
         <div id="boardStageTopBar" class="hidden absolute inset-x-0 top-0 pointer-events-none z-50">
-            <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
+            <div class="w-full max-w-[1440px] mx-auto relative md:px-6">
                 <a href="./index.html" id="boardStageLogoBtn"
-                   class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-50 overflow-visible focus:outline-none transition-transform duration-200 hover:scale-105"
+                   class="pointer-events-auto absolute top-[22px] left-5 md:static md:inline-block md:mt-3 lg:absolute lg:top-4 lg:left-10 lg:mt-0 z-50 overflow-visible focus:outline-none transition-transform duration-200 hover:scale-105 active:scale-95"
                    title="回到有所味主頁">
-                    <img alt="有所味 Logo" class="poogle-logo-img w-[150px] sm:w-[195px] h-auto object-contain block" />
+                    <img alt="有所味 Logo" class="poogle-logo-img w-[118px] md:w-[195px] h-auto object-contain block" />
                 </a>
             </div>
         </div>
     </header>
 
     <!-- 2. 手機版右上角漢堡選單與下拉衛生紙捲筒（僅手機版顯示） -->
-    <div class="fixed md:hidden top-4 right-[6.5%] z-50 flex items-center justify-end">
+    <div class="fixed md:hidden top-[26px] right-5 z-50 flex items-center justify-end">
         <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
                 class="flex flex-col justify-center gap-[8px] p-1.5 focus:outline-none group transition-transform active:scale-95">
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
-        <div id="tpRollDropdownMenu" class="hidden absolute top-[-16px] right-[-14px] w-[180px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+        <div id="tpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[-2px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                 <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
@@ -931,7 +994,7 @@
                                     <g transform="translate(694, 544)">
                                         <g id="birdLeftHandGaming">
                                             <g transform="translate(-694, -544)">
-                                                <path d="M688.5,532.9c1.4-3.4,4.1-6.3,7.5-7.9c2.9-1.5,6.5-2,9.5-0.8c3.1,1.1,5.5,4.1,5.6,7.4c0,3.3-2.7,6.5,6,6.5c3.5-1.2,7.8,0.6,9.4,3.9s0.5,7.8-2.5,9.9c2-2,5.7-1.6,7.6,0.5c1.9,2.1,2.2,5.4,1,8c-1.1,2.6-3.4,4.6-5.9,5.9c-3.6,1.9-7.8,2.6-11.8,1.9"
+                                                <path d="M688.5,532.9c1.4-3.4,4.1-6.3,7.5-7.9c2.9-1.5,6.5-2,9.5-0.8c3.1,1.1,5.5,4.1,5.6,7.4c0,3.3-2.7,6.5-6,6.5c3.5-1.2,7.8,0.6,9.4,3.9s0.5,7.8-2.5,9.9c2-2,5.7-1.6,7.6,0.5c1.9,2.1,2.2,5.4,1,8c-1.1,2.6-3.4,4.6-5.9,5.9c-3.6,1.9-7.8,2.6-11.8,1.9"
                                                       fill="#FF99D3" stroke="#2A348C" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
                                             </g>
                                         </g>
@@ -1026,8 +1089,8 @@
                         <ellipse cx="329.7" cy="254.4" rx="27.7" ry="15.8" fill="#FFF9EC" />
                         <ellipse cx="329.7" cy="227.4" rx="27.7" ry="34.4" fill="#FFF9EC" />
                         <ellipse cx="329.7" cy="254.4" rx="19.6" ry="10.3" fill="#80E4FF" />
-                        <text x="329.7" y="344.6" text-anchor="middle" fill="#2A348C" font-size="23.8" font-weight="900">
-                            <tspan>留</tspan><tspan dx="4">言</tspan><tspan dx="4">板</tspan>
+                        <text x="329.7" y="350" text-anchor="middle" fill="#2A348C" font-size="31.7" font-weight="900">
+                            <tspan>留</tspan><tspan dx="5.3">言</tspan><tspan dx="5.3">板</tspan>
                         </text>
                     </g>
 
@@ -1134,8 +1197,8 @@
                         <circle cx="1128.7" cy="236.8" r="65.5" fill="#45E5AC" />
                         <path d="M1126.5,241.9c0-0.3,0-0.6,0-0.9c0-12.9-9.4-23.3-21-23.3c-11.6,0-21,10.4-21,23.3c0,0.3,0,0.6,0,0.9H1126.5z" fill="#FFF9EC" />
                         <path d="M1167.2,255.7H1092c-4.2,0-7.6-3.4-7.6-7.6v-7h82.8c3.2,0,5.7,2.6,5.7,5.7v3.1C1173,253.2,1170.4,255.7,1167.2,255.7z" fill="#FFF9EC" />
-                        <text x="1128.7" y="344.6" text-anchor="middle" fill="#2A348C" font-size="23.8" font-weight="900">
-                            <tspan>小</tspan><tspan dx="4">怪</tspan><tspan dx="4">現</tspan><tspan dx="4">況</tspan><tspan dx="4">板</tspan>
+                        <text x="1128.7" y="350" text-anchor="middle" fill="#2A348C" font-size="31.7" font-weight="900">
+                            <tspan>小</tspan><tspan dx="5.3">怪</tspan><tspan dx="5.3">現</tspan><tspan dx="5.3">況</tspan><tspan dx="5.3">板</tspan>
                         </text>
                     </g>
 
@@ -1272,16 +1335,16 @@
                                 <circle cx="755.7" cy="515.1" r="15.8" fill="#F26559" />
                                 <circle cx="721.5" cy="549.3" r="15.8" fill="#F3EF84" />
                                 <circle cx="789.9" cy="549.3" r="15.8" fill="#FF99D3" />
-                                <circle cx="755.7" cy="583.5" r="15.8" fill="#00E9A8" />
+                                <circle cx="755.7" cy="583.5" r="15.8" fill="#45E5AC" />
                             </g>
 
                             <g id="consoleStartGroup" clip-path="url(#bottomScreenClip)">
-                                <rect x="273.6" y="468.6" width="398.5" height="220.7" fill="#55E7FF" />
+                                <rect x="273.6" y="468.6" width="398.5" height="220.7" fill="#80E4FF" />
                                 <rect x="273.6" y="689.3" width="398.5" height="62.3" fill="#F3EF84" />
 
                                 <g id="arcadeHudGroup">
                                     <g clip-path="url(#leftPortraitClip)">
-                                        <rect x="296" y="484" width="43" height="43" fill="#6BE8FF" />
+                                        <rect x="296" y="484" width="43" height="43" fill="#80E4FF" />
                                         <g id="leftFighterPortraitFallback" transform="translate(317.5, 526) scale(0.45)">
                                             <use href="#fallbackMirrorDirty" />
                                         </g>
@@ -1304,12 +1367,12 @@
                                     <text x="594.7" y="495" text-anchor="end" fill="#2A348C" font-size="10.2" font-weight="900" letter-spacing="0.8">貪吃台</text>
                                     <g clip-path="url(#rightHpClip)">
                                         <rect x="495.7" y="502" width="100" height="10.5" fill="#FFFFFF" />
-                                        <rect x="556.7" y="502" width="39" height="10.5" fill="#00E9A8" />
+                                        <rect x="556.7" y="502" width="39" height="10.5" fill="#45E5AC" />
                                     </g>
                                     <rect x="495.7" y="502" width="100" height="10.5" rx="5.25" fill="none" stroke="#2A348C" stroke-width="1.8" />
 
                                     <g clip-path="url(#rightPortraitClip)">
-                                        <rect x="606.7" y="484" width="43" height="43" fill="#6BE8FF" />
+                                        <rect x="606.7" y="484" width="43" height="43" fill="#80E4FF" />
                                         <g id="rightFighterPortraitFallback" transform="translate(628.2, 526) scale(0.41)">
                                             <use href="#fallbackSinkTrash" />
                                         </g>
@@ -1354,7 +1417,7 @@
                                   fill="#FFFFFF" stroke="#80E4FF" stroke-width="2" stroke-miterlimit="10" />
 
                             <circle cx="472.85" cy="76.9" r="9.7" fill="#FFFFFF" stroke="#80E4FF" stroke-width="2" />
-                            <rect id="consoleTopScreen" x="240.9" y="101.9" width="463.9" height="295.2" rx="8" fill="#55E7FF" />
+                            <rect id="consoleTopScreen" x="240.9" y="101.9" width="463.9" height="295.2" rx="8" fill="#80E4FF" />
 
                             <g id="consoleTitleCloudGroup">
                                 <!-- 步驟 1：置中雲朵先 Pop 出來 -->
@@ -1376,35 +1439,35 @@
                                 <g transform="translate(450.85, 210)">
                                     <g id="titleChar_0" class="title-char-pop pop-hidden">
                                         <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
-                                              fill="#273491" stroke="#273491" stroke-width="1.3" stroke-linejoin="round"
+                                              fill="#2A348C" stroke="#2A348C" stroke-width="1.3" stroke-linejoin="round"
                                               style="paint-order: stroke fill;" font-size="37" font-weight="900">公</text>
                                     </g>
                                 </g>
                                 <g transform="translate(494.85, 210)">
                                     <g id="titleChar_1" class="title-char-pop pop-hidden">
                                         <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
-                                              fill="#273491" stroke="#273491" stroke-width="1.3" stroke-linejoin="round"
+                                              fill="#2A348C" stroke="#2A348C" stroke-width="1.3" stroke-linejoin="round"
                                               style="paint-order: stroke fill;" font-size="37" font-weight="900">廁</text>
                                     </g>
                                 </g>
                                 <g transform="translate(404.05, 273.5) rotate(-6.14)">
                                     <g id="titleChar_2" class="title-char-pop pop-hidden">
                                         <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
-                                              fill="#273491" stroke="#273491" stroke-width="2.2" stroke-linejoin="round"
+                                              fill="#2A348C" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round"
                                               style="paint-order: stroke fill;" font-size="58" font-weight="900">現</text>
                                     </g>
                                 </g>
                                 <g transform="translate(472.85, 269.8)">
                                     <g id="titleChar_3" class="title-char-pop pop-hidden">
                                         <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
-                                              fill="#273491" stroke="#273491" stroke-width="2.2" stroke-linejoin="round"
+                                              fill="#2A348C" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round"
                                               style="paint-order: stroke fill;" font-size="58" font-weight="900">況</text>
                                     </g>
                                 </g>
                                 <g transform="translate(541.65, 273.5) rotate(6.14)">
                                     <g id="titleChar_4" class="title-char-pop pop-hidden">
                                         <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
-                                              fill="#273491" stroke="#273491" stroke-width="2.2" stroke-linejoin="round"
+                                              fill="#2A348C" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round"
                                               style="paint-order: stroke fill;" font-size="58" font-weight="900">板</text>
                                     </g>
                                 </g>
@@ -1517,31 +1580,25 @@
                 </svg>
             </div>
 
-            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊按鈕 ＋ 中央公廁名稱與四顆星等 ＋ 右上「LIVE」 -->
+            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊橫向並排 ＋ 中央公廁名稱與四顆星等 -->
             <div class="relative z-10 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0">
-                <div class="flex items-start justify-between gap-2 sm:pointer-events-none">
-                    <!-- 左上角：變更公廁 ＋ 返回鍵（相同膠囊設計上下排列） -->
-                    <div class="flex flex-col items-stretch gap-2 sm:gap-2.5 shrink-0 sm:pointer-events-auto z-20">
+                <div class="flex items-start justify-start gap-2 lg:pointer-events-none">
+                    <!-- 左上角：變更公廁（左）＋ 返回鍵（右） -->
+                    <div class="relative flex flex-row items-center gap-2 sm:gap-2.5 shrink-0 lg:pointer-events-auto z-20">
                         <button id="openChangeToiletModalBtn" type="button"
-                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
                             變更公廁
                         </button>
                         <button id="backFromMessageBoardBtn" type="button"
-                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
                             返回
                         </button>
-                    </div>
-
-                    <!-- 右上角：LIVE 膠囊燈號（手機版避開右上漢堡選單微向左移） -->
-                    <div class="mr-12 md:mr-0 shrink-0 h-[28px] px-3.5 rounded-full bg-[#F26559] flex items-center gap-2 select-none">
-                        <span class="w-[8px] h-[8px] rounded-full bg-[#80E4FF] border-[2px] border-white animate-pulse"></span>
-                        <span class="text-white text-[14px] sm:text-[15px] font-black tracking-wider leading-none">LIVE</span>
                     </div>
                 </div>
 
                 <!-- 中央：目前公廁標題（後方加上 1/2 字型大小的 |留言板）＋ 四項圓潤星星評分 -->
-                <div class="mt-2.5 sm:-mt-[86px] flex flex-col items-center text-center px-2 sm:px-[165px]">
-                    <h1 class="text-[#273491] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
+                <div class="mt-3 lg:-mt-[38px] flex flex-col items-center text-center px-2 lg:px-[325px]">
+                    <h1 class="text-[#2A348C] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
                         <span id="mbCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|留言板</span>
                     </h1>
 
@@ -1557,91 +1614,91 @@
                                 </defs>
                                 <!-- 深藍立體底影 -->
                                 <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z"
-                                      fill="#273490" />
+                                      fill="#2A348C" />
                                 <!-- 未填滿處白色底星 -->
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
                                       fill="#FFFFFF" />
                                 <!-- 依分數高低動態填滿的黃色圖層 -->
                                 <g clip-path="url(#mbStarInteriorClip)">
-                                    <rect id="mbStarFill_clean" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    <rect id="mbStarFill_clean" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                 </g>
                                 <!-- 最上層深藍邊框與文字（不被填色壓線） -->
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
-                                      fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                      fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>整</tspan><tspan dx="0.8">潔</tspan>
                                 </text>
-                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>衛</tspan><tspan dx="0.8">生</tspan>
                                 </text>
                             </svg>
-                            <span id="mbScoreClean" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            <span id="mbScoreClean" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                         </div>
 
                         <!-- 2. 環境明亮 -->
                         <div class="flex flex-col items-center">
                             <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
                                 <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z"
-                                      fill="#273490" />
+                                      fill="#2A348C" />
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
                                       fill="#FFFFFF" />
                                 <g clip-path="url(#mbStarInteriorClip)">
-                                    <rect id="mbStarFill_light" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    <rect id="mbStarFill_light" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                 </g>
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
-                                      fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                      fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>環</tspan><tspan dx="0.8">境</tspan>
                                 </text>
-                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>明</tspan><tspan dx="0.8">亮</tspan>
                                 </text>
                             </svg>
-                            <span id="mbScoreLight" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            <span id="mbScoreLight" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                         </div>
 
                         <!-- 3. 設備完善 -->
                         <div class="flex flex-col items-center">
                             <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
                                 <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z"
-                                      fill="#273490" />
+                                      fill="#2A348C" />
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
                                       fill="#FFFFFF" />
                                 <g clip-path="url(#mbStarInteriorClip)">
-                                    <rect id="mbStarFill_equip" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    <rect id="mbStarFill_equip" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                 </g>
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
-                                      fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                      fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>設</tspan><tspan dx="0.8">備</tspan>
                                 </text>
-                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>完</tspan><tspan dx="0.8">善</tspan>
                                 </text>
                             </svg>
-                            <span id="mbScoreEquip" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            <span id="mbScoreEquip" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                         </div>
 
                         <!-- 4. 空間寬敞 -->
                         <div class="flex flex-col items-center">
                             <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
                                 <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z"
-                                      fill="#273490" />
+                                      fill="#2A348C" />
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
                                       fill="#FFFFFF" />
                                 <g clip-path="url(#mbStarInteriorClip)">
-                                    <rect id="mbStarFill_space" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                    <rect id="mbStarFill_space" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                 </g>
                                 <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z"
-                                      fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                      fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>空</tspan><tspan dx="0.8">間</tspan>
                                 </text>
-                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900">
+                                <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900">
                                     <tspan>寬</tspan><tspan dx="0.8">敞</tspan>
                                 </text>
                             </svg>
-                            <span id="mbScoreSpace" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                            <span id="mbScoreSpace" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                         </div>
                     </div>
                 </div>
@@ -1674,7 +1731,7 @@
                         <feComponentTransfer in="mNavyBlur" result="mNavyMask">
                             <feFuncA type="linear" slope="12" intercept="-0.4" />
                         </feComponentTransfer>
-                        <feFlood flood-color="#273491" flood-opacity="1" result="mNavyColor" />
+                        <feFlood flood-color="#2A348C" flood-opacity="1" result="mNavyColor" />
                         <feComposite in="mNavyColor" in2="mNavyMask" operator="in" result="mNavyOutline" />
 
                         <feMerge>
@@ -1732,29 +1789,24 @@
                 <!-- 由 JS 動態生成 24 小時內出現的散步小怪 -->
             </div>
 
-            <!-- 頂部資訊列：左上「變更公廁＋返回」＋ 中央「公廁名稱|小怪板」與四顆星等 ＋ 右上「LIVE」 -->
+            <!-- 頂部資訊列：左上「變更公廁＋返回」雙膠囊橫向並排 ＋ 中央「公廁名稱|小怪板」與四顆星等 -->
             <div class="relative z-20 w-full max-w-[1440px] mx-auto pt-4 sm:pt-6 px-4 sm:px-10 shrink-0 pointer-events-none">
-                <div class="flex items-start justify-between gap-2">
-                    <div id="mkTopLeftBtnsBox" class="flex flex-col items-stretch gap-2 sm:gap-2.5 shrink-0 pointer-events-auto">
+                <div class="flex items-start justify-start gap-2">
+                    <div id="mkTopLeftBtnsBox" class="relative flex flex-row items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto z-20">
                         <button id="openChangeToiletFromMonsterBtn" type="button"
-                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.16em] flex items-center justify-center transition-transform active:scale-95">
                             變更公廁
                         </button>
                         <button id="backFromMonsterBoardBtn" type="button"
-                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#273491] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
+                                class="w-[116px] sm:w-[150px] h-[34px] sm:h-[38px] rounded-full bg-white hover:bg-[#E8FAFF] border-[2px] border-[#80E4FF] text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.24em] flex items-center justify-center transition-transform active:scale-95">
                             返回
                         </button>
                     </div>
-
-                    <div id="mkTopRightLiveBox" class="mr-12 md:mr-0 shrink-0 h-[28px] px-3.5 rounded-full bg-[#F26559] flex items-center gap-2 select-none">
-                        <span class="w-[8px] h-[8px] rounded-full bg-[#80E4FF] border-[2px] border-white animate-pulse"></span>
-                        <span class="text-white text-[14px] sm:text-[15px] font-black tracking-wider leading-none">LIVE</span>
-                    </div>
                 </div>
 
-                <div class="mt-2.5 sm:-mt-[86px] flex flex-col items-center text-center px-2 sm:px-[165px]">
+                <div class="mt-3 lg:-mt-[38px] flex flex-col items-center text-center px-2 lg:px-[325px]">
                     <div id="mkTopCenterHeaderBox" class="inline-flex flex-col items-center">
-                        <h1 class="text-[#273491] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
+                        <h1 class="text-[#2A348C] text-[22px] sm:text-[32px] lg:text-[36px] font-black tracking-[0.12em] leading-snug max-w-[92vw] sm:max-w-[780px] break-words">
                             <span id="mkCurrentToiletTitle">定位最近公廁中...</span><span style="font-size: 0.5em;" class="font-black tracking-[0.12em] ml-1.5 align-middle whitespace-nowrap">|小怪板</span>
                         </h1>
 
@@ -1768,61 +1820,61 @@
                                             <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" />
                                         </clipPath>
                                     </defs>
-                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#2A348C" />
                                     <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
                                     <g clip-path="url(#mkStarInteriorClip)">
-                                        <rect id="mkStarFill_clean" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                        <rect id="mkStarFill_clean" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                     </g>
-                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>整</tspan><tspan dx="0.8">潔</tspan></text>
-                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>衛</tspan><tspan dx="0.8">生</tspan></text>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>整</tspan><tspan dx="0.8">潔</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>衛</tspan><tspan dx="0.8">生</tspan></text>
                                 </svg>
-                                <span id="mkScoreClean" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                                <span id="mkScoreClean" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                             </div>
 
                             <!-- 2. 環境明亮 -->
                             <div class="flex flex-col items-center">
                                 <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
-                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#2A348C" />
                                     <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
                                     <g clip-path="url(#mkStarInteriorClip)">
-                                        <rect id="mkStarFill_light" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                        <rect id="mkStarFill_light" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                     </g>
-                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>環</tspan><tspan dx="0.8">境</tspan></text>
-                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>明</tspan><tspan dx="0.8">亮</tspan></text>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>環</tspan><tspan dx="0.8">境</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>明</tspan><tspan dx="0.8">亮</tspan></text>
                                 </svg>
-                                <span id="mkScoreLight" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                                <span id="mkScoreLight" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                             </div>
 
                             <!-- 3. 設備完善 -->
                             <div class="flex flex-col items-center">
                                 <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
-                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#2A348C" />
                                     <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
                                     <g clip-path="url(#mkStarInteriorClip)">
-                                        <rect id="mkStarFill_equip" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                        <rect id="mkStarFill_equip" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                     </g>
-                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>設</tspan><tspan dx="0.8">備</tspan></text>
-                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>完</tspan><tspan dx="0.8">善</tspan></text>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>設</tspan><tspan dx="0.8">備</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>完</tspan><tspan dx="0.8">善</tspan></text>
                                 </svg>
-                                <span id="mkScoreEquip" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                                <span id="mkScoreEquip" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                             </div>
 
                             <!-- 4. 空間寬敞 -->
                             <div class="flex flex-col items-center">
                                 <svg viewBox="2.8 6.5 42 42.5" class="w-[58px] h-[58px] sm:w-[69px] sm:h-[69px] overflow-visible">
-                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#273490" />
+                                    <path d="M26.3,12.1l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6L14.7,48c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2l-5.2-7.6c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1l5.7-7.3C22.2,10.3,24.9,10.3,26.3,12.1z" fill="#2A348C" />
                                     <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="#FFFFFF" />
                                     <g clip-path="url(#mkStarInteriorClip)">
-                                        <rect id="mkStarFill_space" x="2" y="44.2" width="45" height="0" fill="#F3EE72" />
+                                        <rect id="mkStarFill_space" x="2" y="44.2" width="45" height="0" fill="#F3EF84" />
                                     </g>
-                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#273490" stroke-width="2" stroke-miterlimit="10" />
-                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>空</tspan><tspan dx="0.8">間</tspan></text>
-                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#273490" font-size="7.5" font-weight="900"><tspan>寬</tspan><tspan dx="0.8">敞</tspan></text>
+                                    <path d="M26.6,9.2l5.7,7.3l8.7,3.1c2.2,0.8,3,3.4,1.7,5.3l-5.2,7.6l-0.3,9.2c-0.1,2.3-2.3,3.9-4.5,3.3l-8.9-2.6l-8.9,2.6c-2.2,0.6-4.4-1-4.5-3.3l-0.3-9.2L4.9,25c-1.3-1.9-0.4-4.5,1.7-5.3l8.7-3.1L21,9.2C22.4,7.4,25.1,7.4,26.6,9.2z" fill="none" stroke="#2A348C" stroke-width="2" stroke-miterlimit="10" />
+                                    <text x="23.8" y="22.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>空</tspan><tspan dx="0.8">間</tspan></text>
+                                    <text x="23.8" y="31.8" text-anchor="middle" dominant-baseline="central" fill="#2A348C" font-size="7.5" font-weight="900"><tspan>寬</tspan><tspan dx="0.8">敞</tspan></text>
                                 </svg>
-                                <span id="mkScoreSpace" class="mt-1 text-[#273490] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
+                                <span id="mkScoreSpace" class="mt-1 text-[#2A348C] text-[15px] sm:text-[18px] font-black tracking-wider leading-none">--</span>
                             </div>
                         </div>
                     </div>
@@ -1837,11 +1889,11 @@
     <!-- 變更公廁 Popup 彈窗（左欄自行輸入文字 ＋ 右欄開啟整條下拉式公廁選單） -->
     <!-- =================================================================== -->
     <div id="changeToiletPopupModal" class="hidden fixed inset-0 z-[80] bg-black/55 backdrop-blur-[2px] flex items-center justify-center p-4">
-        <div class="relative w-full max-w-[780px] bg-[#FFF9EC] border-[2.5px] border-[#273491] rounded-[40px] sm:rounded-[56px] px-5 sm:px-16 py-10 sm:py-14">
+        <div class="relative w-full max-w-[780px] bg-[#FFF9EC] border-[2.5px] border-[#2A348C] rounded-[40px] sm:rounded-[56px] px-5 sm:px-16 py-10 sm:py-14">
 
             <!-- 右上角深藍圓形關閉按鈕 -->
             <button id="closeChangeToiletModalBtn" type="button" aria-label="關閉變更公廁視窗"
-                    class="absolute -top-4 -right-2 sm:-top-5 sm:-right-4 w-[48px] h-[48px] sm:w-[58px] sm:h-[58px] rounded-full bg-[#273491] hover:bg-[#1d2670] text-white flex items-center justify-center transition-transform hover:scale-105">
+                    class="absolute -top-4 -right-2 sm:-top-5 sm:-right-4 w-[48px] h-[48px] sm:w-[58px] sm:h-[58px] rounded-full bg-[#2A348C] hover:bg-[#1d2670] text-white flex items-center justify-center transition-transform hover:scale-105">
                 <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6 pointer-events-none">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="3.8" stroke-linecap="round" />
                 </svg>
@@ -1852,14 +1904,14 @@
                 <div id="boardComboContainer" class="relative w-full">
                     <div class="flex items-stretch gap-[5px] w-full h-[46px] sm:h-[52px]">
                         <!-- 左欄位：點擊可自行輸入文字篩選公廁名稱 -->
-                        <div class="flex-1 bg-[#55E7FF] flex items-center px-4 sm:px-6">
+                        <div class="flex-1 bg-[#80E4FF] flex items-center px-4 sm:px-6">
                             <input id="boardToiletNameInput" type="text" autocomplete="off" placeholder="公廁名稱"
-                                   class="w-full h-full bg-transparent border-none text-[#273491] placeholder-[#273491]/45 text-[16px] sm:text-[19px] font-bold tracking-[0.12em] focus:outline-none" />
+                                   class="w-full h-full bg-transparent border-none text-[#2A348C] placeholder-[#2A348C]/45 text-[16px] sm:text-[19px] font-bold tracking-[0.12em] focus:outline-none" />
                         </div>
 
                         <!-- 右欄位：點擊展開／收合整條寬度的下拉式公廁列表 -->
                         <button id="boardToiletDropdownBtn" type="button" aria-label="展開公廁列表" aria-expanded="false"
-                                class="w-[74px] sm:w-[96px] shrink-0 bg-[#55E7FF] hover:bg-[#3fddff] flex items-center justify-center transition-colors">
+                                class="w-[74px] sm:w-[96px] shrink-0 bg-[#80E4FF] hover:bg-[#3fddff] flex items-center justify-center transition-colors">
                             <svg id="boardDropdownChevron" viewBox="0 0 28 18" class="w-6 h-4 transition-transform duration-200 pointer-events-none">
                                 <path d="M 4 4 L 14 14 L 24 4" fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
@@ -1868,7 +1920,7 @@
 
                     <!-- 整條下拉式選單（寬度 100% 貼齊左輸入欄至右箭頭欄） -->
                     <div id="boardToiletDropdownPanel"
-                         class="hidden absolute left-0 right-0 top-[calc(100%+4px)] z-40 bg-[#FFF9EC] border-[2px] border-[#273491] shadow-[0_10px_24px_rgba(39,52,145,0.22)] max-h-[240px] overflow-y-auto board-dropdown-scroll">
+                         class="hidden absolute left-0 right-0 top-[calc(100%+4px)] z-40 bg-[#FFF9EC] border-[2px] border-[#2A348C] shadow-[0_10px_24px_rgba(39,52,145,0.22)] max-h-[240px] overflow-y-auto board-dropdown-scroll">
                         <!-- 由 JS 動態產生篩選或相關名稱的公廁清單 -->
                     </div>
                 </div>
@@ -1876,32 +1928,32 @@
                 <!-- 第二列：縣市 / 鄉鎮 / 類型 / 由近到遠 四個篩選排序按鈕 -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-[18px] w-full">
                     <!-- 縣市 -->
-                    <div id="boardCountyBox" class="relative h-[52px] sm:h-[66px] bg-[#55E7FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
-                        <span id="boardCountyLabel" class="text-[#273491] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">縣市</span>
+                    <div id="boardCountyBox" class="relative h-[52px] sm:h-[66px] bg-[#80E4FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
+                        <span id="boardCountyLabel" class="text-[#2A348C] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">縣市</span>
                         <select id="boardCountySelect" aria-label="選擇縣市" class="absolute inset-0 w-full h-full opacity-0">
                             <option value="">全部縣市</option>
                         </select>
                     </div>
 
                     <!-- 鄉鎮 -->
-                    <div id="boardTownBox" class="relative h-[52px] sm:h-[66px] bg-[#55E7FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
-                        <span id="boardTownLabel" class="text-[#273491] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">鄉鎮</span>
+                    <div id="boardTownBox" class="relative h-[52px] sm:h-[66px] bg-[#80E4FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
+                        <span id="boardTownLabel" class="text-[#2A348C] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">鄉鎮</span>
                         <select id="boardTownSelect" aria-label="選擇鄉鎮" class="absolute inset-0 w-full h-full opacity-0">
                             <option value="">全部鄉鎮</option>
                         </select>
                     </div>
 
                     <!-- 類型 -->
-                    <div id="boardTypeBox" class="relative h-[52px] sm:h-[66px] bg-[#55E7FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
-                        <span id="boardTypeLabel" class="text-[#273491] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">類型</span>
+                    <div id="boardTypeBox" class="relative h-[52px] sm:h-[66px] bg-[#80E4FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
+                        <span id="boardTypeLabel" class="text-[#2A348C] text-[16px] sm:text-[19px] font-extrabold tracking-[0.12em] truncate pointer-events-none">類型</span>
                         <select id="boardTypeSelect" aria-label="選擇類型" class="absolute inset-0 w-full h-full opacity-0">
                             <option value="">全部類型</option>
                         </select>
                     </div>
 
                     <!-- 由近到遠（排序方式） -->
-                    <div id="boardSortBox" class="relative h-[52px] sm:h-[66px] bg-[#55E7FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
-                        <span id="boardSortLabel" class="text-[#273491] text-[16px] sm:text-[19px] font-extrabold tracking-[0.1em] truncate pointer-events-none">由近到遠</span>
+                    <div id="boardSortBox" class="relative h-[52px] sm:h-[66px] bg-[#80E4FF] hover:brightness-[0.98] flex items-center justify-center px-2 transition-colors">
+                        <span id="boardSortLabel" class="text-[#2A348C] text-[16px] sm:text-[19px] font-extrabold tracking-[0.1em] truncate pointer-events-none">由近到遠</span>
                         <select id="boardSortSelect" aria-label="排序方式" class="absolute inset-0 w-full h-full opacity-0">
                             <option value="dist_asc">由近到遠</option>
                             <option value="dist_desc">由遠到近</option>
@@ -2091,48 +2143,143 @@
             const birdHandsStatic = document.getElementById('birdHandsStatic');
             const pinkBirdCatchBounceGroup = document.getElementById('pinkBirdCatchBounceGroup');
 
+            function evalElasticScale3(p, p1, s1, p2, s2) {
+                if (p <= 0) return 0;
+                if (p >= 1) return 1;
+                if (p <= p1) {
+                    const u = p / p1;
+                    return s1 * (1 - Math.pow(1 - u, 2.4));
+                }
+                if (p <= p2) {
+                    const u = (p - p1) / (p2 - p1);
+                    return s1 + (s2 - s1) * (0.5 - 0.5 * Math.cos(u * Math.PI));
+                }
+                const u = (p - p2) / (1 - p2);
+                return s2 + (1 - s2) * (0.5 - 0.5 * Math.cos(u * Math.PI));
+            }
+
             function startConsoleIntroSequence() {
-                if (consoleTitleStage) {
-                    const initDisplay = window.getComputedStyle(consoleTitleStage).display;
-                    if (initDisplay && initDisplay !== 'none') {
-                        consoleTitleStage.style.setProperty('--stage-display', initDisplay);
+                if (typeof syncGuitarBirdAlignment === 'function') {
+                    syncGuitarBirdAlignment();
+                }
+
+                const titleChars = [0, 1, 2, 3, 4].map((idx) => document.getElementById(`titleChar_${idx}`));
+                const charTimings = [960, 1120, 1280, 1440, 1600];
+
+                [cloudPopTarget, startPopTarget, ...titleChars].forEach((el) => {
+                    if (!el) return;
+                    el.setAttribute('opacity', '0');
+                    el.classList.remove('pop-hidden', 'is-popped');
+                });
+
+                if (consoleEntranceMover) {
+                    consoleEntranceMover.setAttribute('opacity', '0');
+                    consoleEntranceMover.classList.add('is-ready');
+                }
+
+                const introStart = performance.now();
+
+                function tickIntro(now) {
+                    const elapsed = now - introStart;
+                    const mobile = isMobileBoardLayout();
+                    const baseCx = mobile ? 470.0 : 720.0;
+                    const baseCy = mobile ? 985.0 : 390.0;
+                    const baseScale = mobile ? 1.08 : 1.0;
+
+                    // 步驟 0：遊戲機彈出登場 (0ms ~ 480ms)
+                    if (elapsed < 480) {
+                        const p = Math.max(0, elapsed / 480);
+                        let appearScale = 1;
+                        let dy = 0;
+                        let alpha = 1;
+                        if (p <= 0.70) {
+                            const u = p / 0.70;
+                            const e = 1 - Math.pow(1 - u, 2.5);
+                            alpha = Math.min(1, u * 1.45);
+                            appearScale = 0.88 + (1.02 - 0.88) * e;
+                            dy = 18 + (-3 - 18) * e;
+                        } else {
+                            const u = (p - 0.70) / 0.30;
+                            const e = 0.5 - 0.5 * Math.cos(u * Math.PI);
+                            appearScale = 1.02 + (1.0 - 1.02) * e;
+                            dy = -3 * (1 - e);
+                        }
+                        const s = baseScale * appearScale;
+                        consoleEntranceMover?.setAttribute('opacity', alpha.toFixed(3));
+                        consoleFrontFace?.setAttribute(
+                            'transform',
+                            `translate(${baseCx.toFixed(2)}, ${(baseCy + dy).toFixed(2)}) scale(${s.toFixed(4)})`
+                        );
+                    } else {
+                        consoleEntranceMover?.setAttribute('opacity', '1');
+                        consoleFrontFace?.setAttribute(
+                            'transform',
+                            mobile ? 'translate(470, 985) scale(1.08)' : 'translate(720, 390)'
+                        );
+                    }
+
+                    // 步驟 1：置中雲朵 Pop 出來 (520ms ~ 980ms)
+                    if (cloudPopTarget && elapsed >= 520) {
+                        const p = Math.min(1, (elapsed - 520) / 460);
+                        if (p < 1) {
+                            const sc = evalElasticScale3(p, 0.64, 1.13, 0.84, 0.96);
+                            const alpha = Math.min(1, p * 2.8);
+                            cloudPopTarget.setAttribute('opacity', alpha.toFixed(3));
+                            cloudPopTarget.setAttribute('transform', `scale(${sc.toFixed(4)})`);
+                        } else {
+                            cloudPopTarget.setAttribute('opacity', '1');
+                            cloudPopTarget.removeAttribute('transform');
+                        }
+                    }
+
+                    // 步驟 2：「公、廁、現、況、板」依序 Pop 出現 (960ms ~ 1980ms)
+                    titleChars.forEach((el, idx) => {
+                        if (!el) return;
+                        const t0 = charTimings[idx];
+                        if (elapsed < t0) return;
+                        const p = Math.min(1, (elapsed - t0) / 380);
+                        if (p < 1) {
+                            const sc = evalElasticScale3(p, 0.66, 1.26, 0.85, 0.95);
+                            let dy = 0;
+                            if (p <= 0.66) {
+                                const e = 1 - Math.pow(1 - (p / 0.66), 2.4);
+                                dy = 10 + (-3 - 10) * e;
+                            } else if (p <= 0.85) {
+                                const e = 0.5 - 0.5 * Math.cos(((p - 0.66) / 0.19) * Math.PI);
+                                dy = -3 * (1 - e);
+                            }
+                            const alpha = Math.min(1, p * 2.8);
+                            el.setAttribute('opacity', alpha.toFixed(3));
+                            el.setAttribute('transform', `translate(0, ${dy.toFixed(2)}) scale(${sc.toFixed(4)})`);
+                        } else {
+                            el.setAttribute('opacity', '1');
+                            el.removeAttribute('transform');
+                        }
+                    });
+
+                    // 步驟 3：下螢幕出現 START 文字 (2020ms ~ 2460ms)
+                    if (startPopTarget && elapsed >= 2020) {
+                        const p = Math.min(1, (elapsed - 2020) / 440);
+                        if (p < 1) {
+                            const sc = evalElasticScale3(p, 0.60, 1.30, 0.80, 0.94);
+                            const alpha = Math.min(1, p * 2.8);
+                            startPopTarget.setAttribute('opacity', alpha.toFixed(3));
+                            startPopTarget.setAttribute('transform', `scale(${sc.toFixed(4)})`);
+                        } else {
+                            startPopTarget.setAttribute('opacity', '1');
+                            startPopTarget.removeAttribute('transform');
+                        }
+                    }
+
+                    // 步驟 4：2720ms 同迴圈無縫銜接翻面縮小
+                    if (elapsed < 2720) {
+                        requestAnimationFrame(tickIntro);
+                    } else {
+                        startConsoleFlipAndShrinkToBird();
                     }
                 }
 
-                requestAnimationFrame(() => {
-                    if (consoleEntranceMover) {
-                        // 進場彈出結束後立即鎖定透明度並解除 CSS animation，讓後續縮小飛向小鳥的變形完全順暢無閃跳
-                        consoleEntranceMover.addEventListener('animationend', () => {
-                            consoleEntranceMover.style.opacity = '1';
-                            consoleEntranceMover.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
-                            consoleEntranceMover.style.animation = 'none';
-                        }, { once: true });
-                        consoleEntranceMover.classList.add('is-ready');
-                    }
-
-                    // 步驟 1：遊戲機登場後，雲朵先 Pop 出來 (520ms)
-                    setTimeout(() => {
-                        cloudPopTarget?.classList.add('is-popped');
-                    }, 520);
-
-                    // 步驟 2：「公、廁、現、況、板」五個字依序 Pop 出現 (960ms ~ 1600ms)
-                    const charTimings = [960, 1120, 1280, 1440, 1600];
-                    charTimings.forEach((delayMs, idx) => {
-                        setTimeout(() => {
-                            document.getElementById(`titleChar_${idx}`)?.classList.add('is-popped');
-                        }, delayMs);
-                    });
-
-                    // 步驟 3：下螢幕出現 START 文字 (2020ms)
-                    setTimeout(() => {
-                        startPopTarget?.classList.add('is-popped');
-                    }, 2020);
-
-                    // 步驟 4：遊戲機轉向（180° 翻面露背）並縮小到粉紅小鳥手中 (2720ms 啟動)
-                    setTimeout(() => {
-                        startConsoleFlipAndShrinkToBird();
-                    }, 2720);
-                });
+                requestAnimationFrame(tickIntro);
             }
 
             // 同步優先預載兩隻對戰小怪 PNG，載入完成後才啟動開場動畫與後續背景資源載入
@@ -2151,114 +2298,197 @@
             ]);
             introAssetsReadyPromise.then(startConsoleIntroSequence);
 
+            const isMobileBoardLayout = () => window.innerWidth < 768;
+            const MOBILE_MID_SCALE = 724.0 / 349.0; // 2.0745（讓下方大廁間左右切齊上方兩扇門）
+            const MOBILE_MID_TX = 117.7 - 564.2 * MOBILE_MID_SCALE; // -1052.73
+            const MOBILE_MID_TY = 1795.0 - 741.1 * MOBILE_MID_SCALE; // 257.59
+            let hasConsoleFlipStarted = false;
+
+            // 原生 SVG 接住微彈跳（不觸發 CSS 圖層重建閃爍）
+            function playBirdCatchBounceSvg(onComplete) {
+                if (!pinkBirdCatchBounceGroup) {
+                    if (typeof onComplete === 'function') onComplete();
+                    return;
+                }
+                const startT = performance.now();
+                const dur = 260;
+                function tickBounce(now) {
+                    const p = Math.min(1, (now - startT) / dur);
+                    let dy = 0;
+                    if (p < 0.45) {
+                        dy = 4 * Math.sin((p / 0.45) * (Math.PI / 2));
+                    } else if (p < 0.78) {
+                        const u = (p - 0.45) / 0.33;
+                        dy = 4 + (-1.5 - 4) * (0.5 - 0.5 * Math.cos(u * Math.PI));
+                    } else {
+                        const u = (p - 0.78) / 0.22;
+                        dy = -1.5 * (1 - u);
+                    }
+
+                    if (p < 1) {
+                        pinkBirdCatchBounceGroup.setAttribute('transform', `translate(0, ${dy.toFixed(2)})`);
+                        requestAnimationFrame(tickBounce);
+                    } else {
+                        pinkBirdCatchBounceGroup.removeAttribute('transform');
+                        if (typeof onComplete === 'function') onComplete();
+                    }
+                }
+                requestAnimationFrame(tickBounce);
+            }
+
+            // 原生 SVG 小鳥打電動待機微動迴圈（維持手機版 2 倍放大向量銳利度、零圖層切換閃跳）
+            let birdGamingSvgRafStarted = false;
+            let wasBirdGamingActive = false;
+            function ensureBirdGamingSvgLoop() {
+                if (birdGamingSvgRafStarted) return;
+                birdGamingSvgRafStarted = true;
+
+                const birdCharEl = document.getElementById('pinkBirdCharacterGroup');
+                const consoleMotionEl = document.getElementById('birdConsoleMotionGroup');
+                const leftHandEl = document.getElementById('birdLeftHandGaming');
+                const rightHandEl = document.getElementById('birdRightHandGaming');
+
+                function tickGaming(now) {
+                    const isGamingNow = Boolean(birdCharEl && birdCharEl.classList.contains('is-gaming'));
+                    if (isGamingNow) {
+                        wasBirdGamingActive = true;
+                        const rad = ((now % 440) / 440) * Math.PI * 2;
+                        const cx = Math.sin(rad * 2) * 0.65;
+                        const cy = -Math.abs(Math.sin(rad)) * 1.5;
+                        const rot = Math.sin(rad) * 1.6;
+                        consoleMotionEl?.setAttribute('transform', `translate(${cx.toFixed(2)}, ${cy.toFixed(2)}) rotate(${rot.toFixed(2)})`);
+
+                        const lTap = 0.5 - 0.5 * Math.cos(((now % 250) / 250) * Math.PI * 2);
+                        leftHandEl?.setAttribute('transform', `translate(${(1.6 * lTap).toFixed(2)}, ${(-2.5 * lTap).toFixed(2)}) rotate(${(-4.5 * lTap).toFixed(2)})`);
+
+                        const rTap = 0.5 - 0.5 * Math.cos((((now + 100) % 210) / 210) * Math.PI * 2);
+                        rightHandEl?.setAttribute('transform', `translate(${(-1.6 * rTap).toFixed(2)}, ${(-2.6 * rTap).toFixed(2)}) rotate(${(4.8 * rTap).toFixed(2)})`);
+                    } else if (wasBirdGamingActive) {
+                        wasBirdGamingActive = false;
+                        consoleMotionEl?.removeAttribute('transform');
+                        leftHandEl?.removeAttribute('transform');
+                        rightHandEl?.removeAttribute('transform');
+                    }
+                    requestAnimationFrame(tickGaming);
+                }
+                requestAnimationFrame(tickGaming);
+            }
+
             function startConsoleFlipAndShrinkToBird() {
+                hasConsoleFlipStarted = true;
+                if (typeof syncGuitarBirdAlignment === 'function') {
+                    syncGuitarBirdAlignment();
+                }
+
+                // 1. 翻轉開始前先定格機內雲朵與文字彈出動畫，消除壓縮翻面時的合成圖層撕裂閃跳
+                [
+                    cloudPopTarget,
+                    startPopTarget,
+                    document.getElementById('titleChar_0'),
+                    document.getElementById('titleChar_1'),
+                    document.getElementById('titleChar_2'),
+                    document.getElementById('titleChar_3'),
+                    document.getElementById('titleChar_4')
+                ].forEach((el) => {
+                    if (!el) return;
+                    el.setAttribute('opacity', '1');
+                    el.removeAttribute('transform');
+                    el.classList.remove('pop-hidden', 'is-popped');
+                });
+
+                // 2. 背景模糊改用單次硬體加速 CSS transition 對焦，避免每幀重算高斯模糊造成手機掉幀
+                if (boardFinalSceneSvg) {
+                    void boardFinalSceneSvg.getBoundingClientRect();
+                    boardFinalSceneSvg.style.transition = 'filter 1.16s cubic-bezier(0.22, 1, 0.36, 1), -webkit-filter 1.16s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.16s ease-out';
+                    boardFinalSceneSvg.style.filter = 'blur(0px)';
+                    boardFinalSceneSvg.style.webkitFilter = 'blur(0px)';
+                    boardFinalSceneSvg.style.opacity = '1';
+                }
+
+                const mobile = isMobileBoardLayout();
                 const durationMs = 1260;
                 const startTime = performance.now();
 
-                // 大小比例常數：大遊戲機寬 746.9px ➔ 小鳥手中 Nintenpoo 寬 68.6px
                 const BACK_TO_FRONT_RATIO = 746.9 / 68.6; // 10.8878
-                const END_SCALE = 1 / BACK_TO_FRONT_RATIO; // 0.09185
+                const START_SCALE = mobile ? 1.08 : 1.0;
+                const TARGET_BACK_SCALE = mobile ? MOBILE_MID_SCALE : 1.0;
+                const END_SCALE = TARGET_BACK_SCALE / BACK_TO_FRONT_RATIO;
+                const MIN_EDGE_COS = 0.045;
 
-                // 起點（畫面正中央）與終點（粉紅小鳥雙手中心）
-                const startX = 720.0, startY = 390.0;
-                const endX = 748.35, endY = 546.0;
+                const startX = mobile ? 470.0 : 720.0;
+                const startY = mobile ? 985.0 : 390.0;
+                const endX = mobile ? (MOBILE_MID_TX + 748.35 * MOBILE_MID_SCALE) : 748.35;
+                const endY = mobile ? (MOBILE_MID_TY + 546.0 * MOBILE_MID_SCALE) : 546.0;
 
+                console3dSideRim?.setAttribute('opacity', '1');
                 console3dSideRim?.classList.remove('hidden');
 
                 function step(now) {
                     const rawT = Math.min(1, (now - startTime) / durationMs);
 
-                    // 平滑位移與縮放曲線
                     const easeMove = rawT < 0.5
                         ? 4 * rawT * rawT * rawT
                         : 1 - Math.pow(-2 * rawT + 2, 3) / 2;
 
-                    // 轉向角度 theta：0 -> PI (約在 rawT=0.44 機身仍大時翻過 90°，清楚展現轉向過程)
                     const flipProgress = Math.pow(rawT, 0.86);
                     const theta = Math.PI * (0.5 - 0.5 * Math.cos(Math.PI * flipProgress));
                     const cosVal = Math.cos(theta);
                     const sinVal = Math.sin(theta);
 
-                    // 微幅拋物線躍起後落入小鳥手中
-                    const arcLiftY = -24 * Math.sin(Math.pow(rawT, 0.85) * Math.PI);
+                    const arcLiftY = (mobile ? -42 : -24) * Math.sin(Math.pow(rawT, 0.85) * Math.PI);
                     const curX = startX + (endX - startX) * easeMove;
                     const curY = startY + (endY - startY) * easeMove + arcLiftY;
 
-                    // 整體尺寸由 1.0 平滑縮小至 END_SCALE
                     const scaleEase = Math.pow(easeMove, 1.08);
-                    const curScale = 1 + (END_SCALE - 1) * scaleEase;
+                    const curScale = START_SCALE + (END_SCALE - START_SCALE) * scaleEase;
 
-                    // 3D 翻轉動態微傾角與機殼側邊厚度偏移
                     const tiltDeg = -5.5 * sinVal;
-                    const skewDeg = 4.2 * sinVal;
-                    const halfThick = 14 * curScale;
+                    const skewDeg = 3.6 * sinVal;
 
                     if (theta <= Math.PI / 2) {
-                        // 0° ~ 90°：正面雙螢幕朝向觀眾並逐漸側轉
-                        consoleFrontFace?.classList.remove('hidden');
-                        consoleBackFace?.classList.add('hidden');
-
-                        const faceScaleX = Math.max(0.025, cosVal) * curScale;
-                        const frontX = curX + halfThick * sinVal;
-                        const rimX = curX - halfThick * sinVal;
+                        // 0° ~ 90°：以 sin(2*theta) 控制側邊厚度，45° 展現立體感、90° 收合至正中央零裂縫
+                        const faceScaleX = Math.max(MIN_EDGE_COS, cosVal) * curScale;
+                        const rimShiftX = -11 * curScale * Math.sin(2 * theta);
 
                         consoleFrontFace?.setAttribute(
                             'transform',
-                            `translate(${frontX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${faceScaleX.toFixed(4)}, ${curScale.toFixed(4)})`
+                            `translate(${curX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${faceScaleX.toFixed(4)}, ${curScale.toFixed(4)})`
                         );
                         console3dSideRim?.setAttribute(
                             'transform',
-                            `translate(${rimX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${faceScaleX.toFixed(4)}, ${curScale.toFixed(4)})`
+                            `translate(${(curX + rimShiftX).toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${faceScaleX.toFixed(4)}, ${curScale.toFixed(4)})`
                         );
+                        consoleFrontFace?.classList.remove('hidden');
+                        console3dSideRim?.classList.remove('hidden');
+                        consoleBackFace?.classList.add('hidden');
                     } else {
-                        // 90° ~ 180°：翻過側面露出白色 Nintenpoo 機背並縮小飛入小鳥手中
-                        consoleFrontFace?.classList.add('hidden');
-                        consoleBackFace?.classList.remove('hidden');
-
+                        // 90° ~ 180°：與正面 90° 邊緣等寬同座標無縫接手，並收起展開態側邊避免突出殘影
                         const uBack = (theta - Math.PI / 2) / (Math.PI / 2);
                         const foldEase = 1 - Math.pow(1 - uBack, 2);
 
                         const backScale = BACK_TO_FRONT_RATIO * curScale;
-                        const absCos = Math.max(0.025, Math.abs(cosVal));
-                        const backX = curX - halfThick * sinVal;
-                        const rimX = curX + halfThick * sinVal;
-
-                        // 下半機身由展開平面微折為小鳥手持遊玩視角
+                        const absCos = Math.max(MIN_EDGE_COS, Math.abs(cosVal));
                         const topFoldY = 1.0729 + (1 - 1.0729) * foldEase;
                         const botFoldY = 1.7881 + (1 - 1.7881) * foldEase;
 
                         consoleBackFace?.setAttribute(
                             'transform',
-                            `translate(${backX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${(backScale * absCos).toFixed(4)}, ${backScale.toFixed(4)})`
+                            `translate(${curX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${(backScale * absCos).toFixed(4)}, ${backScale.toFixed(4)})`
                         );
                         backShellTopFold?.setAttribute('transform', `scale(1, ${topFoldY.toFixed(4)})`);
                         backShellBottomFold?.setAttribute('transform', `scale(1, ${botFoldY.toFixed(4)})`);
 
-                        const rimScaleX = absCos * curScale;
-                        const rimScaleY = curScale * (0.72 + 0.28 * (1 - foldEase));
-                        console3dSideRim?.setAttribute(
-                            'transform',
-                            `translate(${rimX.toFixed(2)}, ${curY.toFixed(2)}) rotate(${tiltDeg.toFixed(2)}) skewY(${skewDeg.toFixed(2)}) scale(${rimScaleX.toFixed(4)}, ${rimScaleY.toFixed(4)})`
-                        );
+                        consoleFrontFace?.classList.add('hidden');
+                        console3dSideRim?.classList.add('hidden');
+                        consoleBackFace?.classList.remove('hidden');
                     }
 
-                    // 背景公廁現況板同步由模糊 (blur 11px, opacity 0.45) 對焦至完全清晰
-                    if (boardFinalSceneSvg) {
-                        const unblurProgress = Math.min(1, Math.max(0, (rawT - 0.08) / 0.78));
-                        const blurEase = 1 - Math.pow(1 - unblurProgress, 2);
-                        const blurPx = 11 * (1 - blurEase);
-                        const bgOpacity = 0.45 + 0.55 * blurEase;
-                        boardFinalSceneSvg.style.filter = blurPx > 0.08 ? `blur(${blurPx.toFixed(2)}px)` : 'none';
-                        boardFinalSceneSvg.style.webkitFilter = blurPx > 0.08 ? `blur(${blurPx.toFixed(2)}px)` : 'none';
-                        boardFinalSceneSvg.style.opacity = bgOpacity.toFixed(3);
-                    }
-
-                    // 最後階段 (rawT >= 0.72)：粉紅小鳥雙手由兩側合攏握住遊戲機
-                    if (rawT >= 0.72 && birdCatchHandsOverlay) {
-                        const catchP = Math.min(1, (rawT - 0.72) / 0.28);
-                        const catchEase = 1 - Math.pow(1 - catchP, 2.4);
-                        const spreadPx = 12 * (1 - catchEase);
-                        birdCatchHandsOverlay.setAttribute('opacity', Math.min(1, catchP * 1.6).toFixed(3));
+                    // 最後階段 (rawT >= 0.86)：遊戲機真正進入胸前範圍時，雙手從兩側合攏接住
+                    if (rawT >= 0.86 && birdCatchHandsOverlay) {
+                        const catchP = Math.min(1, (rawT - 0.86) / 0.14);
+                        const catchEase = 1 - Math.pow(1 - catchP, 2.2);
+                        const spreadPx = 10 * (1 - catchEase);
+                        birdCatchHandsOverlay.setAttribute('opacity', Math.min(1, catchP * 1.5).toFixed(3));
                         birdLeftHandCatch?.setAttribute('transform', `translate(${(-spreadPx).toFixed(2)}, 0)`);
                         birdRightHandCatch?.setAttribute('transform', `translate(${spreadPx.toFixed(2)}, 0)`);
                     }
@@ -2266,26 +2496,25 @@
                     if (rawT < 1) {
                         requestAnimationFrame(step);
                     } else {
-                        // 完美抵達：無縫切換為場景內靜態 Nintenpoo 機身與小鳥雙手，並觸發小鳥接住微彈跳
-                        if (boardFinalSceneSvg) {
-                            boardFinalSceneSvg.style.filter = 'none';
-                            boardFinalSceneSvg.style.webkitFilter = 'none';
-                            boardFinalSceneSvg.style.opacity = '1';
-                        }
-                       birdHeldConsoleStatic?.setAttribute('opacity', '1');
+                        // 先點亮下層靜態遊戲機與雙手，等下一繪製幀確認上屏後再隱藏前景舞台（零斷層交接）
+                        birdHeldConsoleStatic?.setAttribute('opacity', '1');
                         birdHandsStatic?.setAttribute('opacity', '1');
-                        consoleTitleStage?.classList.add('hidden');
-                        pinkBirdCatchBounceGroup?.classList.add('is-caught');
+                        ensureBirdGamingSvgLoop();
 
-                        const boardStageTopBar = document.getElementById('boardStageTopBar');
-                        if (boardStageTopBar) {
-                            boardStageTopBar.classList.remove('hidden', 'is-fading-in');
-                            void boardStageTopBar.offsetWidth;
-                            boardStageTopBar.classList.add('is-fading-in');
-                        }
+                        requestAnimationFrame(() => {
+                            consoleTitleStage?.classList.add('hidden');
 
-                        // 過場完成後啟用左右廁門 Hover 互動
-                        enableBoardDoorInteractions();
+                            const boardStageTopBar = document.getElementById('boardStageTopBar');
+                            if (boardStageTopBar) {
+                                boardStageTopBar.classList.remove('hidden', 'is-fading-in');
+                                void boardStageTopBar.offsetWidth;
+                                boardStageTopBar.classList.add('is-fading-in');
+                            }
+
+                            playBirdCatchBounceSvg(() => {
+                                enableBoardDoorInteractions();
+                            });
+                        });
                     }
                 }
 
@@ -2388,11 +2617,17 @@
                        `C ${blC1x.toFixed(2)},${blC1y.toFixed(2)} ${blC2x.toFixed(2)},${blC2y.toFixed(2)} ${blEx.toFixed(2)},${blEy.toFixed(2)} Z`;
             }
 
-            // 建立單扇門的 3D 立體厚度開闔動畫控制器
+           // 建立單扇門的 3D 立體厚度開闔動畫控制器（支援電腦版長門與手機版方形門）
             function create3dThickDoorAnimator(cfg) {
                 const state = { p: 0, rafId: null, fromP: 0, toP: 0, startTime: 0, duration: 300 };
 
                 function renderAt(p) {
+                    const mobile = isMobileBoardLayout();
+                    const yTop = 101.3;
+                    const yBot = mobile ? 445.3 : 741.1;
+                    const embOffsetY = mobile ? -6 : 0;
+                    const knobOffsetY = mobile ? -58 : 0;
+
                     const frontW = 330 - 52 * p;              // 正面寬度 330 -> 278
                     const thickW = frontW + 15.5 * p;         // 加上 15.5px 立體門板側邊厚度
                     const flareFront = 7.5 * p;               // 外開微透視上下斜角
@@ -2400,16 +2635,24 @@
 
                     cfg.frontPath?.setAttribute(
                         'd',
-                        buildPerspectiveDoorPath(cfg.x0, frontW, 101.3, 741.1, 101.3 - flareFront, 741.1 + flareFront)
+                        buildPerspectiveDoorPath(cfg.x0, frontW, yTop, yBot, yTop - flareFront, yBot + flareFront)
                     );
                     cfg.thicknessPath?.setAttribute(
                         'd',
-                        buildPerspectiveDoorPath(cfg.x0, thickW, 101.3, 741.1, 101.3 - flareBack, 741.1 + flareBack)
+                        buildPerspectiveDoorPath(cfg.x0, thickW, yTop, yBot, yTop - flareBack, yBot + flareBack)
                     );
 
                     if (p <= 0.001) {
-                        cfg.emblemGroup?.removeAttribute('transform');
-                        cfg.knobGroup?.removeAttribute('transform');
+                        if (embOffsetY !== 0) {
+                            cfg.emblemGroup?.setAttribute('transform', `translate(0, ${embOffsetY})`);
+                        } else {
+                            cfg.emblemGroup?.removeAttribute('transform');
+                        }
+                        if (knobOffsetY !== 0) {
+                            cfg.knobGroup?.setAttribute('transform', `translate(0, ${knobOffsetY})`);
+                        } else {
+                            cfg.knobGroup?.removeAttribute('transform');
+                        }
                         cfg.knobSideRim?.removeAttribute('transform');
                     } else {
                         const embDx = -26 * p;
@@ -2418,7 +2661,7 @@
                         const embSkew = -1.25 * p;
                         cfg.emblemGroup?.setAttribute(
                             'transform',
-                            `translate(${(cfg.emblemCx + embDx).toFixed(2)}, 265) skewY(${embSkew.toFixed(2)}) scale(${embSx.toFixed(4)}, ${embSy.toFixed(4)}) translate(${-cfg.emblemCx}, -265)`
+                            `translate(0, ${embOffsetY}) translate(${(cfg.emblemCx + embDx).toFixed(2)}, 265) skewY(${embSkew.toFixed(2)}) scale(${embSx.toFixed(4)}, ${embSy.toFixed(4)}) translate(${-cfg.emblemCx}, -265)`
                         );
 
                         const knobDx = -45.2 * p;
@@ -2426,7 +2669,7 @@
                         const knobSy = 1 + 0.018 * p;
                         cfg.knobGroup?.setAttribute(
                             'transform',
-                            `translate(${(cfg.knobCx + knobDx).toFixed(2)}, 452) scale(${knobSx.toFixed(4)}, ${knobSy.toFixed(4)}) translate(${-cfg.knobCx}, -452)`
+                            `translate(0, ${knobOffsetY}) translate(${(cfg.knobCx + knobDx).toFixed(2)}, 452) scale(${knobSx.toFixed(4)}, ${knobSy.toFixed(4)}) translate(${-cfg.knobCx}, -452)`
                         );
                         cfg.knobSideRim?.setAttribute('transform', `translate(${(5.2 * p).toFixed(2)}, 0)`);
                     }
@@ -2461,7 +2704,8 @@
 
                 return {
                     open: () => animateTo(1, 320),
-                    close: () => animateTo(0, 270)
+                    close: () => animateTo(0, 270),
+                    refresh: () => renderAt(state.p)
                 };
             }
 
@@ -2526,7 +2770,6 @@
                     rightDoorCloseTimer = null;
                 }
 
-                // 門完全閉合後再次 Hover 時，隨機換一隻不重複的小怪並微調探頭高度
                 if (isRightDoorFullyClosed && rightDoorPeekMonsterMover) {
                     const nextUrl = pickRandomMonsterUrl();
                     if (nextUrl && rightDoorPeekMonsterImg) {
@@ -2536,7 +2779,9 @@
                         rightDoorPeekMonsterFallback?.classList.add('hidden');
                     }
 
-                    currentPeekY = Math.round(445 + Math.random() * 205);
+                    currentPeekY = isMobileBoardLayout()
+                        ? Math.round(315 + Math.random() * 105)
+                        : Math.round(445 + Math.random() * 205);
                     rightDoorPeekMonsterMover.style.transition = 'none';
                     rightDoorPeekMonsterMover.setAttribute('transform', `translate(1125, ${currentPeekY}) rotate(0)`);
                     rightDoorPeekMonsterMover.style.transform = `translate(1125px, ${currentPeekY}px) rotate(0deg)`;
@@ -2547,7 +2792,6 @@
                 doorMonsterStatusGroup?.classList.add('is-hovered');
                 rightDoorAnimator.open();
 
-                // 240x240 小怪歪頭探出門縫並延伸至右側 #FFF9EC 米色背景之上
                 if (rightDoorPeekMonsterMover) {
                     rightDoorPeekMonsterMover.style.transition = 'transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s';
                     rightDoorPeekMonsterMover.style.transform = `translate(1198px, ${currentPeekY}px) rotate(28deg)`;
@@ -2590,15 +2834,27 @@
             const middleDoorFrontHinges = document.getElementById('middleDoorFrontHinges');
 
             let isBirdSequencePlaying = false;
+            let currentMiddleDoorProgress = 0;
 
             // 渲染中門在任意開闔進度 c (0 = 完全敞開, 1 = 完全關上) 的 3D 幾何狀態
             function renderMiddleDoorProgress(c) {
+                currentMiddleDoorProgress = c;
+                const mobile = isMobileBoardLayout();
+                const yTop = mobile ? 201.2 : 101.3;
+                const yBot = 741.1;
+
                 if (c <= 0.001) {
-                    const openD = 'M595.2,741.1h-23c-4.4,0-8-3.6-8-8V109.3c0-4.4,3.6-8,8-8h23c4.4,0,8,3.6,8,8v623.8C603.2,737.5,599.6,741.1,595.2,741.1z';
+                    const vTop = (yTop + 8).toFixed(1);
+                    const vLen = (yBot - yTop - 16).toFixed(1);
+                    const openD = `M595.2,741.1h-23c-4.4,0-8-3.6-8-8V${vTop}c0-4.4,3.6-8,8-8h23c4.4,0,8,3.6,8,8v${vLen}C603.2,737.5,599.6,741.1,595.2,741.1z`;
                     middleDoorFrontPath?.setAttribute('d', openD);
                     middleDoorThicknessPath?.setAttribute('d', openD);
                     middleDoorSideHandle?.setAttribute('opacity', '1');
-                    middleDoorSideHandle?.removeAttribute('transform');
+                    if (mobile) {
+                        middleDoorSideHandle?.setAttribute('transform', 'translate(0, 25)');
+                    } else {
+                        middleDoorSideHandle?.removeAttribute('transform');
+                    }
                     middleDoorFrontEmblem?.setAttribute('opacity', '0');
                     middleDoorFrontKnob?.setAttribute('opacity', '0');
                     middleDoorFrontHinges?.setAttribute('opacity', '0');
@@ -2618,39 +2874,186 @@
 
                 middleDoorFrontPath?.setAttribute(
                     'd',
-                    buildPerspectiveDoorPath(x0, frontW, 101.3, 741.1, 101.3 - flareFront, 741.1 + flareFront, rCorner)
+                    buildPerspectiveDoorPath(x0, frontW, yTop, yBot, yTop - flareFront, yBot + flareFront, rCorner)
                 );
                 middleDoorThicknessPath?.setAttribute(
                     'd',
-                    buildPerspectiveDoorPath(x0, thickW, 101.3, 741.1, 101.3 - flareBack, 741.1 + flareBack, rCorner)
+                    buildPerspectiveDoorPath(x0, thickW, yTop, yBot, yTop - flareBack, yBot + flareBack, rCorner)
                 );
 
                 // 側面門把隨轉動收合，正面圓章與門把隨轉動展開
                 const sideHandleVis = Math.max(0, 1 - c * 4.2);
+                const handleShiftY = mobile ? 25 : 0;
                 middleDoorSideHandle?.setAttribute('opacity', sideHandleVis.toFixed(3));
-                middleDoorSideHandle?.setAttribute('transform', `translate(${(c * 14).toFixed(2)}, 0)`);
+                middleDoorSideHandle?.setAttribute('transform', `translate(${(c * 14).toFixed(2)}, ${handleShiftY})`);
 
                 const frontVis = Math.min(1, Math.max(0, (cosP - 0.16) / 0.2));
                 const spanRatio = frontW / 349.0;
                 const scaleX = Math.max(0.05, cosP);
 
                 const embX = x0 + (738.7 - x0) * spanRatio;
+                const embShiftY = mobile ? 95 : 0;
                 middleDoorFrontEmblem?.setAttribute('opacity', frontVis.toFixed(3));
                 middleDoorFrontEmblem?.setAttribute(
                     'transform',
-                    `translate(${embX.toFixed(2)}, 236.8) scale(${scaleX.toFixed(4)}, 1) translate(-738.7, -236.8)`
+                    `translate(${embX.toFixed(2)}, ${(236.8 + embShiftY).toFixed(1)}) scale(${scaleX.toFixed(4)}, 1) translate(-738.7, -236.8)`
                 );
 
                 const knobX = x0 + (870.2 - x0) * spanRatio;
+                const knobShiftY = mobile ? 25 : 0;
                 middleDoorFrontKnob?.setAttribute('opacity', frontVis.toFixed(3));
                 middleDoorFrontKnob?.setAttribute(
                     'transform',
-                    `translate(${knobX.toFixed(2)}, 452) scale(${scaleX.toFixed(4)}, 1) translate(-870.2, -452)`
+                    `translate(${knobX.toFixed(2)}, ${(452 + knobShiftY).toFixed(1)}) scale(${scaleX.toFixed(4)}, 1) translate(-870.2, -452)`
                 );
 
                 const hingeVis = Math.min(1, Math.max(0, (c - 0.25) / 0.35));
                 middleDoorFrontHinges?.setAttribute('opacity', hingeVis.toFixed(3));
             }
+
+            // ===============================================================
+            // 手機版（< 768px）與電腦版（>= 768px）主畫面＆起始畫面響應式切換
+            // ===============================================================
+            function applyBoardResponsiveLayout() {
+                const mobile = isMobileBoardLayout();
+                const targetViewBox = mobile ? '0 0 940 1920' : '0 0 1440 780';
+
+                boardFinalSceneSvg?.setAttribute('viewBox', targetViewBox);
+                consoleTitleStage?.setAttribute('viewBox', targetViewBox);
+
+                // 手機版主選單與起始畫面隱藏右上角 SVG LIVE 膠囊
+                const liveBadgeGroup = document.getElementById('liveBadgeGroup');
+                if (liveBadgeGroup) {
+                    liveBadgeGroup.style.display = mobile ? 'none' : '';
+                }
+
+                // 1. 中間粉紅小鳥廁間與可開關中門（手機版移至下方並放大切齊上方兩門）
+                const middleStallFloorClipPath = document.querySelector('#middleStallFloorClip > path');
+                const middleDoorwayClipRect = document.querySelector('#middleDoorwayClip > rect');
+                const middleOpenStallGroup = document.getElementById('middleOpenStallGroup');
+                const middleOpenStallWrap = middleOpenStallGroup?.parentElement;
+                const middleStallWallPath = middleOpenStallGroup?.querySelector('path[fill="#DCF9F3"]');
+                const middleOpenDoorLeaf = document.getElementById('middleOpenDoorLeaf');
+                const midBackHinges = document.querySelectorAll('#middleDoorSlamShakeGroup > path[fill="#45E5AC"]');
+                const midFrontHinges = document.querySelectorAll('#middleDoorFrontHinges > path');
+
+                const DESKTOP_STALL_WALL_D = 'M901.1,741.1H612c-6.7,0-12.2-5.5-12.2-12.2V119.1c0-6.7,5.5-12.2,12.2-12.2h289c6.7,0,12.2,5.5,12.2,12.2v609.8C913.2,735.6,907.8,741.1,901.1,741.1z';
+                const MOBILE_STALL_WALL_D  = 'M901.1,741.1H612c-6.7,0-12.2-5.5-12.2-12.2V213.4c0-6.7,5.5-12.2,12.2-12.2h289c6.7,0,12.2,5.5,12.2,12.2v515.5C913.2,735.6,907.8,741.1,901.1,741.1z';
+
+                if (mobile) {
+                    const midTransform = `translate(${MOBILE_MID_TX.toFixed(2)}, ${MOBILE_MID_TY.toFixed(2)}) scale(${MOBILE_MID_SCALE.toFixed(5)})`;
+                    middleOpenStallWrap?.setAttribute('transform', midTransform);
+                    middleOpenDoorLeaf?.setAttribute('transform', midTransform);
+                    middleDoorwayClipRect?.setAttribute('y', '201.2');
+                    middleDoorwayClipRect?.setAttribute('height', '539.9');
+                    middleDoorwayClipRect?.setAttribute('rx', '12.2');
+                    middleStallWallPath?.setAttribute('d', MOBILE_STALL_WALL_D);
+                    middleStallFloorClipPath?.setAttribute('d', MOBILE_STALL_WALL_D);
+                    midBackHinges[0]?.setAttribute('transform', 'translate(0, 46)');
+                    midBackHinges[1]?.setAttribute('transform', 'translate(0, 28)');
+                    midFrontHinges[0]?.setAttribute('transform', 'translate(0, 46)');
+                    midFrontHinges[1]?.setAttribute('transform', 'translate(0, 28)');
+                } else {
+                    middleOpenStallWrap?.removeAttribute('transform');
+                    middleOpenDoorLeaf?.removeAttribute('transform');
+                    middleDoorwayClipRect?.setAttribute('y', '101.3');
+                    middleDoorwayClipRect?.setAttribute('height', '639.8');
+                    middleDoorwayClipRect?.setAttribute('rx', '23.3');
+                    middleStallWallPath?.setAttribute('d', DESKTOP_STALL_WALL_D);
+                    middleStallFloorClipPath?.setAttribute('d', DESKTOP_STALL_WALL_D);
+                    midBackHinges[0]?.removeAttribute('transform');
+                    midBackHinges[1]?.removeAttribute('transform');
+                    midFrontHinges[0]?.removeAttribute('transform');
+                    midFrontHinges[1]?.removeAttribute('transform');
+                }
+                renderMiddleDoorProgress(currentMiddleDoorProgress);
+
+                // 2. 左門「留言板」與右門「小怪現況板」（手機版改為上方左右並排方形門）
+                const doorBotY = mobile ? 445.3 : 741.1;
+                const doorH = mobile ? '344' : '639.8';
+
+                if (doorMessageBoardGroup) {
+                    const leftInterior = doorMessageBoardGroup.querySelector('.door-interior-bg');
+                    const leftHinges = doorMessageBoardGroup.querySelectorAll(':scope > path[fill="#45E5AC"]');
+                    const leftHitRect = doorMessageBoardGroup.querySelector(':scope > rect[fill="transparent"]');
+                    const bubbleWrap1 = document.getElementById('leftDoorSpeechBubble1')?.parentElement;
+                    const bubbleWrap2 = document.getElementById('leftDoorSpeechBubble2')?.parentElement;
+
+                    if (mobile) {
+                        doorMessageBoardGroup.setAttribute('transform', 'translate(-47, 160)');
+                        leftHinges[0]?.setAttribute('transform', 'translate(0, -74)');
+                        leftHinges[1]?.setAttribute('transform', 'translate(0, -209)');
+                        bubbleWrap1?.setAttribute('transform', 'translate(455, 290)');
+                        bubbleWrap2?.setAttribute('transform', 'translate(456, 415)');
+                    } else {
+                        doorMessageBoardGroup.removeAttribute('transform');
+                        leftHinges[0]?.removeAttribute('transform');
+                        leftHinges[1]?.removeAttribute('transform');
+                        bubbleWrap1?.setAttribute('transform', 'translate(455, 360)');
+                        bubbleWrap2?.setAttribute('transform', 'translate(456, 514)');
+                    }
+                    leftInterior?.setAttribute('d', buildPerspectiveDoorPath(164.7, 330, 101.3, doorBotY, 101.3, doorBotY));
+                    leftHitRect?.setAttribute('height', doorH);
+                    leftDoorAnimator.refresh();
+                }
+
+                if (doorMonsterStatusGroup) {
+                    const rightInterior = doorMonsterStatusGroup.querySelector('.door-interior-bg');
+                    const rightHinges = doorMonsterStatusGroup.querySelectorAll(':scope > path[fill="#45E5AC"]');
+                    const rightHitRect = doorMonsterStatusGroup.querySelector(':scope > rect[fill="transparent"]');
+                    const rightPeekClipPath = document.querySelector('#rightMonsterPeekClip > path');
+
+                    if (mobile) {
+                        doorMonsterStatusGroup.setAttribute('transform', 'translate(-452, 160)');
+                        rightHinges[0]?.setAttribute('transform', 'translate(0, -74)');
+                        rightHinges[1]?.setAttribute('transform', 'translate(0, -209)');
+                        rightPeekClipPath?.setAttribute('d', 'M 975,118 L 1225,118 L 1225,-40 L 1650,-40 L 1650,500 L 1225,500 L 1225,432 L 975,432 Z');
+                        rightDoorPeekMonsterImg?.setAttribute('x', '-90');
+                        rightDoorPeekMonsterImg?.setAttribute('y', '-180');
+                        rightDoorPeekMonsterImg?.setAttribute('width', '180');
+                        rightDoorPeekMonsterImg?.setAttribute('height', '180');
+                    } else {
+                        doorMonsterStatusGroup.removeAttribute('transform');
+                        rightHinges[0]?.removeAttribute('transform');
+                        rightHinges[1]?.removeAttribute('transform');
+                        rightPeekClipPath?.setAttribute('d', 'M 975,118 L 1225,118 L 1225,-40 L 1650,-40 L 1650,820 L 1225,820 L 1225,724 L 975,724 Z');
+                        rightDoorPeekMonsterImg?.setAttribute('x', '-120');
+                        rightDoorPeekMonsterImg?.setAttribute('y', '-240');
+                        rightDoorPeekMonsterImg?.setAttribute('width', '240');
+                        rightDoorPeekMonsterImg?.setAttribute('height', '240');
+                    }
+                    rightInterior?.setAttribute('d', buildPerspectiveDoorPath(963.7, 330, 101.3, doorBotY, 101.3, doorBotY));
+                    rightHitRect?.setAttribute('height', doorH);
+                    rightDoorAnimator.refresh();
+                }
+
+                // 3. 起始畫面大掌機登場位置與小鳥接機雙手對齊（翻轉開始前同步更新）
+                if (mobile) {
+                    birdCatchHandsOverlay?.setAttribute(
+                        'transform',
+                        `translate(${MOBILE_MID_TX.toFixed(2)}, ${MOBILE_MID_TY.toFixed(2)}) scale(${MOBILE_MID_SCALE.toFixed(5)})`
+                    );
+                } else {
+                    birdCatchHandsOverlay?.removeAttribute('transform');
+                }
+
+                if (!hasConsoleFlipStarted) {
+                    if (consoleEntranceMover) {
+                        consoleEntranceMover.style.transformOrigin = mobile ? '470px 985px' : '720px 390px';
+                    }
+                    const initConsoleTransform = mobile
+                        ? 'translate(470, 985) scale(1.08)'
+                        : 'translate(720, 390)';
+                    consoleFrontFace?.setAttribute('transform', initConsoleTransform);
+                    console3dSideRim?.setAttribute('transform', initConsoleTransform);
+                    if (boardFinalSceneSvg) {
+                        boardFinalSceneSvg.style.opacity = mobile ? '0.95' : '0.45';
+                    }
+                }
+            }
+
+            applyBoardResponsiveLayout();
+            window.addEventListener('resize', applyBoardResponsiveLayout);
 
             function animateMiddleDoor(fromC, toC, durationMs, easingFn, onDone) {
                 const startTime = performance.now();
@@ -2787,14 +3190,23 @@
                 } catch (err) {}
             }
 
-            // 依小鳥目前狀態（打電動／彈吉他）播放對應循環背景音，並支援開門漸強淡入
+            // 依小鳥目前狀態（打電動／彈吉他／打瞌睡）播放對應循環背景音，並支援開門漸強淡入
             function startActiveBirdIdleLoop(mode, withDoorFadeIn = false) {
-                shouldBirdBgLoopPlay = true;
                 if (birdLoopFadeRafId) {
                     cancelAnimationFrame(birdLoopFadeRafId);
                     birdLoopFadeRafId = null;
                 }
 
+                // 打瞌睡時保持安靜，不播放電動或吉他循環音
+                if (mode === 'sleeping') {
+                    shouldBirdBgLoopPlay = false;
+                    [birdGameLoopAudio, birdGuitarLoopAudio].forEach((aud) => {
+                        if (aud) { try { aud.pause(); } catch (e) {} }
+                    });
+                    return;
+                }
+
+                shouldBirdBgLoopPlay = true;
                 const isGuitar = (mode === 'guitar');
                 const activeAudio = isGuitar ? birdGuitarLoopAudio : birdGameLoopAudio;
                 const otherAudio  = isGuitar ? birdGameLoopAudio : birdGuitarLoopAudio;
@@ -2859,6 +3271,7 @@
 
             const unlockBirdAudioOnGesture = (e) => {
                 if (pinkBirdCharacterGroup && e && pinkBirdCharacterGroup.contains(e.target)) return;
+                if (currentBirdActivity === 'sleeping') return;
                 const activeAudio = (currentBirdActivity === 'guitar') ? birdGuitarLoopAudio : birdGameLoopAudio;
                 if (shouldBirdBgLoopPlay && activeAudio && activeAudio.paused) {
                     startActiveBirdIdleLoop(currentBirdActivity, false);
@@ -3004,15 +3417,101 @@
                 } else {
                     pinkBirdCharacterGroup.appendChild(guitarLayer);
                 }
+
+                // 一併掛載「鳥-32.svg」打瞌睡與嚇醒跌落圖層
+                if (!document.getElementById('pinkBirdSleepLayer')) {
+                    const sleepLayer = document.createElementNS(svgNs, 'g');
+                    sleepLayer.setAttribute('id', 'pinkBirdSleepLayer');
+                    sleepLayer.innerHTML = `
+                        <g id="pinkBirdSleepAlignGroup">
+                            <g id="sleepBirdMover">
+                                <!-- 粉紅小鳥身體主輪廓 -->
+                                <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                      d="M227.3,140.3c2.6-7.7,4-15.8,4-24.3c0-15.9-5-31.5-14.1-44.4c-4.6-6.5-10.2-12.2-16.5-17c-6.2-4.7-12.3-9.1-20.1-10.8c-0.9-0.2-2.7-0.3-2.6-1.6c0.1-1.1,0.9-2.2,1-3.4c0.1-1.2,0-2.4-0.4-3.6c-0.6-1.7-1.9-3.2-3.4-4.1c-1.8-1-3.4,0-5.2,0.1c-0.5-2-1.1-3.7-2.6-5.2c-1.4-1.4-3.5-2.2-5.4-1.9c-2,0.3-3.8,1.7-4.3,3.6c-1.2-1.8-1.8-3.9-3-5.7c-1.1-1.8-2.5-3.4-4-4.9c-3.4-3.3-7.2-4.4-11.8-4.7c-2.9-0.2-5.9-0.1-8.7,1c-5,1.9-8.7,6.6-9.3,11.9c-0.6,5.3,2,10.8,6.4,13.7c0.8,0.6,1.7,1,2.4,1.8c0.7,0.8,1,1.9,0.6,2.8c-3,0.5-6.1,1.7-8.8,3c-6.3,3-12.1,6.8-17.3,11.4c-16.7,14.5-26.4,35.9-26.4,58c0,8.5,1.4,16.7,4,24.3c-29.7,6.8-52,33.5-52,65.1c0,36.7,30.1,66.8,66.8,66.8h116.3c36.8,0,66.8-30.1,66.8-66.8C279.4,173.7,257,147,227.3,140.3z"/>
+
+                                <!-- 雙腳（位於身體前方） -->
+                                <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
+                                      d="M131,320.9L131,320.9c-7.2-1.3-12-8.1-10.7-15.3l7.1-40.2c1.3-7.2,8.1-12,15.3-10.7l0,0c7.2,1.3,12,8.1,10.7,15.3l-7.1,40.2C145,317.3,138.1,322.1,131,320.9z"/>
+                                <path fill="#FF99D3" stroke="#2A348C" stroke-miterlimit="10"
+                                      d="M177.8,320.9L177.8,320.9c-7.2,1.3-14-3.6-15.3-10.7l-7.1-40.2c-1.3-7.2,3.6-14,10.7-15.3h0c7.2-1.3,14,3.6,15.3,10.7l7.1,40.2C189.8,312.7,185,319.6,177.8,320.9z"/>
+
+                                <!-- 頭頂捲毛 -->
+                                <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                      d="M130.1,42.9c-4.2,3.4-6,9.4-4.4,14.6c0.7,2.2,1.9,4.1,3.6,5.7c2.4,2.2,5.5,3.5,8.8,3.6c3.2,0.1,6.5-1.1,8.9-3.2c2-1.7,3.5-4,3.9-6.6c0.4-2.6-0.4-5.4-2.3-7.1c-0.9-0.9-2.1-1.5-3.4-1.5c-1.3,0-2.5,0.8-2.9,2s0.4,2.7,1.6,2.9"/>
+
+                                <!-- 托腮右手（自然遮蓋右側脖子凹角，位於眼鏡框下層） -->
+                                <g id="sleepBirdCheekHandFlail">
+                                    <g transform="translate(26.5, -43.8)">
+                                        <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                              d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
+                                    </g>
+                                </g>
+
+                                <!-- 微向右傾的五官與圓框眼鏡（對應 鳥-32.svg 角度） -->
+                                <g transform="translate(4.8, -2.6) rotate(9.5, 154.6, 114.3)">
+                                    <!-- 打瞌睡閉眼弧線 -->
+                                    <g id="sleepBirdClosedEyes">
+                                        <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9-8.3,23.4-18.5,23.4c-7.9,0-14.6-6.2-17.3-14.9"/>
+                                        <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10" d="M154.6,117.9c0,12.9,8.3,23.4,18.5,23.4c7.9,0,14.6-6.2,17.3-14.9"/>
+                                    </g>
+
+                                    <!-- 嚇醒瞬間瞪大雙眼 -->
+                                    <g id="sleepBirdStartledEyes">
+                                        <ellipse transform="matrix(0.1562 -0.9877 0.9877 0.1562 -0.0839 233.5289)" fill="#FFF9EC" cx="136.6" cy="116.8" rx="23.7" ry="19.4"/>
+                                        <ellipse transform="matrix(0.9877 -0.1562 0.1562 0.9877 -16.1319 28.3799)" fill="#FFF9EC" cx="172.5" cy="116.8" rx="19.4" ry="23.7"/>
+                                        <ellipse fill="#2A348C" cx="141.2" cy="122.5" rx="5.8" ry="7.2"/>
+                                        <ellipse fill="#2A348C" cx="167.8" cy="122.5" rx="5.8" ry="7.2"/>
+                                    </g>
+
+                                    <!-- 黃色鳥喙（打瞌睡平靜嘴線 vs 嚇醒張嘴） -->
+                                    <circle fill="#F3EF84" cx="154.6" cy="152.5" r="9.8"/>
+                                    <path id="sleepBirdCalmMouth" fill="none" stroke="#2A348C" stroke-linecap="round" stroke-miterlimit="10"
+                                          d="M166.4,151.6c0,1.6-5.4,2.8-12,2.8c-6.6,0-12-1.2-12-2.8"/>
+                                    <ellipse id="sleepBirdShockMouth" cx="154.6" cy="153.6" rx="5.2" ry="6.8"
+                                             fill="#F26559" stroke="#2A348C" stroke-width="1.3"/>
+
+                                    <!-- 圓框眼鏡與鏡腳 -->
+                                    <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="125.2" cy="114.3" rx="29.4" ry="30.8"/>
+                                    <ellipse fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" cx="184.1" cy="114.3" rx="29.4" ry="30.8"/>
+                                    <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M95.4,112.8H85c-0.8,1.2-1.4,2.8-1,4.1c0.4,1.2,1.7,2,2.9,1.7"/>
+                                    <path fill="none" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M213.4,112.8h10.4c0.8,1.2,1.4,2.8,1,4.1c-0.4,1.2-1.7,2-2.9,1.7"/>
+                                </g>
+
+                                <!-- 垂放在左腿前方的左手 -->
+                                <g id="sleepBirdLapHandFlail">
+                                    <g transform="translate(106.2, 256.5) rotate(192) translate(-214.8, -196)">
+                                        <path fill="#FF99D3" stroke="#2A348C" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+                                              d="M214.8,196c0.9-3.6,0.4-7.5-1.3-10.8c-1.5-2.9-4-5.4-7.2-6.3s-6.9,0-8.9,2.7c-2,2.6-1.7,6.8,1,8.8c-2.1-3-6.6-4.2-9.9-2.5c-3.3,1.7-5,6-3.8,9.5c-0.4-2.8-3.6-4.6-6.4-4.1s-4.9,3-5.6,5.8c-0.7,2.8,0,5.7,1.2,8.2c1.8,3.7,4.8,6.7,8.4,8.6"/>
+                                    </g>
+                                </g>
+
+                                <!-- 嚇醒瞬間頭頂驚嚇紅線 -->
+                                <g id="sleepBirdShockTicks" stroke="#F26559" stroke-width="2.6" stroke-linecap="round">
+                                    <line x1="76" y1="62" x2="64" y2="50"/>
+                                    <line x1="154" y1="6" x2="154" y2="-9"/>
+                                    <line x1="233" y1="62" x2="245" y2="50"/>
+                                </g>
+                            </g>
+                        </g>
+                    `;
+
+                    if (transparentHitRect) {
+                        pinkBirdCharacterGroup.insertBefore(sleepLayer, transparentHitRect);
+                    } else {
+                        pinkBirdCharacterGroup.appendChild(sleepLayer);
+                    }
+                }
             }
 
-            // 以原打電動小鳥的身體主路徑為基準，精準對齊彈吉他小鳥的位置與縮放比例
+            // 以原打電動小鳥的身體主路徑為基準，精準對齊彈吉他與打瞌睡小鳥的位置與縮放比例
             function syncGuitarBirdAlignment() {
                 if (hasAlignedGuitarBird || !pinkBirdCharacterGroup) return;
                 ensureGuitarBirdMounted();
 
                 const alignGroup = document.getElementById('pinkBirdGuitarAlignGroup');
                 const guitarLayer = document.getElementById('pinkBirdGuitarLayer');
+                const sleepAlignGroup = document.getElementById('pinkBirdSleepAlignGroup');
+                const sleepLayer = document.getElementById('pinkBirdSleepLayer');
                 if (!alignGroup || !guitarLayer) return;
 
                 try {
@@ -3021,11 +3520,11 @@
                     if (hadGaming) pinkBirdCharacterGroup.classList.remove('is-gaming');
                     if (hadCaught) pinkBirdCatchBounceGroup.classList.remove('is-caught');
 
-                    // 找出原小鳥面積最大的主身體 <path>
+                    // 找出原小鳥面積最大的主身體 <path>（排除吉他與打瞌睡圖層）
                     let gamingBodyPath = null;
                     let maxArea = 0;
                     pinkBirdCharacterGroup.querySelectorAll('path').forEach((p) => {
-                        if (guitarLayer.contains(p)) return;
+                        if (guitarLayer.contains(p) || (sleepLayer && sleepLayer.contains(p))) return;
                         try {
                             const bb = p.getBBox();
                             const area = bb.width * bb.height;
@@ -3053,13 +3552,15 @@
                             const targetW = Math.abs(p1x - p0x);
                             const targetH = Math.abs(p1y - p0y);
 
-                            // 鳥-31.svg 主身體精確邊界：x=29.80, y=12.32, w=249.90, h=259.88
+                            // 鳥-31.svg / 鳥-32.svg 主身體精確邊界：x=29.80, y=12.32, w=249.90, h=259.88
                             const sx = targetW / 249.90;
                             const sy = targetH / 259.88;
                             const tx = targetX - 29.80 * sx;
                             const ty = targetY - 12.32 * sy;
 
-                            alignGroup.setAttribute('transform', `translate(${tx.toFixed(3)}, ${ty.toFixed(3)}) scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`);
+                            const alignTransform = `translate(${tx.toFixed(3)}, ${ty.toFixed(3)}) scale(${sx.toFixed(5)}, ${sy.toFixed(5)})`;
+                            alignGroup.setAttribute('transform', alignTransform);
+                            sleepAlignGroup?.setAttribute('transform', alignTransform);
                             hasAlignedGuitarBird = true;
                         }
                     }
@@ -3072,7 +3573,7 @@
             ensureGuitarBirdMounted();
 
             // ===============================================================
-            // 🎮 <-> 🎸 點擊粉紅小鳥：打電動與彈吉他雙模式交替循環反應
+            // 🎮 -> 🎸 -> 😴 點擊粉紅小鳥：打電動、彈吉他、打瞌睡三模式循環
             // ===============================================================
             pinkBirdCharacterGroup?.addEventListener('click', () => {
                 if (!isBoardInteractive || isBirdSequencePlaying) return;
@@ -3123,8 +3624,8 @@
                         });
                     }, 580);
 
-                } else {
-                    // 【階段 B：目前在彈吉他】-> 琴弦斷掉＋驚訝表情 -> 關門 -> 開門變回打電動
+                } else if (currentBirdActivity === 'guitar') {
+                    // 【階段 B：目前在彈吉他】-> 琴弦斷掉＋驚訝表情 -> 關門 -> 開門變成打瞌睡
                     stopBirdGameLoop();
                     playBoardSfx(stringBrokeAudio, STRING_BROKE_VOLUME);
                     pinkBirdCharacterGroup.classList.remove('is-strumming');
@@ -3142,9 +3643,48 @@
                                 middleDoorSlamShakeGroup.classList.add('is-slam-shaking');
                             }
 
-                            // 關門期間收起斷弦吉他，換回遊戲機待機姿勢
+                            // 關門期間收起斷弦吉他，切換為托腮打瞌睡姿勢 (鳥-32)
                             setTimeout(() => {
                                 pinkBirdCharacterGroup.classList.remove('is-string-broke', 'is-strumming', 'is-guitar-mode');
+                                currentBirdActivity = 'sleeping';
+                                pinkBirdCharacterGroup.classList.add('is-sleep-mode', 'is-dozing');
+                            }, 420);
+
+                            // 廁門緩緩重新打開：小鳥正在安靜托腮打瞌睡
+                            setTimeout(() => {
+                                middleDoorSlamShakeGroup?.classList.remove('is-slam-shaking');
+                                startActiveBirdIdleLoop('sleeping', true);
+                                const slowCreakEase = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
+                                animateMiddleDoor(1, 0, 1450, slowCreakEase, () => {
+                                    pinkBirdCharacterGroup.classList.remove('is-busy');
+                                    isBirdSequencePlaying = false;
+                                });
+                            }, 900);
+                        });
+                    }, 620);
+
+                } else {
+                    // 【階段 C：目前在打瞌睡】-> 嚇醒跌下馬桶 -> 關門 -> 開門變回打電動
+                    stopBirdGameLoop();
+                    playBoardSfx(birdAngryAudio, BIRD_ANGRY_VOLUME);
+                    pinkBirdCharacterGroup.classList.remove('is-dozing');
+                    pinkBirdCharacterGroup.classList.add('is-busy', 'is-falling-off');
+
+                    // 停留 720ms 完整呈現嚇醒跳起與滑落跌下馬桶動畫，接著關門
+                    setTimeout(() => {
+                        const slamEase = (t) => 0.35 * t * t + 0.65 * t * t * t;
+                        animateMiddleDoor(0, 1, 250, slamEase, () => {
+                            playBoardSfx(doorSlamAudio, DOOR_SLAM_VOLUME);
+
+                            if (middleDoorSlamShakeGroup) {
+                                middleDoorSlamShakeGroup.classList.remove('is-slam-shaking');
+                                void middleDoorSlamShakeGroup.getBoundingClientRect();
+                                middleDoorSlamShakeGroup.classList.add('is-slam-shaking');
+                            }
+
+                            // 關門期間爬回馬桶上，換回打電動待機姿勢
+                            setTimeout(() => {
+                                pinkBirdCharacterGroup.classList.remove('is-falling-off', 'is-dozing', 'is-sleep-mode');
                                 if (birdConsoleMotionGroup) {
                                     birdConsoleMotionGroup.style.transform = '';
                                 }
@@ -3152,7 +3692,7 @@
                                 pinkBirdCharacterGroup.classList.add('is-gaming');
                             }, 420);
 
-                            // 廁門緩緩重新打開：伴隨 sfx/game.mp3 漸強循環，恢復打電動
+                            // 廁門緩緩重新打開：伴隨 sfx/game.mp3 漸強循環，又在玩電動
                             setTimeout(() => {
                                 middleDoorSlamShakeGroup?.classList.remove('is-slam-shaking');
                                 startBirdGameLoop(true);
@@ -3163,7 +3703,7 @@
                                 });
                             }, 900);
                         });
-                    }, 620);
+                    }, 720);
                 }
             });
 
@@ -3993,10 +4533,10 @@
                          class="board-chat-capsule relative min-h-[54px] sm:min-h-[64px] w-[240px] sm:w-[410px] lg:w-[468px] px-6 sm:px-9 py-3 sm:py-3.5 flex items-center justify-center text-center shrink-0">
                         <svg class="absolute inset-0 w-full h-full overflow-visible pointer-events-none" aria-hidden="true">
                             <path class="board-bubble-unified-path"
-                                  fill="#FFFFFF" stroke="#273491" stroke-width="2"
+                                  fill="#FFFFFF" stroke="#2A348C" stroke-width="2"
                                   stroke-linejoin="round" stroke-linecap="round" />
                         </svg>
-                        <span class="relative z-10 text-[#273491] text-[13.5px] sm:text-[17.5px] font-extrabold tracking-[0.12em] leading-relaxed break-words">
+                        <span class="relative z-10 text-[#2A348C] text-[13.5px] sm:text-[17.5px] font-extrabold tracking-[0.12em] leading-relaxed break-words">
                             ${safeText}
                         </span>
                     </div>
@@ -4004,7 +4544,7 @@
 
                 // 左邊對話框：時間在膠囊右側下方與膠囊切齊；右邊對話框：時間在膠囊左邊與膠囊切齊
                 const timeHtml = safeTime
-                    ? `<span class="text-[#273491] text-[12px] sm:text-[16px] font-black tracking-[0.14em] leading-none whitespace-nowrap pb-[2px] select-none shrink-0 ${side === 'left' ? 'ml-2.5 sm:ml-3.5' : 'mr-2.5 sm:mr-3.5'}">${safeTime}</span>`
+                    ? `<span class="text-[#2A348C] text-[12px] sm:text-[16px] font-black tracking-[0.14em] leading-none whitespace-nowrap pb-[2px] select-none shrink-0 ${side === 'left' ? 'ml-2.5 sm:ml-3.5' : 'mr-2.5 sm:mr-3.5'}">${safeTime}</span>`
                     : '';
 
                 row.innerHTML = (side === 'left')
@@ -4104,7 +4644,7 @@
                 if (comments.length === 0) {
                     mbChatStreamStage.innerHTML = `
                         <div class="mb-empty-chat-hint w-full h-full flex items-center justify-center px-6 pb-10">
-                            <div class="bg-white/85 border-[2px] border-[#273491]/55 rounded-full px-8 py-4 text-[#273491]/75 text-sm sm:text-base font-extrabold tracking-[0.14em] text-center">
+                            <div class="bg-white/85 border-[2px] border-[#2A348C]/55 rounded-full px-8 py-4 text-[#2A348C]/75 text-sm sm:text-base font-extrabold tracking-[0.14em] text-center">
                                 目前這間公廁還沒有文字留言～
                             </div>
                         </div>
@@ -4419,7 +4959,7 @@
 
                 if (matched.length === 0) {
                     boardToiletDropdownPanel.innerHTML = `
-                        <div class="px-5 py-6 text-center text-[#273491]/70 text-sm font-bold tracking-wider">
+                        <div class="px-5 py-6 text-center text-[#2A348C]/70 text-sm font-bold tracking-wider">
                             找不到符合篩選或相關名稱的公廁
                         </div>
                     `;
@@ -4437,18 +4977,18 @@
 
                     return `
                         <div data-pick-key="${escapeHtmlBoard(t.key)}"
-                             class="board-dropdown-item px-4 sm:px-6 py-3 border-b border-[#273491]/15 last:border-b-0 ${isCurrent ? 'bg-[#F3EF84]/55' : 'hover:bg-[#55E7FF]/25'} flex items-center justify-between gap-3 transition-colors">
+                             class="board-dropdown-item px-4 sm:px-6 py-3 border-b border-[#2A348C]/15 last:border-b-0 ${isCurrent ? 'bg-[#F3EF84]/55' : 'hover:bg-[#80E4FF]/25'} flex items-center justify-between gap-3 transition-colors">
                             <div class="min-w-0 flex-1">
-                                <div class="text-[#273491] text-sm sm:text-[16px] font-black tracking-wide break-words">
+                                <div class="text-[#2A348C] text-sm sm:text-[16px] font-black tracking-wide break-words">
                                     ${escapeHtmlBoard(t.name)}
                                 </div>
-                                <div class="text-[#273491]/70 text-xs font-bold mt-0.5 break-words">
+                                <div class="text-[#2A348C]/70 text-xs font-bold mt-0.5 break-words">
                                     ${escapeHtmlBoard(t.normalizedType || '公廁')} · ${escapeHtmlBoard(t.address || '')}
                                 </div>
                             </div>
                             <div class="shrink-0 flex flex-col items-end gap-1 text-right">
-                                ${distBadge ? `<span class="px-2.5 py-0.5 rounded-full bg-[#55E7FF] text-[#273491] text-[11px] font-black">${escapeHtmlBoard(distBadge)}</span>` : ''}
-                                ${starBadge ? `<span class="text-[#273491] text-[11px] font-extrabold">${escapeHtmlBoard(starBadge)}</span>` : ''}
+                                ${distBadge ? `<span class="px-2.5 py-0.5 rounded-full bg-[#80E4FF] text-[#2A348C] text-[11px] font-black">${escapeHtmlBoard(distBadge)}</span>` : ''}
+                                ${starBadge ? `<span class="text-[#2A348C] text-[11px] font-extrabold">${escapeHtmlBoard(starBadge)}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -4941,8 +5481,8 @@
                 const relTime = formatMonsterRelativeTime(mItem.latestTimeMs);
                 const isRed = Boolean(relTime.isWithin10Mins ?? relTime.isRecentMinutes);
                 const includeNameRed = (typeof MONSTER_RED_INCLUDE_NAME !== 'undefined') ? MONSTER_RED_INCLUDE_NAME : true;
-                const nameColorClass = (isRed && includeNameRed) ? 'text-[#F26559]' : 'text-[#273491]';
-                const timeColorClass = isRed ? 'text-[#F26559]' : 'text-[#273491]';
+                const nameColorClass = (isRed && includeNameRed) ? 'text-[#F26559]' : 'text-[#2A348C]';
+                const timeColorClass = isRed ? 'text-[#F26559]' : 'text-[#2A348C]';
 
                 const cacheKey = `${mItem.folder}/${mItem.id}`;
                 const cachedUrl = monsterResolvedUrlCache.get(cacheKey) || '';
@@ -5012,7 +5552,7 @@
                     if (!mkStrollStage.querySelector('.mk-empty-hint')) {
                         mkStrollStage.innerHTML = `
                             <div class="mk-empty-hint w-full h-full flex items-center justify-center px-6 pt-28">
-                                <div class="bg-white/85 border-[2px] border-[#273491]/55 rounded-full px-8 py-4 text-[#273491]/75 text-sm sm:text-base font-extrabold tracking-[0.14em] text-center">
+                                <div class="bg-white/85 border-[2px] border-[#2A348C]/55 rounded-full px-8 py-4 text-[#2A348C]/75 text-sm sm:text-base font-extrabold tracking-[0.14em] text-center">
                                     過去 24 小時內這間公廁還沒有出現小怪～
                                 </div>
                             </div>
@@ -5100,12 +5640,12 @@
 
                 if (nameEl) {
                     nameEl.classList.toggle('text-[#F26559]', nameIsRed);
-                    nameEl.classList.toggle('text-[#273491]', !nameIsRed);
+                    nameEl.classList.toggle('text-[#2A348C]', !nameIsRed);
                 }
                 if (timeEl) {
                     timeEl.textContent = rel.label;
                     timeEl.classList.toggle('text-[#F26559]', isRed);
-                    timeEl.classList.toggle('text-[#273491]', !isRed);
+                    timeEl.classList.toggle('text-[#2A348C]', !isRed);
                 }
             }
 

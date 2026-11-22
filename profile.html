@@ -19,12 +19,12 @@
 
     <style>
         :root {
-            --poogle-cream: #FCF5E5;
-            --poogle-navy: #1E2470;
-            --poogle-cyan: #3FE0FF;
-            --poogle-pink: #FF78CB;
-            --poogle-yellow: #F7EC65;
-            --poogle-coral: #FF5A52;
+            --poogle-cream: #FFF9EC;
+            --poogle-navy: #2A348C;
+            --poogle-cyan: #80E4FF;
+            --poogle-pink: #FF99D3;
+            --poogle-yellow: #F3EF84;
+            --poogle-coral: #F26559;
         }
 
         @font-face {
@@ -60,8 +60,8 @@
             pointer-events: none;
             background-color: #D2F7EC;
             background-image:
-                linear-gradient(to right, #FCF5E5 9px, transparent 9px),
-                linear-gradient(to bottom, #FCF5E5 9px, transparent 9px);
+                linear-gradient(to right, #FFF9EC 9px, transparent 9px),
+                linear-gradient(to bottom, #FFF9EC 9px, transparent 9px);
             background-size: 156px 156px;
             will-change: transform;
             /* 10s 控制移動速度（秒數調大更慢、調小更快） */
@@ -83,8 +83,8 @@
             body::before {
                 inset: -104px;
                 background-image:
-                    linear-gradient(to right, #FCF5E5 6px, transparent 6px),
-                    linear-gradient(to bottom, #FCF5E5 6px, transparent 6px);
+                    linear-gradient(to right, #FFF9EC 6px, transparent 6px),
+                    linear-gradient(to bottom, #FFF9EC 6px, transparent 6px);
                 background-size: 104px 104px;
                 animation-name: menuGridDriftMobile;
             }
@@ -149,7 +149,7 @@
             background: transparent;
         }
         .receipt-scroll::-webkit-scrollbar-thumb {
-            background: #3FE0FF;
+            background: #80E4FF;
             border-radius: 9999px;
         }
 
@@ -263,7 +263,7 @@
             transform: translateX(3px);
         }
         .profile-tp-menu-item:hover text {
-            fill: #EE5A5A;
+            fill: #F26559;
         }
         /* ========================================================= */
         /* 自訂游標設定 (Default: img/mouse / Hover: img/hover)       */
@@ -321,7 +321,7 @@
 
         /* 稱號 Popup：卡片上下圓點虛線與 lv. 藍底深藍描邊字 */
         .title-card-dots {
-            background-image: radial-gradient(circle, #1E2470 2px, transparent 2.3px);
+            background-image: radial-gradient(circle, #2A348C 2px, transparent 2.3px);
             background-size: 11px 6px;
             background-repeat: repeat-x;
             background-position: center;
@@ -329,8 +329,8 @@
             width: 100%;
         }
         .title-lv-outlined {
-            color: #3FE0FF;
-            -webkit-text-stroke: 3.2px #1E2470;
+            color: #80E4FF;
+            -webkit-text-stroke: 3.2px #2A348C;
             paint-order: stroke fill;
             font-weight: 900;
             letter-spacing: 0.04em;
@@ -462,8 +462,8 @@
             transform: skewX(-6deg);
         }
         .wa-style-7::before {
-            color: #1E2470;
-            -webkit-text-stroke: 2.2px #1E2470;
+            color: #2A348C;
+            -webkit-text-stroke: 2.2px #2A348C;
             text-shadow: 4px 4px 0 #9AA5B8;
         }
         .wa-style-7::after {
@@ -478,9 +478,9 @@
             transform: skewX(-10deg);
         }
         .wa-style-8::before {
-            color: #1E2470;
-            -webkit-text-stroke: 3.2px #1E2470;
-            text-shadow: 3px 3px 0 #9DA7B8, 4px 4px 0 #1E2470;
+            color: #2A348C;
+            -webkit-text-stroke: 3.2px #2A348C;
+            text-shadow: 3px 3px 0 #9DA7B8, 4px 4px 0 #2A348C;
         }
         .wa-style-8::after {
             color: #FFFFFF;
@@ -521,8 +521,8 @@
     <!-- =================================================================== -->
     <header class="hidden md:block w-full relative z-50 mb-8 lg:mb-10">
         <!-- 粉紅導覽列 -->
-        <nav class="w-full h-[48px] bg-[#FF85D0] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-7 xl:gap-10 text-[#1E2470] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+        <nav class="w-full h-[48px] bg-[#FF99D3] flex items-center justify-end pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-7 xl:gap-10 text-[#2A348C] text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
                 <a href="./index.html" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="./index.html?openReport=1" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" class="hover:opacity-70 transition-opacity">公廁地圖</a>
@@ -549,9 +549,9 @@
     <!-- =================================================================== -->
     <!-- 手機版頂部列：左上角「功德點數:__」+ 右上角漢堡選單 (電腦版隱藏)    -->
     <!-- =================================================================== -->
-    <div class="w-full flex md:hidden items-center justify-between px-[7.4%] pt-[28px] pb-2 relative z-50">
+    <div class="w-full flex md:hidden items-start justify-between px-5 pt-[26px] pb-2 relative z-[45]">
         <!-- 左上角：功德點數 + 已回報次數 -->
-        <div class="text-[#1E2470] flex flex-col items-start leading-tight">
+        <div class="text-[#2A348C] flex flex-col items-start leading-tight">
             <div class="flex items-baseline gap-1.5">
                 <span class="text-[18px] sm:text-[20px] font-medium tracking-wider">功德點數:</span>
                 <span id="mobileMeritPointsCount" class="text-[24px] sm:text-[27px] font-black leading-none">0</span>
@@ -565,51 +565,51 @@
         <div id="profileMobileNavContainer" class="relative flex items-center justify-end">
             <button id="profileMobileHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
                     class="flex flex-col justify-center gap-[8px] p-1.5 focus:outline-none group transition-transform active:scale-95 cursor-pointer">
-                <span class="w-[38px] h-[7px] bg-[#1E2470] block transition-transform group-hover:scale-x-105"></span>
-                <span class="w-[38px] h-[7px] bg-[#1E2470] block transition-transform group-hover:scale-x-105"></span>
+                <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+                <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
             </button>
 
-            <div id="profileTpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-34px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(30,36,112,0.18)]">
-                <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+            <div id="profileTpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[-2px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+                <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                     <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
-                          fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                     <g id="profileTpMenuHomeBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="34" width="180" height="48" fill="transparent" />
-                        <text x="22" y="65" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">主頁</text>
+                        <text x="22" y="65" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">主頁</text>
                     </g>
 
                     <g id="profileTpMenuReportSystemBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="98" width="180" height="48" fill="transparent" />
-                        <text x="22" y="129" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
+                        <text x="22" y="129" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁回報系統</text>
                     </g>
 
                     <g id="profileTpMenuMapBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="162" width="180" height="48" fill="transparent" />
-                        <text x="22" y="193" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
+                        <text x="22" y="193" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁地圖</text>
                     </g>
 
                     <g id="profileTpMenuStatusBoardBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="226" width="180" height="48" fill="transparent" />
-                        <text x="22" y="257" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況板</text>
+                        <text x="22" y="257" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">公廁現況板</text>
                     </g>
 
                     <g id="profileTpMenuMonsterDexBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="290" width="180" height="48" fill="transparent" />
-                        <text x="22" y="321" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
+                        <text x="22" y="321" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">小怪圖鑑</text>
                     </g>
 
                     <g id="profileTpMenuPersonalSpaceBtn" class="profile-tp-menu-item" role="button" tabindex="0">
                         <rect x="8" y="354" width="180" height="48" fill="transparent" />
-                        <text x="22" y="385" fill="#1E2470" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
+                        <text x="22" y="385" fill="#2A348C" font-size="21.5" font-weight="900" letter-spacing="1.5">個人空間</text>
                     </g>
 
                     <path d="M 34,420 L 177,420 A 31,88 0 0,1 177,596 L 34,596 Z"
-                          fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                          fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                     <ellipse cx="34" cy="508" rx="31" ry="88"
-                             fill="#FCF5E5" stroke="#1E2470" stroke-width="2.4" />
+                             fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" />
                     <ellipse cx="31" cy="508" rx="9" ry="26"
-                             fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" />
+                             fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" />
                 </svg>
             </div>
         </div>
@@ -620,13 +620,13 @@
     <!-- =================================================================== -->
     <section class="w-full max-w-[1280px] mx-auto px-4 pt-4 sm:pt-8 lg:pt-4 flex flex-col items-center text-center clear-both">
         <!-- 使用者名稱與稱號 (用戶名稱套用隨機復古 WordArt) -->
-        <h1 class="text-2xl sm:text-[33px] font-extrabold text-[#1E2470] tracking-[0.093em] leading-snug">
+        <h1 class="text-2xl sm:text-[33px] font-extrabold text-[#2A348C] tracking-[0.093em] leading-snug">
             <span id="displayUserNameText" class="wordart-user" data-text="OOO">OOO</span>，<span id="displayUserTitleText">探廁小白</span>
         </h1>
 
         <!-- 圓形馬桶頭貼 + 右下角 Lv.1 徽章 -->
         <div class="relative mt-5 w-[172px] h-[172px] sm:w-[186px] sm:h-[186px]">
-            <div id="profileAvatarContainer" class="w-full h-full rounded-full border-[2.2px] border-[#1E2470] overflow-hidden bg-[#F7EC65] flex items-center justify-center">
+            <div id="profileAvatarContainer" class="w-full h-full rounded-full border-[2.2px] border-[#2A348C] overflow-hidden bg-[#F3EF84] flex items-center justify-center">
                 <img id="profileAvatarImg"
                      src="./img/pfp/free_toilet.png"
                      data-local-src="./img/pfp/free_toilet.png"
@@ -637,27 +637,27 @@
             </div>
 
             <!-- Lv. 深藍圓章 -->
-            <div id="displayUserLevelBadge" class="absolute bottom-1 right-0 w-[44px] h-[44px] rounded-full bg-[#1E2470] text-[#FCF5E5] flex items-center justify-center text-sm font-extrabold tracking-tight">
+            <div id="displayUserLevelBadge" class="absolute bottom-1 right-0 w-[44px] h-[44px] rounded-full bg-[#2A348C] text-[#FFF9EC] flex items-center justify-center text-sm font-extrabold tracking-tight">
                 Lv.1
             </div>
         </div>
 
         <!-- 變更頭貼 與 我的評鑑 按鈕 -->
-        <div class="mt-4 flex items-center justify-center gap-3">
+        <div class="mt-4 w-full flex flex-col md:flex-row items-center justify-center gap-3">
             <button id="openChangeAvatarModalBtn"
                     type="button"
-                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#2A348C] bg-white hover:bg-[#FFF9EC] text-[#2A348C] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
                 變更頭貼
             </button>
             <button id="openMyEvaluationsModalBtn"
                     type="button"
-                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#1E2470] bg-[#F7EC65] hover:bg-[#FCF5E5] text-[#1E2470] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
+                    class="w-[124px] h-[27px] rounded-full border-[1.8px] border-[#2A348C] bg-[#F3EF84] hover:bg-[#FFF9EC] text-[#2A348C] text-xs font-normal tracking-[0.14em] flex items-center justify-center transition-colors cursor-pointer">
                 我的評鑑
             </button>
         </div>
 
         <!-- 稱號進度提示文字 (文字變細 1 級) -->
-        <p id="levelProgressHint" class="mt-4 text-[#1E2470] font-medium tracking-[0.12em] text-sm sm:text-[16px]">
+        <p id="levelProgressHint" class="mt-4 text-[#2A348C] font-medium tracking-[0.12em] text-sm sm:text-[16px]">
             再評論<span id="reportsToNextLevelCount">4</span>間，即可獲得<span id="nextLevelTitleText" class="text-base sm:text-[21px] font-bold mx-0.5">「推門試探者」</span>稱號
         </p>
     </section>
@@ -711,20 +711,20 @@
 
                         <!-- 商店米色主牆面 (底部貼齊，無底邊框或貼底) -->
                         <path d="M 3 300 L 3 3 L 317 3 L 317 300"
-                              fill="#FCF5E5"
-                              stroke="#1E2470"
+                              fill="#FFF9EC"
+                              stroke="#2A348C"
                               stroke-width="2.2"
                               stroke-linejoin="round" />
 
                         <!-- 四格圓弧遮雨棚 (藍、粉、藍、粉) -->
                         <path d="M 3 3 H 81.5 V 112 A 39.25 39.25 0 0 1 3 112 Z"
-                              fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                              fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                         <path d="M 81.5 3 H 160 V 112 A 39.25 39.25 0 0 1 81.5 112 Z"
-                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                         <path d="M 160 3 H 238.5 V 112 A 39.25 39.25 0 0 1 160 112 Z"
-                              fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                              fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                         <path d="M 238.5 3 H 317 V 112 A 39.25 39.25 0 0 1 238.5 112 Z"
-                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
 
                         <!-- 三格白色櫥窗底色 -->
                         <rect x="36" y="186" width="82.67" height="82" fill="#FFFFFF" />
@@ -736,22 +736,22 @@
                             <g id="pinkClerkGroup" transform="translate(48.3, 198)">
                                 <g id="pinkClerkPeekInner" class="pink-clerk-peek">
                                     <!-- 無邊框粉紅色圓頭與向下延伸的梯形身體 -->
-                                    <circle cx="29" cy="27" r="21.5" fill="#FF78CB" />
-                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#FF78CB" />
+                                    <circle cx="29" cy="27" r="21.5" fill="#FF99D3" />
+                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#FF99D3" />
                                     <!-- 雙眼米白眼白 -->
-                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
-                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
+                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
                                     <!-- 深藍大眼珠 -->
                                     <g clip-path="url(#pinkClerkLeftEyeClip)">
-                                        <ellipse id="pinkClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                        <ellipse id="pinkClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                                     </g>
                                     <g clip-path="url(#pinkClerkRightEyeClip)">
-                                        <ellipse id="pinkClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                        <ellipse id="pinkClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                                     </g>
                                     <!-- 粗深藍上眼瞼弧線 -->
                                     <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
                                           fill="none"
-                                          stroke="#1E2470"
+                                          stroke="#2A348C"
                                           stroke-width="2.8"
                                           stroke-linecap="round"
                                           stroke-linejoin="round" />
@@ -762,22 +762,22 @@
                         <!-- 中間櫥窗內的藍色小店員 (對應 個人空間配件-18.svg，眼睛支援游標追蹤) -->
                         <g id="shopClerkGroup" transform="translate(131, 198)">
                             <!-- 無邊框水藍色圓頭與梯形身體 -->
-                            <circle cx="29" cy="27" r="21.5" fill="#3FE0FF" />
-                            <path d="M 13 40 L 7 69 L 51 69 L 45 40 Z" fill="#3FE0FF" />
+                            <circle cx="29" cy="27" r="21.5" fill="#80E4FF" />
+                            <path d="M 13 40 L 7 69 L 51 69 L 45 40 Z" fill="#80E4FF" />
                             <!-- 雙眼米白眼白 (相連) -->
-                            <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
-                            <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                            <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
+                            <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
                             <!-- 深藍大眼珠 (跟隨游標移動) -->
                             <g clip-path="url(#clerkLeftEyeClip)">
-                                <ellipse id="clerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                <ellipse id="clerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                             </g>
                             <g clip-path="url(#clerkRightEyeClip)">
-                                <ellipse id="clerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                <ellipse id="clerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                             </g>
                             <!-- 粗深藍上眼瞼弧線 -->
                             <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
                                   fill="none"
-                                  stroke="#1E2470"
+                                  stroke="#2A348C"
                                   stroke-width="2.8"
                                   stroke-linecap="round"
                                   stroke-linejoin="round" />
@@ -787,22 +787,22 @@
                             <g id="yellowClerkGroup" transform="translate(213.66, 198)">
                                 <g id="yellowClerkPeekInner" class="yellow-clerk-peek">
                                     <!-- 無邊框黃色圓頭與向下延伸的梯形身體 -->
-                                    <circle cx="29" cy="27" r="21.5" fill="#F7EC65" />
-                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#F7EC65" />
+                                    <circle cx="29" cy="27" r="21.5" fill="#F3EF84" />
+                                    <path d="M 13 40 L 4 82 L 54 82 L 45 40 Z" fill="#F3EF84" />
                                     <!-- 雙眼米白眼白 -->
-                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
-                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FCF5E5" />
+                                    <ellipse cx="23.2" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
+                                    <ellipse cx="34.8" cy="26.5" rx="6.6" ry="7.6" fill="#FFF9EC" />
                                     <!-- 深藍大眼珠 -->
                                     <g clip-path="url(#yellowClerkLeftEyeClip)">
-                                        <ellipse id="yellowClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                        <ellipse id="yellowClerkPupilLeft" cx="23.8" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                                     </g>
                                     <g clip-path="url(#yellowClerkRightEyeClip)">
-                                        <ellipse id="yellowClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#1E2470" />
+                                        <ellipse id="yellowClerkPupilRight" cx="34.2" cy="27" rx="4.5" ry="5.6" fill="#2A348C" />
                                     </g>
                                     <!-- 粗深藍上眼瞼弧線 -->
                                     <path d="M 16.5 26.8 A 6.8 7.5 0 0 1 29 22.2 A 6.8 7.5 0 0 1 41.5 26.8"
                                           fill="none"
-                                          stroke="#1E2470"
+                                          stroke="#2A348C"
                                           stroke-width="2.8"
                                           stroke-linecap="round"
                                           stroke-linejoin="round" />
@@ -810,21 +810,21 @@
                             </g>
                         </g>
                         <!-- 三格白色櫥窗外框線 -->
-                        <rect x="36" y="186" width="82.67" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
-                        <rect x="118.67" y="186" width="82.66" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
-                        <rect x="201.33" y="186" width="82.67" height="82" fill="none" stroke="#1E2470" stroke-width="2.2" />
+                        <rect x="36" y="186" width="82.67" height="82" fill="none" stroke="#2A348C" stroke-width="2.2" />
+                        <rect x="118.67" y="186" width="82.66" height="82" fill="none" stroke="#2A348C" stroke-width="2.2" />
+                        <rect x="201.33" y="186" width="82.67" height="82" fill="none" stroke="#2A348C" stroke-width="2.2" />
 
                         <!-- 櫥窗底部黃色凸出檯面 -->
-                        <rect x="30" y="268" width="260" height="19" fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                        <rect x="30" y="268" width="260" height="19" fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                     </svg>
 
                     <!-- 櫥窗上方的分類標題：獎品 / (空白) / 稱號 -->
                     <div class="absolute left-[11.25%] right-[11.25%] top-[53%] grid grid-cols-3 text-center z-10">
-                        <button id="prizeLabelBtn" type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                        <button id="prizeLabelBtn" type="button" class="text-[#2A348C] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
                             獎品
                         </button>
                         <span aria-hidden="true"></span>
-                        <button id="titleLabelBtn" type="button" class="text-[#1E2470] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
+                        <button id="titleLabelBtn" type="button" class="text-[#2A348C] font-extrabold text-base sm:text-[17px] tracking-widest cursor-pointer">
                             稱號
                         </button>
                     </div>
@@ -866,7 +866,7 @@
                                      L 46.14 4 L 57.28 16 L 68.42 4 L 79.57 16 L 90.71 4 L 101.85 16 L 113 4 L 124.14 16 L 135.28 4 L 146.42 16 L 157.57 4 L 168.71 16 L 179.85 4 L 191 16 L 202.14 4 L 213.28 16 L 224.42 4 L 235.57 16 L 246.71 4 L 257.85 16 L 269 4 L 280.14 16 L 291.28 4 L 302.42 16 L 313.57 4 L 324.71 16 L 335.85 4 L 347 16
                                      L 347 282 Z"
                                   fill="#FFFFFF"
-                                  stroke="#1E2470"
+                                  stroke="#2A348C"
                                   stroke-width="2.2"
                                   stroke-linejoin="round" />
                         </g>
@@ -879,20 +879,20 @@
                                      A 42 86 0 0 0 46 368
                                      L 305 368 Z"
                                   fill="#FFFFFF"
-                                  stroke="#1E2470"
+                                  stroke="#2A348C"
                                   stroke-width="2.2"
                                   stroke-linejoin="round" />
 
                             <!-- 滾筒右側米色橢圓截面 (中心 y=282 貼齊畫面下緣，呈現正半圓) -->
                             <ellipse cx="305" cy="282" rx="42" ry="86"
-                                     fill="#FCF5E5"
-                                     stroke="#1E2470"
+                                     fill="#FFF9EC"
+                                     stroke="#2A348C"
                                      stroke-width="2.2" />
 
                             <!-- 滾筒內部黃色紙軸心 (中心 y=282 貼齊畫面下緣，露出上半部軸心) -->
                             <ellipse cx="308" cy="282" rx="9" ry="18"
-                                     fill="#F7EC65"
-                                     stroke="#1E2470"
+                                     fill="#F3EF84"
+                                     stroke="#2A348C"
                                      stroke-width="2.2" />
                         </g>
                     </svg>
@@ -909,8 +909,8 @@
                                      M 38 17.5
                                      A 20.5 20.5 0 1 0 38 58.5
                                      A 20.5 20.5 0 1 0 38 17.5 Z"
-                                  fill="#3FE0FF"
-                                  stroke="#1E2470"
+                                  fill="#80E4FF"
+                                  stroke="#2A348C"
                                   stroke-width="2.4"
                                   stroke-linejoin="round" />
                         </svg>
@@ -919,7 +919,7 @@
                     <!-- 收據內容區 (隨衛生紙向下展開同步顯現) -->
                     <div class="toilet-sheet-unroll relative z-10 pl-[13%] pr-[7%] pt-6 md:pt-10 flex flex-col justify-center md:justify-start gap-2.5 h-[192px] overflow-hidden">
                         <!-- 表格標題 -->
-                        <div class="grid grid-cols-4 text-center text-[#1E2470] font-extrabold text-sm sm:text-[15px] tracking-widest px-2 shrink-0">
+                        <div class="grid grid-cols-4 text-center text-[#2A348C] font-extrabold text-sm sm:text-[15px] tracking-widest px-2 shrink-0">
                             <span>日期</span>
                             <span>獲得</span>
                             <span>扣除</span>
@@ -928,7 +928,7 @@
 
                         <!-- 動態歷史紀錄列表容器 -->
                         <div id="historyListContainer" class="flex flex-col gap-2.5 overflow-y-auto receipt-scroll pr-0.5 pb-1 max-h-[115px]">
-                            <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                            <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                                 載入紀錄中...
                             </div>
                         </div>
@@ -948,32 +948,32 @@
                                          C 8 79, 20 63, 36 57
                                          C 34 41, 44 28, 62 27
                                          C 66 25, 69 18, 72 12 Z"
-                                      fill="#FF78CB"
-                                      stroke="#1E2470"
+                                      fill="#FF99D3"
+                                      stroke="#2A348C"
                                       stroke-width="2.6"
                                       stroke-linejoin="round" />
 
                                 <!-- 米白眼白 (無邊框，微露於鏡框上方) -->
-                                <ellipse cx="56" cy="64" rx="14" ry="15" fill="#FCF5E5" />
-                                <ellipse cx="86" cy="64" rx="14" ry="15" fill="#FCF5E5" />
+                                <ellipse cx="56" cy="64" rx="14" ry="15" fill="#FFF9EC" />
+                                <ellipse cx="86" cy="64" rx="14" ry="15" fill="#FFF9EC" />
 
                                 <!-- 深藍大眼珠 -->
-                                <ellipse cx="55" cy="64" rx="9.5" ry="11.5" fill="#1E2470" />
-                                <ellipse cx="87" cy="64" rx="9.5" ry="11.5" fill="#1E2470" />
+                                <ellipse cx="55" cy="64" rx="9.5" ry="11.5" fill="#2A348C" />
+                                <ellipse cx="87" cy="64" rx="9.5" ry="11.5" fill="#2A348C" />
 
                                 <!-- 深藍圓框眼鏡與左右鏡腳 -->
                                 <ellipse cx="55" cy="67" rx="16.5" ry="12" transform="rotate(4 55 67)"
-                                         fill="none" stroke="#1E2470" stroke-width="3.2" />
+                                         fill="none" stroke="#2A348C" stroke-width="3.2" />
                                 <ellipse cx="88" cy="67" rx="16.5" ry="12" transform="rotate(-4 88 67)"
-                                         fill="none" stroke="#1E2470" stroke-width="3.2" />
-                                <line x1="42" y1="60" x2="29" y2="56" stroke="#1E2470" stroke-width="3.2" stroke-linecap="round" />
-                                <line x1="101" y1="60" x2="115" y2="56" stroke="#1E2470" stroke-width="3.2" stroke-linecap="round" />
+                                         fill="none" stroke="#2A348C" stroke-width="3.2" />
+                                <line x1="42" y1="60" x2="29" y2="56" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
+                                <line x1="101" y1="60" x2="115" y2="56" stroke="#2A348C" stroke-width="3.2" stroke-linecap="round" />
 
                                 <!-- 吐出的紅舌頭與微彎嘴型 -->
                                 <path d="M 78 83 C 77 93, 87 94, 90 85 Z"
-                                      fill="#FF5A52" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#F26559" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <path d="M 52 85 Q 72 80 92 85"
-                                      fill="none" stroke="#1E2470" stroke-width="2.4" stroke-linecap="round" />
+                                      fill="none" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" />
                             </svg>
                         </div>
                     </div>
@@ -990,17 +990,17 @@
                 </div>
 
                 <!-- 功德點數外框 (米色背景、中間垂直虛線分隔、底部貼齊下緣) -->
-                <div class="w-full h-[320px] bg-[#FCF5E5] border-t-[2.4px] border-x-[2.4px] border-[#1E2470] grid grid-cols-[1fr_auto_1fr] items-stretch pt-8 pb-6 px-3">
+                <div class="w-full h-[320px] bg-[#FFF9EC] border-t-[2.4px] border-x-[2.4px] border-[#2A348C] grid grid-cols-[1fr_auto_1fr] items-stretch pt-8 pb-6 px-3">
 
                     <!-- 左半欄：功德點數 (0快速上升動畫) + 已回報次數 -->
                     <div class="flex flex-col items-center justify-center">
-                        <div class="w-[132px] h-[132px] rounded-full bg-[#3FE0FF] flex items-center justify-center relative">
-                            <div class="flex items-baseline text-[#1E2470] leading-none">
+                        <div class="w-[132px] h-[132px] rounded-full bg-[#80E4FF] flex items-center justify-center relative">
+                            <div class="flex items-baseline text-[#2A348C] leading-none">
                                 <span id="meritPointsCount" class="text-[56px] sm:text-[64px] font-black tracking-tighter">0</span>
                                 <span class="text-base font-extrabold ml-0.5">點</span>
                             </div>
                         </div>
-                        <div class="mt-5 text-[#1E2470] text-base sm:text-[17px] font-extrabold tracking-widest">
+                        <div class="mt-5 text-[#2A348C] text-base sm:text-[17px] font-extrabold tracking-widest">
                             已回報<span id="totalReportsCount">0</span>次
                         </div>
                     </div>
@@ -1013,7 +1013,7 @@
                         <div id="nextPrizeIconContainer" class="w-[132px] h-[132px] flex items-center justify-center">
                             <!-- 由 JS 根據目前點數動態渲染最接近的獎品 SVG -->
                         </div>
-                        <div class="mt-3 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-widest leading-relaxed">
+                        <div class="mt-3 text-[#2A348C] text-sm sm:text-[16px] font-extrabold tracking-widest leading-relaxed">
                             <p id="nextPrizeDiffText">您還差5點</p>
                             <p id="nextPrizeNameText" class="mt-1">可兌換所味紙巾</p>
                         </div>
@@ -1030,9 +1030,9 @@
     <!-- =================================================================== -->
     <!-- POPUP 1: 兌換商店 - 獎品專區 -->
     <div id="prizeShopModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-modal-card relative w-full max-w-[568px] bg-[#FCF5E5] rounded-[38px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-10 pb-8 px-6 sm:px-11">
+        <div class="poogle-modal-card relative w-full max-w-[568px] bg-[#FFF9EC] rounded-[38px] sm:rounded-[48px] border-[2px] border-[#2A348C] pt-10 pb-8 px-6 sm:px-11">
             <!-- 頂部置中深藍膠囊標題 -->
-            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap">
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap">
                 兌換商店
             </div>
 
@@ -1040,14 +1040,14 @@
             <button id="closePrizeShopModalBtn"
                     type="button"
                     aria-label="關閉兌換商店"
-                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#2A348C] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
                 <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </button>
 
             <!-- 副標題：獎品專區 -->
-            <h2 class="text-center text-[#1E2470] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
+            <h2 class="text-center text-[#2A348C] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
                 獎品專區
             </h2>
 
@@ -1059,26 +1059,26 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#80E4FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 一滴香瓶身插畫 -->
                             <g transform="translate(0, -6)">
                                 <!-- 黃色長圓蓋 -->
                                 <path d="M 86 48 C 86 34 114 34 114 48 L 114 78 C 114 82 86 82 86 78 Z"
-                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 粉紅瓶身 -->
                                 <path d="M 86 74 C 74 80 66 105 66 120 C 66 138 80 144 100 144 C 120 144 134 138 134 120 C 134 105 126 80 114 74 C 106 78 94 78 86 74 Z"
-                                      fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#FF99D3" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 中央水滴圖案 -->
                                 <path d="M 100 100 C 96 108 94 113 94 117 A 6 6 0 0 0 106 117 C 106 113 104 108 100 100 Z"
-                                      fill="#2CE5B5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
+                                      fill="#45E5AC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
                             </g>
                         </svg>
                         <!-- 底部水藍點數圓章 -->
-                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#80E4FF] flex items-center justify-center text-[#2A348C] text-xs sm:text-[14px] font-extrabold tracking-tight">
                             10點
                         </div>
                     </div>
-                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                    <span class="mt-2 text-[#2A348C] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
                         一滴香
                     </span>
                 </div>
@@ -1088,23 +1088,23 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#80E4FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 所味紙巾盒插畫 -->
                             <g transform="translate(0, -4)">
                                 <!-- 水藍面紙盒 -->
-                                <rect x="50" y="72" width="100" height="54" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <rect x="50" y="72" width="100" height="54" fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 抽出的白色紙巾 -->
-                                <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 抽取口橫線 -->
-                                <line x1="58" y1="98" x2="142" y2="98" stroke="#1E2470" stroke-width="2.2" stroke-linecap="round" />
+                                <line x1="58" y1="98" x2="142" y2="98" stroke="#2A348C" stroke-width="2.2" stroke-linecap="round" />
                             </g>
                         </svg>
                         <!-- 底部水藍點數圓章 -->
-                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#80E4FF] flex items-center justify-center text-[#2A348C] text-xs sm:text-[14px] font-extrabold tracking-tight">
                             5點
                         </div>
                     </div>
-                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                    <span class="mt-2 text-[#2A348C] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
                         所味紙巾
                     </span>
                 </div>
@@ -1114,29 +1114,29 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#80E4FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 所味慕斯壓瓶插畫 -->
                             <g transform="translate(0, -4)">
                                 <!-- 黃色壓頭噴嘴 -->
                                 <path d="M 104 49 L 122 49 C 125 49 127 54 127 55 L 104 55 Z"
-                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 黃色壓頭頸部 -->
                                 <path d="M 86 50 C 86 41 110 41 110 50 L 110 68 L 86 68 Z"
-                                      fill="#F7EC65" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#F3EF84" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 粉紅瓶身 -->
                                 <path d="M 82 66 C 68 74 60 102 60 118 C 60 138 76 146 98 146 C 120 146 136 138 136 118 C 136 102 128 74 114 66 Z"
-                                      fill="#FF78CB" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                                      fill="#FF99D3" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                                 <!-- 兩顆水藍泡泡 -->
-                                <circle cx="92" cy="104" r="12" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" />
-                                <circle cx="110" cy="118" r="7.5" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.2" />
+                                <circle cx="92" cy="104" r="12" fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" />
+                                <circle cx="110" cy="118" r="7.5" fill="#80E4FF" stroke="#2A348C" stroke-width="2.2" />
                             </g>
                         </svg>
                         <!-- 底部水藍點數圓章 -->
-                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#80E4FF] flex items-center justify-center text-[#2A348C] text-xs sm:text-[14px] font-extrabold tracking-tight">
                             25點
                         </div>
                     </div>
-                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                    <span class="mt-2 text-[#2A348C] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
                         所味慕斯
                     </span>
                 </div>
@@ -1146,7 +1146,7 @@
                     <div class="relative w-[130px] h-[130px] sm:w-[158px] sm:h-[158px] flex items-center justify-center">
                         <!-- 點狀水藍外圓環 -->
                         <svg viewBox="0 0 200 200" class="w-full h-full absolute inset-0">
-                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#3FE0FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
+                            <circle cx="100" cy="94" r="82" fill="#FFFFFF" stroke="#80E4FF" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="0.5 13.5" />
                             <!-- 水藍便便問號吊飾插畫 -->
                             <g transform="translate(0, -4)">
                                 <path d="M 100 50
@@ -1158,19 +1158,19 @@
                                          C 52 99, 59 88, 72 83
                                          C 70 71, 78 62, 91 61
                                          C 94 60, 97 55, 100 50 Z"
-                                      fill="#3FE0FF"
-                                      stroke="#1E2470"
+                                      fill="#80E4FF"
+                                      stroke="#2A348C"
                                       stroke-width="2.2"
                                       stroke-linejoin="round" />
-                                <text x="100" y="119" text-anchor="middle" fill="#1E2470" font-size="52" font-weight="900">?</text>
+                                <text x="100" y="119" text-anchor="middle" fill="#2A348C" font-size="52" font-weight="900">?</text>
                             </g>
                         </svg>
                         <!-- 底部水藍點數圓章 -->
-                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#3FE0FF] flex items-center justify-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-tight">
+                        <div class="absolute bottom-0 w-[44px] h-[44px] sm:w-[49px] sm:h-[49px] rounded-full bg-[#80E4FF] flex items-center justify-center text-[#2A348C] text-xs sm:text-[14px] font-extrabold tracking-tight">
                             50點
                         </div>
                     </div>
-                    <span class="mt-2 text-[#1E2470] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
+                    <span class="mt-2 text-[#2A348C] text-sm sm:text-[16px] font-extrabold tracking-[0.14em]">
                         所味吊飾
                     </span>
                 </div>
@@ -1183,9 +1183,9 @@
     <!-- POPUP 1-2: 兌換商店 - 對應等級與稱號                                -->
     <!-- =================================================================== -->
     <div id="titleTierModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
-        <div class="poogle-modal-card relative w-full max-w-[960px] bg-[#FCF5E5] rounded-[34px] sm:rounded-[48px] border-[2px] border-[#1E2470] pt-9 sm:pt-10 pb-7 sm:pb-10 px-4 sm:px-9">
+        <div class="poogle-modal-card relative w-full max-w-[960px] bg-[#FFF9EC] rounded-[34px] sm:rounded-[48px] border-[2px] border-[#2A348C] pt-9 sm:pt-10 pb-7 sm:pb-10 px-4 sm:px-9">
             <!-- 頂部置中深藍膠囊標題 -->
-            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
                 兌換商店
             </div>
 
@@ -1193,14 +1193,14 @@
             <button id="closeTitleTierModalBtn"
                     type="button"
                     aria-label="關閉對應等級與稱號"
-                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
+                    class="absolute -top-2.5 -right-2.5 w-[45px] h-[45px] sm:w-[52px] sm:h-[52px] rounded-full bg-[#2A348C] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
                 <svg viewBox="0 0 32 32" class="w-5 h-5 sm:w-6 sm:h-6">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </button>
 
             <!-- 副標題：對應等級與稱號 -->
-            <h2 class="text-center text-[#1E2470] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-4 sm:mb-6">
+            <h2 class="text-center text-[#2A348C] text-sm sm:text-[17px] font-extrabold tracking-[0.16em] mb-4 sm:mb-6">
                 對應等級與稱號
             </h2>
 
@@ -1209,111 +1209,111 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
 
                     <!-- lv.1 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-2">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.1</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">探廁小白</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">0～3 間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">探廁小白</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">0～3 間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.2 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-1.5">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.2</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">推門試探者</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">4～7間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">推門試探者</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">4～7間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.3 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-1.5">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.3</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">初級探廁家</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">8～16間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">初級探廁家</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">8～16間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.4 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-2">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.4</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">街頭遊俠</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">17～25間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-snug">街頭遊俠</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">17～25間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.5 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-1 px-2">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.5</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">巷弄衛生<br>推手</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">26～34間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">巷弄衛生<br>推手</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">26～34間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.6 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-1.5">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.6</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">乾淨大隊長</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">35～43間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">乾淨大隊長</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">35～43間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.7 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-1">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.7</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.04em] leading-snug">文明守「味」</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">44～52 間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.04em] leading-snug">文明守「味」</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">44～52 間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.8 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-2 px-1.5">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.8</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">五星級顧問</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">53～61間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.08em] leading-snug">五星級顧問</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">53～61間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.9 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-1 px-2">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.9</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">有所味<br>首席代表</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">62～70間</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">有所味<br>首席代表</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">62～70間</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
 
                     <!-- lv.10 -->
-                    <div class="bg-white border-[1.8px] border-[#1E2470] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
+                    <div class="bg-white border-[1.8px] border-[#2A348C] h-[176px] sm:h-[196px] py-3 flex flex-col justify-between items-center text-center">
                         <div class="title-card-dots"></div>
                         <div class="flex flex-col items-center justify-center gap-1 px-2">
                             <span class="title-lv-outlined text-[24px] sm:text-[27px]">lv.10</span>
-                            <span class="text-[#1E2470] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">究極<br>所味之神</span>
-                            <span class="text-[#1E2470] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">70 間以上</span>
+                            <span class="text-[#2A348C] text-[18px] sm:text-[21px] font-black tracking-[0.1em] leading-[1.22]">究極<br>所味之神</span>
+                            <span class="text-[#2A348C] text-xs sm:text-[13px] font-extrabold tracking-widest mt-0.5">70 間以上</span>
                         </div>
                         <div class="title-card-dots"></div>
                     </div>
@@ -1326,9 +1326,9 @@
     <!-- =================================================================== -->
     <!-- POPUP 2: 變更頭貼 (縮小 1/3，點擊頭貼立即套用且不閃爍備援圖)        -->
     <!-- =================================================================== -->
-<div id="changeAvatarModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">        <div class="poogle-modal-card relative w-full max-w-[520px] bg-white rounded-[30px] sm:rounded-[38px] border-[2px] border-[#1E2470] pt-8 pb-8 px-4 sm:px-8">
+<div id="changeAvatarModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">        <div class="poogle-modal-card relative w-full max-w-[520px] bg-white rounded-[30px] sm:rounded-[38px] border-[2px] border-[#2A348C] pt-8 pb-8 px-4 sm:px-8">
             <!-- 頂部置中深藍膠囊標題 -->
-            <div class="absolute -top-[15px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[30px] px-7 flex items-center justify-center text-xs sm:text-[14px] font-extrabold tracking-[0.16em] whitespace-nowrap">
+            <div class="absolute -top-[15px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[30px] px-7 flex items-center justify-center text-xs sm:text-[14px] font-extrabold tracking-[0.16em] whitespace-nowrap">
                 變更頭貼
             </div>
 
@@ -1336,14 +1336,14 @@
             <button id="closeChangeAvatarModalBtn"
                     type="button"
                     aria-label="關閉變更頭貼"
-                    class="absolute -top-2 -right-2 w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                    class="absolute -top-2 -right-2 w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] rounded-full bg-[#2A348C] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
                 <svg viewBox="0 0 32 32" class="w-4 h-4 sm:w-5 sm:h-5">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </button>
 
             <!-- 副標題：你的頭貼 -->
-            <h2 class="text-center text-[#1E2470] text-xs sm:text-[14px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
+            <h2 class="text-center text-[#2A348C] text-xs sm:text-[14px] font-extrabold tracking-[0.16em] mb-5 sm:mb-6">
                 你的頭貼
             </h2>
 
@@ -1359,17 +1359,17 @@
     <!-- =================================================================== -->
     <div id="profileUnderConstructionModal"
          onclick="if(event.target === this) this.classList.add('hidden')"
-         class="hidden fixed inset-0 z-50 bg-[#1E2470]/45 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-modal-card bg-[#FCF5E5] rounded-[28px] max-w-sm w-full border-2 border-[#1E2470] shadow-[0_8px_0_#1E2470] px-6 py-10 relative flex flex-col items-center justify-center text-center">
+         class="hidden fixed inset-0 z-50 bg-[#2A348C]/45 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="poogle-modal-card bg-[#FFF9EC] rounded-[28px] max-w-sm w-full border-2 border-[#2A348C] shadow-[0_8px_0_#2A348C] px-6 py-10 relative flex flex-col items-center justify-center text-center">
             <button type="button"
                     aria-label="關閉"
                     onclick="document.getElementById('profileUnderConstructionModal').classList.add('hidden')"
-                    class="w-9 h-9 rounded-full bg-[#FCF5E5] hover:bg-[#F7EC65] border-[2px] border-[#1E2470] absolute top-4 right-4 flex items-center justify-center cursor-pointer">
+                    class="w-9 h-9 rounded-full bg-[#FFF9EC] hover:bg-[#F3EF84] border-[2px] border-[#2A348C] absolute top-4 right-4 flex items-center justify-center cursor-pointer">
                 <svg viewBox="0 0 24 24" class="w-4 h-4">
-                    <path d="M 6 6 L 18 18 M 18 6 L 6 18" stroke="#1E2470" stroke-width="3" stroke-linecap="round" />
+                    <path d="M 6 6 L 18 18 M 18 6 L 6 18" stroke="#2A348C" stroke-width="3" stroke-linecap="round" />
                 </svg>
             </button>
-            <div class="text-2xl sm:text-3xl font-extrabold text-[#1E2470] tracking-wider py-2">
+            <div class="text-2xl sm:text-3xl font-extrabold text-[#2A348C] tracking-wider py-2">
                 ⚠️施工中⚠️
             </div>
         </div>
@@ -1378,9 +1378,9 @@
     <!-- POPUP 4: 我的評鑑紀錄彈窗 (檢視歷史評鑑星等與刪除紀錄)              -->
     <!-- =================================================================== -->
     <div id="myEvaluationsModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-modal-card relative w-full max-w-[560px] bg-[#FCF5E5] rounded-[34px] sm:rounded-[42px] border-[2px] border-[#1E2470] pt-10 pb-7 px-4 sm:px-8">
+        <div class="poogle-modal-card relative w-full max-w-[560px] bg-[#FFF9EC] rounded-[34px] sm:rounded-[42px] border-[2px] border-[#2A348C] pt-10 pb-7 px-4 sm:px-8">
             <!-- 頂部置中深藍膠囊標題 -->
-            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#1E2470] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
+            <div class="absolute -top-[19px] left-1/2 -translate-x-1/2 bg-[#2A348C] text-white rounded-full h-[38px] px-9 flex items-center justify-center text-sm sm:text-[17px] font-extrabold tracking-[0.16em] whitespace-nowrap z-20">
                 我的評鑑
             </div>
 
@@ -1388,20 +1388,20 @@
             <button id="closeMyEvaluationsModalBtn"
                     type="button"
                     aria-label="關閉我的評鑑"
-                    class="absolute -top-2.5 -right-2.5 w-[42px] h-[42px] sm:w-[48px] sm:h-[48px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
+                    class="absolute -top-2.5 -right-2.5 w-[42px] h-[42px] sm:w-[48px] sm:h-[48px] rounded-full bg-[#2A348C] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-20">
                 <svg viewBox="0 0 32 32" class="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </button>
 
             <!-- 副標題：統計間數 -->
-            <h2 class="text-center text-[#1E2470] text-xs sm:text-[15px] font-extrabold tracking-[0.14em] mb-4">
-                共評鑑過 <span id="myEvalTotalCountText" class="text-[#FF5A52] mx-0.5">0</span> 間公廁
+            <h2 class="text-center text-[#2A348C] text-xs sm:text-[15px] font-extrabold tracking-[0.14em] mb-4">
+                共評鑑過 <span id="myEvalTotalCountText" class="text-[#F26559] mx-0.5">0</span> 間公廁
             </h2>
 
             <!-- 評鑑列表滾動區 -->
             <div id="myEvaluationsListContainer" class="max-h-[58vh] overflow-y-auto receipt-scroll space-y-3 pr-1">
-                <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                     載入評鑑紀錄中...
                 </div>
             </div>
@@ -1412,39 +1412,39 @@
     <!-- POPUP 5: 確定刪除評鑑提醒視窗                                       -->
     <!-- =================================================================== -->
     <div id="confirmDeleteEvalModal" class="hidden fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="poogle-modal-card relative w-full max-w-[420px] bg-white rounded-[32px] border-[2px] border-[#1E2470] px-6 sm:px-8 pt-10 pb-7 flex flex-col items-center text-center shadow-[0_8px_0_#1E2470]">
+        <div class="poogle-modal-card relative w-full max-w-[420px] bg-white rounded-[32px] border-[2px] border-[#2A348C] px-6 sm:px-8 pt-10 pb-7 flex flex-col items-center text-center shadow-[0_8px_0_#2A348C]">
             <!-- 右上角關閉按鈕 -->
             <button id="closeConfirmDeleteEvalBtn"
                     type="button"
                     aria-label="關閉刪除提醒"
-                    class="absolute -top-2.5 -right-2.5 w-[40px] h-[40px] rounded-full bg-[#1E2470] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+                    class="absolute -top-2.5 -right-2.5 w-[40px] h-[40px] rounded-full bg-[#2A348C] hover:bg-[#2a3394] text-white flex items-center justify-center transition-transform hover:scale-105 cursor-pointer">
                 <svg viewBox="0 0 32 32" class="w-4 h-4 pointer-events-none">
                     <path d="M 8 8 L 24 24 M 24 8 L 8 24" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
                 </svg>
             </button>
 
-            <h3 class="text-[#1E2470] text-base sm:text-[19px] font-black tracking-[0.14em]">
+            <h3 class="text-[#2A348C] text-base sm:text-[19px] font-black tracking-[0.14em]">
                 確定要刪除此筆評鑑嗎？
             </h3>
 
-            <div id="confirmDeleteEvalNameText" class="mt-2.5 px-4 py-1.5 rounded-full bg-[#FCF5E5] border-[1.6px] border-[#1E2470] text-[#1E2470] text-xs sm:text-sm font-black tracking-wider max-w-full truncate">
+            <div id="confirmDeleteEvalNameText" class="mt-2.5 px-4 py-1.5 rounded-full bg-[#FFF9EC] border-[1.6px] border-[#2A348C] text-[#2A348C] text-xs sm:text-sm font-black tracking-wider max-w-full truncate">
                 公廁名稱
             </div>
 
-            <p class="mt-3.5 text-[#1E2470]/85 text-xs sm:text-[13.5px] font-bold tracking-wider leading-relaxed">
+            <p class="mt-3.5 text-[#2A348C]/85 text-xs sm:text-[13.5px] font-bold tracking-wider leading-relaxed">
                 刪除後將同步移除地圖與現況板上的紀錄，<br>
-                且總功德點數將<span class="text-[#FF5A52] font-black mx-0.5">扣除 1 點</span>。
+                且總功德點數將<span class="text-[#F26559] font-black mx-0.5">扣除 1 點</span>。
             </p>
 
             <div class="mt-6 w-full flex items-center justify-center gap-3.5">
                 <button id="cancelDeleteEvalBtn"
                         type="button"
-                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#1E2470] bg-white hover:bg-[#FCF5E5] text-[#1E2470] text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
+                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#2A348C] bg-white hover:bg-[#FFF9EC] text-[#2A348C] text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
                     取消
                 </button>
                 <button id="confirmDeleteEvalSubmitBtn"
                         type="button"
-                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#1E2470] bg-[#FF5A52] hover:bg-[#ff746d] text-white text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
+                        class="flex-1 max-w-[140px] h-[40px] rounded-full border-[1.8px] border-[#2A348C] bg-[#F26559] hover:bg-[#ff746d] text-white text-xs sm:text-sm font-black tracking-[0.14em] flex items-center justify-center transition-transform active:scale-95 cursor-pointer">
                     確定刪除
                 </button>
             </div>
@@ -1532,9 +1532,9 @@
                 const cardLv = idx + 1;
                 if (cardLv === activeLv) {
                     card.classList.remove('bg-white');
-                    card.classList.add('bg-[#FF85D0]');
+                    card.classList.add('bg-[#FF99D3]');
                 } else {
-                    card.classList.remove('bg-[#FF85D0]');
+                    card.classList.remove('bg-[#FF99D3]');
                     card.classList.add('bg-white');
                 }
             });
@@ -1578,11 +1578,11 @@
                 return `
                     <svg viewBox="45 30 110 122" class="w-[108px] h-[108px] overflow-visible">
                         <path d="M 86 48 C 86 34 114 34 114 48 L 114 78 C 114 82 86 82 86 78 Z"
-                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                              fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <path d="M 86 74 C 74 80 66 105 66 120 C 66 138 80 144 100 144 C 120 144 134 138 134 120 C 134 105 126 80 114 74 C 106 78 94 78 86 74 Z"
-                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <path d="M 100 100 C 96 108 94 113 94 117 A 6 6 0 0 0 106 117 C 106 113 104 108 100 100 Z"
-                              fill="#2CE5B5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
+                              fill="#45E5AC" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
                     </svg>
                 `;
             }
@@ -1590,13 +1590,13 @@
                 return `
                     <svg viewBox="45 35 110 120" class="w-[108px] h-[108px] overflow-visible">
                         <path d="M 104 49 L 122 49 C 125 49 127 54 127 55 L 104 55 Z"
-                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                              fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <path d="M 86 50 C 86 41 110 41 110 50 L 110 68 L 86 68 Z"
-                              fill="#F7EC65" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
+                              fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <path d="M 82 66 C 68 74 60 102 60 118 C 60 138 76 146 98 146 C 120 146 136 138 136 118 C 136 102 128 74 114 66 Z"
-                              fill="#FF78CB" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
-                        <circle cx="92" cy="104" r="12" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" />
-                        <circle cx="110" cy="118" r="7.5" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" />
+                              fill="#FF99D3" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                        <circle cx="92" cy="104" r="12" fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" />
+                        <circle cx="110" cy="118" r="7.5" fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" />
                     </svg>
                 `;
             }
@@ -1612,20 +1612,20 @@
                                  C 52 99, 59 88, 72 83
                                  C 70 71, 78 62, 91 61
                                  C 94 60, 97 55, 100 50 Z"
-                              fill="#3FE0FF"
-                              stroke="#1E2470"
+                              fill="#80E4FF"
+                              stroke="#2A348C"
                               stroke-width="2.4"
                               stroke-linejoin="round" />
-                        <text x="100" y="119" text-anchor="middle" fill="#1E2470" font-size="52" font-weight="900">?</text>
+                        <text x="100" y="119" text-anchor="middle" fill="#2A348C" font-size="52" font-weight="900">?</text>
                     </svg>
                 `;
             }
             // 預設：所味紙巾 (5點)
             return `
                 <svg viewBox="42 48 116 92" class="w-[108px] h-[108px] overflow-visible">
-                    <rect x="50" y="72" width="100" height="54" fill="#3FE0FF" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
-                    <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#1E2470" stroke-width="2.4" stroke-linejoin="round" />
-                    <line x1="58" y1="98" x2="142" y2="98" stroke="#1E2470" stroke-width="2.4" stroke-linecap="round" />
+                    <rect x="50" y="72" width="100" height="54" fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                    <rect x="65" y="64" width="70" height="34" fill="#FFFFFF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                    <line x1="58" y1="98" x2="142" y2="98" stroke="#2A348C" stroke-width="2.4" stroke-linecap="round" />
                 </svg>
             `;
         }
@@ -1722,26 +1722,26 @@
             if (avatarKey === 'free_squat') {
                 return `
                     <svg viewBox="0 0 200 200" class="w-full h-full block">
-                        <rect width="200" height="200" fill="#FF85D0" />
-                        <path d="M 35 0 L 35 66 M 68 0 L 68 66 M 100 0 L 100 66 M 132 0 L 132 66 M 165 0 L 165 66" stroke="#1E2470" stroke-width="1.2" />
-                        <path d="M 0 33 L 200 33 M 0 66 L 200 66" stroke="#1E2470" stroke-width="1.2" />
-                        <path d="M 35 66 L -15 160 M 68 66 L 25 200 M 100 66 L 100 200 M 132 66 L 175 200 M 165 66 L 215 160" stroke="#1E2470" stroke-width="1.2" />
-                        <path d="M 0 96 L 200 96 M 0 130 L 200 130 M 0 168 L 200 168" stroke="#1E2470" stroke-width="1.2" />
+                        <rect width="200" height="200" fill="#FF99D3" />
+                        <path d="M 35 0 L 35 66 M 68 0 L 68 66 M 100 0 L 100 66 M 132 0 L 132 66 M 165 0 L 165 66" stroke="#2A348C" stroke-width="1.2" />
+                        <path d="M 0 33 L 200 33 M 0 66 L 200 66" stroke="#2A348C" stroke-width="1.2" />
+                        <path d="M 35 66 L -15 160 M 68 66 L 25 200 M 100 66 L 100 200 M 132 66 L 175 200 M 165 66 L 215 160" stroke="#2A348C" stroke-width="1.2" />
+                        <path d="M 0 96 L 200 96 M 0 130 L 200 130 M 0 168 L 200 168" stroke="#2A348C" stroke-width="1.2" />
                         <path d="M 46 146 C 46 92 72 52 100 52 C 128 52 154 92 154 146 C 154 176 132 192 100 192 C 68 192 46 176 46 146 Z"
-                              fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
                         <path d="M 64 114 C 70 74 84 58 100 58 C 116 58 130 74 136 114 Z"
-                              fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
-                        <ellipse cx="100" cy="146" rx="54" ry="44" fill="#FCF5E5" stroke="#1E2470" stroke-width="2" />
-                        <ellipse cx="87" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
-                        <ellipse cx="88" cy="145" rx="7.5" ry="10" fill="#1E2470" />
-                        <ellipse cx="113" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
-                        <ellipse cx="112" cy="145" rx="7.5" ry="10" fill="#1E2470" />
-                        <path d="M 76 156 Q 87 164 98 155 M 102 155 Q 113 164 124 156" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
-                        <path d="M 92 167 C 92 176 108 176 108 167" fill="none" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" />
+                              fill="#72E0FF" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                        <ellipse cx="100" cy="146" rx="54" ry="44" fill="#FFF9EC" stroke="#2A348C" stroke-width="2" />
+                        <ellipse cx="87" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#2A348C" stroke-width="1.6" />
+                        <ellipse cx="88" cy="145" rx="7.5" ry="10" fill="#2A348C" />
+                        <ellipse cx="113" cy="144" rx="11" ry="14" fill="#FFFFFF" stroke="#2A348C" stroke-width="1.6" />
+                        <ellipse cx="112" cy="145" rx="7.5" ry="10" fill="#2A348C" />
+                        <path d="M 76 156 Q 87 164 98 155 M 102 155 Q 113 164 124 156" fill="none" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" />
+                        <path d="M 92 167 C 92 176 108 176 108 167" fill="none" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" />
                         <path d="M 48 166 C 48 154 60 154 62 162 C 64 155 72 156 73 164 C 75 158 83 160 82 170 L 82 188 C 65 186 52 178 48 166 Z"
-                              fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                         <path d="M 152 166 C 152 154 140 154 138 162 C 136 155 128 156 127 164 C 125 158 117 160 118 170 L 118 188 C 135 186 148 178 152 166 Z"
-                              fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                     </svg>
                 `;
             }
@@ -1749,23 +1749,23 @@
                 return `
                     <svg viewBox="0 0 200 200" class="w-full h-full block">
                         <rect width="200" height="200" fill="#3CE6A8" />
-                        <path d="M 42 0 L 10 200 M 78 0 L 62 200 M 122 0 L 138 200 M 158 0 L 190 200" stroke="#1E2470" stroke-width="1.2" />
-                        <path d="M 0 38 L 200 38 M 0 76 L 200 76 M 0 114 L 200 114 M 0 152 L 200 152 M 0 184 L 200 184" stroke="#1E2470" stroke-width="1.2" />
+                        <path d="M 42 0 L 10 200 M 78 0 L 62 200 M 122 0 L 138 200 M 158 0 L 190 200" stroke="#2A348C" stroke-width="1.2" />
+                        <path d="M 0 38 L 200 38 M 0 76 L 200 76 M 0 114 L 200 114 M 0 152 L 200 152 M 0 184 L 200 184" stroke="#2A348C" stroke-width="1.2" />
                         <path d="M 60 40 C 60 22 140 22 140 40 L 132 72 C 146 76 150 84 148 102 L 134 166 C 128 186 114 192 100 192 C 86 192 72 186 66 166 L 52 102 C 50 84 54 76 68 72 Z"
-                              fill="#FCF5E5" stroke="#1E2470" stroke-width="2" stroke-linejoin="round" />
-                        <path d="M 60 40 Q 100 24 140 40" fill="none" stroke="#1E2470" stroke-width="1.8" />
-                        <rect x="89" y="37" width="22" height="6" rx="2" fill="#1E2470" />
-                        <path d="M 82 54 Q 91 50 98 56 M 102 56 Q 109 50 118 54" fill="none" stroke="#1E2470" stroke-width="1.6" stroke-linecap="round" />
-                        <ellipse cx="91" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
-                        <ellipse cx="92" cy="64" rx="5" ry="6.5" fill="#1E2470" />
-                        <ellipse cx="109" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="1.6" />
-                        <ellipse cx="108" cy="64" rx="5" ry="6.5" fill="#1E2470" />
-                        <path d="M 93 78 Q 100 76 107 78 Q 105 86 100 86 Q 95 86 93 78 Z" fill="#FF5A52" stroke="#1E2470" stroke-width="1.6" stroke-linejoin="round" />
+                              fill="#FFF9EC" stroke="#2A348C" stroke-width="2" stroke-linejoin="round" />
+                        <path d="M 60 40 Q 100 24 140 40" fill="none" stroke="#2A348C" stroke-width="1.8" />
+                        <rect x="89" y="37" width="22" height="6" rx="2" fill="#2A348C" />
+                        <path d="M 82 54 Q 91 50 98 56 M 102 56 Q 109 50 118 54" fill="none" stroke="#2A348C" stroke-width="1.6" stroke-linecap="round" />
+                        <ellipse cx="91" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#2A348C" stroke-width="1.6" />
+                        <ellipse cx="92" cy="64" rx="5" ry="6.5" fill="#2A348C" />
+                        <ellipse cx="109" cy="63" rx="7.5" ry="9" fill="#FFFFFF" stroke="#2A348C" stroke-width="1.6" />
+                        <ellipse cx="108" cy="64" rx="5" ry="6.5" fill="#2A348C" />
+                        <path d="M 93 78 Q 100 76 107 78 Q 105 86 100 86 Q 95 86 93 78 Z" fill="#F26559" stroke="#2A348C" stroke-width="1.6" stroke-linejoin="round" />
                         <path d="M 68 102 C 68 92 80 92 88 95 Q 100 99 112 95 C 120 92 132 92 132 102 L 124 156 C 120 174 110 180 100 180 C 90 180 80 174 76 156 Z"
-                              fill="#72E0FF" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
-                        <path d="M 76 150 C 82 166 91 170 100 170 C 109 170 118 166 124 150" fill="none" stroke="#1E2470" stroke-width="1.8" />
-                        <path d="M 67 120 C 74 119 75 126 68 128 C 75 128 76 135 69 137 C 76 137 76 144 69 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M 133 120 C 126 119 125 126 132 128 C 125 128 124 135 131 137 C 124 137 124 144 131 146" fill="#FCF5E5" stroke="#1E2470" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                              fill="#72E0FF" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M 76 150 C 82 166 91 170 100 170 C 109 170 118 166 124 150" fill="none" stroke="#2A348C" stroke-width="1.8" />
+                        <path d="M 67 120 C 74 119 75 126 68 128 C 75 128 76 135 69 137 C 76 137 76 144 69 146" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M 133 120 C 126 119 125 126 132 128 C 125 128 124 135 131 137 C 124 137 124 144 131 146" fill="#FFF9EC" stroke="#2A348C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 `;
             }
@@ -1774,28 +1774,28 @@
                     <defs>
                         <pattern id="yellowTilePattern" width="25" height="25" patternUnits="userSpaceOnUse">
                             <rect width="25" height="25" fill="#F7EE7F" />
-                            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
+                            <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#2A348C" stroke-width="1.2" opacity="0.75" />
                         </pattern>
                     </defs>
                     <rect width="200" height="200" fill="url(#yellowTilePattern)" />
-                    <path d="M 0 132 L 200 132 M 0 152 L 200 152 M 0 174 L 200 174" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
-                    <path d="M 45 132 L 10 200 M 75 132 L 58 200 M 125 132 L 142 200 M 155 132 L 190 200" stroke="#1E2470" stroke-width="1.2" opacity="0.75" />
-                    <ellipse cx="100" cy="54" rx="28" ry="44" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" />
-                    <circle cx="84" cy="40" r="2.5" fill="none" stroke="#1E2470" stroke-width="1.8" />
-                    <circle cx="116" cy="40" r="2.5" fill="none" stroke="#1E2470" stroke-width="1.8" />
-                    <path d="M 74 146 L 68 178 C 68 190 132 190 132 178 L 126 146 Z" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
-                    <path d="M 86 162 C 92 161 93 167 88 169 C 94 170 93 177 86 176" fill="none" stroke="#1E2470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M 114 162 C 108 161 107 167 112 169 C 106 170 107 177 114 176" fill="none" stroke="#1E2470" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M 48 96 C 48 142 72 158 100 158 C 128 158 152 142 152 96 Z" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" stroke-linejoin="round" />
-                    <ellipse cx="100" cy="95" rx="53" ry="22" fill="#FCF5E5" stroke="#1E2470" stroke-width="2.2" />
-                    <ellipse cx="100" cy="95" rx="40" ry="14" fill="#7AD9FF" stroke="#1E2470" stroke-width="2" />
-                    <ellipse cx="92" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="2" />
-                    <ellipse cx="93" cy="131" rx="4.2" ry="6" fill="#1E2470" />
+                    <path d="M 0 132 L 200 132 M 0 152 L 200 152 M 0 174 L 200 174" stroke="#2A348C" stroke-width="1.2" opacity="0.75" />
+                    <path d="M 45 132 L 10 200 M 75 132 L 58 200 M 125 132 L 142 200 M 155 132 L 190 200" stroke="#2A348C" stroke-width="1.2" opacity="0.75" />
+                    <ellipse cx="100" cy="54" rx="28" ry="44" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                    <circle cx="84" cy="40" r="2.5" fill="none" stroke="#2A348C" stroke-width="1.8" />
+                    <circle cx="116" cy="40" r="2.5" fill="none" stroke="#2A348C" stroke-width="1.8" />
+                    <path d="M 74 146 L 68 178 C 68 190 132 190 132 178 L 126 146 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
+                    <path d="M 86 162 C 92 161 93 167 88 169 C 94 170 93 177 86 176" fill="none" stroke="#2A348C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 114 162 C 108 161 107 167 112 169 C 106 170 107 177 114 176" fill="none" stroke="#2A348C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M 48 96 C 48 142 72 158 100 158 C 128 158 152 142 152 96 Z" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" stroke-linejoin="round" />
+                    <ellipse cx="100" cy="95" rx="53" ry="22" fill="#FFF9EC" stroke="#2A348C" stroke-width="2.2" />
+                    <ellipse cx="100" cy="95" rx="40" ry="14" fill="#7AD9FF" stroke="#2A348C" stroke-width="2" />
+                    <ellipse cx="92" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#2A348C" stroke-width="2" />
+                    <ellipse cx="93" cy="131" rx="4.2" ry="6" fill="#2A348C" />
                     <circle cx="91.5" cy="129" r="1.3" fill="#FFFFFF" />
-                    <ellipse cx="108" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#1E2470" stroke-width="2" />
-                    <ellipse cx="107" cy="131" rx="4.2" ry="6" fill="#1E2470" />
+                    <ellipse cx="108" cy="130" rx="6.5" ry="9" fill="#FFFFFF" stroke="#2A348C" stroke-width="2" />
+                    <ellipse cx="107" cy="131" rx="4.2" ry="6" fill="#2A348C" />
                     <circle cx="105.5" cy="129" r="1.3" fill="#FFFFFF" />
-                    <path d="M 94 143 Q 100 146 106 143 Q 104 150 100 150 Q 96 150 94 143 Z" fill="#FF5A52" stroke="#1E2470" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="M 94 143 Q 100 146 106 143 Q 104 150 100 150 Q 96 150 94 143 Z" fill="#F26559" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                 </svg>
             `;
         }
@@ -1890,7 +1890,7 @@
                         <button type="button"
                                 data-select-avatar="${avatarId}"
                                 class="w-full max-w-[144px] min-h-[134px] sm:min-h-[172px] rounded-[14px] px-1.5 sm:px-2.5 pt-2.5 sm:pt-3.5 pb-2 sm:pb-2.5 flex flex-col items-center justify-start transition-colors cursor-pointer">
-                            <div class="w-[82px] h-[82px] sm:w-[120px] sm:h-[120px] rounded-full border-[2px] border-[#1E2470] overflow-hidden shrink-0 flex items-center justify-center bg-[#FCF5E5]">
+                            <div class="w-[82px] h-[82px] sm:w-[120px] sm:h-[120px] rounded-full border-[2px] border-[#2A348C] overflow-hidden shrink-0 flex items-center justify-center bg-[#FFF9EC]">
                                 <img data-modal-pfp="${avatarId}"
                                      src="${useFallbackInSandbox ? '' : imgSrc}"
                                      alt="${avatarId}"
@@ -1899,7 +1899,7 @@
                                     ${getAvatarFallbackSvgMarkup(avatarId)}
                                 </div>
                             </div>
-                            <span data-modal-label="${avatarId}" class="mt-2 sm:mt-2.5 text-[#1E2470] text-[11px] sm:text-[13px] font-extrabold tracking-[0.12em] sm:tracking-[0.16em] whitespace-nowrap">
+                            <span data-modal-label="${avatarId}" class="mt-2 sm:mt-2.5 text-[#2A348C] text-[11px] sm:text-[13px] font-extrabold tracking-[0.12em] sm:tracking-[0.16em] whitespace-nowrap">
                                 目前頭貼
                             </span>
                         </button>
@@ -1931,15 +1931,15 @@
                 const labelEl = btn.querySelector('[data-modal-label]');
 
                 if (isCurrent) {
-                    btn.classList.add('bg-[#FCF5E5]', 'border-[1.6px]', 'border-[#1E2470]');
-                    btn.classList.remove('bg-transparent', 'border-transparent', 'hover:bg-[#FCF5E5]/55');
+                    btn.classList.add('bg-[#FFF9EC]', 'border-[1.6px]', 'border-[#2A348C]');
+                    btn.classList.remove('bg-transparent', 'border-transparent', 'hover:bg-[#FFF9EC]/55');
                     if (labelEl) {
                         labelEl.classList.remove('opacity-0', 'select-none');
                         labelEl.classList.add('opacity-100');
                     }
                 } else {
-                    btn.classList.remove('bg-[#FCF5E5]', 'border-[#1E2470]');
-                    btn.classList.add('bg-transparent', 'border-[1.6px]', 'border-transparent', 'hover:bg-[#FCF5E5]/55');
+                    btn.classList.remove('bg-[#FFF9EC]', 'border-[#2A348C]');
+                    btn.classList.add('bg-transparent', 'border-[1.6px]', 'border-transparent', 'hover:bg-[#FFF9EC]/55');
                     if (labelEl) {
                         labelEl.classList.remove('opacity-100');
                         labelEl.classList.add('opacity-0', 'select-none');
@@ -2262,7 +2262,7 @@
             if ((visibleEvals.length === 0 && visibleRedeems.length === 0 && currentPoints === 0 && totalReports === 0)
                 || (currentPoints === 0 && totalReports === 0 && profileState.profileDoc && typeof profileState.profileDoc.meritPoints === 'number')) {
                 historyContainer.innerHTML = `
-                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                         目前沒有歷史紀錄
                     </div>
                 `;
@@ -2306,7 +2306,7 @@
 
             if (dailyMap.size === 0) {
                 historyContainer.innerHTML = `
-                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                    <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                         目前沒有歷史紀錄
                     </div>
                 `;
@@ -2327,10 +2327,10 @@
                 return `
                     <div class="history-dashed-row grid grid-cols-4 items-center text-center py-2 px-2 text-sm sm:text-[16px] font-extrabold tracking-wider shrink-0"
                          title="${escapeHtml(day.dateKey)}">
-                        <span class="text-[#1E2470] font-bold">${escapeHtml(shortDate)}</span>
-                        <span class="text-[#1E2470]">${day.added}</span>
-                        <span class="text-[#FF5A52]">${day.deducted}</span>
-                        <span class="text-[#1E2470]">${day.totalAtEndOfDay}</span>
+                        <span class="text-[#2A348C] font-bold">${escapeHtml(shortDate)}</span>
+                        <span class="text-[#2A348C]">${day.added}</span>
+                        <span class="text-[#F26559]">${day.deducted}</span>
+                        <span class="text-[#2A348C]">${day.totalAtEndOfDay}</span>
                     </div>
                 `;
             }).join('');
@@ -2343,11 +2343,11 @@
             const rounded = Math.round(Number(score) || 0);
             let html = '';
             for (let i = 1; i <= 5; i++) {
-                const fill = i <= rounded ? '#F7EC65' : '#FCF5E5';
+                const fill = i <= rounded ? '#F3EF84' : '#FFF9EC';
                 html += `
                     <svg viewBox="-24 -24 48 48" class="w-[15px] h-[15px] shrink-0 overflow-visible pointer-events-none">
                         <path d="M 1.2,-19.5 C 4.2,-19.4 6.3,-10.2 8.8,-8.4 C 11.3,-6.6 20.4,-6.8 21.2,-3.9 C 22.0,-1.0 14.3,4.6 13.4,7.4 C 12.5,10.2 15.4,18.8 12.8,20.5 C 10.2,22.2 2.9,16.6 0,16.5 C -2.9,16.4 -10.6,21.7 -13.1,19.8 C -15.6,17.9 -12.2,9.6 -13.0,6.7 C -13.8,3.8 -21.3,-2.0 -20.2,-4.8 C -19.1,-7.6 -10.0,-7.0 -7.4,-8.7 C -4.8,-10.4 -1.9,-19.6 1.2,-19.5 Z"
-                              fill="${fill}" stroke="#1E2470" stroke-width="3.2" stroke-linejoin="round" />
+                              fill="${fill}" stroke="#2A348C" stroke-width="3.2" stroke-linejoin="round" />
                     </svg>
                 `;
             }
@@ -2369,7 +2369,7 @@
 
             if (!profileState.evalLoaded && sortedEvals.length === 0) {
                 listEl.innerHTML = `
-                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                         載入評鑑紀錄中...
                     </div>
                 `;
@@ -2378,7 +2378,7 @@
 
             if (sortedEvals.length === 0) {
                 listEl.innerHTML = `
-                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider text-center">
+                    <div class="history-dashed-row bg-white flex items-center justify-center py-6 px-4 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider text-center">
                         目前還沒有任何評鑑紀錄喔！
                     </div>
                 `;
@@ -2401,16 +2401,16 @@
                 const commentText = String(ev.comment || '').trim();
 
                 return `
-                    <div class="bg-white rounded-[20px] border-[1.8px] border-[#1E2470] p-3.5 sm:p-4 flex items-center justify-between gap-3">
+                    <div class="bg-white rounded-[20px] border-[1.8px] border-[#2A348C] p-3.5 sm:p-4 flex items-center justify-between gap-3">
                         <div class="min-w-0 flex-1 space-y-1.5 text-left">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[#1E2470] text-sm sm:text-[16px] font-black tracking-wide break-words">
+                                <span class="text-[#2A348C] text-sm sm:text-[16px] font-black tracking-wide break-words">
                                     ${escapeHtml(ev.name || '未命名公廁')}
                                 </span>
-                                <span class="px-2 py-0.5 rounded-full bg-[#3FE0FF]/35 border border-[#1E2470] text-[#1E2470] text-[10px] font-extrabold">
+                                <span class="px-2 py-0.5 rounded-full bg-[#80E4FF]/35 border border-[#2A348C] text-[#2A348C] text-[10px] font-extrabold">
                                     ${escapeHtml(sceneLabel)}
                                 </span>
-                                <span class="text-[#1E2470]/55 text-[11px] font-bold">
+                                <span class="text-[#2A348C]/55 text-[11px] font-bold">
                                     ${escapeHtml(dateStr)}
                                 </span>
                             </div>
@@ -2419,22 +2419,22 @@
                                 <div class="flex items-center gap-0.5">
                                     ${renderMiniStarsRowSvg(overall)}
                                 </div>
-                                <span class="ml-1 text-[#1E2470] text-xs sm:text-sm font-black">${escapeHtml(overall)} ★</span>
+                                <span class="ml-1 text-[#2A348C] text-xs sm:text-sm font-black">${escapeHtml(overall)} ★</span>
                             </div>
 
-                            <div class="text-[#1E2470]/75 text-[11px] font-bold tracking-wide flex flex-wrap gap-x-2 gap-y-0.5">
+                            <div class="text-[#2A348C]/75 text-[11px] font-bold tracking-wide flex flex-wrap gap-x-2 gap-y-0.5">
                                 <span>整潔 ${cl}★</span>
                                 <span>明亮 ${li}★</span>
                                 <span>設備 ${eq}★</span>
                                 <span>空間 ${sp}★</span>
                             </div>
 
-                            ${commentText ? `<p class="text-[#1E2470] text-xs font-bold bg-[#FCF5E5] px-2.5 py-1.5 rounded-xl border border-[#1E2470]/20 break-words">「${escapeHtml(commentText)}」</p>` : ''}
+                            ${commentText ? `<p class="text-[#2A348C] text-xs font-bold bg-[#FFF9EC] px-2.5 py-1.5 rounded-xl border border-[#2A348C]/20 break-words">「${escapeHtml(commentText)}」</p>` : ''}
                         </div>
 
                         <button type="button"
                                 data-delete-eval-id="${escapeHtml(ev.id)}"
-                                class="shrink-0 px-3.5 py-1.5 rounded-full bg-[#FF5A52] hover:bg-[#ff746d] border-[1.8px] border-[#1E2470] text-white text-xs font-extrabold tracking-wider transition-transform active:scale-95 cursor-pointer">
+                                class="shrink-0 px-3.5 py-1.5 rounded-full bg-[#F26559] hover:bg-[#ff746d] border-[1.8px] border-[#2A348C] text-white text-xs font-extrabold tracking-wider transition-transform active:scale-95 cursor-pointer">
                             刪除
                         </button>
                     </div>
@@ -2824,7 +2824,7 @@ document.getElementById('profileTpMenuMonsterDexBtn')?.addEventListener('click',
                 const historyContainer = document.getElementById('historyListContainer');
                 if (historyContainer) {
                     historyContainer.innerHTML = `
-                        <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#1E2470]/60 tracking-wider">
+                        <div class="history-dashed-row flex items-center justify-center py-2.5 px-3 text-xs sm:text-sm font-extrabold text-[#2A348C]/60 tracking-wider">
                             目前沒有歷史紀錄
                         </div>
                     `;

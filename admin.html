@@ -51,7 +51,7 @@
         :root {
             --poogle-cream: #FFF9EC;
             --poogle-yellow: #F3EF84;
-            --poogle-blue: #59E1FF;
+            --poogle-blue: #80E4FF;
             --poogle-pink: #FF99D3;
             --poogle-mint: #45E5AC;
             --poogle-coral: #F26559;
@@ -223,7 +223,7 @@
                     <span>切換帳號</span>
                 </button>
                 <a href="./map.html"
-                   class="poogle-pill-btn px-3.5 py-1.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs font-extrabold flex items-center gap-1.5 no-underline">
+                   class="poogle-pill-btn px-3.5 py-1.5 bg-[#80E4FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs font-extrabold flex items-center gap-1.5 no-underline">
                     <i class="fa-solid fa-map-location-dot"></i>
                     <span>公廁地圖</span>
                 </a>
@@ -312,13 +312,13 @@
             </div>
 
             <!-- KPI 2: 總評鑑回報 -->
-            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#59E1FF]/25 flex items-center justify-between gap-3">
+            <div class="poogle-card rounded-[22px] p-4 sm:p-5 bg-[#80E4FF]/25 flex items-center justify-between gap-3">
                 <div>
                     <div class="text-xs font-extrabold text-[#2A348C]/75">總公廁評鑑回報</div>
                     <div id="kpiTotalEvaluations" class="text-2xl sm:text-3xl font-black text-[#2A348C] mt-1">0</div>
                     <div id="kpiAvgStarsSub" class="text-[11px] font-bold text-[#2A348C]/70 mt-0.5">全站平均 0.0 ★</div>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-[#59E1FF] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
+                <div class="w-12 h-12 rounded-2xl bg-[#80E4FF] border-2 border-[#2A348C] flex items-center justify-center text-xl shrink-0">
                     <i class="fa-solid fa-star"></i>
                 </div>
             </div>
@@ -488,14 +488,14 @@
             <div class="space-y-6">
                 <div class="poogle-card rounded-[26px] p-5 sm:p-6 space-y-3.5">
                     <h2 class="text-base sm:text-lg font-black flex items-center gap-2">
-                        <i class="fa-solid fa-broom text-[#59E1FF]"></i>
+                        <i class="fa-solid fa-broom text-[#80E4FF]"></i>
                         <span>本機測試快取清理工具</span>
                     </h2>
                     <p class="text-xs font-bold text-[#2A348C]/75 leading-relaxed">
                         若您在同一台裝置反覆測試評鑑與刪除，可點擊下方按鈕一鍵清除此瀏覽器殘留的本機評鑑快取，確保評鑑頁面 100% 重新讀取雲端狀態。
                     </p>
                     <button id="clearLocalEvalCacheBtn" type="button"
-                            class="poogle-pill-btn w-full py-2.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs sm:text-sm font-black flex items-center justify-center gap-2">
+                            class="poogle-pill-btn w-full py-2.5 bg-[#80E4FF] hover:bg-[#3ad8fa] text-[#2A348C] text-xs sm:text-sm font-black flex items-center justify-center gap-2">
                         <i class="fa-solid fa-rotate"></i>
                         <span>清除本機評鑑快取 (poogle_local_evaluations_v2)</span>
                     </button>
@@ -520,7 +520,7 @@
     <!-- =================================================================== -->
     <div id="editUserPointsModal" class="hidden fixed inset-0 z-50 bg-[#2A348C]/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="poogle-card rounded-[28px] max-w-md w-full bg-[#FFF9EC] overflow-hidden shadow-[0_8px_0_#2A348C]">
-            <div class="bg-[#59E1FF] border-b-2 border-[#2A348C] px-6 py-4 flex items-center justify-between">
+            <div class="bg-[#80E4FF] border-b-2 border-[#2A348C] px-6 py-4 flex items-center justify-between">
                 <h3 class="text-base font-black text-[#2A348C]">調整會員點數與回報數</h3>
                 <button id="closeEditUserModalBtn" type="button" class="poogle-pill-btn w-8 h-8 bg-[#FFF9EC] flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
@@ -1148,7 +1148,7 @@
                            <span class="text-[11px] font-bold text-[#2A348C]/65">擺放小怪：</span>
                            ${monsterIds.map((id) => {
                                const info = MONSTER_CATALOG_MAP[id] || { name: id, kind: '小怪' };
-                               const bg = info.kind === '小妖' ? 'bg-[#FF99D3]/45' : 'bg-[#59E1FF]/40';
+                               const bg = info.kind === '小妖' ? 'bg-[#FF99D3]/45' : 'bg-[#80E4FF]/40';
                                return `<span class="px-2 py-0.5 rounded-full ${bg} border border-[#2A348C] text-[10.5px] font-black">${escapeHtml(info.name)}</span>`;
                            }).join('')}
                        </div>`
@@ -1283,7 +1283,7 @@
 
                         <div class="flex flex-wrap items-center justify-end gap-2">
                             <button type="button" data-user-edit="${escapeHtml(u.docId)}"
-                                    class="poogle-pill-btn px-3.5 py-1.5 bg-[#59E1FF] hover:bg-[#3ad8fa] text-xs font-black">
+                                    class="poogle-pill-btn px-3.5 py-1.5 bg-[#80E4FF] hover:bg-[#3ad8fa] text-xs font-black">
                                 <i class="fa-solid fa-sliders mr-1"></i>調整點數/回報數
                             </button>
                             <button type="button" data-user-reset="${escapeHtml(u.docId)}"

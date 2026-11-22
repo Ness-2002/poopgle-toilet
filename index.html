@@ -1049,8 +1049,8 @@
     <!-- 1. TOP NAVBAR + MARQUEE BAR (上方粉紅導覽列 + 下方 POOPGLE 跑馬燈) -->
     <header class="sticky top-0 w-full shrink-0 z-40 flex flex-col">
         <!-- 與 profile.html 一致的粉紅導覽列 (電腦版顯示，手機版保留右上角漢堡選單) -->
-        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#FF85D0] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#1E2470] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
+        <nav class="hidden md:flex w-full h-[40px] sm:h-[48px] bg-[#FF99D3] items-center justify-end pr-4 sm:pr-10 xl:pr-20 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-5 sm:gap-7 xl:gap-10 text-[#2A348C] text-xs sm:text-[15px] lg:text-[17px] font-normal tracking-[0.18em] whitespace-nowrap">
                 <a href="./index.html" id="desktopNavHomeBtn" class="hover:opacity-70 transition-opacity">首頁</a>
                 <a href="#" id="desktopNavReportBtn" class="hover:opacity-70 transition-opacity">公廁回報系統</a>
                 <a href="./map.html" id="desktopNavMapBtn" class="hover:opacity-70 transition-opacity">公廁地圖</a>
@@ -1129,22 +1129,22 @@
             </defs>
         </svg>
 
-        <!-- 進入公廁回報／定位時顯示的左上角 LOGO（位置與尺寸同 profile.html，附白框與深藍細線） -->
+        <!-- 進入公廁回報／定位時顯示的左上角 LOGO（手機版統一左上角位置，電腦版維持原位） -->
         <div id="reportStageTopBar" class="hidden absolute inset-x-0 top-0 pointer-events-none z-50">
-            <div class="w-full max-w-[1440px] mx-auto relative px-3 sm:px-6">
+            <div class="w-full max-w-[1440px] mx-auto relative md:px-6">
                 <button id="reportStageLogoBtn" type="button"
-                        class="pointer-events-auto lg:absolute lg:top-4 lg:left-10 inline-block mt-3 lg:mt-0 z-50 overflow-visible focus:outline-none transition-transform duration-200 hover:scale-105"
+                        class="pointer-events-auto absolute top-[22px] left-5 md:static md:inline-block md:mt-3 lg:absolute lg:top-4 lg:left-10 lg:mt-0 z-50 overflow-visible focus:outline-none transition-transform duration-200 hover:scale-105 active:scale-95"
                         title="回到有所味主頁">
-                    <img alt="有所味 Logo" class="poogle-logo-img report-logo-sticker w-[150px] sm:w-[195px] h-auto object-contain block" />
+                    <img alt="有所味 Logo" class="poogle-logo-img report-logo-sticker w-[118px] md:w-[195px] h-auto object-contain block" />
                 </button>
             </div>
         </div>
     </header>
 
     <!-- 2. TOP NAVIGATION BAR (手機版：頭貼在左上角、漢堡選單在右上角；電腦版：登入頭貼下移至跑馬燈下方) -->
-    <div id="topRightNavContainer" class="absolute md:fixed top-[34px] md:top-[86px] left-[7.4%] right-[7.4%] md:left-auto md:right-[2.8%] z-30 flex items-center justify-between md:justify-end gap-3 sm:gap-4">
+    <div id="topRightNavContainer" class="absolute md:fixed top-[26px] md:top-[86px] left-5 right-5 md:left-auto md:right-[2.8%] z-[45] flex items-start md:items-center justify-between md:justify-end gap-3 sm:gap-4 pointer-events-none">
         <!-- 登入文字與頭貼按鈕 -->
-        <button id="homeLoginBtn" type="button" class="flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
+        <button id="homeLoginBtn" type="button" class="pointer-events-auto -mt-[3px] md:mt-0 flex items-center gap-2.5 sm:gap-3.5 group focus:outline-none">
             <span id="userLoginText" class="text-base sm:text-[21px] font-bold text-[#2A348C] tracking-widest group-hover:opacity-80">登入</span>
             <span id="userAvatarCircle" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center overflow-hidden shrink-0 transition-transform group-hover:scale-105">
                 <img src="data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 104 104%22><circle cx=%2252%22 cy=%2252%22 r=%2252%22 fill=%22%232A348C%22/><path d=%22M 52,25 C 47.5,33.5 39,36.5 35.5,41 C 30.5,46 28.5,51.5 29,57.5 C 18,62.5 11.5,74.5 11.5,91.5 L 92.5,91.5 C 92.5,74.5 86,62.5 75,57.5 C 75.5,51.5 73.5,46 68.5,41 C 65,36.5 56.5,33.5 52,25 Z%22 fill=%22%23FF99D3%22/></svg>" alt="匿名訪客頭貼" class="w-full h-full object-cover block rounded-full" />
@@ -1153,14 +1153,14 @@
 
         <!-- 右上角的雙橫線漢堡選單按鈕 (=) (僅手機版顯示 md:hidden) -->
         <button id="topHamburgerBtn" type="button" aria-label="開啟選單" aria-expanded="false"
-                class="flex md:hidden flex-col justify-center gap-[8px] sm:gap-[9px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
-            <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
-            <span class="w-[38px] sm:w-[44px] h-[7px] sm:h-[8px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+                class="pointer-events-auto flex md:hidden flex-col justify-center gap-[8px] p-1.5 ml-auto focus:outline-none group transition-transform active:scale-95">
+            <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
+            <span class="w-[38px] h-[7px] bg-[#2A348C] block transition-transform group-hover:scale-x-105"></span>
         </button>
 
-        <!-- 下拉式衛生紙捲筒選單 (僅手機版點擊漢堡選單時展開，頂端無縫貼齊跑馬燈下緣並直接覆蓋漢堡選單) -->
-        <div id="tpRollDropdownMenu" style="right: calc(-6.8vw - 14px);" class="hidden md:hidden absolute top-[-18px] sm:top-[-16px] w-[180px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
-            <svg viewBox="0 0 212 608" class="w-full h-auto block overflow-visible">
+        <!-- 下拉式衛生紙捲筒選單 (統一貼齊螢幕右側與跑馬燈下緣) -->
+        <div id="tpRollDropdownMenu" class="pointer-events-auto hidden md:hidden fixed top-[14px] sm:top-[16px] right-0 w-[184px] sm:w-[200px] z-50 select-none filter drop-shadow-[0_6px_10px_rgba(42,52,140,0.18)]">
+            <svg viewBox="0 0 209.2 608" class="w-full h-auto block overflow-visible">
                 <!-- 垂直下拉的衛生紙張本體 (頂端 y=0 直接貼齊跑馬燈底部無空隙) -->
                 <path d="M 3,508 L 3,0 L 208,0 L 208,508 Z"
                       fill="#FFF9EC" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
@@ -1328,7 +1328,7 @@
                     </text>
                 </g>
 
-                <!-- 手機版選項 2：公廁現況板 (左上歪頭粉紅便便 + #FFF383 大聲公旗幟) -->
+                <!-- 手機版選項 2：公廁現況板 (左上歪頭粉紅便便 + #F3EF84 大聲公旗幟) -->
                 <g id="mobileOpenStatusBoardBtn" class="poogle-zone" role="button" aria-label="公廁現況板">
                     <!-- 新增：固定不隨動畫晃動的透明點擊感應框 -->
                     <rect x="572" y="236" width="332" height="148" rx="22" fill="transparent" />
@@ -1359,7 +1359,7 @@
                         </g>
 
                         <polygon points="689,313 899,284 885,369 689,339"
-                                 fill="#FFF383" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                                 fill="#F3EF84" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
                         <g transform="rotate(1.5, 792, 327)">
                             <text x="792" y="334" fill="#2A348C" font-size="23" font-weight="900" letter-spacing="2" text-anchor="middle">
                                 公廁現況板
@@ -1526,7 +1526,7 @@
              </clipPath>
              <g id="toiletLidWarningTape" clip-path="url(#toiletClosedLidClip)">
                  <g transform="translate(720, 517.5) rotate(8.5)">
-                     <rect x="-240" y="-22" width="480" height="44" fill="#FFF383" stroke="#2A348C" stroke-width="1.8" />
+                     <rect x="-240" y="-22" width="480" height="44" fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" />
                      <polygon points="-168,-22 -149,-22 -169,22 -188,22" fill="#2A348C" />
                      <polygon points="-120,-22 -101,-22 -121,22 -140,22" fill="#2A348C" />
                      <polygon points="121,-22 140,-22 120,22 101,22" fill="#2A348C" />
@@ -1912,7 +1912,7 @@
                             </g>
 
                             <polygon points="689,313 899,284 885,369 689,339"
-                                     fill="#FFF383" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
+                                     fill="#F3EF84" stroke="#2A348C" stroke-width="1.8" stroke-linejoin="round" />
                             <g transform="rotate(1.5, 792, 327)">
                                 <text x="792" y="334" fill="#2A348C" font-size="21" font-weight="900" letter-spacing="2" text-anchor="middle">
                                     公廁現況板
@@ -2224,7 +2224,7 @@
 
                                             <!-- 小便斗內部藍色水池 -->
                                             <path d="M -44,-118 L 44,-118 Q 68,-118 68,-94 L 68,-26 C 68,18 38,38 0,38 C -38,38 -68,18 -68,-26 L -68,-94 Q -68,-118 -44,-118 Z"
-                                                  fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                                                  fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                                             <!-- 小便斗內部下方弧線 -->
                                             <path d="M -34,30 Q 0,16 34,30"
@@ -2268,7 +2268,7 @@
 
                                             <!-- 馬桶內部藍色水池 -->
                                             <ellipse cx="0" cy="-2" rx="69" ry="18.5"
-                                                     fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" />
+                                                     fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" />
 
                                             <!-- 馬桶正面微笑表情 -->
                                             <path d="M -23,44 C -23,59 -1,59 0,44 C 1,59 23,59 23,44"
@@ -2371,16 +2371,16 @@
 
                                             <!-- 右側專屬黃色膠囊捲軸 (1:1 還原截圖比例與配色) -->
                                             <div id="nearby100mScrollbarBox"
-                                                 style="position:absolute; right:16px; top:26px; width:16px; height:148px; border-radius:9999px; background:#FFF9EC; border:2px solid #59E1FF; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:3px 0; user-select:none;">
+                                                 style="position:absolute; right:16px; top:26px; width:16px; height:148px; border-radius:9999px; background:#FFF9EC; border:2px solid #80E4FF; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:3px 0; user-select:none;">
                                                 <button id="nearby100mScrollUpBtn" type="button" aria-label="向上捲動"
-                                                        style="background:transparent; border:none; padding:0; color:#FF85D6; font-size:8px; line-height:1; cursor:pointer;">▲</button>
+                                                        style="background:transparent; border:none; padding:0; color:#FF99D3; font-size:8px; line-height:1; cursor:pointer;">▲</button>
                                                 <div id="nearby100mScrollTrack"
                                                      style="position:relative; flex:1; width:100%; margin:2px 0; display:flex; justify-content:center; cursor:pointer;">
                                                     <div id="nearby100mScrollThumb"
                                                          style="width:9px; height:56px; border-radius:9999px; background:#F3EF84; cursor:grab; transform:translateY(0px);"></div>
                                                 </div>
                                                 <button id="nearby100mScrollDownBtn" type="button" aria-label="向下捲動"
-                                                        style="background:transparent; border:none; padding:0; color:#FF85D6; font-size:8px; line-height:1; cursor:pointer;">▼</button>
+                                                        style="background:transparent; border:none; padding:0; color:#FF99D3; font-size:8px; line-height:1; cursor:pointer;">▼</button>
                                             </div>
                                         </div>
                                     </foreignObject>
@@ -2420,7 +2420,7 @@
 
                                         <!-- 馬桶內部藍色水池 -->
                                         <ellipse cx="0" cy="-2" rx="69" ry="18.5"
-                                                 fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" />
+                                                 fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" />
 
                                         <!-- 馬桶正面微笑表情 -->
                                         <path d="M -23,44 C -23,59 -1,59 0,44 C 1,59 23,59 23,44"
@@ -2456,7 +2456,7 @@
 
                                         <!-- 小便斗內部藍色水池 -->
                                         <path d="M -44,-118 L 44,-118 Q 68,-118 68,-94 L 68,-26 C 68,18 38,38 0,38 C -38,38 -68,18 -68,-26 L -68,-94 Q -68,-118 -44,-118 Z"
-                                              fill="#59E1FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
+                                              fill="#80E4FF" stroke="#2A348C" stroke-width="2.4" stroke-linejoin="round" />
 
                                         <!-- 小便斗內部下方弧線 -->
                                         <path d="M -34,30 Q 0,16 34,30"
@@ -2564,7 +2564,7 @@
                 </button>
 
                 <!-- 已登入時顯示的粉紅膠囊登出按鈕 -->
-                <button id="logoutBtn" type="button" class="hidden poogle-pill-btn w-full h-[54px] rounded-full bg-[#FF85D0] hover:bg-[#ff70c6] text-[#2A348C] font-extrabold text-sm sm:text-base tracking-widest flex items-center justify-center gap-2 transition-colors">
+                <button id="logoutBtn" type="button" class="hidden poogle-pill-btn w-full h-[54px] rounded-full bg-[#FF99D3] hover:bg-[#ff70c6] text-[#2A348C] font-extrabold text-sm sm:text-base tracking-widest flex items-center justify-center gap-2 transition-colors">
                     <span>登出帳號</span>
                 </button>
             </div>
@@ -5222,7 +5222,7 @@
                                       地址${escapeHtml(cleanAddr)}
                                   </div>
                               </div>
-                              <span style="flex-shrink:0; min-width:68px; height:34px; padding:0 12px; border-radius:9999px; background:#59E1FF; border:1.8px solid #2A348C; color:#2A348C; font-size:13.5px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
+                              <span style="flex-shrink:0; min-width:68px; height:34px; padding:0 12px; border-radius:9999px; background:#80E4FF; border:1.8px solid #2A348C; color:#2A348C; font-size:13.5px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
                                   ${escapeHtml(distText)}
                               </span>
                           </div>
@@ -5252,7 +5252,7 @@
                                       地址${escapeHtml(cleanAddr)}
                                   </div>
                               </div>
-                              <span style="flex-shrink:0; min-width:74px; height:38px; padding:0 12px; border-radius:9999px; background:#59E1FF; border:1.9px solid #2A348C; color:#2A348C; font-size:15px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
+                              <span style="flex-shrink:0; min-width:74px; height:38px; padding:0 12px; border-radius:9999px; background:#80E4FF; border:1.9px solid #2A348C; color:#2A348C; font-size:15px; font-weight:900; letter-spacing:1px; display:inline-flex; align-items:center; justify-content:center;">
                                   ${escapeHtml(distText)}
                               </span>
                           </div>
@@ -5408,8 +5408,8 @@
                         mobileReportDoorWheelSvgEl.classList.add('is-jumping-up');
                     }
                     if (reportStageTopBarEl) {
-                        reportStageTopBarEl.classList.remove('is-fading-in');
-                        reportStageTopBarEl.classList.add('md:block');
+                        reportStageTopBarEl.classList.remove('hidden', 'is-fading-in');
+                        reportStageTopBarEl.classList.add('block');
                         void reportStageTopBarEl.offsetWidth;
                         reportStageTopBarEl.classList.add('is-fading-in');
                     }
@@ -5446,7 +5446,8 @@
 
                 setTimeout(() => {
                     reportFlowStageEl?.classList.add('hidden');
-                    reportStageTopBarEl?.classList.remove('md:block', 'is-fading-in');
+                    reportStageTopBarEl?.classList.add('hidden');
+                    reportStageTopBarEl?.classList.remove('block', 'md:block', 'is-fading-in');
                     reportDoorWheelSvgEl?.classList.remove('is-sinking-out');
                     mobileReportDoorWheelSvgEl?.classList.remove('is-sinking-out');
                     resetDoorWheelToStage01();
@@ -5488,7 +5489,8 @@
                     topRightNavContainerEl?.classList.add('md:hidden');
                     openAdminPortalBtnEl?.classList.add('hidden');
                     reportFlowStageEl?.classList.remove('hidden');
-                    reportStageTopBarEl?.classList.add('md:block');
+                    reportStageTopBarEl?.classList.remove('hidden');
+                    reportStageTopBarEl?.classList.add('block');
                 }
             } catch (e) {}
 
